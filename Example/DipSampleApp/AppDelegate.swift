@@ -9,6 +9,20 @@
 import UIKit
 import Dip
 
+enum PersonFormatterTags : String {
+    case MassHeight
+    case EyesHair
+}
+
+private let _dependencies: Void = {
+    Dependency.register(instance: StarWarsWebService() as WebServiceAPI)
+    Dependency.register(instance: StarWarsJSONPersonFactory() as PersonFactoryAPI)
+    Dependency.register(instance: JSONSerializer() as SerializerAPI)
+    Dependency.register(PersonFormatterTags.MassHeight.rawValue, instance: MassHeightFormatter() as PersonFormatterAPI)
+    Dependency.register(PersonFormatterTags.EyesHair.rawValue, instance: EyesHairFormatter() as PersonFormatterAPI)
+    }()
+
+
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
@@ -17,12 +31,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         
-        registerDependencies()
-
         return true
-    }
-
-    func registerDependencies() {
-//        Dependency.register(instance: …)
     }
 }

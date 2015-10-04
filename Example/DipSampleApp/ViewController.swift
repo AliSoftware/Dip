@@ -7,19 +7,56 @@
 //
 
 import UIKit
+import Dip
+
+let kCellIdentifier = "Cell"
 
 class ViewController: UIViewController {
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+    let ws = Dependency.resolve() as WebServiceAPI
+    
+    var personList = [Person]()
+    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var displayModeSelector: UISegmentedControl!
+    
+    @IBAction func fetchPeople(sender: UIButton) {
+        sender.enabled = false
+        self.activityIndicator.startAnimating()
+        ws.fetchPeopleList { persons in
+            self.activityIndicator.stopAnimating()
+            sender.enabled = true
+            self.personList = persons ?? []
+            self.tableView.reloadData()
+        }
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    @IBAction func displayModeChanged(sender: UISegmentedControl) {
+        self.tableView.reloadData()
     }
-
-
 }
 
+
+extension ViewController : UITableViewDataSource {
+    func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.personList.count
+    }
+    
+    func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCellWithIdentifier(kCellIdentifier, forIndexPath: indexPath)
+
+        let person = personList[indexPath.row]
+        let formatter = Dependency.resolve(formatterTag) as PersonFormatterAPI
+        cell.textLabel?.text = formatter.textForPerson(person)
+        cell.detailTextLabel?.text = formatter.subtextForPerson(person)
+        
+        return cell
+    }
+    
+    var formatterTag: String {
+        switch displayModeSelector.selectedSegmentIndex {
+        case 0: return PersonFormatterTags.MassHeight.rawValue
+        default: return PersonFormatterTags.EyesHair.rawValue
+        }
+    }
+}

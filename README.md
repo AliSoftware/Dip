@@ -11,7 +11,7 @@ To run the example project, clone the repo, and run `pod install` from the Examp
 
 ## Work In Progress
 
-* [ ] Example project
+* [X] Example project
 * [ ] Tests
 * [ ] README
 * [ ] Source Documentation
