@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     @IBAction func fetchPeople(sender: UIButton) {
         sender.enabled = false
         self.activityIndicator.startAnimating()
-        ws.fetchPeopleList { persons in
+        ws.fetch { persons in
             self.activityIndicator.stopAnimating()
             sender.enabled = true
             self.personList = persons ?? []

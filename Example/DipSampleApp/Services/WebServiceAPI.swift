@@ -9,6 +9,6 @@
 import Foundation
 
 protocol WebServiceAPI {
-    func fetchPeopleList(completion: [Person]? -> Void)
-    func fetchPerson(id: Int, completion: Person? -> Void)
+    func fetch(completion: [Person]? -> Void)
+    func fetch(id: Int, completion: Person? -> Void)
 }

@@ -15,8 +15,8 @@ enum PersonFormatterTags : String {
 }
 
 private let _dependencies: Void = {
-    Dependency.register(instance: StarWarsWebService() as WebServiceAPI)
-    Dependency.register(instance: StarWarsJSONPersonFactory() as PersonFactoryAPI)
+    Dependency.register(instance: SWAPIWebService() as WebServiceAPI)
+    Dependency.register(instance: SWAPIPersonFactory() as PersonFactoryAPI)
     Dependency.register(instance: JSONSerializer() as SerializerAPI)
     Dependency.register(PersonFormatterTags.MassHeight.rawValue, instance: MassHeightFormatter() as PersonFormatterAPI)
     Dependency.register(PersonFormatterTags.EyesHair.rawValue, instance: EyesHairFormatter() as PersonFormatterAPI)

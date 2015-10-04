@@ -9,6 +9,6 @@
 import Foundation
 
 protocol PersonFactoryAPI {
-    func personListFromData(personData: NSData) throws -> [Person]
+    func peopleFromData(personData: NSData) throws -> [Person]
     func personFromData(personData: NSData) throws -> Person
 }

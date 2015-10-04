@@ -1,5 +1,5 @@
 //
-//  StarWarsJSONPersonFactory.swift
+//  SWAPIPersonFactory.swift
 //  Dip
 //
 //  Created by Olivier Halligon on 04/10/2015.
@@ -9,7 +9,7 @@
 import Foundation
 import Dip
 
-class StarWarsJSONPersonFactory : PersonFactoryAPI {
+class SWAPIPersonFactory : PersonFactoryAPI {
     typealias JSONDict = [String:AnyObject]
     enum Error : ErrorType {
         case MissingResultsEntry
@@ -18,7 +18,7 @@ class StarWarsJSONPersonFactory : PersonFactoryAPI {
     
     let serializer = Dependency.resolve() as SerializerAPI
 
-    func personListFromData(personData: NSData) throws -> [Person] {
+    func peopleFromData(personData: NSData) throws -> [Person] {
         let json = try serializer.dictionaryFromData(personData)
         if let results = json["results"] as? [JSONDict] {
             return try results.map { try personFromJSON($0) }

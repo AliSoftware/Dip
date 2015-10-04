@@ -10,10 +10,10 @@
 		097D52E81BC13B0D006C893C /* WebServiceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52E71BC13B0D006C893C /* WebServiceAPI.swift */; settings = {ASSET_TAGS = (); }; };
 		097D52EA1BC15FFF006C893C /* PersonFactoryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52E91BC15FFF006C893C /* PersonFactoryAPI.swift */; settings = {ASSET_TAGS = (); }; };
 		097D52ED1BC16091006C893C /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52EC1BC16091006C893C /* Person.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52EF1BC1611C006C893C /* StarWarsWS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52EE1BC1611C006C893C /* StarWarsWS.swift */; settings = {ASSET_TAGS = (); }; };
+		097D52EF1BC1611C006C893C /* SWAPIWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52EE1BC1611C006C893C /* SWAPIWebService.swift */; settings = {ASSET_TAGS = (); }; };
 		097D52F11BC161F7006C893C /* SerializerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F01BC161F7006C893C /* SerializerAPI.swift */; settings = {ASSET_TAGS = (); }; };
 		097D52F51BC166F3006C893C /* JSONSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F41BC166F3006C893C /* JSONSerializer.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52F71BC169C0006C893C /* StarWarsPersonFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F61BC169C0006C893C /* StarWarsPersonFactory.swift */; settings = {ASSET_TAGS = (); }; };
+		097D52F71BC169C0006C893C /* SWAPIPersonFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F61BC169C0006C893C /* SWAPIPersonFactory.swift */; settings = {ASSET_TAGS = (); }; };
 		097D52F91BC17418006C893C /* PersonFormatterAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F81BC17418006C893C /* PersonFormatterAPI.swift */; settings = {ASSET_TAGS = (); }; };
 		097D52FB1BC1745B006C893C /* MassHeightFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */; settings = {ASSET_TAGS = (); }; };
 		097D52FD1BC174B6006C893C /* EyesHairFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */; settings = {ASSET_TAGS = (); }; };
@@ -31,10 +31,10 @@
 		097D52E71BC13B0D006C893C /* WebServiceAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebServiceAPI.swift; sourceTree = "<group>"; };
 		097D52E91BC15FFF006C893C /* PersonFactoryAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonFactoryAPI.swift; sourceTree = "<group>"; };
 		097D52EC1BC16091006C893C /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
-		097D52EE1BC1611C006C893C /* StarWarsWS.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarWarsWS.swift; sourceTree = "<group>"; };
+		097D52EE1BC1611C006C893C /* SWAPIWebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIWebService.swift; sourceTree = "<group>"; };
 		097D52F01BC161F7006C893C /* SerializerAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializerAPI.swift; sourceTree = "<group>"; };
 		097D52F41BC166F3006C893C /* JSONSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONSerializer.swift; sourceTree = "<group>"; };
-		097D52F61BC169C0006C893C /* StarWarsPersonFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarWarsPersonFactory.swift; sourceTree = "<group>"; };
+		097D52F61BC169C0006C893C /* SWAPIPersonFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIPersonFactory.swift; sourceTree = "<group>"; };
 		097D52F81BC17418006C893C /* PersonFormatterAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonFormatterAPI.swift; sourceTree = "<group>"; };
 		097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MassHeightFormatter.swift; sourceTree = "<group>"; };
 		097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EyesHairFormatter.swift; sourceTree = "<group>"; };
@@ -111,8 +111,8 @@
 		097D52F31BC16271006C893C /* Implementations */ = {
 			isa = PBXGroup;
 			children = (
-				097D52EE1BC1611C006C893C /* StarWarsWS.swift */,
-				097D52F61BC169C0006C893C /* StarWarsPersonFactory.swift */,
+				097D52EE1BC1611C006C893C /* SWAPIWebService.swift */,
+				097D52F61BC169C0006C893C /* SWAPIPersonFactory.swift */,
 				097D52F41BC166F3006C893C /* JSONSerializer.swift */,
 				097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */,
 				097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */,
@@ -408,8 +408,8 @@
 				099022641BC123C000E76F43 /* ViewController.swift in Sources */,
 				097D52F51BC166F3006C893C /* JSONSerializer.swift in Sources */,
 				099022621BC123C000E76F43 /* AppDelegate.swift in Sources */,
-				097D52F71BC169C0006C893C /* StarWarsPersonFactory.swift in Sources */,
-				097D52EF1BC1611C006C893C /* StarWarsWS.swift in Sources */,
+				097D52F71BC169C0006C893C /* SWAPIPersonFactory.swift in Sources */,
+				097D52EF1BC1611C006C893C /* SWAPIWebService.swift in Sources */,
 				097D52FD1BC174B6006C893C /* EyesHairFormatter.swift in Sources */,
 				097D52FB1BC1745B006C893C /* MassHeightFormatter.swift in Sources */,
 				097D52E81BC13B0D006C893C /* WebServiceAPI.swift in Sources */,
