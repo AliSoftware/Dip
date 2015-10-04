@@ -38,6 +38,7 @@
 		097D52F81BC17418006C893C /* PersonFormatterAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonFormatterAPI.swift; sourceTree = "<group>"; };
 		097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MassHeightFormatter.swift; sourceTree = "<group>"; };
 		097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EyesHairFormatter.swift; sourceTree = "<group>"; };
+		097D52FE1BC18A09006C893C /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		0990225F1BC123C000E76F43 /* DipSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DipSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		099022611BC123C000E76F43 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		099022631BC123C000E76F43 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -186,6 +187,7 @@
 			children = (
 				FDB7C1D2EFEC1BA700762782 /* Dip.podspec */,
 				64B6CB26CB93DFD18565BB72 /* README.md */,
+				097D52FE1BC18A09006C893C /* CHANGELOG.md */,
 				9B78063878AFC700C876DEE9 /* LICENSE */,
 			);
 			name = "Podspec Metadata";
