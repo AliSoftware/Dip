@@ -5,6 +5,9 @@
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 
+![Chocolate con churros - San Ginés, Madrid](https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Chocolate_con_churros_-_San_Ginés%2C_Madrid.jpg/160px-Chocolate_con_churros_-_San_Ginés%2C_Madrid.jpg)  
+_Photo by [Matthew Hine](http://www.flickr.com/photos/75771631@N00), cc-by-2.0_
+
 ## Introduction
 
 `Dip` is a simple **Dependency Injection Container**.
@@ -18,7 +21,7 @@ It's inspired by `C#`'s [Unity Container](https://msdn.microsoft.com/library/ff6
 This allows you to define the real, concrete types only in one place (typically in your `AppDelegate` for your app, in your `setup` for your Unit Tests)
 and **then only work with `protocols` in your code** (which only define an API contract), without worrying about the real implementation.
 
-This has several advantages:
+## Advantages of DI and loose coupling
 
 * Define clear API contracts before even thinking about implementation, and make your code loosly coupled with the real implementation.
 * Easily switch between implementations — as long as they respect the same API contact (the `protocol`
