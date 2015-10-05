@@ -18,7 +18,7 @@ It's inspired by `.NET`'s [Unity Container](https://msdn.microsoft.com/library/f
 * You start by creating `let dc = DependencyContainer()` and **register all your dependencies, by associating a `protocol` to an `instance` or a `factory`**.
 * Then anywhere in your application, you can call `dc.resolve()` to **resolve a `protocol` into an instance of a concrete type** using that `DependencyContainer`.
 
-This allows you to define the real, concrete types only in one place ([typically at the top of your `AppDelegate` for your app](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/AppDelegate.swift#L17-L25), in your `setUp` for your Unit Tests) and then [only work with `protocols` in your code](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/ViewController.swift#L15) (which only define an API contract), without worrying about the real implementation.
+This allows you to define the real, concrete types only in one place ([typically at the top of your `AppDelegate` for your app](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/AppDelegate.swift#L12-L21), and [in your `setUp` for your Unit Tests](https://github.com/AliSoftware/Dip/blob/master/Example/Tests/SWAPIWebServiceTests.swift#L36-L38)) and then [only work with `protocols` in your code](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/ViewController.swift#L15) (which only define an API contract), without worrying about the real implementation.
 
 ## Advantages of DI and loose coupling
 
@@ -46,8 +46,8 @@ First, create a `DependencyContainer` and use it to register instances and facto
 * `register(factory: _)` will register an instance factory — which generates a new instance each time you `resolve()`.
 * You need **cast the instance to the protocol type** you want to register it with (e.g. `register(instance: PlistUsersProvider() as UsersListProviderType)`).
 
-Typically, to register your dependencies as early as possible in your app life-cycle, you will declare a `let dip: DependencyContainer = { … }()` somewhere (for example [at the top of your `AppDelegate.swift`](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/AppDelegate.swift#L17-L25)).
- In your (non-hosted, standalone) unit tests, you'll probably declare them in your `func setUp()` instead.
+Typically, to register your dependencies as early as possible in your app life-cycle, you will declare a `let dip: DependencyContainer = { … }()` somewhere (for example [at the top of your `AppDelegate.swift`](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/AppDelegate.swift#L12-L21)).
+ In your (non-hosted, standalone) unit tests, you'll probably [declare them in your `func setUp()`](https://github.com/AliSoftware/Dip/blob/master/Example/Tests/SWAPIWebServiceTests.swift#L36-L38) instead.
 
 ### Resolve dependencies
 
