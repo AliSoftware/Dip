@@ -8,63 +8,69 @@
 
 import Foundation
 
-public class DependencyContainer {
-    public typealias TagType = String
-    typealias InstanceType = Any
-    typealias InstanceFactory = TagType?->InstanceType
+/**
+*  Internal representation of a key to associate protocols & tags to an instance factory
+*/
+private struct ProtoTagKey<TagType : Equatable> : Hashable, Equatable, CustomDebugStringConvertible {
+    var protocolType: Any.Type
+    var associatedTag: TagType?
     
-    /**
-     *  Internal representation of a key to associate protocols & tags to an instance factory
-     */
-    private struct Key : Hashable, CustomDebugStringConvertible {
-        var protocolType: Any.Type
-        var associatedTag: TagType?
-        
-        var hashValue: Int {
-            return "\(protocolType)-\(associatedTag)".hashValue
-        }
-        
-        var debugDescription: String {
-            return "type: \(protocolType), tag: \(associatedTag)"
-        }
+    var hashValue: Int {
+        return "\(protocolType)-\(associatedTag)".hashValue
     }
     
-    private var dependencies = [Key: InstanceFactory]()
+    var debugDescription: String {
+        return "type: \(protocolType), tag: \(associatedTag)"
+    }
+}
+
+private func ==<T>(lhs: ProtoTagKey<T>, rhs: ProtoTagKey<T>) -> Bool {
+    return lhs.protocolType == rhs.protocolType && lhs.associatedTag == rhs.associatedTag
+}
+
+// MARK: - DependencyContainer
+
+public class DependencyContainer<TagType : Equatable> {
+    typealias InstanceType = Any
+    typealias InstanceFactory = TagType?->InstanceType
+    private typealias Key = ProtoTagKey<TagType>
+    
+    private var dependencies = [Key : InstanceFactory]()
     
     public init() {}
     
-    // MARK: - Reset all dependencies
+    // MARK: Reset all dependencies
     
     public func reset() {
         dependencies.removeAll()
     }
     
-    // MARK: - Register dependencies
+    // MARK: Register dependencies
     
     /// Register a TagType?->T factory (which takes the tag as parameter)
-    public func register<T : Any>(tag: TagType? = nil, instanceFactory: TagType?->T) {
+    public func register<T : Any>(tag: TagType? = nil, factory: TagType?->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
-        dependencies[key] = { instanceFactory($0) }
+        dependencies[key] = { factory($0) }
     }
     
     /// Register a Void->T factory (which don't care about the tag used)
-    public func register<T : Any>(tag: TagType? = nil, instanceFactory: Void->T) {
+    public func register<T : Any>(tag: TagType? = nil, factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
-        dependencies[key] = { _ in instanceFactory() }
+        dependencies[key] = { _ in factory() }
     }
     
     /// Register a Singleton instance
-    public func register<T : Any>(tag: TagType? = nil, @autoclosure(escaping) instance instanceFactory: Void->T) {
+    public func register<T : Any>(tag: TagType? = nil, @autoclosure(escaping) instance factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         // FIXME: Make it thread-safe
         dependencies[key] = { _ in
-            let instance = instanceFactory()
+            let instance = factory()
             self.dependencies[key] = { _ in return instance }
             return instance
         }
     }
     
-    // MARK: - Resolve dependencies
+    // MARK: Resolve dependencies
     
     /// Resolve a dependency
     ///
@@ -80,8 +86,3 @@ public class DependencyContainer {
     }
 }
 
-// MARK: - Key equality
-
-private func == (lhs: DependencyContainer.Key, rhs: DependencyContainer.Key) -> Bool {
-    return lhs.protocolType == rhs.protocolType && lhs.associatedTag == rhs.associatedTag
-}

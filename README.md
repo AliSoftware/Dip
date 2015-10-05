@@ -45,7 +45,6 @@ First, create a `DependencyContainer` and use it to register instances and facto
 * `register(instance: _)` will register a singleton instance with a given protocol.
 * `register(factory: _)` will register an instance factory — which generates a new instance each time you `resolve()`.
 * You need **cast the instance to the protocol type** you want to register it with (e.g. `register(instance: PlistUsersProvider() as UsersListProviderType)`).
-* if you give a `tag` in the parameter to `register()`, it will associate that instance or factory with this tag, which can be used later during `resolve` (see below).
 
 Typically, to register your dependencies as early as possible in your app life-cycle, you will declare a `let dip: DependencyContainer = { … }()` somewhere (for example [at the top of your `AppDelegate.swift`](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/AppDelegate.swift#L17-L25)).
  In your (non-hosted, standalone) unit tests, you'll probably declare them in your `func setUp()` instead.
@@ -55,7 +54,12 @@ Typically, to register your dependencies as early as possible in your app life-c
 * `resolve()` will return a new instance matching the requested protocol.
 * Explicitly specify the return type of `resolve` so that Swift's type inference knows which protocol you're trying to resolve.
 * If that protocol was registered as a singleton instance (using `register(instance: …)`, the same instance will be returned each time you call `resolve()` for this protocol type. Otherwise, the instance factory will generate a new instance each time.
+
+### Using tags to associate various factories to one protocol
+
+* If you give a `tag` in the parameter to `register()`, it will associate that instance or factory with this tag, which can be used later during `resolve` (see below).
 * `resolve(tag)` will try to find an instance (or instance factory) that match both the requested protocol _and_ the tag. If it doesn't find any, it will fallback to an instance (or instance factory) that only match the requested protocol.
+* The tags can be anything, as long as it's of a type conforming to `Equatable`. `DependencyContainer` is a generic class which takes that type as generic parameter (so one `DependencyContainer` will be tied with a given tag type)
 
 
 ### Example
