@@ -53,10 +53,12 @@ extension ViewController : UITableViewDataSource {
         return cell
     }
     
-    var formatterTag: PersonFormatterTags {
+    var formatterTag: PersonFormatterTag {
         switch displayModeSelector.selectedSegmentIndex {
-        case 0: return PersonFormatterTags.MassHeight
-        default: return PersonFormatterTags.EyesHair
+        case 0:
+            return .MassHeight
+        default:
+            return .EyesHair
         }
     }
 }

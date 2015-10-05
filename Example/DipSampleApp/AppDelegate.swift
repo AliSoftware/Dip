@@ -9,18 +9,14 @@
 import UIKit
 import Dip
 
-enum PersonFormatterTags {
-    case MassHeight
-    case EyesHair
-}
-
-let dip: DependencyContainer<PersonFormatterTags> = {
-    let dip = DependencyContainer<PersonFormatterTags>()
+let dip: DependencyContainer<PersonFormatterTag> = {
+    let dip = DependencyContainer<PersonFormatterTag>()
+    dip.register(instance: NSURLSessionNetworkLayer() as NetworkLayer)
     dip.register(instance: SWAPIWebService() as WebServiceAPI)
     dip.register(instance: SWAPIPersonFactory() as PersonFactoryAPI)
     dip.register(instance: JSONSerializer() as SerializerAPI)
-    dip.register(PersonFormatterTags.MassHeight, instance: MassHeightFormatter() as PersonFormatterAPI)
-    dip.register(PersonFormatterTags.EyesHair, instance: EyesHairFormatter() as PersonFormatterAPI)
+    dip.register(.MassHeight, instance: MassHeightFormatter() as PersonFormatterAPI)
+    dip.register(.EyesHair, instance: EyesHairFormatter() as PersonFormatterAPI)
     return dip
 }()
 
