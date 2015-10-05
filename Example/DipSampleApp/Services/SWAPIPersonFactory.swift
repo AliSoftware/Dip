@@ -16,7 +16,7 @@ class SWAPIPersonFactory : PersonFactoryAPI {
         case InvalidPersonSchema
     }
     
-    let serializer = Dependency.resolve() as SerializerAPI
+    let serializer = dip.resolve() as SerializerAPI
 
     func peopleFromData(personData: NSData) throws -> [Person] {
         let json = try serializer.dictionaryFromData(personData)

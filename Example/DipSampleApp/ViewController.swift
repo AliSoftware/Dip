@@ -12,7 +12,7 @@ import Dip
 let kCellIdentifier = "Cell"
 
 class ViewController: UIViewController {
-    let ws = Dependency.resolve() as WebServiceAPI
+    let ws = dip.resolve() as WebServiceAPI
     
     var personList = [Person]()
     
@@ -46,7 +46,7 @@ extension ViewController : UITableViewDataSource {
         let cell = tableView.dequeueReusableCellWithIdentifier(kCellIdentifier, forIndexPath: indexPath)
 
         let person = personList[indexPath.row]
-        let formatter = Dependency.resolve(formatterTag) as PersonFormatterAPI
+        let formatter = dip.resolve(formatterTag) as PersonFormatterAPI
         cell.textLabel?.text = formatter.textForPerson(person)
         cell.detailTextLabel?.text = formatter.subtextForPerson(person)
         
