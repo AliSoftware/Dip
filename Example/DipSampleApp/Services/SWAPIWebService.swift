@@ -11,7 +11,7 @@ import Dip
 
 /// WebService for The StarWars API — see http://swapi.co/documentation
 class SWAPIWebService : WebServiceAPI {
-    let personFactory = Dependency.resolve() as PersonFactoryAPI
+    let personFactory = dip.resolve() as PersonFactoryAPI
 
     func fetch(completion: [Person]? -> Void) {
         let url = NSURL(string: "http://swapi.co/api/people/")!

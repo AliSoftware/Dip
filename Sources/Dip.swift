@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class Dependency {
+public class DependencyContainer {
     public typealias TagType = String
     typealias InstanceType = Any
     typealias InstanceFactory = TagType?->InstanceType
@@ -29,35 +29,37 @@ public class Dependency {
         }
     }
     
-    private static var dependencies = [Key: InstanceFactory]()
+    private var dependencies = [Key: InstanceFactory]()
+    
+    public init() {}
     
     // MARK: - Reset all dependencies
     
-    public static func reset() {
+    public func reset() {
         dependencies.removeAll()
     }
     
     // MARK: - Register dependencies
     
     /// Register a TagType?->T factory (which takes the tag as parameter)
-    public static func register<T : Any>(tag: TagType? = nil, instanceFactory: TagType?->T) {
+    public func register<T : Any>(tag: TagType? = nil, instanceFactory: TagType?->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         dependencies[key] = { instanceFactory($0) }
     }
     
     /// Register a Void->T factory (which don't care about the tag used)
-    public static func register<T : Any>(tag: TagType? = nil, instanceFactory: Void->T) {
+    public func register<T : Any>(tag: TagType? = nil, instanceFactory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         dependencies[key] = { _ in instanceFactory() }
     }
     
     /// Register a Singleton instance
-    public static func register<T : Any>(tag: TagType? = nil, @autoclosure(escaping) instance instanceFactory: Void->T) {
+    public func register<T : Any>(tag: TagType? = nil, @autoclosure(escaping) instance instanceFactory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         // FIXME: Make it thread-safe
         dependencies[key] = { _ in
             let instance = instanceFactory()
-            dependencies[key] = { _ in return instance }
+            self.dependencies[key] = { _ in return instance }
             return instance
         }
     }
@@ -68,7 +70,7 @@ public class Dependency {
     ///
     /// **Note** If a tag is given, it will try to resolve using the tag to generate a specific instance,
     ///          and fallback without the tag if not found with it
-    public static func resolve<T>(tag: TagType? = nil) -> T! {
+    public func resolve<T>(tag: TagType? = nil) -> T! {
         let key = Key(protocolType: T.self, associatedTag: tag)
         let nilKey = Key(protocolType: T.self, associatedTag: nil)
         guard let factory = dependencies[key] ?? dependencies[nilKey] else {
@@ -80,6 +82,6 @@ public class Dependency {
 
 // MARK: - Key equality
 
-private func == (lhs: Dependency.Key, rhs: Dependency.Key) -> Bool {
+private func == (lhs: DependencyContainer.Key, rhs: DependencyContainer.Key) -> Bool {
     return lhs.protocolType == rhs.protocolType && lhs.associatedTag == rhs.associatedTag
 }

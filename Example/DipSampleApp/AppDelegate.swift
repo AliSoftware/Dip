@@ -14,13 +14,15 @@ enum PersonFormatterTags : String {
     case EyesHair
 }
 
-private let _dependencies: Void = {
-    Dependency.register(instance: SWAPIWebService() as WebServiceAPI)
-    Dependency.register(instance: SWAPIPersonFactory() as PersonFactoryAPI)
-    Dependency.register(instance: JSONSerializer() as SerializerAPI)
-    Dependency.register(PersonFormatterTags.MassHeight.rawValue, instance: MassHeightFormatter() as PersonFormatterAPI)
-    Dependency.register(PersonFormatterTags.EyesHair.rawValue, instance: EyesHairFormatter() as PersonFormatterAPI)
-    }()
+let dip: DependencyContainer = {
+    let dip = DependencyContainer()
+    dip.register(instance: SWAPIWebService() as WebServiceAPI)
+    dip.register(instance: SWAPIPersonFactory() as PersonFactoryAPI)
+    dip.register(instance: JSONSerializer() as SerializerAPI)
+    dip.register(PersonFormatterTags.MassHeight.rawValue, instance: MassHeightFormatter() as PersonFormatterAPI)
+    dip.register(PersonFormatterTags.EyesHair.rawValue, instance: EyesHairFormatter() as PersonFormatterAPI)
+    return dip
+}()
 
 
 @UIApplicationMain
