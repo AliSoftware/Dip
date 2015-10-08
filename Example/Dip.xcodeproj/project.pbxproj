@@ -7,63 +7,51 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		097D52E81BC13B0D006C893C /* WebServiceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52E71BC13B0D006C893C /* WebServiceAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52EA1BC15FFF006C893C /* PersonFactoryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52E91BC15FFF006C893C /* PersonFactoryAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52ED1BC16091006C893C /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52EC1BC16091006C893C /* Person.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52EF1BC1611C006C893C /* SWAPIWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52EE1BC1611C006C893C /* SWAPIWebService.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52F11BC161F7006C893C /* SerializerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F01BC161F7006C893C /* SerializerAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52F51BC166F3006C893C /* JSONSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F41BC166F3006C893C /* JSONSerializer.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52F71BC169C0006C893C /* SWAPIPersonFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F61BC169C0006C893C /* SWAPIPersonFactory.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52F91BC17418006C893C /* PersonFormatterAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F81BC17418006C893C /* PersonFormatterAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52FB1BC1745B006C893C /* MassHeightFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */; settings = {ASSET_TAGS = (); }; };
-		097D52FD1BC174B6006C893C /* EyesHairFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53011BC31F4A006C893C /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D53001BC31F4A006C893C /* Tags.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53021BC31FA6006C893C /* WebServiceAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52E71BC13B0D006C893C /* WebServiceAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53031BC31FA6006C893C /* SerializerAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F01BC161F7006C893C /* SerializerAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53041BC31FA6006C893C /* PersonFactoryAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52E91BC15FFF006C893C /* PersonFactoryAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53051BC31FA6006C893C /* PersonFormatterAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F81BC17418006C893C /* PersonFormatterAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53061BC31FAE006C893C /* SWAPIWebService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52EE1BC1611C006C893C /* SWAPIWebService.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53071BC31FC5006C893C /* Tags.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D53001BC31F4A006C893C /* Tags.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53081BC32053006C893C /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52EC1BC16091006C893C /* Person.swift */; settings = {ASSET_TAGS = (); }; };
-		097D530A1BC3243D006C893C /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D53091BC3243D006C893C /* NetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
-		097D530C1BC324DA006C893C /* NSURLSessionNetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D530B1BC324DA006C893C /* NSURLSessionNetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
-		097D530D1BC3250B006C893C /* SWAPIPersonFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F61BC169C0006C893C /* SWAPIPersonFactory.swift */; settings = {ASSET_TAGS = (); }; };
-		097D530E1BC3250E006C893C /* JSONSerializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52F41BC166F3006C893C /* JSONSerializer.swift */; settings = {ASSET_TAGS = (); }; };
-		097D530F1BC3250E006C893C /* MassHeightFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53101BC3250E006C893C /* EyesHairFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */; settings = {ASSET_TAGS = (); }; };
-		097D53111BC32513006C893C /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 097D53091BC3243D006C893C /* NetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
+		090012291BC6FECA0079C600 /* BaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012161BC6FECA0079C600 /* BaseCell.swift */; settings = {ASSET_TAGS = (); }; };
+		0900122A1BC6FECA0079C600 /* PersonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012171BC6FECA0079C600 /* PersonCell.swift */; settings = {ASSET_TAGS = (); }; };
+		0900122C1BC6FECA0079C600 /* PersonProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */; settings = {ASSET_TAGS = (); }; };
+		0900122D1BC6FECA0079C600 /* DummyPilotProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */; settings = {ASSET_TAGS = (); }; };
+		0900122E1BC6FECA0079C600 /* HardCodedStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
+		0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */; settings = {ASSET_TAGS = (); }; };
+		0900123B1BC6FF4D0079C600 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0900123A1BC6FF4D0079C600 /* Main.storyboard */; settings = {ASSET_TAGS = (); }; };
+		0900123D1BC7012A0079C600 /* StarshipProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */; settings = {ASSET_TAGS = (); }; };
+		090012401BC704C60079C600 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; settings = {ASSET_TAGS = (); }; };
+		090012421BC7059E0079C600 /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; settings = {ASSET_TAGS = (); }; };
+		090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012431BC708A00079C600 /* DummyStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
 		099022621BC123C000E76F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099022611BC123C000E76F43 /* AppDelegate.swift */; };
-		099022641BC123C000E76F43 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099022631BC123C000E76F43 /* ViewController.swift */; };
-		099022671BC123C000E76F43 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 099022651BC123C000E76F43 /* Main.storyboard */; };
 		099022691BC123C000E76F43 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 099022681BC123C000E76F43 /* Assets.xcassets */; };
 		0990226C1BC123C000E76F43 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */; };
+		09D795FF1BC71F5A003C68EB /* PersonListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796001BC722C0003C68EB /* StarshipListViewController.swift */; settings = {ASSET_TAGS = (); }; };
+		09D796031BC72691003C68EB /* StarshipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796021BC72691003C68EB /* StarshipCell.swift */; settings = {ASSET_TAGS = (); }; };
+		09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796061BC73E8B003C68EB /* StoryboardConstants.swift */; settings = {ASSET_TAGS = (); }; };
 		607FACEC1AFB9204008FA782 /* SWAPIWebServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* SWAPIWebServiceTests.swift */; };
 		7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 304AD039660A2C58EB08D985 /* Pods_DipTests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		84D8EBE5B2D583BEFB17C45A /* Pods_DipSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		097D52E71BC13B0D006C893C /* WebServiceAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WebServiceAPI.swift; sourceTree = "<group>"; };
-		097D52E91BC15FFF006C893C /* PersonFactoryAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonFactoryAPI.swift; sourceTree = "<group>"; };
-		097D52EC1BC16091006C893C /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
-		097D52EE1BC1611C006C893C /* SWAPIWebService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIWebService.swift; sourceTree = "<group>"; };
-		097D52F01BC161F7006C893C /* SerializerAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SerializerAPI.swift; sourceTree = "<group>"; };
-		097D52F41BC166F3006C893C /* JSONSerializer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONSerializer.swift; sourceTree = "<group>"; };
-		097D52F61BC169C0006C893C /* SWAPIPersonFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIPersonFactory.swift; sourceTree = "<group>"; };
-		097D52F81BC17418006C893C /* PersonFormatterAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonFormatterAPI.swift; sourceTree = "<group>"; };
-		097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MassHeightFormatter.swift; sourceTree = "<group>"; };
-		097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EyesHairFormatter.swift; sourceTree = "<group>"; };
+		090012161BC6FECA0079C600 /* BaseCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseCell.swift; sourceTree = "<group>"; };
+		090012171BC6FECA0079C600 /* PersonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonCell.swift; sourceTree = "<group>"; };
+		0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonProviderAPI.swift; sourceTree = "<group>"; };
+		0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyPilotProvider.swift; sourceTree = "<group>"; };
+		0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HardCodedStarshipProvider.swift; sourceTree = "<group>"; };
+		0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlistPersonProvider.swift; sourceTree = "<group>"; };
+		0900123A1BC6FF4D0079C600 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipProviderAPI.swift; sourceTree = "<group>"; };
+		0900123F1BC704C60079C600 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
+		090012411BC7059E0079C600 /* Starship.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Starship.swift; sourceTree = "<group>"; };
+		090012431BC708A00079C600 /* DummyStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyStarshipProvider.swift; sourceTree = "<group>"; };
 		097D52FE1BC18A09006C893C /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
-		097D53001BC31F4A006C893C /* Tags.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Tags.swift; sourceTree = "<group>"; };
-		097D53091BC3243D006C893C /* NetworkLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkLayer.swift; sourceTree = "<group>"; };
-		097D530B1BC324DA006C893C /* NSURLSessionNetworkLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSURLSessionNetworkLayer.swift; sourceTree = "<group>"; };
 		0990225F1BC123C000E76F43 /* DipSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DipSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		099022611BC123C000E76F43 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		099022631BC123C000E76F43 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		099022661BC123C000E76F43 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		099022681BC123C000E76F43 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0990226B1BC123C000E76F43 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0990226D1BC123C000E76F43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonListViewController.swift; sourceTree = "<group>"; };
+		09D796001BC722C0003C68EB /* StarshipListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipListViewController.swift; sourceTree = "<group>"; };
+		09D796021BC72691003C68EB /* StarshipCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipCell.swift; sourceTree = "<group>"; };
+		09D796061BC73E8B003C68EB /* StoryboardConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryboardConstants.swift; sourceTree = "<group>"; };
 		2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		304AD039660A2C58EB08D985 /* Pods_DipTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACE51AFB9204008FA782 /* DipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -98,58 +86,82 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		097D52E61BC139A8006C893C /* Services */ = {
+		090012141BC6FECA0079C600 /* Cells */ = {
 			isa = PBXGroup;
 			children = (
-				097D52F21BC16258006C893C /* Protocols */,
-				097D52F31BC16271006C893C /* Implementations */,
+				090012161BC6FECA0079C600 /* BaseCell.swift */,
+				090012171BC6FECA0079C600 /* PersonCell.swift */,
+				09D796021BC72691003C68EB /* StarshipCell.swift */,
 			);
-			path = Services;
+			path = Cells;
 			sourceTree = "<group>";
 		};
-		097D52EB1BC16083006C893C /* Model */ = {
+		0900121A1BC6FECA0079C600 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
-				097D52EC1BC16091006C893C /* Person.swift */,
+				090012371BC6FEEA0079C600 /* APIs */,
+				090012381BC6FEFD0079C600 /* PersonProviders */,
+				090012391BC6FF080079C600 /* StarshipProviders */,
+			);
+			path = Providers;
+			sourceTree = "<group>";
+		};
+		090012201BC6FECA0079C600 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */,
+				09D796001BC722C0003C68EB /* StarshipListViewController.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		090012371BC6FEEA0079C600 /* APIs */ = {
+			isa = PBXGroup;
+			children = (
+				0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */,
+				0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */,
+			);
+			name = APIs;
+			sourceTree = "<group>";
+		};
+		090012381BC6FEFD0079C600 /* PersonProviders */ = {
+			isa = PBXGroup;
+			children = (
+				0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */,
+				0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */,
+			);
+			name = PersonProviders;
+			sourceTree = "<group>";
+		};
+		090012391BC6FF080079C600 /* StarshipProviders */ = {
+			isa = PBXGroup;
+			children = (
+				090012431BC708A00079C600 /* DummyStarshipProvider.swift */,
+				0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */,
+			);
+			name = StarshipProviders;
+			sourceTree = "<group>";
+		};
+		0900123E1BC704A80079C600 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0900123F1BC704C60079C600 /* Person.swift */,
+				090012411BC7059E0079C600 /* Starship.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		097D52F21BC16258006C893C /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-				097D52E71BC13B0D006C893C /* WebServiceAPI.swift */,
-				097D52F01BC161F7006C893C /* SerializerAPI.swift */,
-				097D52E91BC15FFF006C893C /* PersonFactoryAPI.swift */,
-				097D52F81BC17418006C893C /* PersonFormatterAPI.swift */,
-				097D53091BC3243D006C893C /* NetworkLayer.swift */,
-			);
-			path = Protocols;
-			sourceTree = "<group>";
-		};
-		097D52F31BC16271006C893C /* Implementations */ = {
-			isa = PBXGroup;
-			children = (
-				097D52EE1BC1611C006C893C /* SWAPIWebService.swift */,
-				097D52F61BC169C0006C893C /* SWAPIPersonFactory.swift */,
-				097D52F41BC166F3006C893C /* JSONSerializer.swift */,
-				097D52FA1BC1745B006C893C /* MassHeightFormatter.swift */,
-				097D52FC1BC174B6006C893C /* EyesHairFormatter.swift */,
-				097D530B1BC324DA006C893C /* NSURLSessionNetworkLayer.swift */,
-			);
-			path = Implementations;
 			sourceTree = "<group>";
 		};
 		099022601BC123C000E76F43 /* DipSampleApp */ = {
 			isa = PBXGroup;
 			children = (
-				097D52EB1BC16083006C893C /* Model */,
-				097D52E61BC139A8006C893C /* Services */,
-				097D53001BC31F4A006C893C /* Tags.swift */,
+				0900123A1BC6FF4D0079C600 /* Main.storyboard */,
 				099022611BC123C000E76F43 /* AppDelegate.swift */,
-				099022631BC123C000E76F43 /* ViewController.swift */,
-				099022651BC123C000E76F43 /* Main.storyboard */,
+				0900123E1BC704A80079C600 /* Model */,
+				0900121A1BC6FECA0079C600 /* Providers */,
+				090012201BC6FECA0079C600 /* ViewControllers */,
+				090012141BC6FECA0079C600 /* Cells */,
 				099022681BC123C000E76F43 /* Assets.xcassets */,
+				09D796061BC73E8B003C68EB /* StoryboardConstants.swift */,
 				0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */,
 				0990226D1BC123C000E76F43 /* Info.plist */,
 			);
@@ -310,9 +322,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0900123B1BC6FF4D0079C600 /* Main.storyboard in Resources */,
 				0990226C1BC123C000E76F43 /* LaunchScreen.storyboard in Resources */,
 				099022691BC123C000E76F43 /* Assets.xcassets in Resources */,
-				099022671BC123C000E76F43 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,21 +435,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				097D530A1BC3243D006C893C /* NetworkLayer.swift in Sources */,
-				097D52ED1BC16091006C893C /* Person.swift in Sources */,
-				097D52F11BC161F7006C893C /* SerializerAPI.swift in Sources */,
-				097D52F91BC17418006C893C /* PersonFormatterAPI.swift in Sources */,
-				099022641BC123C000E76F43 /* ViewController.swift in Sources */,
-				097D530C1BC324DA006C893C /* NSURLSessionNetworkLayer.swift in Sources */,
-				097D52F51BC166F3006C893C /* JSONSerializer.swift in Sources */,
-				097D53011BC31F4A006C893C /* Tags.swift in Sources */,
+				09D795FF1BC71F5A003C68EB /* PersonListViewController.swift in Sources */,
+				0900122A1BC6FECA0079C600 /* PersonCell.swift in Sources */,
+				09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */,
+				0900122C1BC6FECA0079C600 /* PersonProviderAPI.swift in Sources */,
+				090012291BC6FECA0079C600 /* BaseCell.swift in Sources */,
+				0900122D1BC6FECA0079C600 /* DummyPilotProvider.swift in Sources */,
 				099022621BC123C000E76F43 /* AppDelegate.swift in Sources */,
-				097D52F71BC169C0006C893C /* SWAPIPersonFactory.swift in Sources */,
-				097D52EF1BC1611C006C893C /* SWAPIWebService.swift in Sources */,
-				097D52FD1BC174B6006C893C /* EyesHairFormatter.swift in Sources */,
-				097D52FB1BC1745B006C893C /* MassHeightFormatter.swift in Sources */,
-				097D52E81BC13B0D006C893C /* WebServiceAPI.swift in Sources */,
-				097D52EA1BC15FFF006C893C /* PersonFactoryAPI.swift in Sources */,
+				090012421BC7059E0079C600 /* Starship.swift in Sources */,
+				0900123D1BC7012A0079C600 /* StarshipProviderAPI.swift in Sources */,
+				0900122E1BC6FECA0079C600 /* HardCodedStarshipProvider.swift in Sources */,
+				09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */,
+				09D796031BC72691003C68EB /* StarshipCell.swift in Sources */,
+				090012401BC704C60079C600 /* Person.swift in Sources */,
+				090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */,
+				0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -446,32 +458,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACEC1AFB9204008FA782 /* SWAPIWebServiceTests.swift in Sources */,
-				097D53051BC31FA6006C893C /* PersonFormatterAPI.swift in Sources */,
-				097D53071BC31FC5006C893C /* Tags.swift in Sources */,
-				097D53111BC32513006C893C /* NetworkLayer.swift in Sources */,
-				097D53021BC31FA6006C893C /* WebServiceAPI.swift in Sources */,
-				097D53041BC31FA6006C893C /* PersonFactoryAPI.swift in Sources */,
-				097D530E1BC3250E006C893C /* JSONSerializer.swift in Sources */,
-				097D53031BC31FA6006C893C /* SerializerAPI.swift in Sources */,
-				097D53081BC32053006C893C /* Person.swift in Sources */,
-				097D53101BC3250E006C893C /* EyesHairFormatter.swift in Sources */,
-				097D530F1BC3250E006C893C /* MassHeightFormatter.swift in Sources */,
-				097D530D1BC3250B006C893C /* SWAPIPersonFactory.swift in Sources */,
-				097D53061BC31FAE006C893C /* SWAPIWebService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		099022651BC123C000E76F43 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				099022661BC123C000E76F43 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (

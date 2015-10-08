@@ -6,7 +6,7 @@
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 
 ![Chocolate con churros - San Ginés, Madrid](https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Chocolate_con_churros_-_San_Ginés%2C_Madrid.jpg/160px-Chocolate_con_churros_-_San_Ginés%2C_Madrid.jpg)  
-_Photo by [Matthew Hine](http://www.flickr.com/photos/75771631@N00), cc-by-2.0_
+_Photo by [Matthew Hine](https://commons.wikimedia.org/wiki/File:Chocolate_con_churros_-_San_Ginés,_Madrid.jpg), cc-by-2.0_
 
 ## Introduction
 
