@@ -8,11 +8,14 @@
 
 import UIKit
 
-class PersonListViewController: UITableViewController {
+class PersonListViewController: UITableViewController, FetchableTrait {
     var objects: [Person]?
     var batchRequestID = 0
     
     let provider = dip.resolve() as PersonProviderAPI
+    
+    lazy var fetchOne: (Int, Person? -> Void) -> Void = self.provider.fetch
+    lazy var fetchAll: ([Person] -> Void) -> Void = self.provider.fetch
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         guard
@@ -26,15 +29,6 @@ class PersonListViewController: UITableViewController {
         }
         
         destVC.fetchObjects(person.starshipIDs)
-    }
-}
-
-extension PersonListViewController : FetchableTrait {
-    var fetchOne: (Int, Person? -> Void) -> Void {
-        return self.provider.fetch
-    }
-    var fetchAll: ([Person] -> Void) -> Void {
-        return self.provider.fetch
     }
 }
 

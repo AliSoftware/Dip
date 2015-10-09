@@ -8,11 +8,14 @@
 
 import UIKit
 
-class StarshipListViewController : UITableViewController {
+class StarshipListViewController : UITableViewController, FetchableTrait {
     var objects: [Starship]?
     var batchRequestID = 0
     
     let provider = dip.resolve() as StarshipProviderAPI
+    
+    lazy var fetchOne: (Int, Starship? -> Void) -> Void = self.provider.fetch
+    lazy var fetchAll: ([Starship] -> Void) -> Void = self.provider.fetch
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         guard
@@ -26,15 +29,6 @@ class StarshipListViewController : UITableViewController {
         }
         
         destVC.fetchObjects(starship.pilotIDs)
-    }
-}
-
-extension StarshipListViewController : FetchableTrait {
-    var fetchOne: (Int, Starship? -> Void) -> Void {
-        return self.provider.fetch
-    }
-    var fetchAll: ([Starship] -> Void) -> Void {
-        return self.provider.fetch
     }
 }
 
