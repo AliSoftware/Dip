@@ -9,11 +9,15 @@
 import UIKit
 
 protocol BaseCell {
+    typealias ObjectType
+    
     static var identifier: String { get }
     static var nib: UINib? { get }
     
     static func register(tableView: UITableView)
     static func dequeueFromTableView(tableView: UITableView, forIndexPath indexPath: NSIndexPath) -> Self
+    
+    func fillWithObject(object: ObjectType)
 }
 
 extension BaseCell where Self : UITableViewCell {

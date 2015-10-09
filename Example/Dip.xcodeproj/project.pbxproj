@@ -25,6 +25,7 @@
 		09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796001BC722C0003C68EB /* StarshipListViewController.swift */; settings = {ASSET_TAGS = (); }; };
 		09D796031BC72691003C68EB /* StarshipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796021BC72691003C68EB /* StarshipCell.swift */; settings = {ASSET_TAGS = (); }; };
 		09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796061BC73E8B003C68EB /* StoryboardConstants.swift */; settings = {ASSET_TAGS = (); }; };
+		09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7960C1BC7431C003C68EB /* FetchableTrait.swift */; settings = {ASSET_TAGS = (); }; };
 		607FACEC1AFB9204008FA782 /* SWAPIWebServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* SWAPIWebServiceTests.swift */; };
 		7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 304AD039660A2C58EB08D985 /* Pods_DipTests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		84D8EBE5B2D583BEFB17C45A /* Pods_DipSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -52,6 +53,7 @@
 		09D796001BC722C0003C68EB /* StarshipListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipListViewController.swift; sourceTree = "<group>"; };
 		09D796021BC72691003C68EB /* StarshipCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipCell.swift; sourceTree = "<group>"; };
 		09D796061BC73E8B003C68EB /* StoryboardConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryboardConstants.swift; sourceTree = "<group>"; };
+		09D7960C1BC7431C003C68EB /* FetchableTrait.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchableTrait.swift; sourceTree = "<group>"; };
 		2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		304AD039660A2C58EB08D985 /* Pods_DipTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACE51AFB9204008FA782 /* DipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -109,6 +111,7 @@
 		090012201BC6FECA0079C600 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				09D7960C1BC7431C003C68EB /* FetchableTrait.swift */,
 				09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */,
 				09D796001BC722C0003C68EB /* StarshipListViewController.swift */,
 			);
@@ -449,6 +452,7 @@
 				09D796031BC72691003C68EB /* StarshipCell.swift in Sources */,
 				090012401BC704C60079C600 /* Person.swift in Sources */,
 				090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */,
+				09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */,
 				0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

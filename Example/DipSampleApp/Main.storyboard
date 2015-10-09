@@ -36,7 +36,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="PersonCell" rowHeight="95" id="Sba-Wm-z4c" customClass="PersonCell" customModule="DipSampleApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="92" width="600" height="95"/>
+                                <rect key="frame" x="0.0" y="28" width="600" height="95"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Sba-Wm-z4c" id="UE9-zV-NsG">
                                     <rect key="frame" x="0.0" y="0.0" width="567" height="94.5"/>
@@ -186,7 +186,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="StarshipCell" rowHeight="102" id="rfe-RG-ql1" customClass="StarshipCell" customModule="DipSampleApp" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="92" width="600" height="102"/>
+                                <rect key="frame" x="0.0" y="28" width="600" height="102"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="rfe-RG-ql1" id="RHz-uO-ANq">
                                     <rect key="frame" x="0.0" y="0.0" width="567" height="101.5"/>
@@ -356,7 +356,7 @@
         <image name="spaceship" width="22" height="22"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="07W-Xm-zjJ"/>
-        <segue reference="l50-ri-Dfy"/>
+        <segue reference="zjp-Bb-fTw"/>
+        <segue reference="Yvy-aQ-caa"/>
     </inferredMetricsTieBreakers>
 </document>

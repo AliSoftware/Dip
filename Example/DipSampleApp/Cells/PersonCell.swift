@@ -9,6 +9,7 @@
 import UIKit
 
 final class PersonCell : UITableViewCell, BaseCell {
+    typealias ObjectType = Person
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var genderImageView: UIImageView!
@@ -28,7 +29,7 @@ final class PersonCell : UITableViewCell, BaseCell {
         return f
     }()
     
-    func fillWithPerson(person: Person) {
+    func fillWithObject(person: Person) {
         nameLabel.text = person.name
         genderImageView.image = person.gender.flatMap { UIImage(named: $0.rawValue) }
         heightLabel.text = heightFormatter.stringFromValue(Double(person.height), unit: .Centimeter)

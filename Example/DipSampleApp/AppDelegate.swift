@@ -34,10 +34,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let tabBarVC = self.window?.rootViewController as? UITabBarController,
             let vcs = tabBarVC.viewControllers as? [UINavigationController] {
                 if let personListVC = vcs[0].topViewController as? PersonListViewController {
-                    personListVC.loadPersons()
+                    personListVC.fetchAllObjects()
                 }
                 if let starshipListVC = vcs[1].topViewController as? StarshipListViewController {
-                    starshipListVC.loadStarships()
+                    starshipListVC.fetchAllObjects()
                 }
         }
         

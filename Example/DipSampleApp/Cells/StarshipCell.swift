@@ -9,6 +9,7 @@
 import UIKit
 
 final class StarshipCell : UITableViewCell, BaseCell {
+    typealias ObjectType = Starship
     
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var modelLabel: UILabel!
@@ -18,7 +19,7 @@ final class StarshipCell : UITableViewCell, BaseCell {
     
     let numberFormatter = NSNumberFormatter()
     
-    func fillWithStarship(starship: Starship) {
+    func fillWithObject(starship: Starship) {
         nameLabel.text = starship.name
         modelLabel.text = starship.model
         manufacturerLabel.text = starship.manufacturer
