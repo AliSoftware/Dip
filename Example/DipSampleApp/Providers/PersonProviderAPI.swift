@@ -9,6 +9,6 @@
 import Foundation
 
 protocol PersonProviderAPI {
-    func fetch(completion: [Person] -> Void)
+    func fetchIDs(completion: [Int] -> Void)
     func fetch(id: Int, completion: Person? -> Void)
 }

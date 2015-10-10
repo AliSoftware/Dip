@@ -14,8 +14,8 @@ protocol FetchableTrait: class {
     var batchRequestID: Int { get set }
     var tableView: UITableView! { get }
     
+    var fetchIDs: ([Int] -> Void) -> Void { get }
     var fetchOne: (Int, ObjectType? -> Void) -> Void { get }
-    var fetchAll: ([ObjectType] -> Void) -> Void { get }
 }
 
 extension FetchableTrait {
@@ -27,13 +27,11 @@ extension FetchableTrait {
         for objectID in objectIDs {
             fetchOne(objectID) { (object: ObjectType?) in
                 // Exit if we failed to retrive an object for this ID, or if the request
-                // should be ignore because a new batch request has been started since
+                // should be ignored because a new batch request has been started since
                 guard let object = object where batch == self.batchRequestID else { return }
-                if var list = self.objects {
-                    list.append(object)
-                } else {
-                    self.objects = [object]
-                }
+
+                if self.objects == nil { self.objects = [] }
+                self.objects?.append(object)
                 self.tableView?.reloadData()
             }
         }
@@ -43,10 +41,9 @@ extension FetchableTrait {
         self.batchRequestID += 1
         let batch = self.batchRequestID
         
-        fetchAll() { objects in
+        fetchIDs() { objectIDs in
             guard batch == self.batchRequestID else { return }
-            self.objects = objects
-            self.tableView?.reloadData()
+            self.fetchObjects(objectIDs)
         }
     }
 }

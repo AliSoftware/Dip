@@ -9,14 +9,11 @@
 import Foundation
 
 struct DummyStarshipProvider : StarshipProviderAPI {
-    var pilot: String
+    var pilotName: String
     
-    func fetch(completion: [Starship] -> Void) {
-        let nbShips = pilot.characters.count
-        let starships = (1...nbShips).map { idx in
-            return dummyStarship(idx)
-        }
-        completion(starships)
+    func fetchIDs(completion: [Int] -> Void) {
+        let nbShips = pilotName.characters.count
+        completion(Array(0..<nbShips))
     }
     
     func fetch(id: Int, completion: Starship? -> Void) {
@@ -25,9 +22,9 @@ struct DummyStarshipProvider : StarshipProviderAPI {
     
     private func dummyStarship(idx: Int) -> Starship {
         return Starship(
-            name: "\(pilot)'s awesome starship #\(idx)",
-            model: "\(pilot)Ship",
-            manufacturer: "\(pilot) Industries",
+            name: "\(pilotName)'s awesome starship #\(idx)",
+            model: "\(pilotName)Ship",
+            manufacturer: "Dummy Industries",
             crew: 1 + (idx%3),
             passengers: 10 + (idx*7 % 40),
             pilotIDs: [idx]

@@ -26,6 +26,7 @@
 		09D796031BC72691003C68EB /* StarshipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796021BC72691003C68EB /* StarshipCell.swift */; settings = {ASSET_TAGS = (); }; };
 		09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796061BC73E8B003C68EB /* StoryboardConstants.swift */; settings = {ASSET_TAGS = (); }; };
 		09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7960C1BC7431C003C68EB /* FetchableTrait.swift */; settings = {ASSET_TAGS = (); }; };
+		09D796111BC97809003C68EB /* mainPilot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09D796101BC97809003C68EB /* mainPilot.plist */; settings = {ASSET_TAGS = (); }; };
 		607FACEC1AFB9204008FA782 /* SWAPIWebServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* SWAPIWebServiceTests.swift */; };
 		7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 304AD039660A2C58EB08D985 /* Pods_DipTests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		84D8EBE5B2D583BEFB17C45A /* Pods_DipSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -54,6 +55,7 @@
 		09D796021BC72691003C68EB /* StarshipCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipCell.swift; sourceTree = "<group>"; };
 		09D796061BC73E8B003C68EB /* StoryboardConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryboardConstants.swift; sourceTree = "<group>"; };
 		09D7960C1BC7431C003C68EB /* FetchableTrait.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchableTrait.swift; sourceTree = "<group>"; };
+		09D796101BC97809003C68EB /* mainPilot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = mainPilot.plist; sourceTree = "<group>"; };
 		2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		304AD039660A2C58EB08D985 /* Pods_DipTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACE51AFB9204008FA782 /* DipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -167,6 +169,7 @@
 				09D796061BC73E8B003C68EB /* StoryboardConstants.swift */,
 				0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */,
 				0990226D1BC123C000E76F43 /* Info.plist */,
+				09D796101BC97809003C68EB /* mainPilot.plist */,
 			);
 			path = DipSampleApp;
 			sourceTree = "<group>";
@@ -327,6 +330,7 @@
 			files = (
 				0900123B1BC6FF4D0079C600 /* Main.storyboard in Resources */,
 				0990226C1BC123C000E76F43 /* LaunchScreen.storyboard in Resources */,
+				09D796111BC97809003C68EB /* mainPilot.plist in Resources */,
 				099022691BC123C000E76F43 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

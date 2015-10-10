@@ -17,11 +17,11 @@ class PlistPersonProvider : PersonProviderAPI {
             peopleDict = list as? [[String:AnyObject]]
             else { fatalError("PLIST for \(basename) not found") }
         
-        self.people = peopleDict.map(PlistPersonProvider.personFromStringDict)
+        self.people = peopleDict.map(PlistPersonProvider.personFromDict)
     }
     
-    func fetch(completion: [Person] -> Void) {
-        completion(people)
+    func fetchIDs(completion: [Int] -> Void) {
+        completion(Array(0..<people.count))
     }
     
     func fetch(id: Int, completion: Person? -> Void) {
@@ -32,15 +32,15 @@ class PlistPersonProvider : PersonProviderAPI {
         completion(people[id])
     }
     
-    private static func personFromStringDict(stringDict: [String:AnyObject]) -> Person {
+    private static func personFromDict(dict: [String:AnyObject]) -> Person {
         guard
-            let name = stringDict["name"] as? String,
-            height = stringDict["height"] as? Int,
-            mass = stringDict["mass"] as? Int,
-            hairColor = stringDict["hairColor"] as? String,
-            eyeColor = stringDict["eyeColor"] as? String,
-            genderStr = stringDict["gender"] as? String,
-            starshipsIDs = stringDict["starships"] as? [Int]
+            let name = dict["name"] as? String,
+            height = dict["height"] as? Int,
+            mass = dict["mass"] as? Int,
+            hairColor = dict["hairColor"] as? String,
+            eyeColor = dict["eyeColor"] as? String,
+            genderStr = dict["gender"] as? String,
+            starshipsIDs = dict["starships"] as? [Int]
             else { fatalError("Invalid Plist")
         }
         

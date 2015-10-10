@@ -10,11 +10,8 @@ import Foundation
 
 struct DummyPilotProvider : PersonProviderAPI {
     
-    func fetch(completion: [Person] -> Void) {
-        let persons = (1...5).map { idx in
-            return dummyPerson(idx)
-        }
-        completion(persons)
+    func fetchIDs(completion: [Int] -> Void) {
+        completion(Array(0..<5))
     }
     
     func fetch(id: Int, completion: Person? -> Void) {
@@ -25,7 +22,7 @@ struct DummyPilotProvider : PersonProviderAPI {
         let colors = ["blue", "brown", "yellow", "orange", "red", "dark"]
         let genders: [Gender?] = [Gender.Male, Gender.Female, nil]
         return Person(
-            name: "John Doe #\(idx)",
+            name: "John Dummy Doe #\(idx)",
             height: 150 + (idx*27%40),
             mass: 50 + (idx*7%30),
             hairColor: colors[idx*3%colors.count],

@@ -11,11 +11,12 @@ import UIKit
 class PersonListViewController: UITableViewController, FetchableTrait {
     var objects: [Person]?
     var batchRequestID = 0
-    
-    let provider = dip.resolve() as PersonProviderAPI
-    
-    lazy var fetchOne: (Int, Person? -> Void) -> Void = self.provider.fetch
-    lazy var fetchAll: ([Person] -> Void) -> Void = self.provider.fetch
+        
+    lazy var fetchIDs: ([Int] -> Void) -> Void = (dip.resolve() as PersonProviderAPI).fetchIDs
+    lazy var fetchOne: (Int, Person? -> Void) -> Void = { personID, completion in
+        let provider = dip.resolve(personID) as PersonProviderAPI
+        return provider.fetch(personID, completion: completion)
+    }
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         guard
