@@ -27,6 +27,12 @@
 		09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796061BC73E8B003C68EB /* StoryboardConstants.swift */; settings = {ASSET_TAGS = (); }; };
 		09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7960C1BC7431C003C68EB /* FetchableTrait.swift */; settings = {ASSET_TAGS = (); }; };
 		09D796111BC97809003C68EB /* mainPilot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09D796101BC97809003C68EB /* mainPilot.plist */; settings = {ASSET_TAGS = (); }; };
+		09D796131BC9A5BC003C68EB /* SWAPIPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */; settings = {ASSET_TAGS = (); }; };
+		09D796151BC9A5FC003C68EB /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796141BC9A5FC003C68EB /* NetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
+		09D796171BC9B53D003C68EB /* URLSessionNetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796161BC9B53D003C68EB /* URLSessionNetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
+		09D796191BC9BA49003C68EB /* DependencyContainers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796181BC9BA49003C68EB /* DependencyContainers.swift */; settings = {ASSET_TAGS = (); }; };
+		09D7961B1BC9BE65003C68EB /* SWAPIStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
+		09D7961D1BC9C62E003C68EB /* SWAPICommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */; settings = {ASSET_TAGS = (); }; };
 		607FACEC1AFB9204008FA782 /* SWAPIWebServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* SWAPIWebServiceTests.swift */; };
 		7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 304AD039660A2C58EB08D985 /* Pods_DipTests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		84D8EBE5B2D583BEFB17C45A /* Pods_DipSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -56,6 +62,12 @@
 		09D796061BC73E8B003C68EB /* StoryboardConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StoryboardConstants.swift; sourceTree = "<group>"; };
 		09D7960C1BC7431C003C68EB /* FetchableTrait.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FetchableTrait.swift; sourceTree = "<group>"; };
 		09D796101BC97809003C68EB /* mainPilot.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = mainPilot.plist; sourceTree = "<group>"; };
+		09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIPersonProvider.swift; sourceTree = "<group>"; };
+		09D796141BC9A5FC003C68EB /* NetworkLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkLayer.swift; sourceTree = "<group>"; };
+		09D796161BC9B53D003C68EB /* URLSessionNetworkLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLSessionNetworkLayer.swift; sourceTree = "<group>"; };
+		09D796181BC9BA49003C68EB /* DependencyContainers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DependencyContainers.swift; sourceTree = "<group>"; };
+		09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIStarshipProvider.swift; sourceTree = "<group>"; };
+		09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPICommon.swift; sourceTree = "<group>"; };
 		2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		304AD039660A2C58EB08D985 /* Pods_DipTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACE51AFB9204008FA782 /* DipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,9 +115,11 @@
 		0900121A1BC6FECA0079C600 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
+				09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */,
 				090012371BC6FEEA0079C600 /* APIs */,
 				090012381BC6FEFD0079C600 /* PersonProviders */,
 				090012391BC6FF080079C600 /* StarshipProviders */,
+				09D796161BC9B53D003C68EB /* URLSessionNetworkLayer.swift */,
 			);
 			path = Providers;
 			sourceTree = "<group>";
@@ -125,6 +139,7 @@
 			children = (
 				0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */,
 				0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */,
+				09D796141BC9A5FC003C68EB /* NetworkLayer.swift */,
 			);
 			name = APIs;
 			sourceTree = "<group>";
@@ -134,6 +149,7 @@
 			children = (
 				0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */,
 				0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */,
+				09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */,
 			);
 			name = PersonProviders;
 			sourceTree = "<group>";
@@ -143,6 +159,7 @@
 			children = (
 				090012431BC708A00079C600 /* DummyStarshipProvider.swift */,
 				0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */,
+				09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */,
 			);
 			name = StarshipProviders;
 			sourceTree = "<group>";
@@ -161,6 +178,7 @@
 			children = (
 				0900123A1BC6FF4D0079C600 /* Main.storyboard */,
 				099022611BC123C000E76F43 /* AppDelegate.swift */,
+				09D796181BC9BA49003C68EB /* DependencyContainers.swift */,
 				0900123E1BC704A80079C600 /* Model */,
 				0900121A1BC6FECA0079C600 /* Providers */,
 				090012201BC6FECA0079C600 /* ViewControllers */,
@@ -442,15 +460,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09D796151BC9A5FC003C68EB /* NetworkLayer.swift in Sources */,
 				09D795FF1BC71F5A003C68EB /* PersonListViewController.swift in Sources */,
 				0900122A1BC6FECA0079C600 /* PersonCell.swift in Sources */,
 				09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */,
 				0900122C1BC6FECA0079C600 /* PersonProviderAPI.swift in Sources */,
+				09D7961D1BC9C62E003C68EB /* SWAPICommon.swift in Sources */,
 				090012291BC6FECA0079C600 /* BaseCell.swift in Sources */,
 				0900122D1BC6FECA0079C600 /* DummyPilotProvider.swift in Sources */,
 				099022621BC123C000E76F43 /* AppDelegate.swift in Sources */,
+				09D796131BC9A5BC003C68EB /* SWAPIPersonProvider.swift in Sources */,
 				090012421BC7059E0079C600 /* Starship.swift in Sources */,
 				0900123D1BC7012A0079C600 /* StarshipProviderAPI.swift in Sources */,
+				09D7961B1BC9BE65003C68EB /* SWAPIStarshipProvider.swift in Sources */,
 				0900122E1BC6FECA0079C600 /* HardCodedStarshipProvider.swift in Sources */,
 				09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */,
 				09D796031BC72691003C68EB /* StarshipCell.swift in Sources */,
@@ -458,6 +480,8 @@
 				090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */,
 				09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */,
 				0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */,
+				09D796191BC9BA49003C68EB /* DependencyContainers.swift in Sources */,
+				09D796171BC9B53D003C68EB /* URLSessionNetworkLayer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

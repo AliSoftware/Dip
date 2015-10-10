@@ -12,10 +12,16 @@ class PersonListViewController: UITableViewController, FetchableTrait {
     var objects: [Person]?
     var batchRequestID = 0
         
-    lazy var fetchIDs: ([Int] -> Void) -> Void = (dip.resolve() as PersonProviderAPI).fetchIDs
+    lazy var fetchIDs: ([Int] -> Void) -> Void = (providerDependencies.resolve() as PersonProviderAPI).fetchIDs
     lazy var fetchOne: (Int, Person? -> Void) -> Void = { personID, completion in
-        let provider = dip.resolve(personID) as PersonProviderAPI
+        let provider = providerDependencies.resolve(personID) as PersonProviderAPI
         return provider.fetch(personID, completion: completion)
+    }
+    
+    var fetchProgress: (current: Int, total: Int?) = (0, nil) {
+        didSet {
+            displayProgressInNavBar(self.navigationItem)
+        }
     }
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

@@ -12,11 +12,17 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var objects: [Starship]?
     var batchRequestID = 0
     
-    var provider: (Int? -> StarshipProviderAPI) = { dip.resolve($0) }
+    var provider: (Int? -> StarshipProviderAPI) = { providerDependencies.resolve($0) }
 
     lazy var fetchIDs: ([Int] -> Void) -> Void = self.provider(nil).fetchIDs
     lazy var fetchOne: (Int, Starship? -> Void) -> Void = { shipID, completion in
         self.provider(shipID).fetch(shipID, completion: completion)
+    }
+    
+    var fetchProgress: (current: Int, total: Int?) = (0, nil) {
+        didSet {
+            displayProgressInNavBar(self.navigationItem)
+        }
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
