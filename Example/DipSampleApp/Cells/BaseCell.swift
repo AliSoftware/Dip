@@ -9,15 +9,11 @@
 import UIKit
 
 protocol BaseCell {
-    typealias ObjectType
-    
     static var identifier: String { get }
     static var nib: UINib? { get }
     
     static func register(tableView: UITableView)
     static func dequeueFromTableView(tableView: UITableView, forIndexPath indexPath: NSIndexPath) -> Self
-    
-    func fillWithObject(object: ObjectType)
 }
 
 extension BaseCell where Self : UITableViewCell {
@@ -37,4 +33,9 @@ extension BaseCell where Self : UITableViewCell {
     static func dequeueFromTableView(tableView: UITableView, forIndexPath indexPath: NSIndexPath) -> Self {
         return tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath) as! Self
     }
+}
+
+protocol FillableCell: BaseCell {
+    typealias ObjectType
+    func fillWithObject(object: ObjectType)
 }

@@ -8,9 +8,7 @@
 
 import UIKit
 
-final class PersonCell : UITableViewCell, BaseCell {
-    typealias ObjectType = Person
-    
+final class PersonCell : UITableViewCell, FillableCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var genderImageView: UIImageView!
     @IBOutlet weak var heightLabel: UILabel!

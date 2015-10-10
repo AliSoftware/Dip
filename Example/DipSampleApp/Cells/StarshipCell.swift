@@ -8,9 +8,7 @@
 
 import UIKit
 
-final class StarshipCell : UITableViewCell, BaseCell {
-    typealias ObjectType = Starship
-    
+final class StarshipCell : UITableViewCell, FillableCell {
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var modelLabel: UILabel!
     @IBOutlet weak var manufacturerLabel: UILabel!

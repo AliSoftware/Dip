@@ -34,7 +34,7 @@ extension FetchableTrait {
                 } else {
                     self.objects = [object]
                 }
-                self.tableView.reloadData()
+                self.tableView?.reloadData()
             }
         }
     }
@@ -46,7 +46,7 @@ extension FetchableTrait {
         fetchAll() { objects in
             guard batch == self.batchRequestID else { return }
             self.objects = objects
-            self.tableView.reloadData()
+            self.tableView?.reloadData()
         }
     }
 }
