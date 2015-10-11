@@ -55,14 +55,56 @@ Typically, to register your dependencies as early as possible in your app life-c
 * Explicitly specify the return type of `resolve` so that Swift's type inference knows which protocol you're trying to resolve.
 * If that protocol was registered as a singleton instance (using `register(instance: …)`, the same instance will be returned each time you call `resolve()` for this protocol type. Otherwise, the instance factory will generate a new instance each time.
 
+### Using block-based initialization
+
+When calling the initializer of `DependencyContainer()`, you can pass a block that will be called right after the initialization. This allows you to have a nice syntax to do all your `register(…)` calls in there, instead of having to do them separately.
+
+It may not seem to provide much, but given the fact that `DependencyContainers` are typically declared as global constants using a top-level `let`, it gets very useful, because instead of having to do it like this :
+
+```swift
+let dip: DependencyContainer<String> = {
+    let dip = DependencyContainer<String>()
+
+    dip.register(instance: ProductionEnvironment(analytics: true) as EnvironmentType)
+    dip.register(instance: WebService() as WebServiceAPI)
+
+    return dip
+    }()
+```
+
+You can instead write this exact equivalent code, which is more compact, doesn't need you to write the `DependencyContainer<TagType>` twice, and indent better in Xcode (as the final closing brack is properly aligned):
+
+```swift
+let dip = DependencyContainer<String> { dip in
+    dip.register(instance: ProductionEnvironment(analytics: true) as EnvironmentType)
+    dip.register(instance: WebService() as WebServiceAPI)
+}
+```
+
 ### Using tags to associate various factories to one protocol
 
 * If you give a `tag` in the parameter to `register()`, it will associate that instance or factory with this tag, which can be used later during `resolve` (see below).
 * `resolve(tag)` will try to find an instance (or instance factory) that match both the requested protocol _and_ the tag. If it doesn't find any, it will fallback to an instance (or instance factory) that only match the requested protocol.
 * The tags can be anything, as long as it's of a type conforming to `Equatable`. `DependencyContainer` is a generic class which takes that type as generic parameter (so one `DependencyContainer` will be tied with a given tag type)
 
+For example, you can use an `Int`, a `String`… or even an `enum`, like this:
 
-### Example
+```swift
+enum WebService {
+    case PersonWS
+    case StarshipWS
+}
+
+let wsDependencies = DependencyContainer<WebService>() { dip in
+    
+    dip.register(.PersonWS, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
+    dip.register(.StashipWS, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
+    
+}
+```
+
+
+### Concrete Example
 
 Somewhere in your App target, register the dependencies:
 
@@ -111,7 +153,7 @@ This way, when running your app target:
 
 But when running your Unit tests target, it will probably resolve to other instances, depending on how you registered your dependencies in your Test Case.
 
-### Complete Example
+### Complete Example Project
 
 You can find a complete example in the `Example/DipSampleApp` project provided in this repository.
 
