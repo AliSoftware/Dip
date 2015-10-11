@@ -5,8 +5,8 @@
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 
-![Chocolate con churros - San Ginés, Madrid, by Matthew Hine](chocolate-churros.gif)  
-_Photo by [Matthew Hine](https://commons.wikimedia.org/wiki/File:Chocolate_con_churros_-_San_Ginés,_Madrid.jpg), cc-by-2.0_
+![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)  
+_Photo courtesy of [www.kevinandamanda.com](http://www.kevinandamanda.com/recipes/appetizer/homemade-soft-cinnamon-sugar-pretzel-bites-with-salted-caramel-dipping-sauce.html)_
 
 ## Introduction
 
@@ -163,10 +163,12 @@ network layer returning fixture data during the Unit Tests.
 This sample uses the Star Wars API provided by swapi.co to fetch Star Wars characters and starships info and display them in TableViews.
 
 
-## Author
+## Credits
 
-Olivier Halligon, olivier@halligon.net
+This library is authored by **Olivier Halligon**, olivier@halligon.net
 
-## License
+**Dip** is available under the **MIT license**. See the `LICENSE` file for more info.
 
-Dip is available under the MIT license. See the LICENSE file for more info.
+The animated GIF at the top of this `README.md` is from [this recipe](http://www.kevinandamanda.com/recipes/appetizer/homemade-soft-cinnamon-sugar-pretzel-bites-with-salted-caramel-dipping-sauce.html) on the yummy blog of [Kevin & Amanda](http://www.kevinandamanda.com/recipes/). Go try the recipe!
+
+The image used as the SampleApp LaunchScreen and Icon is from [Matthew Hine](https://commons.wikimedia.org/wiki/File:Chocolate_con_churros_-_San_Ginés,_Madrid.jpg) and is under _CC-by-2.0_.
