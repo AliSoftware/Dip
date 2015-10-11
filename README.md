@@ -18,7 +18,7 @@ It's inspired by `.NET`'s [Unity Container](https://msdn.microsoft.com/library/f
 * You start by creating `let dc = DependencyContainer()` and **register all your dependencies, by associating a `protocol` to an `instance` or a `factory`**.
 * Then anywhere in your application, you can call `dc.resolve()` to **resolve a `protocol` into an instance of a concrete type** using that `DependencyContainer`.
 
-This allows you to define the real, concrete types only in one place ([typically at the top of your `AppDelegate` for your app](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/AppDelegate.swift#L12-L21), and [in your `setUp` for your Unit Tests](https://github.com/AliSoftware/Dip/blob/master/Example/Tests/SWAPIWebServiceTests.swift#L36-L38)) and then [only work with `protocols` in your code](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/ViewController.swift#L15) (which only define an API contract), without worrying about the real implementation.
+This allows you to define the real, concrete types only in one place ([like this in your app](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/DependencyContainers.swift#L28-L33), and [in your `setUp` for your Unit Tests](https://github.com/AliSoftware/Dip/blob/master/Example/Tests/SWAPIWebServiceTests.swift#L36-L38)) and then [only work with `protocols` in your code](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/Providers/SWAPIStarshipProvider.swift#L12) (which only define an API contract), without worrying about the real implementation.
 
 ## Advantages of DI and loose coupling
 
@@ -111,14 +111,20 @@ This way, when running your app target:
 
 But when running your Unit tests target, it will probably resolve to other instances, depending on how you registered your dependencies in your Test Case.
 
+### Complete Example
+
+You can find a complete example in the `Example/DipSampleApp` project provided in this repository.
+
+This sample project is a bit more complex, but closer to real-world applications (even if this sample is all about StarWars!),
+by declaring protocols like `NetworkLayer` which can be resolved to a `URLSessionNetworkLayer` in the real app, but to a dummy
+network layer returning fixture data during the Unit Tests.
+
+This sample uses the Star Wars API provided by swapi.co to fetch Star Wars characters and starships info and display them in TableViews.
+
 
 ## Work In Progress
 
-* [x] Example project
 * [ ] Unit Tests
-* [x] README
-* [X] Source Documentation
-* [X] Thread-Safety
 
 
 ## Author

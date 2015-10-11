@@ -34,8 +34,8 @@
 		09D7961B1BC9BE65003C68EB /* SWAPIStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
 		09D7961D1BC9C62E003C68EB /* SWAPICommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */; settings = {ASSET_TAGS = (); }; };
 		607FACEC1AFB9204008FA782 /* SWAPIWebServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* SWAPIWebServiceTests.swift */; };
-		7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 304AD039660A2C58EB08D985 /* Pods_DipTests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		84D8EBE5B2D583BEFB17C45A /* Pods_DipSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 304AD039660A2C58EB08D985 /* Pods_DipTests.framework */; };
+		84D8EBE5B2D583BEFB17C45A /* Pods_DipSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
