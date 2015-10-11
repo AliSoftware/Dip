@@ -36,6 +36,7 @@ public class DependencyContainer<TagType : Equatable> {
     private typealias Key = ProtoTagKey<TagType>
     
     private var dependencies = [Key : InstanceFactory]()
+    private var lock: OSSpinLock = OS_SPINLOCK_INIT
     
     public init(@noescape configBlock: (DependencyContainer->Void) = { _ in }) {
         configBlock(self)
@@ -44,7 +45,9 @@ public class DependencyContainer<TagType : Equatable> {
     // MARK: Reset all dependencies
     
     public func reset() {
-        dependencies.removeAll()
+        lockAndDo {
+            dependencies.removeAll()
+        }
     }
     
     // MARK: Register dependencies
@@ -52,23 +55,28 @@ public class DependencyContainer<TagType : Equatable> {
     /// Register a TagType?->T factory (which takes the tag as parameter)
     public func register<T : Any>(tag: TagType? = nil, factory: TagType?->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
-        dependencies[key] = { factory($0) }
+        lockAndDo {
+            dependencies[key] = { factory($0) }
+        }
     }
     
     /// Register a Void->T factory (which don't care about the tag used)
     public func register<T : Any>(tag: TagType? = nil, factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
-        dependencies[key] = { _ in factory() }
+        lockAndDo {
+            dependencies[key] = { _ in factory() }
+        }
     }
     
     /// Register a Singleton instance
     public func register<T : Any>(tag: TagType? = nil, @autoclosure(escaping) instance factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
-        // FIXME: Make it thread-safe
-        dependencies[key] = { _ in
-            let instance = factory()
-            self.dependencies[key] = { _ in return instance }
-            return instance
+        lockAndDo {
+            dependencies[key] = { _ in
+                let instance = factory()
+                self.dependencies[key] = { _ in return instance }
+                return instance
+            }
         }
     }
     
@@ -81,10 +89,20 @@ public class DependencyContainer<TagType : Equatable> {
     public func resolve<T>(tag: TagType? = nil) -> T! {
         let key = Key(protocolType: T.self, associatedTag: tag)
         let nilKey = Key(protocolType: T.self, associatedTag: nil)
-        guard let factory = dependencies[key] ?? dependencies[nilKey] else {
-            fatalError("No instance factory registered with \(key)")
+        var resolved: T!
+        lockAndDo { [unowned self] in
+            guard let factory = self.dependencies[key] ?? self.dependencies[nilKey] else {
+                fatalError("No instance factory registered with \(key)")
+            }
+            resolved = factory(tag) as! T
         }
-        return factory(tag) as! T
+        return resolved
+    }
+
+    private func lockAndDo(@noescape block: Void->Void) {
+        OSSpinLockLock(&lock)
+        defer { OSSpinLockUnlock(&lock) }
+        block()
     }
 }
 
