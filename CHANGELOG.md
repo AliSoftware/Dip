@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.0.1
+
+* Improved README
+* Imrpoved discoverability using keywords in `podspec`
+
 ## 1.0.0
 
 #### Dip

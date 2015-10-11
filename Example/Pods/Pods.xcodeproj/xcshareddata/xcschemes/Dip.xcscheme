@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'C1B5AE1707BA9907C05BEC25'
+               BlueprintIdentifier = 'F898EE358E970DD87AE48E7E'
                BlueprintName = 'Dip'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'Dip.framework'>

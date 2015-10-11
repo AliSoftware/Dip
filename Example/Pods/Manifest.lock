@@ -1,5 +1,5 @@
 PODS:
-  - Dip (1.0.0)
+  - Dip (1.0.1)
 
 DEPENDENCIES:
   - Dip (from `../`)
@@ -9,6 +9,6 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  Dip: 25f7794871e836ba68d303e3ada4c0cdbe1afac7
+  Dip: 66dafc23bc285b2df13ca493bbd60a5b119df1c4
 
 COCOAPODS: 0.39.0
