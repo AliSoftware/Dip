@@ -12,6 +12,11 @@ enum SWAPIError: ErrorType {
     case InvalidJSON
 }
 
+enum WebService {
+    case PersonWS
+    case StarshipWS
+}
+
 func idFromURLString(urlString: String) -> Int? {
     let url = NSURL(string: urlString)
     let idString = url.flatMap { $0.lastPathComponent }

@@ -14,7 +14,7 @@ struct SWAPIPersonProvider : PersonProviderAPI {
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("people") { response in
             do {
-                let dict = try response.json()
+                let dict = try response.json() as NSDictionary
                 guard let results = dict["results"] as? [NSDictionary] else { throw SWAPIError.InvalidJSON }
                 
                 // Extract URLs (flatten to ignore invalid ones)
@@ -32,15 +32,15 @@ struct SWAPIPersonProvider : PersonProviderAPI {
     func fetch(id: Int, completion: Person? -> Void) {
         ws.request("people/\(id)") { response in
             do {
-                let json = try response.json()
-                guard let dict = json as? NSDictionary,
-                    let name = dict["name"] as? String,
-                    let heightStr = dict["height"] as? String, height = Int(heightStr),
-                    let massStr = dict["mass"] as? String, mass = Int(massStr),
-                    let hairColor = dict["hair_color"] as? String,
-                    let eyeColor = dict["eye_color"] as? String,
-                    let gender = dict["gender"] as? String,
-                    let starshipURLStrings = dict["starships"] as? [String]
+                let json = try response.json() as NSDictionary
+                guard
+                    let name = json["name"] as? String,
+                    let heightStr = json["height"] as? String, height = Int(heightStr),
+                    let massStr = json["mass"] as? String, mass = Int(massStr),
+                    let hairColor = json["hair_color"] as? String,
+                    let eyeColor = json["eye_color"] as? String,
+                    let gender = json["gender"] as? String,
+                    let starshipURLStrings = json["starships"] as? [String]
                     else {
                         throw SWAPIError.InvalidJSON
                 }

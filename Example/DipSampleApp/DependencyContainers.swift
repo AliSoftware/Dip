@@ -17,12 +17,6 @@ private let FAKE_STARSHIPS = false
 /* ---- */
 
 
-enum WebService {
-    case PersonWS
-    case StarshipWS
-}
-
-
 
 // MARK: Dependency Container for WebServices & NetworkLayer
 let wsDependencies = DependencyContainer<WebService>() { dip in
