@@ -12,10 +12,13 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var objects: [Starship]?
     var batchRequestID = 0
     
-    var provider: (Int? -> StarshipProviderAPI) = { providerDependencies.resolve($0) }
-    lazy var fetchIDs: ([Int] -> Void) -> Void = self.provider(nil).fetchIDs
-    lazy var fetchOne: (Int, Starship? -> Void) -> Void = { shipID, completion in
-        self.provider(shipID).fetch(shipID, completion: completion)
+    private func provider(tag:Int?) -> StarshipProviderAPI { return providerDependencies.resolve(tag) }
+    
+    func fetchIDs(completion: [Int] -> Void) {
+        provider(nil).fetchIDs(completion)
+    }
+    func fetchOne(shipID:Int, completion: Starship? -> Void) {
+        provider(shipID).fetch(shipID, completion: completion)
     }
     
     var fetchProgress: (current: Int, total: Int?) = (0, nil) {
@@ -35,7 +38,7 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
                 fatalError()
         }
         
-        destVC.fetchObjects(starship.pilotIDs)
+        destVC.loadObjects(starship.pilotIDs)
     }
 }
 

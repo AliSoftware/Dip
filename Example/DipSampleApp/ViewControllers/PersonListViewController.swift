@@ -12,8 +12,11 @@ class PersonListViewController: UITableViewController, FetchableTrait {
     var objects: [Person]?
     var batchRequestID = 0
         
-    lazy var fetchIDs: ([Int] -> Void) -> Void = (providerDependencies.resolve() as PersonProviderAPI).fetchIDs
-    lazy var fetchOne: (Int, Person? -> Void) -> Void = { personID, completion in
+    func fetchIDs(completion: [Int] -> Void) {
+        let provider = providerDependencies.resolve() as PersonProviderAPI
+        return provider.fetchIDs(completion)
+    }
+    func fetchOne(personID: Int, completion: Person? -> Void) {
         let provider = providerDependencies.resolve(personID) as PersonProviderAPI
         return provider.fetch(personID, completion: completion)
     }
@@ -35,7 +38,7 @@ class PersonListViewController: UITableViewController, FetchableTrait {
                 fatalError()
         }
         
-        destVC.fetchObjects(person.starshipIDs)
+        destVC.loadObjects(person.starshipIDs)
     }
 }
 

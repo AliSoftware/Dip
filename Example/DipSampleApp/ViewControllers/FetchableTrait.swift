@@ -14,13 +14,13 @@ protocol FetchableTrait: class {
     var batchRequestID: Int { get set }
     var tableView: UITableView! { get }
     
-    var fetchIDs: ([Int] -> Void) -> Void { get }
-    var fetchOne: (Int, ObjectType? -> Void) -> Void { get }
+    func fetchIDs(completion: [Int] -> Void)
+    func fetchOne(id: Int, completion: ObjectType? -> Void)
     var fetchProgress: (current: Int, total: Int?) { get set }
 }
 
 extension FetchableTrait {
-    func fetchObjects(objectIDs: [Int]) {
+    func loadObjects(objectIDs: [Int]) {
         self.batchRequestID += 1
         let batch = self.batchRequestID
         
@@ -34,19 +34,19 @@ extension FetchableTrait {
 
                 if self.objects == nil { self.objects = [] }
                 self.objects?.append(object)
-                self.fetchProgress = (self.objects?.count ?? 0, objectIDs.count)
+                self.fetchProgress.current = self.objects?.count ?? 0
                 self.tableView?.reloadData()
             }
         }
     }
     
-    func fetchAllObjects() {
+    func loadFirstPage() {
         self.batchRequestID += 1
         let batch = self.batchRequestID
         fetchProgress = (0, nil)
         fetchIDs() { objectIDs in
             guard batch == self.batchRequestID else { return }
-            self.fetchObjects(objectIDs)
+            self.loadObjects(objectIDs)
         }
     }
     

@@ -12,10 +12,13 @@ class PlistPersonProvider : PersonProviderAPI {
     let people: [Person]
     
     init(plist basename: String) {
-        guard let path = NSBundle.mainBundle().pathForResource(basename, ofType: "plist"),
+        guard
+            let path = NSBundle.mainBundle().pathForResource(basename, ofType: "plist"),
             let list = NSArray(contentsOfFile: path),
             peopleDict = list as? [[String:AnyObject]]
-            else { fatalError("PLIST for \(basename) not found") }
+            else {
+                fatalError("PLIST for \(basename) not found")
+        }
         
         self.people = peopleDict.map(PlistPersonProvider.personFromDict)
     }
@@ -41,7 +44,8 @@ class PlistPersonProvider : PersonProviderAPI {
             eyeColor = dict["eyeColor"] as? String,
             genderStr = dict["gender"] as? String,
             starshipsIDs = dict["starships"] as? [Int]
-            else { fatalError("Invalid Plist")
+            else {
+                fatalError("Invalid Plist")
         }
         
         return Person(

@@ -19,10 +19,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let tabBarVC = self.window?.rootViewController as? UITabBarController,
             let vcs = tabBarVC.viewControllers as? [UINavigationController] {
                 if let personListVC = vcs[0].topViewController as? PersonListViewController {
-                    personListVC.fetchAllObjects()
+                    personListVC.loadFirstPage()
                 }
                 if let starshipListVC = vcs[1].topViewController as? StarshipListViewController {
-                    starshipListVC.fetchAllObjects()
+                    starshipListVC.loadFirstPage()
                 }
         }
         
