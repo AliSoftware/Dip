@@ -13,7 +13,6 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var batchRequestID = 0
     
     var provider: (Int? -> StarshipProviderAPI) = { providerDependencies.resolve($0) }
-
     lazy var fetchIDs: ([Int] -> Void) -> Void = self.provider(nil).fetchIDs
     lazy var fetchOne: (Int, Starship? -> Void) -> Void = { shipID, completion in
         self.provider(shipID).fetch(shipID, completion: completion)

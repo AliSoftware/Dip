@@ -9,13 +9,22 @@
 import Foundation
 import Dip
 
+// MARK: Configuration
+
+/* Change this to toggle between real and fake data */
+private let FAKE_PERSONS = false
+private let FAKE_STARSHIPS = false
+/* ---- */
+
 
 enum WebService {
     case PersonWS
     case StarshipWS
 }
 
-// Dependency Container for WebServices & NetworkLayer
+
+
+// MARK: Dependency Container for WebServices & NetworkLayer
 let wsDependencies: DependencyContainer<WebService> = {
     let dip = DependencyContainer<WebService>()
     
@@ -27,12 +36,7 @@ let wsDependencies: DependencyContainer<WebService> = {
 
 
 
-/* Change this to toggle between real and fake data */
-let FAKE_PERSONS = false
-let FAKE_STARSHIPS = false
-
-
-// Dependency Container for Providers
+// MARK: Dependency Container for Providers
 let providerDependencies: DependencyContainer<Int> = {
     let dip = DependencyContainer<Int>()
 

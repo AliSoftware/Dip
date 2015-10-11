@@ -14,7 +14,7 @@ class HardCodedStarshipProvider : StarshipProviderAPI {
         Starship(name: "First Ship", model: "AwesomeShip", manufacturer: "HardCoded Inc.", crew: 3, passengers: 20, pilotIDs: [1,2]),
         Starship(name: "Second Ship", model: "AwesomeShip Express", manufacturer: "HardCoded Inc.", crew: 4, passengers: 10, pilotIDs: [1]),
         Starship(name: "Third Ship", model: "AwesomeShip Cargo", manufacturer: "HardCoded Inc.", crew: 12, passengers: 150, pilotIDs: [2]),
-    ]
+        ] + Array(4..<75).map { Starship(name: "Ship #\($0)", model: "AwesomeShip Fighter", manufacturer: "HardCoded Inc.", crew: 1, passengers: 2, pilotIDs: [1]) }
     
     func fetchIDs(completion: [Int] -> Void) {
         completion(Array(0..<starships.count))
