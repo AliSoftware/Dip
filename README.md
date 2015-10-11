@@ -117,7 +117,7 @@ But when running your Unit tests target, it will probably resolve to other insta
 * [x] Example project
 * [ ] Unit Tests
 * [x] README
-* [ ] Source Documentation
+* [X] Source Documentation
 * [X] Thread-Safety
 
 
