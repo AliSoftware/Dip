@@ -37,7 +37,9 @@ public class DependencyContainer<TagType : Equatable> {
     
     private var dependencies = [Key : InstanceFactory]()
     
-    public init() {}
+    public init(@noescape configBlock: (DependencyContainer->Void) = { _ in }) {
+        configBlock(self)
+    }
     
     // MARK: Reset all dependencies
     
