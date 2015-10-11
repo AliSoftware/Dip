@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "0.1.0"
-  s.summary          = "A simple Dependency Resolver (Simplified Dependency Injection-like resolution)."
+  s.version          = "1.0.0"
+  s.summary          = "A simple Dependency Resolver (Dependency Injection using Protocol resolution)."
 
   s.description      = <<-DESC
                         Dip is a Swift framework to manage your Dependencies between your classes

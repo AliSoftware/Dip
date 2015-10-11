@@ -122,11 +122,6 @@ network layer returning fixture data during the Unit Tests.
 This sample uses the Star Wars API provided by swapi.co to fetch Star Wars characters and starships info and display them in TableViews.
 
 
-## Work In Progress
-
-* [ ] Unit Tests
-
-
 ## Author
 
 Olivier Halligon, olivier@halligon.net
