@@ -22,7 +22,7 @@ class SWAPIPersonProviderTests: XCTestCase {
     
     func testFetchPersonIDs() {
         let mock = NetworkMock(json: ["results": [fakePerson1, fakePerson2]])
-        wsDependencies.register(.PersonWS, instance: mock as NetworkLayer)
+        wsDependencies.register(PersonWebServiceTag, instance: mock as NetworkLayer)
         
         let provider = SWAPIPersonProvider()
         provider.fetchIDs { personIDs in
@@ -37,7 +37,7 @@ class SWAPIPersonProviderTests: XCTestCase {
     func testFetchOnePerson() {
         
         let mock = NetworkMock(json: fakePerson1)
-        wsDependencies.register(.PersonWS, instance: mock as NetworkLayer)
+        wsDependencies.register(PersonWebServiceTag, instance: mock as NetworkLayer)
         
         let provider = SWAPIPersonProvider()
         provider.fetch(1) { person in
@@ -57,7 +57,7 @@ class SWAPIPersonProviderTests: XCTestCase {
     func testFetchInvalidPerson() {
         let json = ["error":"whoops"]
         let mock = NetworkMock(json: json)
-        wsDependencies.register(.PersonWS, instance: mock as NetworkLayer)
+        wsDependencies.register(PersonWebServiceTag, instance: mock as NetworkLayer)
         
         let provider = SWAPIPersonProvider()
         provider.fetch(12) { person in

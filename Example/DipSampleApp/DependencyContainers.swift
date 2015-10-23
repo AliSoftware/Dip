@@ -19,7 +19,7 @@ private let FAKE_STARSHIPS = false
 
 
 // MARK: Dependency Container for WebServices & NetworkLayer
-let wsDependencies = DependencyContainer<WebService>() { dip in
+let wsDependencies = DependencyContainer() { dip in
     
     // Register the NetworkLayer, same for everyone here (but we have the ability to register a different one for a specific WebService if we wanted to)
     dip.register(instance: URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer)
@@ -27,15 +27,17 @@ let wsDependencies = DependencyContainer<WebService>() { dip in
 }
 
 
+let NamedStarshipProviderTag    = "NamedStarshipProvider"
+let PlistPersonProviderTag      = "PlistPersonProvider"
 
 // MARK: Dependency Container for Providers
-let providerDependencies = DependencyContainer<Int>() { dip in
+let providerDependencies = DependencyContainer() { dip in
     
     if FAKE_PERSONS {
         
         // 1) Register the PersonProviderAPI singleton, one generic and one specific for a specific personID
         dip.register(instance: DummyPilotProvider() as PersonProviderAPI)
-        dip.register(0, instance: PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI)
+        dip.register(PlistPersonProviderTag, instance: PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI)
         
     } else {
         
@@ -48,7 +50,7 @@ let providerDependencies = DependencyContainer<Int>() { dip in
 
         // 2) Register the StarshipProviderAPI factories, one generic and one specific for a specific starshipID
         dip.register() { HardCodedStarshipProvider() as StarshipProviderAPI }
-        dip.register(0) { DummyStarshipProvider(pilotName: "Main Pilot") as StarshipProviderAPI }
+        dip.register(NamedStarshipProviderTag) { DummyStarshipProvider(pilotName: "Main Pilot") as StarshipProviderAPI }
         
     } else {
         

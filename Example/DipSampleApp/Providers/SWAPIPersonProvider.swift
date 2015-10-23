@@ -8,8 +8,10 @@
 
 import Foundation
 
+let PersonWebServiceTag = "PersonWS"
+
 struct SWAPIPersonProvider : PersonProviderAPI {
-    let ws = wsDependencies.resolve(.PersonWS) as NetworkLayer
+    let ws = wsDependencies.resolve(PersonWebServiceTag) as NetworkLayer
     
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("people") { response in

@@ -11,9 +11,9 @@ import Foundation
 /**
 *  Internal representation of a key to associate protocols & tags to an instance factory
 */
-private struct ProtoTagKey<TagType : Equatable> : Hashable, Equatable, CustomDebugStringConvertible {
+private struct ProtoTagKey : Hashable, Equatable, CustomDebugStringConvertible {
     var protocolType: Any.Type
-    var associatedTag: TagType?
+    var associatedTag: String?
     
     var hashValue: Int {
         return "\(protocolType)-\(associatedTag)".hashValue
@@ -24,7 +24,7 @@ private struct ProtoTagKey<TagType : Equatable> : Hashable, Equatable, CustomDeb
     }
 }
 
-private func ==<T>(lhs: ProtoTagKey<T>, rhs: ProtoTagKey<T>) -> Bool {
+private func ==(lhs: ProtoTagKey, rhs: ProtoTagKey) -> Bool {
     return lhs.protocolType == rhs.protocolType && lhs.associatedTag == rhs.associatedTag
 }
 
@@ -34,10 +34,10 @@ private func ==<T>(lhs: ProtoTagKey<T>, rhs: ProtoTagKey<T>) -> Bool {
   _Dip_'s Dependency Containers allow you to do very simple **Dependency Injection**
   by associating `protocols` to concrete implementations
 */
-public class DependencyContainer<TagType : Equatable> {
+public class DependencyContainer {
     private typealias InstanceType = Any
-    private typealias InstanceFactory = TagType?->InstanceType
-    private typealias Key = ProtoTagKey<TagType>
+    private typealias InstanceFactory = String?->InstanceType
+    private typealias Key = ProtoTagKey
     
     private var dependencies = [Key : InstanceFactory]()
     private var lock: OSSpinLock = OS_SPINLOCK_INIT
@@ -78,7 +78,7 @@ public class DependencyContainer<TagType : Equatable> {
     
     - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T>(tag: TagType? = nil, factory: TagType?->T) {
+    public func register<T>(tag: String? = nil, factory: String?->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { factory($0) }
@@ -93,7 +93,7 @@ public class DependencyContainer<TagType : Equatable> {
     
     - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T>(tag: TagType? = nil, factory: Void->T) {
+    public func register<T>(tag: String? = nil, factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { _ in factory() }
@@ -109,7 +109,7 @@ public class DependencyContainer<TagType : Equatable> {
     
     - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T>(tag: TagType? = nil, @autoclosure(escaping) instance factory: Void->T) {
+    public func register<T>(tag: String? = nil, @autoclosure(escaping) instance factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { _ in
@@ -129,7 +129,7 @@ public class DependencyContainer<TagType : Equatable> {
                       If no instance/factory was registered with this `tag` for this `protocol`,
                       it will resolve to the instance/factory associated with `nil` (no tag).
     */
-    public func resolve<T>(tag: TagType? = nil) -> T! {
+    public func resolve<T>(tag: String? = nil) -> T! {
         let key = Key(protocolType: T.self, associatedTag: tag)
         let nilKey = Key(protocolType: T.self, associatedTag: nil)
         var resolved: T!
