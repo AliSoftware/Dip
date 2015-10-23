@@ -78,7 +78,7 @@ public class DependencyContainer<TagType : Equatable> {
     
     - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T : Any>(tag: TagType? = nil, factory: TagType?->T) {
+    public func register<T>(tag: TagType? = nil, factory: TagType?->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { factory($0) }
@@ -93,7 +93,7 @@ public class DependencyContainer<TagType : Equatable> {
     
     - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T : Any>(tag: TagType? = nil, factory: Void->T) {
+    public func register<T>(tag: TagType? = nil, factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { _ in factory() }
@@ -109,7 +109,7 @@ public class DependencyContainer<TagType : Equatable> {
     
     - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T : Any>(tag: TagType? = nil, @autoclosure(escaping) instance factory: Void->T) {
+    public func register<T>(tag: TagType? = nil, @autoclosure(escaping) instance factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { _ in
