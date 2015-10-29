@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import Dip
 
-let StarshipWebServiceTag = "StarshipWS"
+let StarshipWebServiceTag = Tag.String("StarshipWS")
 
 struct SWAPIStarshipProvider : StarshipProviderAPI {
     let ws = wsDependencies.resolve(StarshipWebServiceTag) as NetworkLayer

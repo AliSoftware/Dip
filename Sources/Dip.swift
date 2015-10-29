@@ -8,12 +8,28 @@
 
 import Foundation
 
+public enum Tag: Equatable {
+    case String(Swift.String)
+    case Int(Swift.Int)
+}
+
+public func ==(lhs: Tag, rhs: Tag) -> Bool {
+    switch (lhs, rhs) {
+    case let (.String(lhsString), .String(rhsString)):
+        return lhsString == rhsString
+    case let (.Int(lhsInt), .Int(rhsInt)):
+        return lhsInt == rhsInt
+    default:
+        return false
+    }
+}
+
 /**
 *  Internal representation of a key to associate protocols & tags to an instance factory
 */
 private struct ProtoTagKey : Hashable, Equatable, CustomDebugStringConvertible {
     var protocolType: Any.Type
-    var associatedTag: String?
+    var associatedTag: Tag?
     
     var hashValue: Int {
         return "\(protocolType)-\(associatedTag)".hashValue
@@ -36,7 +52,7 @@ private func ==(lhs: ProtoTagKey, rhs: ProtoTagKey) -> Bool {
 */
 public class DependencyContainer {
     private typealias InstanceType = Any
-    private typealias InstanceFactory = String?->InstanceType
+    private typealias InstanceFactory = Tag?->InstanceType
     private typealias Key = ProtoTagKey
     
     private var dependencies = [Key : InstanceFactory]()
@@ -78,7 +94,7 @@ public class DependencyContainer {
     
     - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T>(tag: String? = nil, factory: String?->T) {
+    public func register<T>(tag: Tag? = nil, factory: Tag?->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { factory($0) }
@@ -93,7 +109,7 @@ public class DependencyContainer {
     
     - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T>(tag: String? = nil, factory: Void->T) {
+    public func register<T>(tag: Tag? = nil, factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { _ in factory() }
@@ -109,7 +125,7 @@ public class DependencyContainer {
     
     - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
     */
-    public func register<T>(tag: String? = nil, @autoclosure(escaping) instance factory: Void->T) {
+    public func register<T>(tag: Tag? = nil, @autoclosure(escaping) instance factory: Void->T) {
         let key = Key(protocolType: T.self, associatedTag: tag)
         lockAndDo {
             dependencies[key] = { _ in
@@ -129,7 +145,7 @@ public class DependencyContainer {
                       If no instance/factory was registered with this `tag` for this `protocol`,
                       it will resolve to the instance/factory associated with `nil` (no tag).
     */
-    public func resolve<T>(tag: String? = nil) -> T! {
+    public func resolve<T>(tag: Tag? = nil) -> T! {
         let key = Key(protocolType: T.self, associatedTag: tag)
         let nilKey = Key(protocolType: T.self, associatedTag: nil)
         var resolved: T!

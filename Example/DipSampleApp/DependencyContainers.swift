@@ -27,8 +27,8 @@ let wsDependencies = DependencyContainer() { dip in
 }
 
 
-let NamedStarshipProviderTag    = "NamedStarshipProvider"
-let PlistPersonProviderTag      = "PlistPersonProvider"
+let NamedStarshipProviderTag    = Tag.String("NamedStarshipProvider")
+let PlistPersonProviderTag      = Tag.String("PlistPersonProvider")
 
 // MARK: Dependency Container for Providers
 let providerDependencies = DependencyContainer() { dip in
