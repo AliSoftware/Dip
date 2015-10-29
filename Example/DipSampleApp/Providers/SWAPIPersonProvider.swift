@@ -9,7 +9,7 @@
 import Foundation
 import Dip
 
-let PersonWebServiceTag = Tag.String("PersonWS")
+let PersonWebServiceTag: Tag = "PersonWS"
 
 struct SWAPIPersonProvider : PersonProviderAPI {
     let ws = wsDependencies.resolve(PersonWebServiceTag) as NetworkLayer

@@ -9,8 +9,31 @@
 import Foundation
 
 public enum Tag: Equatable {
-    case String(Swift.String)
-    case Int(Swift.Int)
+    case String(StringLiteralType)
+    case Int(IntegerLiteralType)
+}
+
+extension Tag: IntegerLiteralConvertible {
+    public init(integerLiteral value: IntegerLiteralType) {
+        self = .Int(value)
+    }
+}
+
+extension Tag: StringLiteralConvertible {
+    public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
+    public typealias UnicodeScalarLiteralType = StringLiteralType
+    
+    public init(stringLiteral value: StringLiteralType) {
+        self = .String(value)
+    }
+    
+    public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
+        self.init(stringLiteral: value)
+    }
+    
+    public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
+        self.init(stringLiteral: value)
+    }
 }
 
 public func ==(lhs: Tag, rhs: Tag) -> Bool {
