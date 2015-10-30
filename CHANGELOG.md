@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## MASTER
+
+* Moved from generic _tag_ parameter on container to `Tag` enum with `String` and `Int` cases ([#3](https://github.com/AliSoftware/Dip/pull/3), [@ilyapuchka](https://github.com/ilyapuchka))
+
 ## 1.0.1
 
 * Improved README
