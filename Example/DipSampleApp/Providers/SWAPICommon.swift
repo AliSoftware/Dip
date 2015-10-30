@@ -7,14 +7,16 @@
 //
 
 import Foundation
+import Dip
 
 enum SWAPIError: ErrorType {
     case InvalidJSON
 }
 
-enum WebService {
+enum WebService: String {
     case PersonWS
     case StarshipWS
+    var tag: Tag { return Tag.String(self.rawValue) }
 }
 
 func idFromURLString(urlString: String) -> Int? {

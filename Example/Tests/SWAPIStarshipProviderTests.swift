@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import Dip
 
 class SWAPIStarshipProviderTests: XCTestCase {
     let fakeShip1 = ["name": "Falcon", "model": "Fighter", "manufacturer": "Fake Industries", "crew": "7", "passengers": "15",
@@ -22,7 +23,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
     
     func testFetchStarshipIDs() {
         let mock = NetworkMock(json: ["results": [fakeShip1, fakeShip2]])
-        wsDependencies.register(StarshipWebServiceTag, instance: mock as NetworkLayer)
+        wsDependencies.register(WebService.StarshipWS.tag, instance: mock as NetworkLayer)
         
         let provider = SWAPIStarshipProvider()
         provider.fetchIDs { shipIDs in
@@ -37,7 +38,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
     func testFetchOneStarship() {
         
         let mock = NetworkMock(json: fakeShip1)
-        wsDependencies.register(StarshipWebServiceTag, instance: mock as NetworkLayer)
+        wsDependencies.register(WebService.StarshipWS.tag, instance: mock as NetworkLayer)
         
         let provider = SWAPIStarshipProvider()
         provider.fetch(1) { starship in
@@ -56,7 +57,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
     func testFetchInvalidStarship() {
         let json = ["error":"whoops"]
         let mock = NetworkMock(json: json)
-        wsDependencies.register(StarshipWebServiceTag, instance: mock as NetworkLayer)
+        wsDependencies.register(WebService.StarshipWS.tag, instance: mock as NetworkLayer)
         
         let provider = SWAPIStarshipProvider()
         provider.fetch(12) { starship in

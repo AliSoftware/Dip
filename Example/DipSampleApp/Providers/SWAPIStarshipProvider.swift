@@ -7,12 +7,9 @@
 //
 
 import Foundation
-import Dip
-
-let StarshipWebServiceTag: Tag = "StarshipWS"
 
 struct SWAPIStarshipProvider : StarshipProviderAPI {
-    let ws = wsDependencies.resolve(StarshipWebServiceTag) as NetworkLayer
+    let ws = wsDependencies.resolve(WebService.StarshipWS.tag) as NetworkLayer
     
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("starships") { response in

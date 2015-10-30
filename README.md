@@ -88,12 +88,15 @@ let dip = DependencyContainer { dip in
 
 
 ```swift
-let PersonWSTag: Tag = "PersonWS"
-let StashipWSTag: Tag = "StashipWS"
+enum WebService: String {
+    case PersonWS
+    case StarshipWS
+    var tag: Tag { return Tag.String(self.rawValue) }
+}
 
 let wsDependencies = DependencyContainer<WebService>() { dip in
-    dip.register(PersonWSTag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
-    dip.register(StashipWSTag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
+    dip.register(WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
+    dip.register(WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
 }
 ```
 

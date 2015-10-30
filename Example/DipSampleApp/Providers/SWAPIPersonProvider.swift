@@ -7,12 +7,9 @@
 //
 
 import Foundation
-import Dip
-
-let PersonWebServiceTag: Tag = "PersonWS"
 
 struct SWAPIPersonProvider : PersonProviderAPI {
-    let ws = wsDependencies.resolve(PersonWebServiceTag) as NetworkLayer
+    let ws = wsDependencies.resolve(WebService.PersonWS.tag) as NetworkLayer
     
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("people") { response in

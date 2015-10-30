@@ -27,9 +27,6 @@ let wsDependencies = DependencyContainer() { dip in
 }
 
 
-let NamedStarshipProviderTag: Tag    = "NamedStarshipProvider"
-let PlistPersonProviderTag: Tag      = "PlistPersonProvider"
-
 // MARK: Dependency Container for Providers
 let providerDependencies = DependencyContainer() { dip in
     
@@ -37,7 +34,7 @@ let providerDependencies = DependencyContainer() { dip in
         
         // 1) Register the PersonProviderAPI singleton, one generic and one specific for a specific personID
         dip.register(instance: DummyPilotProvider() as PersonProviderAPI)
-        dip.register(PlistPersonProviderTag, instance: PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI)
+        dip.register(0, instance: PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI)
         
     } else {
         
@@ -50,7 +47,7 @@ let providerDependencies = DependencyContainer() { dip in
 
         // 2) Register the StarshipProviderAPI factories, one generic and one specific for a specific starshipID
         dip.register() { HardCodedStarshipProvider() as StarshipProviderAPI }
-        dip.register(NamedStarshipProviderTag) { DummyStarshipProvider(pilotName: "Main Pilot") as StarshipProviderAPI }
+        dip.register(0) { DummyStarshipProvider(pilotName: "Main Pilot") as StarshipProviderAPI }
         
     } else {
         
