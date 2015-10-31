@@ -1,8 +1,11 @@
 # CHANGELOG
 
-## MASTER
+## 2.0.0
 
-* Moved from generic _tag_ parameter on container to `Tag` enum with `String` and `Int` cases ([#3](https://github.com/AliSoftware/Dip/pull/3), [@ilyapuchka](https://github.com/ilyapuchka))
+* Moved from generic _tag_ parameter on container to `Tag` enum with `String` and `Int` cases  
+[#3](https://github.com/AliSoftware/Dip/pull/3), [@ilyapuchka](https://github.com/ilyapuchka)
+
+> This API change allows easier use of `DependencyContainer` and avoid some constraints. For a complete rationale on that change, see [PR #3](https://github.com/AliSoftware/Dip/pull/3).
 
 ## 1.0.1
 

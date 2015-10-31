@@ -16,7 +16,7 @@ enum SWAPIError: ErrorType {
 enum WebService: String {
     case PersonWS
     case StarshipWS
-    var tag: Tag { return Tag.String(self.rawValue) }
+    var tag: DependencyContainer.Tag { return DependencyContainer.Tag.String(self.rawValue) }
 }
 
 func idFromURLString(urlString: String) -> Int? {
