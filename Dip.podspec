@@ -1,11 +1,11 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "1.0.1"
-  s.summary          = "A simple Dependency Resolver (Dependency Injection using Protocol resolution)."
+  s.version          = "2.0.0"
+  s.summary          = "A simple Dependency Resolver: Dependency Injection using Protocol resolution."
 
   s.description      = <<-DESC
                         Dip is a Swift framework to manage your Dependencies between your classes
-                        in your app.
+                        in your app using Dependency Injection.
 
                         It's aimed to be very simple to use while improving testability
                         of your app by allowing you to get rid of those sharedInstances and instead
@@ -15,8 +15,6 @@ Pod::Spec.new do |s|
                         an instance dynamically in your classes. Then your App and your Tests can be
                         configured to resolve the protocol using a different instance or class so this
                         improve testability by decoupling the API and the concrete class used to implement it.
-
-                        It's not real Dependency Injection _per se_, but it's close.
                        DESC
 
   s.homepage         = "https://github.com/AliSoftware/Dip"
