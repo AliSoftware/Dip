@@ -61,8 +61,8 @@ When calling the initializer of `DependencyContainer()`, you can pass a block th
 It may not seem to provide much, but given the fact that `DependencyContainers` are typically declared as global constants using a top-level `let`, it gets very useful, because instead of having to do it like this:
 
 ```swift
-let dip: DependencyContainer<String> = {
-    let dip = DependencyContainer<String>()
+let dip: DependencyContainer = {
+    let dip = DependencyContainer()
 
     dip.register(instance: ProductionEnvironment(analytics: true) as EnvironmentType)
     dip.register(instance: WebService() as WebServiceAPI)
@@ -71,10 +71,10 @@ let dip: DependencyContainer<String> = {
     }()
 ```
 
-You can instead write this exact equivalent code, which is more compact, doesn't need you to write the `DependencyContainer<TagType>` twice, and indent better in Xcode (as the final closing brack is properly aligned):
+You can instead write this exact equivalent code, which is more compact, and indent better in Xcode (as the final closing brack is properly aligned):
 
 ```swift
-let dip = DependencyContainer<String> { dip in
+let dip = DependencyContainer { dip in
     dip.register(instance: ProductionEnvironment(analytics: true) as EnvironmentType)
     dip.register(instance: WebService() as WebServiceAPI)
 }
@@ -84,21 +84,19 @@ let dip = DependencyContainer<String> { dip in
 
 * If you give a `tag` in the parameter to `register()`, it will associate that instance or factory with this tag, which can be used later during `resolve` (see below).
 * `resolve(tag)` will try to find an instance (or instance factory) that match both the requested protocol _and_ the tag. If it doesn't find any, it will fallback to an instance (or instance factory) that only match the requested protocol.
-* The tags can be anything, as long as it's of a type conforming to `Equatable`. `DependencyContainer` is a generic class which takes that type as generic parameter (so one `DependencyContainer` will be tied with a given tag type)
+* The tags can be StringLiteralType or IntegerLiteralType. That said you can use plain strings or integers as tags.
 
-For example, you can use an `Int`, a `String`… or even an `enum`, like this:
 
 ```swift
-enum WebService {
+enum WebService: String {
     case PersonWS
     case StarshipWS
+    var tag: Tag { return Tag.String(self.rawValue) }
 }
 
 let wsDependencies = DependencyContainer<WebService>() { dip in
-    
-    dip.register(.PersonWS, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
-    dip.register(.StashipWS, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
-    
+    dip.register(WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
+    dip.register(WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
 }
 ```
 
@@ -108,8 +106,8 @@ let wsDependencies = DependencyContainer<WebService>() { dip in
 Somewhere in your App target, register the dependencies:
 
 ```swift
-let dip: DependencyContainer<String> = {
-    let dip = DependencyContainer<String>()
+let dip: DependencyContainer = {
+    let dip = DependencyContainer()
     let env = ProductionEnvironment(analytics: true)
     dip.register(instance: env as EnvironmentType)
     dip.register(instance: WebService() as WebServiceType)

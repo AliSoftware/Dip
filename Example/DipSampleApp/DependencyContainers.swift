@@ -19,7 +19,7 @@ private let FAKE_STARSHIPS = false
 
 
 // MARK: Dependency Container for WebServices & NetworkLayer
-let wsDependencies = DependencyContainer<WebService>() { dip in
+let wsDependencies = DependencyContainer() { dip in
     
     // Register the NetworkLayer, same for everyone here (but we have the ability to register a different one for a specific WebService if we wanted to)
     dip.register(instance: URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer)
@@ -27,9 +27,8 @@ let wsDependencies = DependencyContainer<WebService>() { dip in
 }
 
 
-
 // MARK: Dependency Container for Providers
-let providerDependencies = DependencyContainer<Int>() { dip in
+let providerDependencies = DependencyContainer() { dip in
     
     if FAKE_PERSONS {
         

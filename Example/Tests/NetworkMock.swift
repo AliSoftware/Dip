@@ -9,7 +9,7 @@
 import Foundation
 import Dip
 
-var wsDependencies = DependencyContainer<WebService>()
+var wsDependencies = DependencyContainer()
 
 // MARK: - Mock object used for tests
 
