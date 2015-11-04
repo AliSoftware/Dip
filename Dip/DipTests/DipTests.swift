@@ -9,28 +9,103 @@
 import XCTest
 @testable import Dip
 
+protocol Service {
+    func getServiceName() -> String
+}
+
 class DipTests: XCTestCase {
+    
+    class ServiceImp1: Service {
+        func getServiceName() -> String {
+            return "ServiceImp1"
+        }
+    }
+    
+    class ServiceImp2: Service {
+        func getServiceName() -> String {
+            return "ServiceImp2"
+        }
+    }
+    
+    let container = DependencyContainer()
     
     override func setUp() {
         super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+        container.reset()
     }
     
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
+    func testThatItResolvesInstanceRegisteredWithoutTag() {
+        //given
+        container.register { ServiceImp1() as Service }
+
+        //when
+        let serviceInstance = container.resolve() as Service
+        
+        //then
+        XCTAssertTrue(serviceInstance is ServiceImp1)
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    func testThatItResolvesInstanceRegisteredWithTag() {
+        //given
+        container.register("service") { ServiceImp1() as Service }
+
+        //when
+        let serviceInstance = container.resolve("service") as Service
+        
+        //then
+        XCTAssertTrue(serviceInstance is ServiceImp1)
+    }
+
+    func testThatItResolvesDifferentInstancesRegisteredForDifferentTags() {
+        //given
+        container.register("service1") { ServiceImp1() as Service }
+        container.register("service2") { ServiceImp2() as Service }
+        
+        //when
+        let service1Instance = container.resolve("service1") as Service
+        let service2Instance = container.resolve("service2") as Service
+        
+        //then
+        XCTAssertTrue(service1Instance is ServiceImp1)
+        XCTAssertTrue(service2Instance is ServiceImp2)
+    }
+
+    func testThatNewRegistrationOverridesPreviousRegistration() {
+        //given
+        container.register { ServiceImp1() as Service }
+        let service1 = container.resolve() as Service
+        
+        //when
+        container.register { ServiceImp2() as Service }
+        let service2 = container.resolve() as Service
+        
+        //then
+        XCTAssertTrue(service1 is ServiceImp1)
+        XCTAssertTrue(service2 is ServiceImp2)
+    }
+
+    func testThatItResolvesTypeAsNewInstanceEveryTime() {
+        //given
+        container.register { ServiceImp1() as Service }
+
+        //when
+        let service1 = container.resolve() as Service
+        let service2 = container.resolve() as Service
+        
+        //then
+        XCTAssertFalse((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
     }
     
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
-        }
+    func testThatItReusesInstanceRegisteredAsSingleton() {
+        //given
+        container.register(instance: ServiceImp1() as Service)
+        
+        //when
+        let service1 = container.resolve() as Service
+        let service2 = container.resolve() as Service
+        
+        //then
+        XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
     }
     
 }
