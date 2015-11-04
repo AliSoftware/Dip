@@ -17,7 +17,7 @@
                BlueprintIdentifier = "0990225E1BC123C000E76F43"
                BuildableName = "DipSampleApp.app"
                BlueprintName = "DipSampleApp"
-               ReferencedContainer = "container:Dip.xcodeproj">
+               ReferencedContainer = "container:DipSampleApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
@@ -29,9 +29,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
-               BuildableName = "DipTests.xctest"
-               BlueprintName = "DipTests"
-               ReferencedContainer = "container:Dip.xcodeproj">
+               BuildableName = "DipSampleAppTests.xctest"
+               BlueprintName = "DipSampleAppTests"
+               ReferencedContainer = "container:DipSampleApp.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -48,9 +48,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACE41AFB9204008FA782"
-               BuildableName = "DipTests.xctest"
-               BlueprintName = "DipTests"
-               ReferencedContainer = "container:Dip.xcodeproj">
+               BuildableName = "DipSampleAppTests.xctest"
+               BlueprintName = "DipSampleAppTests"
+               ReferencedContainer = "container:DipSampleApp.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -60,7 +60,7 @@
             BlueprintIdentifier = "0990225E1BC123C000E76F43"
             BuildableName = "DipSampleApp.app"
             BlueprintName = "DipSampleApp"
-            ReferencedContainer = "container:Dip.xcodeproj">
+            ReferencedContainer = "container:DipSampleApp.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -83,7 +83,7 @@
             BlueprintIdentifier = "0990225E1BC123C000E76F43"
             BuildableName = "DipSampleApp.app"
             BlueprintName = "DipSampleApp"
-            ReferencedContainer = "container:Dip.xcodeproj">
+            ReferencedContainer = "container:DipSampleApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -102,7 +102,7 @@
             BlueprintIdentifier = "0990225E1BC123C000E76F43"
             BuildableName = "DipSampleApp.app"
             BlueprintName = "DipSampleApp"
-            ReferencedContainer = "container:Dip.xcodeproj">
+            ReferencedContainer = "container:DipSampleApp.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

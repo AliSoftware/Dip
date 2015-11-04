@@ -7,44 +7,44 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		090012291BC6FECA0079C600 /* BaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012161BC6FECA0079C600 /* BaseCell.swift */; settings = {ASSET_TAGS = (); }; };
-		0900122A1BC6FECA0079C600 /* PersonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012171BC6FECA0079C600 /* PersonCell.swift */; settings = {ASSET_TAGS = (); }; };
-		0900122C1BC6FECA0079C600 /* PersonProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		0900122D1BC6FECA0079C600 /* DummyPilotProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		0900122E1BC6FECA0079C600 /* HardCodedStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		0900123B1BC6FF4D0079C600 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0900123A1BC6FF4D0079C600 /* Main.storyboard */; settings = {ASSET_TAGS = (); }; };
-		0900123D1BC7012A0079C600 /* StarshipProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		090012401BC704C60079C600 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; settings = {ASSET_TAGS = (); }; };
-		090012421BC7059E0079C600 /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; settings = {ASSET_TAGS = (); }; };
-		090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012431BC708A00079C600 /* DummyStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
+		090012291BC6FECA0079C600 /* BaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012161BC6FECA0079C600 /* BaseCell.swift */; };
+		0900122A1BC6FECA0079C600 /* PersonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012171BC6FECA0079C600 /* PersonCell.swift */; };
+		0900122C1BC6FECA0079C600 /* PersonProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */; };
+		0900122D1BC6FECA0079C600 /* DummyPilotProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */; };
+		0900122E1BC6FECA0079C600 /* HardCodedStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */; };
+		0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */; };
+		0900123B1BC6FF4D0079C600 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0900123A1BC6FF4D0079C600 /* Main.storyboard */; };
+		0900123D1BC7012A0079C600 /* StarshipProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */; };
+		090012401BC704C60079C600 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; };
+		090012421BC7059E0079C600 /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; };
+		090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012431BC708A00079C600 /* DummyStarshipProvider.swift */; };
 		099022621BC123C000E76F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099022611BC123C000E76F43 /* AppDelegate.swift */; };
 		099022691BC123C000E76F43 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 099022681BC123C000E76F43 /* Assets.xcassets */; };
 		0990226C1BC123C000E76F43 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */; };
-		09D795FF1BC71F5A003C68EB /* PersonListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796001BC722C0003C68EB /* StarshipListViewController.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796031BC72691003C68EB /* StarshipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796021BC72691003C68EB /* StarshipCell.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796061BC73E8B003C68EB /* StoryboardConstants.swift */; settings = {ASSET_TAGS = (); }; };
-		09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7960C1BC7431C003C68EB /* FetchableTrait.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796111BC97809003C68EB /* mainPilot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09D796101BC97809003C68EB /* mainPilot.plist */; settings = {ASSET_TAGS = (); }; };
-		09D796131BC9A5BC003C68EB /* SWAPIPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796151BC9A5FC003C68EB /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796141BC9A5FC003C68EB /* NetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796171BC9B53D003C68EB /* URLSessionNetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796161BC9B53D003C68EB /* URLSessionNetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796191BC9BA49003C68EB /* DependencyContainers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796181BC9BA49003C68EB /* DependencyContainers.swift */; settings = {ASSET_TAGS = (); }; };
-		09D7961B1BC9BE65003C68EB /* SWAPIStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		09D7961D1BC9C62E003C68EB /* SWAPICommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796221BCA8305003C68EB /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796141BC9A5FC003C68EB /* NetworkLayer.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796231BCA833E003C68EB /* SWAPIPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796241BCA8345003C68EB /* PersonProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796251BCA8345003C68EB /* StarshipProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796261BCA8348003C68EB /* SWAPIStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796271BCA8550003C68EB /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796281BCA8550003C68EB /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; settings = {ASSET_TAGS = (); }; };
-		09D796291BCA86D4003C68EB /* SWAPICommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */; settings = {ASSET_TAGS = (); }; };
-		09D7962C1BCA8AD4003C68EB /* NetworkMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7962A1BCA8AB3003C68EB /* NetworkMock.swift */; settings = {ASSET_TAGS = (); }; };
-		09D7962F1BCA922E003C68EB /* SWAPIStarshipProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7962D1BCA91D3003C68EB /* SWAPIStarshipProviderTests.swift */; settings = {ASSET_TAGS = (); }; };
+		09D795FF1BC71F5A003C68EB /* PersonListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */; };
+		09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796001BC722C0003C68EB /* StarshipListViewController.swift */; };
+		09D796031BC72691003C68EB /* StarshipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796021BC72691003C68EB /* StarshipCell.swift */; };
+		09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796061BC73E8B003C68EB /* StoryboardConstants.swift */; };
+		09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7960C1BC7431C003C68EB /* FetchableTrait.swift */; };
+		09D796111BC97809003C68EB /* mainPilot.plist in Resources */ = {isa = PBXBuildFile; fileRef = 09D796101BC97809003C68EB /* mainPilot.plist */; };
+		09D796131BC9A5BC003C68EB /* SWAPIPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */; };
+		09D796151BC9A5FC003C68EB /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796141BC9A5FC003C68EB /* NetworkLayer.swift */; };
+		09D796171BC9B53D003C68EB /* URLSessionNetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796161BC9B53D003C68EB /* URLSessionNetworkLayer.swift */; };
+		09D796191BC9BA49003C68EB /* DependencyContainers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796181BC9BA49003C68EB /* DependencyContainers.swift */; };
+		09D7961B1BC9BE65003C68EB /* SWAPIStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */; };
+		09D7961D1BC9C62E003C68EB /* SWAPICommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */; };
+		09D796221BCA8305003C68EB /* NetworkLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796141BC9A5FC003C68EB /* NetworkLayer.swift */; };
+		09D796231BCA833E003C68EB /* SWAPIPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */; };
+		09D796241BCA8345003C68EB /* PersonProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */; };
+		09D796251BCA8345003C68EB /* StarshipProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */; };
+		09D796261BCA8348003C68EB /* SWAPIStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */; };
+		09D796271BCA8550003C68EB /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; };
+		09D796281BCA8550003C68EB /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; };
+		09D796291BCA86D4003C68EB /* SWAPICommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */; };
+		09D7962C1BCA8AD4003C68EB /* NetworkMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7962A1BCA8AB3003C68EB /* NetworkMock.swift */; };
+		09D7962F1BCA922E003C68EB /* SWAPIStarshipProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7962D1BCA91D3003C68EB /* SWAPIStarshipProviderTests.swift */; };
+		3D8769E42C7B90363FAFE365 /* Pods_DipSampleAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2C6C3A848EB4F91A56B8CE2 /* Pods_DipSampleAppTests.framework */; };
 		607FACEC1AFB9204008FA782 /* SWAPIPersonProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* SWAPIPersonProviderTests.swift */; };
-		7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 304AD039660A2C58EB08D985 /* Pods_DipTests.framework */; };
 		84D8EBE5B2D583BEFB17C45A /* Pods_DipSampleApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -82,15 +82,16 @@
 		09D7962D1BCA91D3003C68EB /* SWAPIStarshipProviderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIStarshipProviderTests.swift; sourceTree = "<group>"; };
 		2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		304AD039660A2C58EB08D985 /* Pods_DipTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		607FACE51AFB9204008FA782 /* DipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		39469AD512A7E001F3D4B2A8 /* Pods-DipSampleAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DipSampleAppTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DipSampleAppTests/Pods-DipSampleAppTests.release.xcconfig"; sourceTree = "<group>"; };
+		607FACE51AFB9204008FA782 /* DipSampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipSampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* SWAPIPersonProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWAPIPersonProviderTests.swift; sourceTree = "<group>"; };
 		64B6CB26CB93DFD18565BB72 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		6AB71DAFECF410F2FB12A44C /* Pods-DipSampleApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DipSampleApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DipSampleApp/Pods-DipSampleApp.debug.xcconfig"; sourceTree = "<group>"; };
-		7E5EDFB4A9194B50CAED7E1A /* Pods-DipTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DipTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DipTests/Pods-DipTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9B78063878AFC700C876DEE9 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		A2C6C3A848EB4F91A56B8CE2 /* Pods_DipSampleAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B16085421B606723B72DE694 /* Pods-DipSampleApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DipSampleApp.release.xcconfig"; path = "Pods/Target Support Files/Pods-DipSampleApp/Pods-DipSampleApp.release.xcconfig"; sourceTree = "<group>"; };
-		D9BBF14E74848332935F75C4 /* Pods-DipTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DipTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-DipTests/Pods-DipTests.release.xcconfig"; sourceTree = "<group>"; };
+		F0136B7190E952E9A9D8BF64 /* Pods-DipSampleAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DipSampleAppTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-DipSampleAppTests/Pods-DipSampleAppTests.debug.xcconfig"; sourceTree = "<group>"; };
 		FDB7C1D2EFEC1BA700762782 /* Dip.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Dip.podspec; path = ../Dip.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -107,7 +108,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7BBD849465D99D9D1987AE6D /* Pods_DipTests.framework in Frameworks */,
+				3D8769E42C7B90363FAFE365 /* Pods_DipSampleAppTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,6 +210,7 @@
 			children = (
 				2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */,
 				304AD039660A2C58EB08D985 /* Pods_DipTests.framework */,
+				A2C6C3A848EB4F91A56B8CE2 /* Pods_DipSampleAppTests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -228,7 +230,7 @@
 		607FACD11AFB9204008FA782 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				607FACE51AFB9204008FA782 /* DipTests.xctest */,
+				607FACE51AFB9204008FA782 /* DipSampleAppTests.xctest */,
 				0990225F1BC123C000E76F43 /* DipSampleApp.app */,
 			);
 			name = Products;
@@ -269,8 +271,8 @@
 			children = (
 				6AB71DAFECF410F2FB12A44C /* Pods-DipSampleApp.debug.xcconfig */,
 				B16085421B606723B72DE694 /* Pods-DipSampleApp.release.xcconfig */,
-				7E5EDFB4A9194B50CAED7E1A /* Pods-DipTests.debug.xcconfig */,
-				D9BBF14E74848332935F75C4 /* Pods-DipTests.release.xcconfig */,
+				F0136B7190E952E9A9D8BF64 /* Pods-DipSampleAppTests.debug.xcconfig */,
+				39469AD512A7E001F3D4B2A8 /* Pods-DipSampleAppTests.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -298,9 +300,9 @@
 			productReference = 0990225F1BC123C000E76F43 /* DipSampleApp.app */;
 			productType = "com.apple.product-type.application";
 		};
-		607FACE41AFB9204008FA782 /* DipTests */ = {
+		607FACE41AFB9204008FA782 /* DipSampleAppTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "DipTests" */;
+			buildConfigurationList = 607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "DipSampleAppTests" */;
 			buildPhases = (
 				5CA726E6162DF780766DC6CA /* Check Pods Manifest.lock */,
 				607FACE11AFB9204008FA782 /* Sources */,
@@ -313,9 +315,9 @@
 			);
 			dependencies = (
 			);
-			name = DipTests;
+			name = DipSampleAppTests;
 			productName = Tests;
-			productReference = 607FACE51AFB9204008FA782 /* DipTests.xctest */;
+			productReference = 607FACE51AFB9204008FA782 /* DipSampleAppTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -336,7 +338,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "Dip" */;
+			buildConfigurationList = 607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "DipSampleApp" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -350,7 +352,7 @@
 			projectRoot = "";
 			targets = (
 				0990225E1BC123C000E76F43 /* DipSampleApp */,
-				607FACE41AFB9204008FA782 /* DipTests */,
+				607FACE41AFB9204008FA782 /* DipSampleAppTests */,
 			);
 		};
 /* End PBXProject section */
@@ -434,7 +436,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DipTests/Pods-DipTests-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DipSampleAppTests/Pods-DipSampleAppTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8665FFA2238FD898C8846391 /* Copy Pods Resources */ = {
@@ -464,7 +466,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DipTests/Pods-DipTests-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-DipSampleAppTests/Pods-DipSampleAppTests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -645,7 +647,7 @@
 		};
 		607FACF31AFB9204008FA782 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7E5EDFB4A9194B50CAED7E1A /* Pods-DipTests.debug.xcconfig */;
+			baseConfigurationReference = F0136B7190E952E9A9D8BF64 /* Pods-DipSampleAppTests.debug.xcconfig */;
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -660,7 +662,7 @@
 		};
 		607FACF41AFB9204008FA782 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D9BBF14E74848332935F75C4 /* Pods-DipTests.release.xcconfig */;
+			baseConfigurationReference = 39469AD512A7E001F3D4B2A8 /* Pods-DipSampleAppTests.release.xcconfig */;
 			buildSettings = {
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
@@ -681,7 +683,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "Dip" */ = {
+		607FACCB1AFB9204008FA782 /* Build configuration list for PBXProject "DipSampleApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				607FACED1AFB9204008FA782 /* Debug */,
@@ -690,7 +692,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "DipTests" */ = {
+		607FACF21AFB9204008FA782 /* Build configuration list for PBXNativeTarget "DipSampleAppTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				607FACF31AFB9204008FA782 /* Debug */,

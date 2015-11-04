@@ -84,8 +84,8 @@ strip_invalid_archs() {
 
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "Pods-DipTests/Dip.framework"
+  install_framework "Pods-DipSampleAppTests/Dip.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "Pods-DipTests/Dip.framework"
+  install_framework "Pods-DipSampleAppTests/Dip.framework"
 fi

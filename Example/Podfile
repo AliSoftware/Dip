@@ -7,6 +7,6 @@ target 'DipSampleApp' do
   pod 'Dip', :path => '../'
 end
 
-target 'DipTests' do
+target 'DipSampleAppTests' do
   pod "Dip", :path => '../'
 end
