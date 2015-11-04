@@ -94,7 +94,7 @@ enum WebService: String {
     var tag: Tag { return Tag.String(self.rawValue) }
 }
 
-let wsDependencies = DependencyContainer<WebService>() { dip in
+let wsDependencies = DependencyContainer() { dip in
     dip.register(WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
     dip.register(WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
 }
