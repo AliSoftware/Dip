@@ -58,18 +58,6 @@ public class DependencyContainer {
     // MARK: Register dependencies
     
     /**
-    Register a `Tag?->T` factory (which takes the tag as parameter) with a given tag
-    
-    - parameter tag:     The arbitrary tag to associate this factory with when registering with that protocol. `nil` to associate with any tag.
-    - parameter factory: The factory to register, typed/casted as the protocol you want to register it as
-    
-    - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
-    */
-    public func register<T>(tag: Tag? = nil, factory: (Tag?)->T) {
-        _register(tag, factory: factory) as DefinitionOf<T>
-    }
-    
-    /**
      Register a Void->T factory (which don't care about the tag used)
      
      - parameter tag:     The arbitrary tag to associate this factory with when registering with that protocol. `nil` to associate with any tag.
