@@ -11,22 +11,22 @@ import Foundation
 ///Internal representation of a key used to associate definitons and factories by tag, type and factory.
 struct DefinitionKey : Hashable, Equatable, CustomDebugStringConvertible {
     var protocolType: Any.Type
-    var factory: Any.Type
+    var factoryType: Any.Type
     var associatedTag: DependencyContainer.Tag?
     
     var hashValue: Int {
-        return "\(protocolType)-\(factory)-\(associatedTag)".hashValue
+        return "\(protocolType)-\(factoryType)-\(associatedTag)".hashValue
     }
     
     var debugDescription: String {
-        return "type: \(protocolType), factory: \(factory), tag: \(associatedTag)"
+        return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag)"
     }
 }
 
 func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
     return
         lhs.protocolType == rhs.protocolType &&
-            lhs.factory == rhs.factory &&
+            lhs.factoryType == rhs.factoryType &&
             lhs.associatedTag == rhs.associatedTag
 }
 

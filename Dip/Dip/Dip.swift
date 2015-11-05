@@ -98,7 +98,7 @@ public class DependencyContainer {
      ```
      */
     public func register<T, F>(tag: Tag? = nil, factory: F, scope: ComponentScope) -> DefinitionOf<T> {
-        let key = DefinitionKey(protocolType: T.self, factory: F.self, associatedTag: tag)
+        let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
         let definition = DefinitionOf<T>(factory: factory, scope: scope)
         lockAndDo {
             dependencies[key] = definition
@@ -137,8 +137,8 @@ public class DependencyContainer {
      
     */
     public func resolve<T, F>(tag: Tag? = nil, builder: F->T) -> T {
-        let key = DefinitionKey(protocolType: T.self, factory: F.self, associatedTag: tag)
-        let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factory: F.self, associatedTag: nil) }
+        let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+        let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
         
         var resolved: T!
         lockAndDo { [unowned self] in
