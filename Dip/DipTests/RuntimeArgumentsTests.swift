@@ -200,7 +200,8 @@ class RuntimeArgumentsTests: XCTestCase {
         container.register { (port: Int, url: NSURL!) in ServiceImp3(name: name3, baseURL: url, port: port) as Service }
         
         //when
-        let service1 = container.resolve(80, NSURL(string: "http://example.com")!) as Service
+        let url: NSURL = NSURL(string: "http://example.com")!
+        let service1 = container.resolve(80, url) as Service
         let service2 = container.resolve(80, NSURL(string: "http://example.com")) as Service
         
         let service3 = container.resolve(80, NSURL(string: "http://example.com")! as NSURL!) as Service
