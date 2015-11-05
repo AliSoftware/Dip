@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## Develop
+
+#### New Features
+
+* Added support for circular dependencies by adding `ObjectGraph` scope to reuse resolved instances.  
+  [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
+
+#### Breaking Changes
+
+* Removed container thread-safety to enable recursion for circular dependencies.  
+**Access to the container across threads should be handled by clients now**.
+
 ## 3.0.0
 
 * Added support for factories with up to six runtime arguments.  

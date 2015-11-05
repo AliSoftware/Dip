@@ -27,9 +27,9 @@ import Foundation
 // MARK: - DependencyContainer
 
 /**
- * _Dip_'s Dependency Containers allow you to do very simple **Dependency Injection**
- * by associating `protocols` to concrete implementations
- */
+_Dip_'s Dependency Containers allow you to do very simple **Dependency Injection**
+by associating `protocols` to concrete implementations
+*/
 public class DependencyContainer {
   
   /**
@@ -42,8 +42,7 @@ public class DependencyContainer {
     case Int(IntegerLiteralType)
   }
   
-  private var dependencies = [DefinitionKey : Definition]()
-  private var lock: OSSpinLock = OS_SPINLOCK_INIT
+  var definitions = [DefinitionKey : Definition]()
   
   /**
    Designated initializer for a DependencyContainer
@@ -66,9 +65,7 @@ public class DependencyContainer {
   Clear all the previously registered dependencies on this container.
   */
   public func reset() {
-    lockAndDo {
-      dependencies.removeAll()
-    }
+    definitions.removeAll()
   }
   
   // MARK: Register dependencies
@@ -79,7 +76,14 @@ public class DependencyContainer {
   - parameter tag: The arbitrary tag to associate this factory with when registering with that protocol. Pass `nil` to associate with any tag. Default value is `nil`.
   - parameter factory: The factory to register, with return type of protocol you want to register it for
   
-  - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
+  - note: You must cast the factory return type to the protocol you want to register it for.
+  Inside factory block if you need to reference container use it as `unowned` to avoid retain cycle.
+  
+  **Example**
+  ```swift
+  container.register { ServiceImp() as Service }
+  container.register { [unowned container] ClientImp(service: container.resolve()) as Client }
+  ```
   */
   public func register<T>(tag tag: Tag? = nil, factory: ()->T) -> DefinitionOf<T> {
     return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
@@ -88,11 +92,13 @@ public class DependencyContainer {
   /**
    Register a Singleton instance associated with optional tag.
    
-   - parameter tag: The arbitrary tag to associate this instance with when registering with that protocol. `nil` to associate with any tag.
+   - parameter tag: The arbitrary tag to associate this instance with when registering with that protocol. 
+   Pass `nil` to associate with any tag.
    - parameter instance: The instance to register, with return type of protocol you want to register it for
    
    - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
    */
+  @available(*, deprecated, message="Use inScope(:) method of DefinitionOf instead to define scope.")
   public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T> {
     return register(tag: tag, factory: { factory() }, scope: .Singleton)
   }
@@ -120,9 +126,7 @@ public class DependencyContainer {
   public func register<T, F>(tag tag: Tag? = nil, factory: F, scope: ComponentScope) -> DefinitionOf<T> {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let definition = DefinitionOf<T>(factory: factory, scope: scope)
-    lockAndDo {
-      dependencies[key] = definition
-    }
+    definitions[key] = definition
     return definition
   }
   
@@ -131,9 +135,11 @@ public class DependencyContainer {
   /**
   Resolve a dependency. 
   
-  If no instance/factory was registered with this `tag` for this `protocol`, it will try to resolve the instance/factory associated with `nil` (no tag).
+  If no definition was registered with this `tag` for this `protocol`,
+  it will try to resolve the definition associated with `nil` (no tag).
   
   - parameter tag: The arbitrary tag to look for when resolving this protocol.
+  
   */
   public func resolve<T>(tag tag: Tag? = nil) -> T {
     return resolve(tag: tag) { (factory: ()->T) in factory() }
@@ -161,37 +167,74 @@ public class DependencyContainer {
   public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) -> T {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
-    
-    var resolved: T!
-    lockAndDo { [unowned self] in
-      resolved = self._resolve(key, nilTagKey: nilTagKey, builder: builder)
+
+    guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T> else {
+      fatalError("No definition registered with \(key) or \(nilTagKey)."
+        + "Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`.")
     }
-    return resolved
+
+    let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
+    return _resolve(usingKey, definition: definition, builder: builder)
   }
   
   /// Actually resolve dependency
-  private func _resolve<T, F>(key: DefinitionKey, nilTagKey: DefinitionKey?, builder: F->T) -> T {
-    guard let definition = (self.dependencies[key] ?? self.dependencies[nilTagKey]) as? DefinitionOf<T> else {
-      fatalError("No instance factory registered with \(key) or \(nilTagKey)")
-    }
+  private func _resolve<T, F>(key: DefinitionKey?, definition: DefinitionOf<T>, builder: F->T) -> T {
     
-    if let resolvedInstance = definition.resolvedInstance {
-      return resolvedInstance
+    resolvedInstances.incrementDepth()
+    defer { resolvedInstances.decrementDepth() }
+    
+    if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+      return previouslyResolved
     }
     else {
-      let resolved = builder(definition.factory as! F)
-      definition.resolvedInstance = resolved
-      return resolved
+      let resolvedInstance = builder(definition.factory as! F)
+      
+      //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
+      //when it returns instance that we try to resolve here can be already resolved
+      //so we return it, throwing away instance created by previous call to builder
+      if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+        return previouslyResolved
+      }
+      
+      resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, definition: definition)
+      definition.resolveDependenciesBlock?(self, resolvedInstance)
+      
+      return resolvedInstance
     }
   }
   
   // MARK: - Private
   
-  private func lockAndDo(@noescape block: Void->Void) {
-    OSSpinLockLock(&lock)
-    defer { OSSpinLockUnlock(&lock) }
-    block()
+  let resolvedInstances = ResolvedInstances()
+  
+  ///Pool to hold instances, created during call to `resolve()`. 
+  ///Before `resolve()` returns pool is drained.
+  class ResolvedInstances {
+    var resolvedInstances = [DefinitionKey: Any]()
+    
+    func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey?, definition: DefinitionOf<T>) {
+      self.resolvedInstances[key] = instance
+      definition.resolvedInstance = instance
+    }
+    
+    func previouslyResolved<T>(key: DefinitionKey?, definition: DefinitionOf<T>) -> T? {
+      return (definition.resolvedInstance ?? self.resolvedInstances[key]) as? T
+    }
+    
+    var depth: Int = 0
+
+    func incrementDepth() {
+      depth++
+    }
+    
+    func decrementDepth() {
+      guard depth-- > 0 else { fatalError("Depth can not be lower than zero") }
+      if depth == 0 {
+        resolvedInstances.removeAll()
+      }
+    }
   }
+  
 }
 
 extension DependencyContainer.Tag: IntegerLiteralConvertible {
@@ -229,8 +272,14 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
 }
 
 extension Dictionary {
-  subscript(key: Key?) -> Value! {
-    guard let key = key else { return nil }
-    return self[key]
+  subscript(key: Key?) -> Value? {
+    get {
+      guard let key = key else { return nil }
+      return self[key]
+    }
+    set {
+      guard let key = key else { return }
+      self[key] = newValue
+    }
   }
 }

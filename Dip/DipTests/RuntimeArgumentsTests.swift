@@ -2,8 +2,7 @@
 //  RuntimeArgumentsTests.swift
 //  DipTests
 //
-//  Created by Ilya Puchka on 04.11.15.
-//  Copyright © 2015 AliSoftware. All rights reserved.
+//  This code is under MIT Licence. See the LICENCE file for more info.
 //
 
 import XCTest

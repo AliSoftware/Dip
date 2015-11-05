@@ -14,6 +14,8 @@
 		094526B41BEA51540034E72A /* RuntimeArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B31BEA51540034E72A /* RuntimeArguments.swift */; };
 		094526B61BEA520B0034E72A /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B51BEA520B0034E72A /* Definition.swift */; };
 		094526B81BEA536A0034E72A /* RuntimeArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */; };
+		0989323F1BEBC8CD00ACDA2B /* ComponentScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0989323E1BEBC8CD00ACDA2B /* ComponentScopeTests.swift */; };
+		09969C551BEB7C0A00F93C70 /* Dip.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 09969C541BEB7C0A00F93C70 /* Dip.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +39,8 @@
 		094526B31BEA51540034E72A /* RuntimeArguments.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = RuntimeArguments.swift; sourceTree = "<group>"; tabWidth = 2; };
 		094526B51BEA520B0034E72A /* Definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Definition.swift; sourceTree = "<group>"; tabWidth = 2; };
 		094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
+		0989323E1BEBC8CD00ACDA2B /* ComponentScopeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentScopeTests.swift; sourceTree = "<group>"; };
+		09969C541BEB7C0A00F93C70 /* Dip.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Dip.podspec; path = ../Dip.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +99,7 @@
 			children = (
 				094526A01BEA1CFF0034E72A /* DipTests.swift */,
 				094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */,
+				0989323E1BEBC8CD00ACDA2B /* ComponentScopeTests.swift */,
 				094526A21BEA1CFF0034E72A /* Info.plist */,
 			);
 			path = DipTests;
@@ -219,6 +224,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				094526A11BEA1CFF0034E72A /* DipTests.swift in Sources */,
+				0989323F1BEBC8CD00ACDA2B /* ComponentScopeTests.swift in Sources */,
 				094526B81BEA536A0034E72A /* RuntimeArgumentsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

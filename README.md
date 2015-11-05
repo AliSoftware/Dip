@@ -147,6 +147,20 @@ func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _
 
 ```
 
+### Circular dependencies
+
+_Dip_ supports circular dependencies. To resolve them use new `ObjectGraph` scope and `resolveDependencies` method of `DefinitionOf<T>` returned by `register` method.
+
+```swift
+container.register { [unowned container] ClientImp(server: container.resolve() as Server) as Client }.inScope(.ObjectGraph)
+
+container.register { ServerImp() as Server }
+.inScope(.ObjectGraph)
+.resolveDependencies { container, server in 
+  server.client = container.resolve() as Client
+}
+```
+
 ### Concrete Example
 
 Somewhere in your App target, register the dependencies:
@@ -157,8 +171,8 @@ let dip: DependencyContainer = {
     let env = ProductionEnvironment(analytics: true)
     dip.register(instance: env as EnvironmentType)
     dip.register(instance: WebService() as WebServiceType)
-    dip.register() { name: String in DummyFriendsProvider(user: name) as FriendsProviderType }
-    dip.register(tag: "me") { _: String in PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
+    dip.register() { (name: String) in DummyFriendsProvider(user: name) as FriendsProviderType }
+    dip.register(tag: "me") { (_: String) in PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
     return dip
 }
 ```

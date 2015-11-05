@@ -2,8 +2,7 @@
 //  DipTests.swift
 //  DipTests
 //
-//  Created by Ilya Puchka on 04.11.15.
-//  Copyright © 2015 AliSoftware. All rights reserved.
+//  This code is under MIT Licence. See the LICENCE file for more info.
 //
 
 import XCTest
@@ -13,17 +12,15 @@ protocol Service {
   func getServiceName() -> String
 }
 
-class ServiceImp1: Service {
+extension Service {
   func getServiceName() -> String {
-    return "ServiceImp1"
+    return "\(self.dynamicType)"
   }
 }
 
-class ServiceImp2: Service {
-  func getServiceName() -> String {
-    return "ServiceImp2"
-  }
-}
+class ServiceImp1: Service {}
+
+class ServiceImp2: Service {}
 
 class DipTests: XCTestCase {
   
@@ -84,28 +81,18 @@ class DipTests: XCTestCase {
     XCTAssertTrue(service2 is ServiceImp2)
   }
   
-  func testThatItResolvesTypeAsNewInstanceEveryTime() {
+  func testThatItCallsResolveDependenciesOnDefinition() {
     //given
-    container.register { ServiceImp1() as Service }
+    var resolveDependenciesCalled = false
+    container.register { ServiceImp1() as Service }.resolveDependencies { (c, s) in
+      resolveDependenciesCalled = true
+    }
     
     //when
-    let service1 = container.resolve() as Service
-    let service2 = container.resolve() as Service
+    container.resolve() as Service
     
     //then
-    XCTAssertFalse((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
-  }
-  
-  func testThatItReusesInstanceRegisteredAsSingleton() {
-    //given
-    container.register(instance: ServiceImp1() as Service)
-    
-    //when
-    let service1 = container.resolve() as Service
-    let service2 = container.resolve() as Service
-    
-    //then
-    XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+    XCTAssertTrue(resolveDependenciesCalled)
   }
   
 }
