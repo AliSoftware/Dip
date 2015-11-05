@@ -119,6 +119,23 @@ let service3 = webServices.resolve(80, NSURL(string: "http://example.url")?) as 
 
 ```
 
+### Runtime arguments
+
+You can register factories that accept up to six arguments. When you resolve dependency you can pass those arguments to `resolve()` method and they will be passed to the factory. Note that _number_, _types_ and _order_ of parameters matters. Also use of optional parameter and not optional parameter will result in two factories registered in container.
+
+```swift
+let webServices = DependencyContainer() { webServices in
+	webServices.register { (url: NSURL, port: Int) in WebService(name: "1", baseURL: url, port: port) as WebServiceAPI }
+   webServices.register { (port: Int, url: NSURL) in WebService(name: "2", baseURL: url, port: port) as WebServiceAPI }
+   webServices.register { (port: Int, url: NSURL?) in WebService(name: "3", baseURL: url!, port: port) as WebServiceAPI }
+}
+
+let service1 = webServices.resolve(NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1.name == "1"
+let service2 = webServices.resolve(80, NSURL(string: "http://example.url")!) as WebServiceAPI // service1.name == "2"
+let service3 = webServices.resolve(80, NSURL(string: "http://example.url")) as WebServiceAPI // service1.name == "3"
+
+```
+
 
 ### Concrete Example
 
