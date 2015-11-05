@@ -10,6 +10,7 @@
         <page name='Circular dependencies'/>
         <page name='Shared Instances'/>
         <page name='Auto-injection'/>
+        <page name='Multi-injection'/>
         <page name='Testing'/>
     </pages>
 </playground>

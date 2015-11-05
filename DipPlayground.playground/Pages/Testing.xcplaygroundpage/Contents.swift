@@ -1,4 +1,4 @@
-//: [Previous: Shared Instances](@previous)
+//: [Previous: Multi-injection](@previous)
 
 
 /*:

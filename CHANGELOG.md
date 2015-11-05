@@ -7,9 +7,11 @@
 * Added auto-injection feature.  
   [#13](https://github.com/AliSoftware/Dip/pull/13), [@ilyapuchka](https://github.com/ilyapuchka)
 * Factories and `resolveDependencies` blocks of `DefinitionOf` are now allowed to `throw`.  
-  [#32](https://github.com/AliSoftware/Dip/pull/13), [@ilyapuchka](https://github.com/ilyapuchka)
+  [#32](https://github.com/AliSoftware/Dip/pull/32), [@ilyapuchka](https://github.com/ilyapuchka)
 * Thread safety reimplemented with support for recursive methods calls.  
   [#31](https://github.com/AliSoftware/Dip/pull/31), [@mwoollard](https://github.com/mwoollard)
+* Multi-injection to resolve an array of all the instances registere for the protocol.  
+  [#39](https://github.com/AliSoftware/Dip/pull/39), [@ilyapuchka](https://github.com/ilyapuchka)
 
 
 ## 4.0.0

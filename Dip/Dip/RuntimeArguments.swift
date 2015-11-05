@@ -58,6 +58,18 @@ extension DependencyContainer {
     return try resolve(tag: tag) { (factory: (Arg1) throws -> T) in try factory(arg1) }
   }
   
+  /**
+   Resolve dependency with runtime argument as array. Resulting array will contain instances of resolved type created by resolving all registered definitions for resolved type with matching factory.
+   
+   - parameter arg1: Argument that will be used to resolve each instance
+   - returns: array of resolved instances
+   
+   - seealso: `resolveAll()`, `resolve(tag:withArguments:)`
+   */
+  public func resolveAll<T, Arg1>(arg1: Arg1) throws -> [T] {
+    return try resolveAll { (factory: (Arg1) throws -> T) in try factory(arg1) }
+  }
+  
   // MARK: 2 Runtime Arguments
   
   /// - seealso: `register(:factory:scope:)`
@@ -65,9 +77,13 @@ extension DependencyContainer {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
-  /// - seealso: `resolve(tag:_:)`
+  /// - seealso: `resolve(tag:withArguments:)`
   public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2) throws -> T {
     return try resolve(tag: tag) { (factory: (Arg1, Arg2) throws -> T) in try factory(arg1, arg2) }
+  }
+
+  public func resolveAll<T, Arg1, Arg2>(arg1: Arg1, _ arg2: Arg2) throws -> [T] {
+    return try resolveAll { (factory: (Arg1, Arg2) throws -> T) in try factory(arg1, arg2) }
   }
 
   // MARK: 3 Runtime Arguments
@@ -81,6 +97,10 @@ extension DependencyContainer {
     return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) throws -> T) in try factory(arg1, arg2, arg3) }
   }
   
+  public func resolveAll<T, Arg1, Arg2, Arg3>(arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) throws -> [T] {
+    return try resolveAll { (factory: (Arg1, Arg2, Arg3) throws -> T) in try factory(arg1, arg2, arg3) }
+  }
+
   // MARK: 4 Runtime Arguments
   
   public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) throws -> T> {
@@ -90,6 +110,10 @@ extension DependencyContainer {
   /// - seealso: `resolve(tag:withArguments:)`
   public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) throws -> T {
     return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) throws -> T) in try factory(arg1, arg2, arg3, arg4) }
+  }
+
+  public func resolveAll<T, Arg1, Arg2, Arg3, Arg4>(arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) throws -> [T] {
+    return try resolveAll { (factory: (Arg1, Arg2, Arg3, Arg4) throws -> T) in try factory(arg1, arg2, arg3, arg4) }
   }
 
   // MARK: 5 Runtime Arguments
@@ -103,6 +127,10 @@ extension DependencyContainer {
     return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T) in try factory(arg1, arg2, arg3, arg4, arg5) }
   }
 
+  public func resolveAll<T, Arg1, Arg2, Arg3, Arg4, Arg5>(arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) throws -> [T] {
+    return try resolveAll { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T) in try factory(arg1, arg2, arg3, arg4, arg5) }
+  }
+
   // MARK: 6 Runtime Arguments
   
   public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T> {
@@ -112,6 +140,10 @@ extension DependencyContainer {
   /// - seealso: `resolve(tag:withArguments:)`
   public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) throws -> T {
     return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T) in try factory(arg1, arg2, arg3, arg4, arg5, arg6) }
+  }
+
+  public func resolveAll<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) throws -> [T] {
+    return try resolveAll { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T) in try factory(arg1, arg2, arg3, arg4, arg5, arg6) }
   }
 
 }
