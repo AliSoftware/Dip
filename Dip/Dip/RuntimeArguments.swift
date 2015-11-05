@@ -22,8 +22,8 @@ extension DependencyContainer {
 
      - seealso: `register(tag:factory:scope:)`
      */
-    public func register<T, Arg1>(tag: Tag? = nil, factory: (Arg1) -> T) -> DefinitionOf<T> {
-        return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+    public func register<T, Arg1>(tag tag: Tag? = nil, factory: (Arg1) -> T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
     }
     
     /**
@@ -35,52 +35,52 @@ extension DependencyContainer {
      - seealso: `resolve(tag:)`
     */
     public func resolve<T, Arg1>(tag tag: Tag? = nil, _ arg1: Arg1) -> T {
-        return resolve(tag) { (factory: (Arg1) -> T) in factory(arg1) }
+        return resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }
     }
 
     /// - seealso: `register(:factory:scope:)`
-    public func register<T, Arg1, Arg2>(tag: Tag? = nil, factory: (Arg1, Arg2) -> T) -> DefinitionOf<T> {
-        return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+    public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, factory: (Arg1, Arg2) -> T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
     }
     
     /// - seealso: `resolve(tag:_:)`
     public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2) -> T {
-        return resolve(tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
+        return resolve(tag: tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
     }
     
-    public func register<T, Arg1, Arg2, Arg3>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3) -> T) -> DefinitionOf<T> {
-        return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+    public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3) -> T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
     }
     
     /// - seealso: `resolve(tag:_:)`
     public func resolve<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) -> T {
-        return resolve(tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
+        return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
     }
     
-    public func register<T, Arg1, Arg2, Arg3, Arg4>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4) -> T) -> DefinitionOf<T> {
-        return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+    public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4) -> T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
     }
     
     /// - seealso: `resolve(tag:_:)`
     public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) -> T {
-        return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
+        return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
     }
     
-    public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T> {
-        return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+    public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
     }
     
     /// - seealso: `resolve(tag:_:)`
     public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) -> T {
-        return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
+        return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
     }
     
-    public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T> {
-        return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+    public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
     }
     
     /// - seealso: `resolve(tag:_:)`
     public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) -> T {
-        return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
+        return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
     }
 }

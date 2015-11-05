@@ -65,8 +65,8 @@ public class DependencyContainer {
      
      - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
      */
-    public func register<T>(tag: Tag? = nil, factory: ()->T) -> DefinitionOf<T> {
-        return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+    public func register<T>(tag tag: Tag? = nil, factory: ()->T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
     }
     
     /**
@@ -77,8 +77,8 @@ public class DependencyContainer {
      
      - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
      */
-    public func register<T>(tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T> {
-        return register(tag, factory: { factory() }, scope: .Singleton)
+    public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T> {
+        return register(tag: tag, factory: { factory() }, scope: .Singleton)
     }
     
     /**
@@ -97,7 +97,7 @@ public class DependencyContainer {
      }
      ```
      */
-    public func register<T, F>(tag: Tag? = nil, factory: F, scope: ComponentScope) -> DefinitionOf<T> {
+    public func register<T, F>(tag tag: Tag? = nil, factory: F, scope: ComponentScope) -> DefinitionOf<T> {
         let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
         let definition = DefinitionOf<T>(factory: factory, scope: scope)
         lockAndDo {
@@ -116,7 +116,7 @@ public class DependencyContainer {
     - parameter tag: The arbitrary tag to look for when resolving this protocol.
     */
     public func resolve<T>(tag tag: Tag? = nil) -> T {
-        return resolve(tag) { (factory: ()->T) in factory() }
+        return resolve(tag: tag) { (factory: ()->T) in factory() }
     }
     
     /**
@@ -136,7 +136,7 @@ public class DependencyContainer {
      ```
      
     */
-    public func resolve<T, F>(tag: Tag? = nil, builder: F->T) -> T {
+    public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) -> T {
         let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
         let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
         

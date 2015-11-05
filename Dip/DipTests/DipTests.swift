@@ -47,7 +47,7 @@ class DipTests: XCTestCase {
     
     func testThatItResolvesInstanceRegisteredWithTag() {
         //given
-        container.register("service") { ServiceImp1() as Service }
+        container.register(tag: "service") { ServiceImp1() as Service }
 
         //when
         let serviceInstance = container.resolve(tag: "service") as Service
@@ -58,8 +58,8 @@ class DipTests: XCTestCase {
 
     func testThatItResolvesDifferentInstancesRegisteredForDifferentTags() {
         //given
-        container.register("service1") { ServiceImp1() as Service }
-        container.register("service2") { ServiceImp2() as Service }
+        container.register(tag: "service1") { ServiceImp1() as Service }
+        container.register(tag: "service2") { ServiceImp2() as Service }
         
         //when
         let service1Instance = container.resolve(tag: "service1") as Service
