@@ -35,7 +35,7 @@ public final class DependencyContainer {
    with the same protocol, to differentiate them. Tags can be either String
    or Int, to your convenience.
    */
-  public enum Tag: Equatable {
+  public enum Tag: Equatable, Comparable {
     case String(StringLiteralType)
     case Int(IntegerLiteralType)
   }
@@ -120,7 +120,7 @@ public final class DependencyContainer {
   container.register { ClientImp(service: try! container.resolve() as Service) as Client }
   ```
   */
-  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws ->T > {
+  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
@@ -233,6 +233,51 @@ public final class DependencyContainer {
     }
   }
   
+  /**
+   Resolve dependency as array. Resulting array will contain instances of resolved type created by resolving all registered definitions for resolved type with matching factory.
+   
+   - note: resolved instances will be ordered according to tags order. 
+   Tags are compared by strings made of their associated values.
+   
+   - returns: array of resolved instances
+   
+   **Example**:
+   ```swift
+   container.register() { ServiceImp0() as Service }
+   container.register(tag: "service1") { ServiceImp1() as Service }
+   container.register(tag: "service2") { ServiceImp2() as Service }
+   
+   let allServices = try! container.resolveAll() as [Service]
+   
+   allServices[0] // is ServiceImp0()
+   allServices[1] // is ServiceImp1()
+   allServices[2] // is ServiceImp2()
+   ```
+   
+   */
+  public func resolveAll<T>() throws -> [T] {
+    return try resolveAll { (factory: () throws -> T) -> T in try factory() }
+  }
+  
+  /**
+   Resolves all components registered for the type. 
+   
+   - note: You should use this method _only_ to resolve dependency with more runtime arguments than _Dip_ supports.
+   
+   - seealso: `resolve(tag:builder:)`
+   */
+  public func resolveAll<T, F>(builder: F throws -> T) rethrows -> [T] {
+    return try threadSafe {
+      return try self.definitions
+        .sort({ $0.0.associatedTag < $1.0.associatedTag })
+        .flatMap { (key, definition) in
+          guard let definition = definition as? DefinitionOf<T, F> else { return nil }
+          let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
+          return try self._resolve(key: usingKey, definition: definition, builder: builder)
+      }
+    }
+  }
+  
   /// Actually resolve dependency
   private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F throws -> T) rethrows -> T {
     
@@ -340,14 +385,43 @@ extension DependencyContainer.Tag: StringLiteralConvertible {
   }
 }
 
+/*
+.String("a") == .Stirng("a")
+.Int(1) == .Int(1)
+.String("1") == .Int(1)
+*/
 public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
   switch (lhs, rhs) {
   case let (.String(lhsString), .String(rhsString)):
     return lhsString == rhsString
   case let (.Int(lhsInt), .Int(rhsInt)):
     return lhsInt == rhsInt
-  default:
-    return false
+  case let (.String(lhsString), .Int(rhsInt)):
+    return lhsString == String(rhsInt)
+  case let (.Int(lhsInt), .String(rhsString)):
+    return String(lhsInt) == rhsString
+  }
+}
+
+/**
+ Tags are compared by comparing strings created from their assiciated values.
+ 
+ .String("a") < .String("b")
+ .Int(0) < .Int(1)
+ .String("0") < .Int(1)
+ .Int(0) < .String("1")
+ 
+ */
+public func <(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
+  switch (lhs, rhs) {
+  case let (.String(lhsString), .String(rhsString)):
+    return lhsString < rhsString
+  case let (.Int(lhsInt), .Int(rhsInt)):
+    return lhsInt < rhsInt
+  case let (.String(lhsString), .Int(rhsInt)):
+    return lhsString < String(rhsInt)
+  case let (.Int(lhsInt), .String(rhsString)):
+    return String(lhsInt) < rhsString
   }
 }
 

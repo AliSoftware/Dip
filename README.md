@@ -212,6 +212,17 @@ let client = try! container.resolve() as Client
 ```
 You can find more use cases for auto-injection in the Playground available in this repository.
 
+### Multi-injection
+
+If you have several implementations of the same protocol and you wish to get them all as an array you can do that using `resolveAll` method:
+
+```swift
+container.register(tag: "facebook") { FacebookShare() as SharingService }
+container.register(tag: "twitter") { TwitterShare() as SharingService }
+
+let sharingServices = try! container.resolveAll() as [SharingService]
+```
+
 ### Thread safety
 
 `DependencyContainer` is thread safe, you can register and resolve components from different threads. 
