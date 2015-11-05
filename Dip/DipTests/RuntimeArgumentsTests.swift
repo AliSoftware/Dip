@@ -9,6 +9,19 @@
 import XCTest
 @testable import Dip
 
+class ServiceImp3: Service {
+    
+    let name: String
+    
+    init(name: String, baseURL: NSURL, port: Int) {
+        self.name = name
+    }
+    
+    func getServiceName() -> String {
+        return name
+    }
+}
+
 class RuntimeArgumentsTests: XCTestCase {
     
     let container = DependencyContainer()
@@ -177,6 +190,27 @@ class RuntimeArgumentsTests: XCTestCase {
         //then
         XCTAssertTrue(service1 is ServiceImp1)
         XCTAssertTrue(service2 is ServiceImp2)
+    }
+    
+    func testThatDifferentFactoriesRegisteredIfArgumentIsOptional() {
+        //given
+        let name1 = "1", name2 = "2", name3 = "3"
+        container.register { (port: Int, url: NSURL) in ServiceImp3(name: name1, baseURL: url, port: port) as Service }
+        container.register { (port: Int, url: NSURL?) in ServiceImp3(name: name2, baseURL: url!, port: port) as Service }
+        container.register { (port: Int, url: NSURL!) in ServiceImp3(name: name3, baseURL: url, port: port) as Service }
+        
+        //when
+        let service1 = container.resolve(80, NSURL(string: "http://example.com")!) as Service
+        let service2 = container.resolve(80, NSURL(string: "http://example.com")) as Service
+        
+        let service3 = container.resolve(80, NSURL(string: "http://example.com")! as NSURL!) as Service
+        let service4 = container.resolve(80, NSURL(string: "http://example.com")!) as Service
+        
+        //then
+        XCTAssertEqual(service1.getServiceName(), name1)
+        XCTAssertEqual(service2.getServiceName(), name2)
+        XCTAssertEqual(service3.getServiceName(), name3)
+        XCTAssertEqual(service4.getServiceName(), name1) //implicitly unwrapped optional parameter is the same as not optional parameter
     }
 
 }
