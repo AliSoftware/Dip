@@ -2,9 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:../DipPlayground.playground">
+      location = "group:DipPlayground.playground">
    </FileRef>
    <FileRef
-      location = "self:">
+      location = "container:Dip.xcodeproj">
    </FileRef>
 </Workspace>
