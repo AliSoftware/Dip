@@ -108,34 +108,28 @@ You can register factories that accept up to six arguments. When you resolve dep
 
 ```swift
 let webServices = DependencyContainer() { webServices in
-	webServices.register { (url: NSURL, port: Int) in WebService(name: "1", baseURL: url, port: port) as WebServiceAPI }
-   webServices.register { (port: Int, url: NSURL) in WebService(name: "2", baseURL: url, port: port) as WebServiceAPI }
-   webServices.register { (port: Int, url: NSURL?) in WebService(name: "3", baseURL: url!, port: port) as WebServiceAPI }
+	webServices.register { (url: NSURL, port: Int) in WebServiceImp1(url, port: port) as WebServiceAPI }
+	webServices.register { (port: Int, url: NSURL) in WebServiceImp2(url, port: port) as WebServiceAPI }
+	webServices.register { (port: Int, url: NSURL?) in WebServiceImp3(url!, port: port) as WebServiceAPI }
 }
 
-let service1 = webServices.resolve(NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1.name == "1"
-let service2 = webServices.resolve(80, NSURL(string: "http://example.url")!) as WebServiceAPI // service1.name == "2"
-let service3 = webServices.resolve(80, NSURL(string: "http://example.url")?) as WebServiceAPI // service1.name == "3"
+let service1 = webServices.resolve(NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1 is WebServiceImp1
+let service2 = webServices.resolve(80, NSURL(string: "http://example.url")!) as WebServiceAPI // service2 is WebServiceImp2
+let service3 = webServices.resolve(80, NSURL(string: "http://example.url")) as WebServiceAPI // service3 is WebServiceImp3
 
 ```
+Though Dip provides support for up to six runtime arguments out of the box you can extend this number using following code snippet for seven arguments:
 
-### Runtime arguments
-
-You can register factories that accept up to six arguments. When you resolve dependency you can pass those arguments to `resolve()` method and they will be passed to the factory. Note that _number_, _types_ and _order_ of parameters matters. Also use of optional parameter and not optional parameter will result in two factories registered in container.
-
-```swift
-let webServices = DependencyContainer() { webServices in
-	webServices.register { (url: NSURL, port: Int) in WebService(name: "1", baseURL: url, port: port) as WebServiceAPI }
-   webServices.register { (port: Int, url: NSURL) in WebService(name: "2", baseURL: url, port: port) as WebServiceAPI }
-   webServices.register { (port: Int, url: NSURL?) in WebService(name: "3", baseURL: url!, port: port) as WebServiceAPI }
+```
+func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) -> DefinitionOf<T> {
+	return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+}
+	
+func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) -> T {
+	return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
 }
 
-let service1 = webServices.resolve(NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1.name == "1"
-let service2 = webServices.resolve(80, NSURL(string: "http://example.url")!) as WebServiceAPI // service1.name == "2"
-let service3 = webServices.resolve(80, NSURL(string: "http://example.url")) as WebServiceAPI // service1.name == "3"
-
 ```
-
 
 ### Concrete Example
 

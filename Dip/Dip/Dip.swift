@@ -88,14 +88,16 @@ public class DependencyContainer {
      - parameter factory: generic factory that should be used to create concrete instance of type
      - parameter scope: scope of the component. Default value is `Prototype`
 
-     -note: You should not call this method directly, instead call any of other `register` methods. You _should_ use this method only to register dependency with more runtime arguments than _Dip_ supports (currently it's up to six). Though before you do that you should probably review your design and try to reduce number of depnedencies.
+     -note: You should not call this method directly, instead call any of other `register` methods. You _should_ use this method only to register dependency with more runtime arguments than _Dip_ supports (currently it's up to six) like in this example:
      
-     **Example**
      ```swift
-     public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, ...) -> T) {
-         register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+     public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T> {
+         return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
      }
      ```
+     
+     Though before you do that you should probably review your design and try to reduce number of depnedencies.
+     
      */
     public func register<T, F>(tag tag: Tag? = nil, factory: F, scope: ComponentScope) -> DefinitionOf<T> {
         let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
@@ -125,15 +127,15 @@ public class DependencyContainer {
      - parameter tag: The arbitrary tag to look for when resolving this protocol.
      - parameter builder: Generic closure that accepts generic factory and returns inctance produced by that factory
      
-     - note: You should not call this method directly, instead call any of other `resolve` methods. You _should_ use this method only to register dependency with more runtime arguments than _Dip_ supports (currently it's up to six). Though before you do that you should probably review your design and try to reduce number of depnedencies.
-     
-     **Example**
+     - note: You should not call this method directly, instead call any of other `resolve` methods. You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports (currently it's up to six) like in this example:
      
      ```swift
      public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) -> T {
          return resolve(tag) { (factory: (Arg1, Arg2, Arg3, ...) -> T) in factory(arg1, arg2, arg3, ...) }
      }
      ```
+     
+     Though before you do that you should probably review your design and try to reduce number of depnedencies.
      
     */
     public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) -> T {
