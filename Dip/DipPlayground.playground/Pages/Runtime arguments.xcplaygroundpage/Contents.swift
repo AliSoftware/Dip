@@ -1,4 +1,4 @@
-//: [Previous](@previous)
+//: [Previous: Resolving Components](@previous)
 
 import Dip
 
@@ -17,7 +17,6 @@ container.register { (port: Int, url: NSURL) in ServiceImp3(name: "2", baseURL: 
 container.register { (port: Int, url: NSURL?) in ServiceImp3(name: "3", baseURL: url!, port: port) as Service }
 container.register { (port: Int, url: NSURL!) in ServiceImp3(name: "4", baseURL: url, port: port) as Service }
 
-//when
 let url: NSURL = NSURL(string: "http://example.com")!
 let service1 = container.resolve(url, 80) as Service
 let service2 = container.resolve(80, url) as Service
@@ -32,7 +31,7 @@ let service4 = container.resolve(80, NSURL(string: "http://example.com")! as NSU
 /*:
 Note that all of the services were resolved using different factories.
 
-Dip supports up to six runtime arguments. If that is not enougth you can extend container to accept more arguments. Here is how you can extend it to serve seven arguments.
+_Dip_ supports up to six runtime arguments. If that is not enougth you can extend `DependencyContainer` to accept more arguments. For example, here is how you can extend it to serve seven arguments.
 */
 
 extension DependencyContainer {
@@ -46,7 +45,7 @@ extension DependencyContainer {
 }
 
 /*:
-If you find yourself thinking about adding more runtime arguments - stop and think about your design instead. Having too many dependencies could be a sign of some problem in your architecture.
+However, if you find yourself thinking about adding more runtime arguments, stop and think about your design instead. Having too many dependencies could be a sign of some problem in your architecture, so we strongly suggest that you refrain from doing so; six runtime arguments is already a lot.
 */
 
-//: [Next](@next)
+//: [Next: Scopes](@next)

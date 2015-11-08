@@ -1,4 +1,4 @@
-//: [Previous](@previous)
+//: [Previous: Creating a DependencyContainer](@previous)
 
 import Dip
 
@@ -6,15 +6,15 @@ import Dip
 
 ### Registering components
 
-You register definition in container using `register` method:
+You register a definition in a container using the `register` method:
 */
 let container = DependencyContainer()
 container.register { ServiceImp1() as Service }
 
 /*:
-That code means that as `Service` you want to use instance of `ServiceImp1` class created with it's `init()` initializer.
+That code means that when you need a `Service`, you want to use instances of `ServiceImp1` class created with it's `init()` initializer.
 
-You can register factories that accept runtime arguments:
+You can also register factories that accept runtime arguments:
 */
 
 container.register { service in ClientImp1(service: service) as Client }
@@ -22,17 +22,23 @@ container.register { service in ClientImp1(service: service) as Client }
 /*:
 Dip supports up to six runtime arguments, but you can use as many as you want. For more details see ["Runtime arguments"](Runtime%20arguments).
 
-Also you can use factory methods in definitions. That can be usefull if you already have some factories but want to migrate to Dip.
+You can also use factory methods in definitions. This can be useful if you already have some factories but want to migrate to Dip.
 */
 
 let factory = ServiceFactory()
+// factory.someService is a method with signature `() -> Service`, Cmd-Click to see definition
 container.register(factory: factory.someService)
 
 /*:
-Optionally you can associate definitions with Integer or String tags. This way you can register different implementations of the same protocol. You can use String or Integer literals, or DependencyContainer.Tag enum.
+Optionally you can associate definitions with Integer or String tags. This way you can register different implementations for the same protocol.  
+You can use String or Integer literals, or the `DependencyContainer.Tag` enum.
 */
 
 container.register(tag: "tag") { ServiceImp1() as Service }
 container.register(tag: DependencyContainer.Tag.Int(0)) { ServiceImp1() as Service }
 
-//: [Next](@next)
+/*:
+We recommand you to use constants for the tags, to make the intent clear and avoid magic numbers and typos.
+*/
+
+//: [Next: Resolving Components](@next)

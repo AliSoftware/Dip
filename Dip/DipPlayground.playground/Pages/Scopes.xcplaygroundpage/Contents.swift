@@ -1,4 +1,4 @@
-//: [Previous](@previous)
+//: [Previous: Runtime Arguments](@previous)
 
 import Dip
 
@@ -6,9 +6,12 @@ import Dip
 
 ### Scopes
 
-Dip supports two different scopes of objects: _Prototype_ and _Singleton_. First will make container to resolve type as a new instance every time you call `resolve`. Singleton scope will make it to retain once resolved instance and reuse it during container lifetime.
+Dip supports two different scopes of objects: _Prototype_ and _Singleton_.
 
-Prototype scope is default. To register singleton use `register(tag:instance:)`
+* The `.Prototype` scope will make the `DependencyContainer` resolve your type as __a new instance every time__ you call `resolve`.
+* The `.Singleton` scope will make the `DependencyContainer` retain the instance once resolved the first time, and reuse it in the next calls during the container lifetime.
+
+The `.Prototype` scope is the default. To register a singleton, use `register(tag:instance:)`
 */
 
 let container = DependencyContainer { container in
@@ -24,4 +27,3 @@ let service = container.resolve() as Service
 let anotherService = container.resolve() as Service
 service as! ServiceImp1 === anotherService as! ServiceImp1
 
-//: [Next](@next)
