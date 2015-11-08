@@ -110,7 +110,7 @@ public class DependencyContainer {
    
    ```swift
    public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T> {
-     return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+     return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
    }
    ```
    
@@ -151,7 +151,7 @@ public class DependencyContainer {
    
    ```swift
    public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) -> T {
-     return resolve(tag) { (factory: (Arg1, Arg2, Arg3, ...) -> T) in factory(arg1, arg2, arg3, ...) }
+     return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, ...) -> T) in factory(arg1, arg2, arg3, ...) }
    }
    ```
    
