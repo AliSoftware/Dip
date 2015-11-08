@@ -35,8 +35,8 @@ public class DependencyContainer {
      - parameter configBlock: A configuration block in which you typically put all you `register` calls.
      
      - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
-     It is only present for convenience to have a cleaner syntax when declaring and initializing 
-     your `DependencyContainer` instances.
+             It is only present for convenience to have a cleaner syntax when declaring and initializing
+             your `DependencyContainer` instances.
      
      - returns: A new DependencyContainer.
      */
@@ -88,7 +88,9 @@ public class DependencyContainer {
      - parameter factory: generic factory that should be used to create concrete instance of type
      - parameter scope: scope of the component. Default value is `Prototype`
 
-     -note: You should not call this method directly, instead call any of other `register` methods. You _should_ use this method only to register dependency with more runtime arguments than _Dip_ supports (currently it's up to six) like in this example:
+     - note: You should not call this method directly, instead call any of other `register` methods.
+             You _should_ use this method only to register dependency with more runtime arguments
+             than _Dip_ supports (currently it's up to six) like in this example:
      
      ```swift
      public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T> {

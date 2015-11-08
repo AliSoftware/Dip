@@ -38,8 +38,8 @@
 		094526B01BEA1E1C0034E72A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		094526B11BEA1E1C0034E72A /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
 		094526B21BEA1E1C0034E72A /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
-		094526B31BEA51540034E72A /* RuntimeArguments.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeArguments.swift; sourceTree = "<group>"; };
-		094526B51BEA520B0034E72A /* Definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Definition.swift; sourceTree = "<group>"; };
+		094526B31BEA51540034E72A /* RuntimeArguments.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = RuntimeArguments.swift; sourceTree = "<group>"; tabWidth = 2; };
+		094526B51BEA520B0034E72A /* Definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Definition.swift; sourceTree = "<group>"; tabWidth = 2; };
 		094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
 		09969C541BEB7C0A00F93C70 /* Dip.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Dip.podspec; path = ../Dip.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -71,7 +71,9 @@
 				0945269F1BEA1CFF0034E72A /* DipTests */,
 				094526921BEA1CFF0034E72A /* Products */,
 			);
+			indentWidth = 2;
 			sourceTree = "<group>";
+			tabWidth = 2;
 		};
 		094526921BEA1CFF0034E72A /* Products */ = {
 			isa = PBXGroup;
