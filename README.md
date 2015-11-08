@@ -193,7 +193,8 @@ This sample uses the Star Wars API provided by swapi.co to fetch Star Wars chara
 
 ## Credits
 
-This library is authored by **Olivier Halligon**, olivier@halligon.net
+This library has been created by **Olivier Halligon**, olivier@halligon.net
+I'd also like to thank Ilya Puchka for his big contribution to it, as he added a lot of great features to it.
 
 **Dip** is available under the **MIT license**. See the `LICENSE` file for more info.
 
