@@ -83,7 +83,7 @@ let dip = DependencyContainer { dip in
 ### Using tags to associate various factories to one protocol
 
 * If you give a `tag` in the parameter to `register()`, it will associate that instance or factory with this tag, which can be used later during `resolve` (see below).
-* `resolve(tag)` will try to find an instance (or instance factory) that match both the requested protocol _and_ the tag. If it doesn't find any, it will fallback to an instance (or instance factory) that only match the requested protocol.
+* `resolve(tag: tag)` will try to find an instance (or instance factory) that match both the requested protocol _and_ the tag. If it doesn't find any, it will fallback to an instance (or instance factory) that only match the requested protocol.
 * The tags can be StringLiteralType or IntegerLiteralType. That said you can use plain strings or integers as tags.
 
 
@@ -95,11 +95,41 @@ enum WebService: String {
 }
 
 let wsDependencies = DependencyContainer() { dip in
-    dip.register(WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
-    dip.register(WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
+    dip.register(tag: WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
+    dip.register(tag: WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
 }
+
+let networkLayer = dip.resolve(tag: WebService.PersonWS.tag) as NetworkLayer
 ```
 
+### Runtime arguments
+
+You can register factories that accept up to six arguments. When you resolve dependency you can pass those arguments to `resolve()` method and they will be passed to the factory. Note that _number_, _types_ and _order_ of parameters matters. Also use of optional parameter and not optional parameter will result in two factories registered in container.
+
+```swift
+let webServices = DependencyContainer() { webServices in
+	webServices.register { (url: NSURL, port: Int) in WebServiceImp1(url, port: port) as WebServiceAPI }
+	webServices.register { (port: Int, url: NSURL) in WebServiceImp2(url, port: port) as WebServiceAPI }
+	webServices.register { (port: Int, url: NSURL?) in WebServiceImp3(url!, port: port) as WebServiceAPI }
+}
+
+let service1 = webServices.resolve(NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1 is WebServiceImp1
+let service2 = webServices.resolve(80, NSURL(string: "http://example.url")!) as WebServiceAPI // service2 is WebServiceImp2
+let service3 = webServices.resolve(80, NSURL(string: "http://example.url")) as WebServiceAPI // service3 is WebServiceImp3
+
+```
+Though Dip provides support for up to six runtime arguments out of the box you can extend this number using following code snippet for seven arguments:
+
+```
+func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) -> DefinitionOf<T> {
+	return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+}
+	
+func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) -> T {
+	return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
+}
+
+```
 
 ### Concrete Example
 
@@ -112,7 +142,7 @@ let dip: DependencyContainer = {
     dip.register(instance: env as EnvironmentType)
     dip.register(instance: WebService() as WebServiceType)
     dip.register() { DummyFriendsProvider(user: $0 ?? "Jane Doe") as FriendsProviderType }
-    dip.register("me") { PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
+    dip.register(tag: "me") { PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
     return dip
 }
 ```
@@ -146,7 +176,7 @@ struct SomeViewModel {
 This way, when running your app target:
 
 * `ws` will be resolved as your singleton instance `WebService` registered before.
-* `friendsProvider` will be resolved as a new instance each time, which will be an instance created via `PlistFriendsProvider(plist: "myfriends")` if `userName` is `me` and created via `DummyFriendsProvider(userName)` for any other `userName` value (because `resolve(userName)` will fallback to `resolve(nil)` in that case, using the instance factory which was registered without a tag).
+* `friendsProvider` will be resolved as a new instance each time, which will be an instance created via `PlistFriendsProvider(plist: "myfriends")` if `userName` is `me` and created via `DummyFriendsProvider(userName)` for any other `userName` value (because `resolve(userName)` will fallback to `resolve(tag: nil)` in that case, using the instance factory which was registered without a tag).
 
 But when running your Unit tests target, it will probably resolve to other instances, depending on how you registered your dependencies in your Test Case.
 

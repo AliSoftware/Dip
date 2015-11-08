@@ -17,7 +17,7 @@ class PersonListViewController: UITableViewController, FetchableTrait {
         return provider.fetchIDs(completion)
     }
     func fetchOne(personID: Int, completion: Person? -> Void) {
-        let provider = providerDependencies.resolve(.Int(personID)) as PersonProviderAPI
+        let provider = providerDependencies.resolve(tag: .Int(personID)) as PersonProviderAPI
         return provider.fetch(personID, completion: completion)
     }
     

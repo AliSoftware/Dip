@@ -13,19 +13,19 @@ protocol Service {
     func getServiceName() -> String
 }
 
+class ServiceImp1: Service {
+    func getServiceName() -> String {
+        return "ServiceImp1"
+    }
+}
+
+class ServiceImp2: Service {
+    func getServiceName() -> String {
+        return "ServiceImp2"
+    }
+}
+
 class DipTests: XCTestCase {
-    
-    class ServiceImp1: Service {
-        func getServiceName() -> String {
-            return "ServiceImp1"
-        }
-    }
-    
-    class ServiceImp2: Service {
-        func getServiceName() -> String {
-            return "ServiceImp2"
-        }
-    }
     
     let container = DependencyContainer()
     
@@ -47,10 +47,10 @@ class DipTests: XCTestCase {
     
     func testThatItResolvesInstanceRegisteredWithTag() {
         //given
-        container.register("service") { ServiceImp1() as Service }
+        container.register(tag: "service") { ServiceImp1() as Service }
 
         //when
-        let serviceInstance = container.resolve("service") as Service
+        let serviceInstance = container.resolve(tag: "service") as Service
         
         //then
         XCTAssertTrue(serviceInstance is ServiceImp1)
@@ -58,12 +58,12 @@ class DipTests: XCTestCase {
 
     func testThatItResolvesDifferentInstancesRegisteredForDifferentTags() {
         //given
-        container.register("service1") { ServiceImp1() as Service }
-        container.register("service2") { ServiceImp2() as Service }
+        container.register(tag: "service1") { ServiceImp1() as Service }
+        container.register(tag: "service2") { ServiceImp2() as Service }
         
         //when
-        let service1Instance = container.resolve("service1") as Service
-        let service2Instance = container.resolve("service2") as Service
+        let service1Instance = container.resolve(tag: "service1") as Service
+        let service2Instance = container.resolve(tag: "service2") as Service
         
         //then
         XCTAssertTrue(service1Instance is ServiceImp1)

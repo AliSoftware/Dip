@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Develop
+* Added support for factories with up to six runtime arguments
+[#8](https://github.com/AliSoftware/Dip/pull/8), [@ilyapuchka](https://github.com/ilyapuchka)
+* Parameter `tag` is now named in all register/resolve methods
+
 ## 2.0.0
 
 * Moved from generic _tag_ parameter on container to `Tag` enum with `String` and `Int` cases  
