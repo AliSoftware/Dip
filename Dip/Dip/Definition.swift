@@ -32,7 +32,7 @@ func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
 
 ///Describes the lifecycle of instances created by container.
 public enum ComponentScope {
-    /// Indicates that new instance of the component will be always created.
+    /// Indicates that a new instance of the component will be created each time it's resolved.
     case Prototype
     /// Indicates that resolved component should be retained by container and always reused.
     case Singleton

@@ -127,7 +127,9 @@ public class DependencyContainer {
      - parameter tag: The arbitrary tag to look for when resolving this protocol.
      - parameter builder: Generic closure that accepts generic factory and returns inctance produced by that factory
      
-     - note: You should not call this method directly, instead call any of other `resolve` methods. You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports (currently it's up to six) like in this example:
+     - note: You should not call this method directly, instead call any of other `resolve` methods. (see `RuntimeArguments.swift`).
+             You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports
+             (currently it's up to six) like in this example:
      
      ```swift
      public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) -> T {
@@ -135,7 +137,7 @@ public class DependencyContainer {
      }
      ```
      
-     Though before you do that you should probably review your design and try to reduce number of depnedencies.
+     Though before you do that you should probably review your design and try to reduce the number of dependencies.
      
     */
     public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) -> T {
