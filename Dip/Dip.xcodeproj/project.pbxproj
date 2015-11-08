@@ -14,7 +14,6 @@
 		094526B41BEA51540034E72A /* RuntimeArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B31BEA51540034E72A /* RuntimeArguments.swift */; };
 		094526B61BEA520B0034E72A /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B51BEA520B0034E72A /* Definition.swift */; };
 		094526B81BEA536A0034E72A /* RuntimeArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */; };
-		09969C551BEB7C0A00F93C70 /* Dip.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 09969C541BEB7C0A00F93C70 /* Dip.podspec */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,13 +34,9 @@
 		094526A01BEA1CFF0034E72A /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DipTests.swift; sourceTree = "<group>"; };
 		094526A21BEA1CFF0034E72A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		094526AB1BEA1D200034E72A /* Dip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dip.swift; sourceTree = "<group>"; };
-		094526B01BEA1E1C0034E72A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		094526B11BEA1E1C0034E72A /* CHANGELOG.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
-		094526B21BEA1E1C0034E72A /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		094526B31BEA51540034E72A /* RuntimeArguments.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = RuntimeArguments.swift; sourceTree = "<group>"; tabWidth = 2; };
 		094526B51BEA520B0034E72A /* Definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Definition.swift; sourceTree = "<group>"; tabWidth = 2; };
 		094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
-		09969C541BEB7C0A00F93C70 /* Dip.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Dip.podspec; path = ../Dip.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,7 +61,6 @@
 		094526871BEA1CFF0034E72A = {
 			isa = PBXGroup;
 			children = (
-				094526AF1BEA1E0B0034E72A /* Podspec Metadata */,
 				094526931BEA1CFF0034E72A /* Dip */,
 				0945269F1BEA1CFF0034E72A /* DipTests */,
 				094526921BEA1CFF0034E72A /* Products */,
@@ -104,17 +98,6 @@
 				094526A21BEA1CFF0034E72A /* Info.plist */,
 			);
 			path = DipTests;
-			sourceTree = "<group>";
-		};
-		094526AF1BEA1E0B0034E72A /* Podspec Metadata */ = {
-			isa = PBXGroup;
-			children = (
-				09969C541BEB7C0A00F93C70 /* Dip.podspec */,
-				094526B01BEA1E1C0034E72A /* README.md */,
-				094526B11BEA1E1C0034E72A /* CHANGELOG.md */,
-				094526B21BEA1E1C0034E72A /* LICENSE */,
-			);
-			name = "Podspec Metadata";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,7 +191,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				09969C551BEB7C0A00F93C70 /* Dip.podspec in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
