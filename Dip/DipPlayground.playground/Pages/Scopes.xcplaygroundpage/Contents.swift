@@ -27,3 +27,5 @@ let service = container.resolve() as Service
 let anotherService = container.resolve() as Service
 service as! ServiceImp1 === anotherService as! ServiceImp1
 
+//: [Next: Shared Instances](@next)
+

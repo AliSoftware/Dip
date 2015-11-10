@@ -26,5 +26,10 @@ container = DependencyContainer { container in
 
 /*:
 Both syntaxes are equivalent. The one using the configuration block is simply a convenience way to scope your components registrations in a nice looking way.
+
+### When/where to create container?
+
+While there is an option to use container as a global variable we advise instead to create and configure container in your app delegate and pass it between your objects.
+
 */
 //: [Next: Registering Components](@next)

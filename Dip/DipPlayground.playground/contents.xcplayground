@@ -7,5 +7,6 @@
         <page name='Resolving components'/>
         <page name='Runtime arguments'/>
         <page name='Scopes'/>
+        <page name='Shared Instances'/>
     </pages>
 </playground>
