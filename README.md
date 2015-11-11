@@ -157,8 +157,8 @@ let dip: DependencyContainer = {
     let env = ProductionEnvironment(analytics: true)
     dip.register(instance: env as EnvironmentType)
     dip.register(instance: WebService() as WebServiceType)
-    dip.register() { DummyFriendsProvider(user: $0 ?? "Jane Doe") as FriendsProviderType }
-    dip.register(tag: "me") { PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
+    dip.register() { name: String in DummyFriendsProvider(user: name) as FriendsProviderType }
+    dip.register(tag: "me") { _: String in PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
     return dip
 }
 ```
@@ -180,7 +180,7 @@ struct SomeViewModel {
   let ws: WebServiceType = dip.resolve()
   var friendsProvider: FriendsProviderType
   init(userName: String) {
-    friendsProvider = dip.resolve(userName)
+    friendsProvider = dip.resolve(tag: userName, userName)
   }
   func foo() {
     ws.someMethodDeclaredOnWebServiceType()
@@ -192,13 +192,13 @@ struct SomeViewModel {
 This way, when running your app target:
 
 * `ws` will be resolved as your singleton instance `WebService` registered before.
-* `friendsProvider` will be resolved as a new instance each time, which will be an instance created via `PlistFriendsProvider(plist: "myfriends")` if `userName` is `me` and created via `DummyFriendsProvider(userName)` for any other `userName` value (because `resolve(userName)` will fallback to `resolve(tag: nil)` in that case, using the instance factory which was registered without a tag).
+* `friendsProvider` will be resolved as a new instance each time, which will be an instance created via `PlistFriendsProvider(plist: "myfriends")` if `userName` is `me` and created via `DummyFriendsProvider(userName)` for any other `userName` value (because `resolve(tag: userName, userName)` will fallback to `resolve(tag: nil, userName)` in that case, using the instance factory which was registered without a tag, but will pass `userName` as argument).
 
 But when running your Unit tests target, it will probably resolve to other instances, depending on how you registered your dependencies in your Test Case.
 
 ### Complete Example Project
 
-In addition to this Usage overview and to the aforementioned playground, you can also find a complete example in the `Example/DipSampleApp` project provided in this repository.
+In addition to this Usage overview and to the aforementioned playground, you can also find a complete example in the `Sample app/DipSampleApp` project provided in this repository.
 
 This sample project is a bit more complex, but closer to real-world applications (even if this sample is all about StarWars!),
 by declaring protocols like `NetworkLayer` which can be resolved to a `URLSessionNetworkLayer` in the real app, but to a dummy
