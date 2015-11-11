@@ -36,6 +36,16 @@ it, simply add the following line to your Podfile:
 pod "Dip"
 ```
 
+## Playground
+
+Dip comes with a **Playground** to introduce you to Inversion of Control, Dependency Injection, and how to use Dip in practice.
+
+To play with it, [open `Dip.xcworkspace`](Dip/Dip.xcworkspace), then click on the `DipPlayground` entry in Xcode's Project Navigator and let it be your guide.
+
+_Note: Do not open the `DipPlayground.playground` file directly, as it needs to be part of the workspace to access the Dip framework so that the demo code it contains can work._
+
+The next paragraphs give you an overview of the Usage of _Dip_ directly, but if you're new to Dependency Injection, the Playground is probably a better start.
+
 ## Usage
 
 ### Register instances and instance factories
@@ -182,7 +192,7 @@ But when running your Unit tests target, it will probably resolve to other insta
 
 ### Complete Example Project
 
-You can find a complete example in the `Example/DipSampleApp` project provided in this repository.
+In addition to this Usage overview and to the aforementioned playground, you can also find a complete example in the `Example/DipSampleApp` project provided in this repository.
 
 This sample project is a bit more complex, but closer to real-world applications (even if this sample is all about StarWars!),
 by declaring protocols like `NetworkLayer` which can be resolved to a `URLSessionNetworkLayer` in the real app, but to a dummy
@@ -193,8 +203,8 @@ This sample uses the Star Wars API provided by swapi.co to fetch Star Wars chara
 
 ## Credits
 
-This library has been created by **Olivier Halligon**, olivier@halligon.net
-I'd also like to thank Ilya Puchka for his big contribution to it, as he added a lot of great features to it.
+This library has been created by [**Olivier Halligon**](olivier@halligon.net).  
+I'd also like to thank **Ilya Puchka** for his big contribution to it, as he added a lot of great features to it.
 
 **Dip** is available under the **MIT license**. See the `LICENSE` file for more info.
 
