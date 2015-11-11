@@ -5,22 +5,25 @@
       location = "group:DipPlayground.playground">
    </FileRef>
    <FileRef
-      location = "container:Dip.xcodeproj">
+      location = "group:Dip/Dip.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Sample app/DipSampleApp.xcodeproj">
    </FileRef>
    <Group
-      location = "group:"
+      location = "container:"
       name = "Podspec Metadata">
       <FileRef
-         location = "group:../Dip.podspec">
+         location = "group:Dip.podspec">
       </FileRef>
       <FileRef
-         location = "group:../README.md">
+         location = "group:README.md">
       </FileRef>
       <FileRef
-         location = "group:../CHANGELOG.md">
+         location = "group:LICENSE">
       </FileRef>
       <FileRef
-         location = "group:../LICENSE">
+         location = "group:CHANGELOG.md">
       </FileRef>
    </Group>
 </Workspace>
