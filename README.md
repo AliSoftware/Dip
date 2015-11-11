@@ -36,6 +36,12 @@ it, simply add the following line to your Podfile:
 pod "Dip"
 ```
 
+If you use _Carthage_ add this line to your Cartfile:
+
+```
+github "AliSoftware/Dip"
+```
+
 ## Playground
 
 Dip comes with a **Playground** to introduce you to Inversion of Control, Dependency Injection, and how to use Dip in practice.
