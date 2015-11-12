@@ -18,6 +18,7 @@
 		090012401BC704C60079C600 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; };
 		090012421BC7059E0079C600 /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; };
 		090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012431BC708A00079C600 /* DummyStarshipProvider.swift */; };
+		097291071BF4F556001EB6BC /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 097291061BF4F556001EB6BC /* Dip.framework */; };
 		099022621BC123C000E76F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099022611BC123C000E76F43 /* AppDelegate.swift */; };
 		099022691BC123C000E76F43 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 099022681BC123C000E76F43 /* Assets.xcassets */; };
 		0990226C1BC123C000E76F43 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */; };
@@ -59,6 +60,7 @@
 		0900123F1BC704C60079C600 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		090012411BC7059E0079C600 /* Starship.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Starship.swift; sourceTree = "<group>"; };
 		090012431BC708A00079C600 /* DummyStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyStarshipProvider.swift; sourceTree = "<group>"; };
+		097291061BF4F556001EB6BC /* Dip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Dip.framework; path = "../Dip/build/Debug-iphoneos/Dip.framework"; sourceTree = "<group>"; };
 		0990225F1BC123C000E76F43 /* DipSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DipSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		099022611BC123C000E76F43 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		099022681BC123C000E76F43 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -100,6 +102,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				097291071BF4F556001EB6BC /* Dip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -199,6 +202,7 @@
 		1A92CB92072DE61786F63E4C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				097291061BF4F556001EB6BC /* Dip.framework */,
 				09D8055E1BF3D018006EBC12 /* Dip.framework */,
 				2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */,
 				304AD039660A2C58EB08D985 /* Pods_DipTests.framework */,
