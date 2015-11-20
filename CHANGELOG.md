@@ -9,8 +9,8 @@
 
 #### Breaking Changes
 
-* Removed container thread-safety to enable recursion for circular dependencies.  
-**Access to the container across threads should be handled by clients now**.
+* Removed container thread-safety to enable recursion calls to `resolve`.  
+  **Access to container from multiple threads should be handled by clients** from now on.
 
 ## 3.0.0
 

@@ -161,6 +161,11 @@ container.register { ServerImp() as Server }
 }
 ```
 
+### Thread safety
+
+_Dip_ does not provide thread safety, so you need to make sure you always call `resolve` method of `DependencyContainer` from the single thread. 
+Otherwise if two threads try to resolve the same type they can get different instances where the same instance is expected.
+
 ### Concrete Example
 
 Somewhere in your App target, register the dependencies:
