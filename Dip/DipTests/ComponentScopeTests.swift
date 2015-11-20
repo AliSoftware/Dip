@@ -75,8 +75,7 @@ class ComponentScopeTests: XCTestCase {
     //given
     container.register(.ObjectGraph) { [unowned container] in Client(server: container.resolve()) as Client }
     
-    var serverDefinition = container.register(.ObjectGraph) { Server() as Server }
-    serverDefinition.resolveDependencies(container) { container, server in
+    container.register(.ObjectGraph) { Server() as Server }.resolveDependencies(container) { container, server in
       server.client = container.resolve() as Client
     }
     
@@ -91,8 +90,7 @@ class ComponentScopeTests: XCTestCase {
   func testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve() {
     //given
     container.register(.ObjectGraph) { [unowned container] in Client(server: container.resolve()) as Client }
-    var serverDefinition = container.register(.ObjectGraph) { Server() as Server }
-    serverDefinition.resolveDependencies(container) { container, server in
+    container.register(.ObjectGraph) { Server() as Server }.resolveDependencies(container) { container, server in
       server.client = container.resolve() as Client
     }
     
@@ -111,8 +109,7 @@ class ComponentScopeTests: XCTestCase {
   func testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag() {
     //given
     var service2: Service?
-    var service1Definition = container.register(.ObjectGraph) { ServiceImp1() as Service }
-    service1Definition.resolveDependencies(container) { (c, _) in
+    container.register(.ObjectGraph) { ServiceImp1() as Service }.resolveDependencies(container) { (c, _) in
       service2 = c.resolve(tag: "service") as Service
     }
     container.register(tag: "service", .ObjectGraph) { ServiceImp2() as Service}

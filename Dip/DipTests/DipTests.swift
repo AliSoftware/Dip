@@ -84,8 +84,7 @@ class DipTests: XCTestCase {
   func testThatItCallsResolveDependenciesOnDefinition() {
     //given
     var resolveDependenciesCalled = false
-    var definition = container.register { ServiceImp1() as Service }
-    definition.resolveDependencies(container) { (c, s) in
+    container.register { ServiceImp1() as Service }.resolveDependencies(container) { (c, s) in
       resolveDependenciesCalled = true
     }
     

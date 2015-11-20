@@ -81,12 +81,14 @@ public struct DefinitionOf<T, F>: Definition {
    ```
    
    */
-  public mutating func resolveDependencies(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, block: (DependencyContainer, T) -> ()) {
+  public func resolveDependencies(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
     guard resolveDependenciesBlock == nil else {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
-    resolveDependenciesBlock = block
-    container.register(tag: tag, definition: self)
+    var newDefinition = self
+    newDefinition.resolveDependenciesBlock = block
+    container.register(tag: tag, definition: newDefinition)
+    return newDefinition
   }
   
   let factory: F
