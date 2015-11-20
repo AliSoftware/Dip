@@ -33,10 +33,10 @@ class RuntimeArgumentsTests: XCTestCase {
   func testThatItResolvesInstanceWithOneArgument() {
     //given
     let arg1 = 1
-    container.register { (a1: Int) -> Service in
+    container.register(factory: { (a1: Int) -> Service in
       XCTAssertEqual(a1, arg1)
       return ServiceImp1()
-    }
+    })
     
     //when
     let service = container.resolve(arg1) as Service
@@ -149,8 +149,8 @@ class RuntimeArgumentsTests: XCTestCase {
   func testThatItRegistersDifferentFactoriesForDifferentTypesOfArguments() {
     //given
     let arg1 = 1, arg2 = "string"
-    container.register { (a1: Int) in ServiceImp1() as Service }
-    container.register { (a1: String) in ServiceImp2() as Service }
+    container.register(factory: { (a1: Int) in ServiceImp1() as Service })
+    container.register(factory: { (a1: String) in ServiceImp2() as Service })
     
     //when
     let service1 = container.resolve(arg1) as Service

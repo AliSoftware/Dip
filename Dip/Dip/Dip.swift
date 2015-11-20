@@ -68,13 +68,38 @@ public class DependencyContainer {
     definitions.removeAll()
   }
   
+  /**
+   Removes previously registered definition from container.
+   
+   - parameter tag: tag used to register definition
+   - parameter definition: definition to remove
+  */
+  public func remove<T, F>(tag tag: Tag? = nil, definition: DefinitionOf<T, F>) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+    definitions[key] = nil
+  }
+  
+  /**
+   Registers new definiton in container and associate it with provided tag.
+   Will override already registered definition for the same type and factory associated with the same tag.
+   
+   - parameter tag: The arbitrary tag to associate definition with
+   - parameter definition: definition to register in container
+  */
+  public func register<T, F>(tag tag: Tag? = nil, definition: DefinitionOf<T, F>) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+    definitions[key] = definition
+  }
+  
   // MARK: Register dependencies
   
   /**
   Register a Void->T factory associated with optional tag.
   
   - parameter tag: The arbitrary tag to associate this factory with when registering with that protocol. Pass `nil` to associate with any tag. Default value is `nil`.
+  - parameter scope: scope to use for this compone
   - parameter factory: The factory to register, with return type of protocol you want to register it for
+  - returns: definition created for provided type and factory
   
   - note: You must cast the factory return type to the protocol you want to register it for.
   Inside factory block if you need to reference container use it as `unowned` to avoid retain cycle.
@@ -85,8 +110,8 @@ public class DependencyContainer {
   container.register { [unowned container] ClientImp(service: container.resolve()) as Client }
   ```
   */
-  public func register<T>(tag tag: Tag? = nil, factory: ()->T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: ()->T) -> DefinitionOf<T, ()->T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /**
@@ -99,8 +124,8 @@ public class DependencyContainer {
    - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
    */
   @available(*, deprecated, message="Use inScope(:) method of DefinitionOf instead to define scope.")
-  public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: { factory() }, scope: .Singleton)
+  public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T, ()->T> {
+    return registerFactory(tag: tag, scope: .Singleton, factory: { factory() })
   }
   
   /**
@@ -109,23 +134,24 @@ public class DependencyContainer {
    - parameter tag: The arbitrary tag to look for when resolving this protocol.
    - parameter factory: generic factory that should be used to create concrete instance of type
    - parameter scope: scope of the component. Default value is `Prototype`
-   
+   - returns: definition created for provided type and factory
+
    - note: You should not call this method directly, instead call any of other `register` methods.
            You _should_ use this method only to register dependency with more runtime arguments
            than _Dip_ supports (currently it's up to six) like in this example:
    
    ```swift
-   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T> {
-     return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, ...) -> T> {
+     return register(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, ...) -> T>
    }
    ```
    
    Though before you do that you should probably review your design and try to reduce number of depnedencies.
    
    */
-  public func register<T, F>(tag tag: Tag? = nil, factory: F, scope: ComponentScope) -> DefinitionOf<T> {
+  public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    let definition = DefinitionOf<T>(factory: factory, scope: scope)
+    let definition = DefinitionOf<T, F>(factory: factory, scope: scope)
     definitions[key] = definition
     return definition
   }
@@ -150,6 +176,7 @@ public class DependencyContainer {
    
    - parameter tag: The arbitrary tag to look for when resolving this protocol.
    - parameter builder: Generic closure that accepts generic factory and returns inctance produced by that factory
+   - returns: resolved instance of type T
    
    - note: You should not call this method directly, instead call any of other `resolve` methods. (see `RuntimeArguments.swift`).
            You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports
@@ -168,17 +195,17 @@ public class DependencyContainer {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
-    guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T> else {
+    guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
       fatalError("No definition registered with \(key) or \(nilTagKey)."
         + "Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`.")
     }
 
     let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
-    return _resolve(usingKey, definition: definition, builder: builder)
+    return _resolve(tag, key: usingKey, definition: definition, builder: builder)
   }
   
   /// Actually resolve dependency
-  private func _resolve<T, F>(key: DefinitionKey?, definition: DefinitionOf<T>, builder: F->T) -> T {
+  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, var definition: DefinitionOf<T, F>, builder: F->T) -> T {
     
     return resolvedInstances.resolve {
       
@@ -196,12 +223,14 @@ public class DependencyContainer {
         }
         
         resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key)
+        definition.resolvedInstance(self, tag: tag, instance: resolvedInstance)
         definition.resolveDependenciesBlock?(self, resolvedInstance)
         
         return resolvedInstance
       }
       
     }
+    
   }
   
   // MARK: - Private
@@ -212,13 +241,12 @@ public class DependencyContainer {
   ///Before `resolve()` returns pool is drained.
   class ResolvedInstances {
     var resolvedInstances = [DefinitionKey: Any]()
-    
-    func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey?, definition: DefinitionOf<T>) {
+
+    func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey?) {
       self.resolvedInstances[key] = instance
-      definition.resolvedInstance = instance
     }
     
-    func previouslyResolved<T>(key: DefinitionKey?, definition: DefinitionOf<T>) -> T? {
+    func previouslyResolved<T, F>(key: DefinitionKey?, definition: DefinitionOf<T, F>) -> T? {
       return (definition.resolvedInstance ?? self.resolvedInstances[key]) as? T
     }
     

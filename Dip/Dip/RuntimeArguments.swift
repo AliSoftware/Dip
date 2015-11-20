@@ -43,8 +43,8 @@ extension DependencyContainer {
   
   - seealso: `register(tag:factory:scope:)`
   */
-  public func register<T, Arg1>(tag tag: Tag? = nil, factory: (Arg1) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T, Arg1>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1) -> T) -> DefinitionOf<T, (Arg1) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1) -> T>
   }
   
   /**
@@ -63,8 +63,8 @@ extension DependencyContainer {
   // MARK: 2 Runtime Arguments
   
   /// - seealso: `register(:factory:scope:)`
-  public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, factory: (Arg1, Arg2) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2) -> T) -> DefinitionOf<T, (Arg1, Arg2) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2) -> T>
   }
   
   /// - seealso: `resolve(tag:_:)`
@@ -74,8 +74,8 @@ extension DependencyContainer {
   
   // MARK: 3 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3) -> T>
   }
   
   /// - seealso: `resolve(tag:_:)`
@@ -85,8 +85,8 @@ extension DependencyContainer {
   
   // MARK: 4 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) -> T>
   }
   
   /// - seealso: `resolve(tag:_:)`
@@ -96,8 +96,8 @@ extension DependencyContainer {
   
   // MARK: 4 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) -> T>
   }
   
   /// - seealso: `resolve(tag:_:)`
@@ -107,8 +107,8 @@ extension DependencyContainer {
   
   // MARK: 5 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T>
   }
   
   /// - seealso: `resolve(tag:_:)`

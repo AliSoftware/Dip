@@ -57,17 +57,7 @@ public enum ComponentScope {
 }
 
 ///Definition of type T describes how instances of this type should be created when they are resolved by container.
-public final class DefinitionOf<T>: Definition {
-  
-  /**
-   Changes scope of the component.
-   
-   - parameter scope: new scope value. New definitions have `Prototype` scope
-  */
-  public func inScope(scope: ComponentScope) -> DefinitionOf<T> {
-    self.scope = scope
-    return self
-  }
+public struct DefinitionOf<T, F>: Definition {
   
   /**
    Sets the block that will be used to resolve dependencies of the component. 
@@ -84,23 +74,26 @@ public final class DefinitionOf<T>: Definition {
    ```swift
    container.register { [unowned container] ClientImp(service: container.resolve() as Service) as Client }
 
-   container.register { ServiceImp() as Service }
-    .resolveDependencies { container, service in
+   var definition = container.register { ServiceImp() as Service }
+   definition.resolveDependencies { container, service in
       service.delegate = container.resolve() as Client
    }
    ```
    
    */
-  public func resolveDependencies(block: (DependencyContainer, T) -> ()) -> DefinitionOf<T> {
-    self.resolveDependenciesBlock = block
-    return self
+  public mutating func resolveDependencies(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, block: (DependencyContainer, T) -> ()) {
+    guard resolveDependenciesBlock == nil else {
+      fatalError("You can not change resolveDependencies block after it was set.")
+    }
+    resolveDependenciesBlock = block
+    container.register(tag: tag, definition: self)
   }
   
-  let factory: Any
+  let factory: F
   var scope: ComponentScope
   var resolveDependenciesBlock: ((DependencyContainer, T) -> ())?
   
-  init(factory: Any, scope: ComponentScope) {
+  init(factory: F, scope: ComponentScope) {
     self.factory = factory
     self.scope = scope
   }
@@ -111,10 +104,12 @@ public final class DefinitionOf<T>: Definition {
       guard scope == .Singleton else { return nil }
       return _resolvedInstance
     }
-    set {
-      guard scope == .Singleton else { return }
-      _resolvedInstance = newValue
-    }
+  }
+  
+  mutating func resolvedInstance(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, instance: T) {
+    guard scope == .Singleton else { return }
+    _resolvedInstance = instance
+    container.register(tag: tag, definition: self)
   }
   
   private var _resolvedInstance: T?
