@@ -180,26 +180,27 @@ public class DependencyContainer {
   /// Actually resolve dependency
   private func _resolve<T, F>(key: DefinitionKey?, definition: DefinitionOf<T>, builder: F->T) -> T {
     
-    resolvedInstances.incrementDepth()
-    defer { resolvedInstances.decrementDepth() }
-    
-    if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
-      return previouslyResolved
-    }
-    else {
-      let resolvedInstance = builder(definition.factory as! F)
+    return resolvedInstances.resolve {
       
-      //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
-      //when it returns instance that we try to resolve here can be already resolved
-      //so we return it, throwing away instance created by previous call to builder
       if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
         return previouslyResolved
       }
+      else {
+        let resolvedInstance = builder(definition.factory)
+        
+        //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
+        //when it returns instance that we try to resolve here can be already resolved
+        //so we return it, throwing away instance created by previous call to builder
+        if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+          return previouslyResolved
+        }
+        
+        resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key)
+        definition.resolveDependenciesBlock?(self, resolvedInstance)
+        
+        return resolvedInstance
+      }
       
-      resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, definition: definition)
-      definition.resolveDependenciesBlock?(self, resolvedInstance)
-      
-      return resolvedInstance
     }
   }
   
@@ -221,17 +222,16 @@ public class DependencyContainer {
       return (definition.resolvedInstance ?? self.resolvedInstances[key]) as? T
     }
     
-    var depth: Int = 0
-
-    func incrementDepth() {
-      depth++
-    }
+    private var depth: Int = 0
     
-    func decrementDepth() {
-      guard depth-- > 0 else { fatalError("Depth can not be lower than zero") }
+    func resolve<T>(@noescape block: ()->T) -> T {
+      depth++
+      let resolved = block()
+      depth--
       if depth == 0 {
         resolvedInstances.removeAll()
       }
+      return resolved
     }
   }
   
