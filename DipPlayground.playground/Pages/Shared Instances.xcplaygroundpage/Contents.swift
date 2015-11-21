@@ -43,7 +43,7 @@ Sure, this is very easy to code indeed. And nothing bad so far.
 But probably if you wrote a unit test or integration test for that code first, you would have noticed a problem earilier. How you test that code? And how you ensure that your tests are idenpendent of the API client's state from the previous test?
 Of cource you can work around all of the problems and the fact that `ApiClient` is a singleton, reset it's state somehow, or mock a class so that it will not return a singleton instance. But look - a moment before the singleton was your best friend and now you are fighting against it.
 
-Think - why do you want API client to be a singleton in a first place? To queue or throttle requests? Then do your queue or throttler a singleton, not an API client. Or is there any other reason. Most likely API client itself does not have a requirement to have only one system during the whole lifecycle of your application. Imagine that in the future we need two API Clients, because you now have to address two different servers & plaforms? Imposing that singleton restricts now your flexibility a lot.
+Think - why do you want API client to be a singleton in a first place? To queue or throttle requests? Then do your queue or throttler a singleton, not an API client. Or is there any other reason. Most likely API client itself does not have a requirement to have one and only one instance during the lifecycle of your application. Imagine that in the future we need two API Clients, because you now have to address two different servers & plaforms? Imposing that singleton restricts now your flexibility a lot.
 
 Instead, inject API client in view controller with property injection or constructor injection.
 */
@@ -125,7 +125,7 @@ class DipViewController: UIViewController {
 var dipController = DipViewController(dependencies: container)
 
 /*:
-Of cource `DependencyContainer` should not be used as singleton too. Instead, inject it to objects that need to access it. And use a protocol for that. For example if your view controller needs to access API client, it does not need a reference to `DependencyContainer`, it only needs a reference to _something_ that can provide it an API client instance.
+Of cource `DependencyContainer` should not be a singleton too. Instead, inject it to objects that need to access it. And use a protocol for that. For example if your view controller needs to access API client, it does not need a reference to `DependencyContainer`, it only needs a reference to _something_ that can provide it an API client instance.
 */
 
 protocol ApiClientProvider {

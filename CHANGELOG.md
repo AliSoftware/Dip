@@ -6,6 +6,8 @@
 
 * Added support for circular dependencies by adding `ObjectGraph` scope to reuse resolved instances.  
   [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added methods to register/remove individual definitions.  
+  [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
 
 #### Breaking Changes
 
