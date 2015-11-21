@@ -41,7 +41,7 @@ extension DependencyContainer {
           When you resolve it container will match the type and tag as well as __number__, __types__ and __order__
           of runtime arguments that you pass to `resolve` method.
   
-  - seealso: `register(tag:factory:scope:)`
+  - seealso: `registerFactory(tag:scope:factory:)`
   */
   public func register<T, Arg1>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1) -> T) -> DefinitionOf<T, (Arg1) -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1) -> T>
@@ -54,7 +54,7 @@ extension DependencyContainer {
    - parameter tag: The arbitrary tag to look for when resolving this protocol.
    - parameter arg1: First argument to be passed to factory
    
-   - seealso: `resolve(tag:)`
+   - seealso: `resolve(tag:builder:)`
    */
   public func resolve<T, Arg1>(tag tag: Tag? = nil, _ arg1: Arg1) -> T {
     return resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }

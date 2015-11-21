@@ -11,6 +11,7 @@
 
 * Removed container thread-safety to enable recursion calls to `resolve`.  
   **Access to container from multiple threads should be handled by clients** from now on.
+* Deprecated `register(tag:instance:)` method.
 
 ## 3.0.0
 

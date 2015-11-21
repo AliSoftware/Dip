@@ -104,10 +104,14 @@ public class DependencyContainer {
   - note: You must cast the factory return type to the protocol you want to register it for.
   Inside factory block if you need to reference container use it as `unowned` to avoid retain cycle.
   
-  **Example**
+  **Example**:
   ```swift
   container.register { ServiceImp() as Service }
-  container.register { [unowned container] ClientImp(service: container.resolve()) as Client }
+  container.register(tag: "service") { ServiceImp() as Service }
+  container.register(.ObjectGraph) { ServiceImp() as Service }
+  container.register { [unowned container] 
+    ClientImp(service: container.resolve() as Service) as Client 
+  }
   ```
   */
   public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: ()->T) -> DefinitionOf<T, ()->T> {
@@ -122,8 +126,10 @@ public class DependencyContainer {
    - parameter instance: The instance to register, with return type of protocol you want to register it for
    
    - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
+   
+   **Deprecated**: Use `register(.Singleton){}` method instead to define singleton scope.
    */
-  @available(*, deprecated, message="Use inScope(:) method of DefinitionOf instead to define scope.")
+  @available(*, deprecated, message="Use `register(.Singleton){}` method instead to define singleton scope.")
   public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T, ()->T> {
     return registerFactory(tag: tag, scope: .Singleton, factory: { factory() })
   }
@@ -142,7 +148,7 @@ public class DependencyContainer {
    
    ```swift
    public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, ...) -> T> {
-     return register(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, ...) -> T>
+     return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, ...) -> T>
    }
    ```
    
@@ -165,6 +171,13 @@ public class DependencyContainer {
   it will try to resolve the definition associated with `nil` (no tag).
   
   - parameter tag: The arbitrary tag to look for when resolving this protocol.
+  
+  **Example**:
+  ```swift
+  let service = container.resolve() as Service
+  let service = container.resolve(tag: "service") as Service
+  let service: Service = container.resolve()
+  ```
   
   */
   public func resolve<T>(tag tag: Tag? = nil) -> T {
@@ -196,7 +209,7 @@ public class DependencyContainer {
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
     guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
-      fatalError("No definition registered with \(key) or \(nilTagKey)."
+      fatalError("No definition registered with " + (tag == nil ? "\(key)" : "\(key) or \(nilTagKey)") + ". "
         + "Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`.")
     }
 
