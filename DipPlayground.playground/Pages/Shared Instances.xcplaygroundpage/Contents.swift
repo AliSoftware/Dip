@@ -150,7 +150,7 @@ dipController = DipViewController(apiClientProvider: container)
 /*:
 This way you also does not depend directly on Dip. Instead you provide a boundary between Dip — that you don't have control of — and your source code. So when something chagnes in Dip, you update only the boundary code.
 
-Dependency injection is a pattern as well as singleton. And any pattern can be abused. That's why if you adopt DI in one part of your system it does not mean that you should inject everything and everywhere. The same with using protocols instead of concrete implementations. For every tool there is a right time and the same way as singleton can harm you the same way DI and protocols abuse can make your code unnececerry complex.
+Dependency injection is a pattern as well as singleton. And any pattern can be abused. DI can be use in a [wrong way]((http://www.loosecouplings.com/2011/01/dependency-injection-using-di-container.html)), container can easily become a [service locator](http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/). That's why if you adopt DI in one part of your system it does not mean that you should inject everything and everywhere. The same with using protocols instead of concrete implementations. For every tool there is a right time and the same way as singleton can harm you the same way DI and protocols abuse can make your code unnececerry complex.
 
 */
 
