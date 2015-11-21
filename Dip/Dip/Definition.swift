@@ -81,23 +81,25 @@ public struct DefinitionOf<T, F>: Definition {
    ```
    
    */
-  public func resolveDependencies(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
+  public func resolveDependencies(container: DependencyContainer, block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
     guard resolveDependenciesBlock == nil else {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
     var newDefinition = self
     newDefinition.resolveDependenciesBlock = block
-    container.register(tag: tag, definition: newDefinition)
+    container.register(newDefinition)
     return newDefinition
   }
   
   let factory: F
   var scope: ComponentScope
   var resolveDependenciesBlock: ((DependencyContainer, T) -> ())?
+  let tag: DependencyContainer.Tag?
   
-  init(factory: F, scope: ComponentScope) {
+  init(factory: F, scope: ComponentScope, tag: DependencyContainer.Tag?) {
     self.factory = factory
     self.scope = scope
+    self.tag = tag
   }
   
   ///Will be stored only if scope is `Singleton`
@@ -111,7 +113,7 @@ public struct DefinitionOf<T, F>: Definition {
   mutating func resolvedInstance(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, instance: T) {
     guard scope == .Singleton else { return }
     _resolvedInstance = instance
-    container.register(tag: tag, definition: self)
+    container.register(self)
   }
   
   private var _resolvedInstance: T?

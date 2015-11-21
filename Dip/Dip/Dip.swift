@@ -74,8 +74,8 @@ public class DependencyContainer {
    - parameter tag: tag used to register definition
    - parameter definition: definition to remove
   */
-  public func remove<T, F>(tag tag: Tag? = nil, definition: DefinitionOf<T, F>) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+  public func remove<T, F>(definition: DefinitionOf<T, F>) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: definition.tag)
     definitions[key] = nil
   }
   
@@ -86,8 +86,8 @@ public class DependencyContainer {
    - parameter tag: The arbitrary tag to associate definition with
    - parameter definition: definition to register in container
   */
-  public func register<T, F>(tag tag: Tag? = nil, definition: DefinitionOf<T, F>) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+  public func register<T, F>(definition: DefinitionOf<T, F>) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: definition.tag)
     definitions[key] = definition
   }
   
@@ -151,7 +151,7 @@ public class DependencyContainer {
    */
   public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    let definition = DefinitionOf<T, F>(factory: factory, scope: scope)
+    let definition = DefinitionOf<T, F>(factory: factory, scope: scope, tag: tag)
     definitions[key] = definition
     return definition
   }
