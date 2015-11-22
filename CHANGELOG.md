@@ -1,10 +1,12 @@
 # CHANGELOG
 
-## Develop
-* Added support for factories with up to six runtime arguments
-[#8](https://github.com/AliSoftware/Dip/pull/8), [@ilyapuchka](https://github.com/ilyapuchka)
-* Parameter `tag` is now named in all register/resolve methods
-* Playground added to project [#10](https://github.com/AliSoftware/Dip/pull/10), [@ilyapuchka](https://github.com/ilyapuchka)
+## 3.0.0
+
+* Added support for factories with up to six runtime arguments.  
+  [#8](https://github.com/AliSoftware/Dip/pull/8), [@ilyapuchka](https://github.com/ilyapuchka)
+* Parameter `tag` is now named in all register/resolve methods.
+* Playground added to project.  
+  [#10](https://github.com/AliSoftware/Dip/pull/10), [@ilyapuchka](https://github.com/ilyapuchka)
 
 ## 2.0.0
 
