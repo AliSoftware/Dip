@@ -198,7 +198,7 @@ But when running your Unit tests target, it will probably resolve to other insta
 
 ### Complete Example Project
 
-In addition to this Usage overview and to the aforementioned playground, you can also find a complete example in the `Sample app/DipSampleApp` project provided in this repository.
+In addition to this Usage overview and to the aforementioned playground, you can also find a complete example in the `SampleApp/DipSampleApp` project provided in this repository.
 
 This sample project is a bit more complex, but closer to real-world applications (even if this sample is all about StarWars!),
 by declaring protocols like `NetworkLayer` which can be resolved to a `URLSessionNetworkLayer` in the real app, but to a dummy
