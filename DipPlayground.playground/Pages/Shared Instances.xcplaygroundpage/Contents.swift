@@ -1,4 +1,4 @@
-//: [Previous: Scopes](@previous)
+//: [Previous: Circular Dependencies](@previous)
 
 import Dip
 import UIKit
@@ -19,6 +19,8 @@ Dip supports singletons, but it reduces cost of using them. Their singleton natu
 - No need for calls to `sharedInstance` in your code anymore. Instead you get the instance from the _Container_ by resolving a protocol.
 - You can easyly change concrete implementations without the rest of your system even notice that something changed.
 - Also it's easy to test - you just register another object in your tests. Even if you still want to use a singleton in your system.
+
+Those features you got when using Dip limits tight coupling in your code and gives you back your code flexibility.
 
 Probably the most common example is using a singleton in the network layer or "API client".
 */
