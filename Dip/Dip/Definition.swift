@@ -56,7 +56,14 @@ public enum ComponentScope {
   case Singleton
 }
 
-///Definition of type T describes how instances of this type should be created when they are resolved by container.
+/**
+ Definition of type T describes how instances of this type should be created when this type is resolved by container.
+ 
+ - Generic parameter `T` is the type of the instance to resolve 
+ - Generic parameter `F` is the type of block-factory that creates an instance of T.
+ 
+ For example `DefinitionOf<Service,(String)->Service>` is the type of definition that during resolution will produce instance of type `Service` using closure that accepts `String` argument.
+*/
 public struct DefinitionOf<T, F>: Definition {
   
   /**
