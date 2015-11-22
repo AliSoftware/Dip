@@ -1,4 +1,4 @@
-//: [Previous: Scopes](@previous)
+//: [Previous: Circular Dependencies](@previous)
 
 import Dip
 import UIKit
@@ -19,6 +19,8 @@ Dip supports singletons, but it reduces cost of using them. Their singleton natu
 - No need for calls to `sharedInstance` in your code anymore. Instead you get the instance from the _Container_ by resolving a protocol.
 - You can easyly change concrete implementations without the rest of your system even notice that something changed.
 - Also it's easy to test - you just register another object in your tests. Even if you still want to use a singleton in your system.
+
+Those features you got when using Dip limits tight coupling in your code and gives you back your code flexibility.
 
 Probably the most common example is using a singleton in the network layer or "API client".
 */
@@ -43,7 +45,7 @@ Sure, this is very easy to code indeed. And nothing bad so far.
 But probably if you wrote a unit test or integration test for that code first, you would have noticed a problem earilier. How you test that code? And how you ensure that your tests are idenpendent of the API client's state from the previous test?
 Of cource you can work around all of the problems and the fact that `ApiClient` is a singleton, reset it's state somehow, or mock a class so that it will not return a singleton instance. But look - a moment before the singleton was your best friend and now you are fighting against it.
 
-Think - why do you want API client to be a singleton in a first place? To queue or throttle requests? Then do your queue or throttler a singleton, not an API client. Or is there any other reason. Most likely API client itself does not have a requirement to have only one system during the whole lifecycle of your application. Imagine that in the future we need two API Clients, because you now have to address two different servers & plaforms? Imposing that singleton restricts now your flexibility a lot.
+Think - why do you want API client to be a singleton in a first place? To queue or throttle requests? Then do your queue or throttler a singleton, not an API client. Or is there any other reason. Most likely API client itself does not have a requirement to have one and only one instance during the lifecycle of your application. Imagine that in the future we need two API Clients, because you now have to address two different servers & plaforms? Imposing that singleton restricts now your flexibility a lot.
 
 Instead, inject API client in view controller with property injection or constructor injection.
 */
@@ -125,7 +127,7 @@ class DipViewController: UIViewController {
 var dipController = DipViewController(dependencies: container)
 
 /*:
-Of cource `DependencyContainer` should not be used as singleton too. Instead, inject it to objects that need to access it. And use a protocol for that. For example if your view controller needs to access API client, it does not need a reference to `DependencyContainer`, it only needs a reference to _something_ that can provide it an API client instance.
+Of cource `DependencyContainer` should not be a singleton too. Instead, inject it to objects that need to access it. And use a protocol for that. For example if your view controller needs to access API client, it does not need a reference to `DependencyContainer`, it only needs a reference to _something_ that can provide it an API client instance.
 */
 
 protocol ApiClientProvider {
@@ -150,7 +152,7 @@ dipController = DipViewController(apiClientProvider: container)
 /*:
 This way you also does not depend directly on Dip. Instead you provide a boundary between Dip — that you don't have control of — and your source code. So when something chagnes in Dip, you update only the boundary code.
 
-Dependency injection is a pattern as well as singleton. And any pattern can be abused. That's why if you adopt DI in one part of your system it does not mean that you should inject everything and everywhere. The same with using protocols instead of concrete implementations. For every tool there is a right time and the same way as singleton can harm you the same way DI and protocols abuse can make your code unnececerry complex.
+Dependency injection is a pattern as well as singleton. And any pattern can be abused. DI can be use in a [wrong way]((http://www.loosecouplings.com/2011/01/dependency-injection-using-di-container.html)), container can easily become a [service locator](http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/). That's why if you adopt DI in one part of your system it does not mean that you should inject everything and everywhere. The same with using protocols instead of concrete implementations. For every tool there is a right time and the same way as singleton can harm you the same way DI and protocols abuse can make your code unnececerry complex.
 
 */
 

@@ -8,8 +8,11 @@ public class ServiceImp1: Service {
 public class ServiceImp2: Service {
   public init() {}
 }
-
 public class ServiceImp3: Service {
+    public init() {}
+}
+
+public class ServiceImp4: Service {
   
   public let name: String
   
@@ -19,7 +22,7 @@ public class ServiceImp3: Service {
   
 }
 
-public protocol Client {
+public protocol Client: class {
   var service: Service {get}
   init(service: Service)
 }
@@ -43,5 +46,10 @@ public class ServiceFactory {
   public func someService() -> Service {
     return ServiceImp1()
   }
+}
+
+public class ClientServiceImp: Service {
+    public weak var client: Client?
+    public init() {}
 }
 

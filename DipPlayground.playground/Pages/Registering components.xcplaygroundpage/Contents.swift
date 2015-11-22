@@ -39,6 +39,13 @@ container.register(tag: DependencyContainer.Tag.Int(0)) { ServiceImp1() as Servi
 
 /*:
 We recommand you to use constants for the tags, to make the intent clear and avoid magic numbers and typos.
+
+You can remove all registered definitions or register and remove them one by one:
 */
+
+let serviceDefinition = container.register { ServiceImp1() as Service }
+container.remove(serviceDefinition)
+
+container.reset()
 
 //: [Next: Resolving Components](@next)

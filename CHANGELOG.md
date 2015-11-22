@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## Develop
+
+#### New Features
+
+* Added support for circular dependencies by adding `ObjectGraph` scope to reuse resolved instances.  
+  [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added methods to register/remove individual definitions.  
+  [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
+
+#### Breaking Changes
+
+* Removed container thread-safety to enable recursion calls to `resolve`.  
+  **Access to container from multiple threads should be handled by clients** from now on.
+* Deprecated `register(tag:instance:)` method in favor of `register(.Singleton, …)`.
+
 ## 3.0.0
 
 * Added support for factories with up to six runtime arguments.  

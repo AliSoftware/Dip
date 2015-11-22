@@ -7,6 +7,7 @@
         <page name='Resolving components'/>
         <page name='Runtime arguments'/>
         <page name='Scopes'/>
+        <page name='Circular dependencies'/>
         <page name='Shared Instances'/>
         <page name='Testing'/>
     </pages>

@@ -50,29 +50,70 @@ func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
 public enum ComponentScope {
   /// Indicates that a new instance of the component will be created each time it's resolved.
   case Prototype
+  /// Indicates that instances will be reused during resolve but will be discurded when topmost `resolve` method returns.
+  case ObjectGraph
   /// Indicates that resolved component should be retained by container and always reused.
   case Singleton
 }
 
 ///Definition of type T describes how instances of this type should be created when they are resolved by container.
-public final class DefinitionOf<T>: Definition {
-  let factory: Any
-  let scope: ComponentScope
+public struct DefinitionOf<T, F>: Definition {
   
-  init(factory: Any, scope: ComponentScope = .Prototype) {
-    self.factory = factory
-    self.scope = scope
+  /**
+   Sets the block that will be used to resolve dependencies of the component. 
+   This block will be called before `resolve` returns.
+   
+   - parameter block: block to use to resolve dependencies
+   
+   - note:  
+   If you have circular dependencies at least one of them should use this block
+   to resolve it's dependencies. Otherwise code enter infinite loop.
+   
+   **Example**
+   
+   ```swift
+   container.register { [unowned container] ClientImp(service: container.resolve() as Service) as Client }
+
+   var definition = container.register { ServiceImp() as Service }
+   definition.resolveDependencies { container, service in
+      service.delegate = container.resolve() as Client
+   }
+   ```
+   
+   */
+  public func resolveDependencies(container: DependencyContainer, block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
+    guard resolveDependenciesBlock == nil else {
+      fatalError("You can not change resolveDependencies block after it was set.")
+    }
+    var newDefinition = self
+    newDefinition.resolveDependenciesBlock = block
+    container.register(newDefinition)
+    return newDefinition
   }
   
+  let factory: F
+  var scope: ComponentScope
+  var resolveDependenciesBlock: ((DependencyContainer, T) -> ())?
+  let tag: DependencyContainer.Tag?
+  
+  init(factory: F, scope: ComponentScope, tag: DependencyContainer.Tag?) {
+    self.factory = factory
+    self.scope = scope
+    self.tag = tag
+  }
+  
+  ///Will be stored only if scope is `Singleton`
   var resolvedInstance: T? {
     get {
       guard scope == .Singleton else { return nil }
       return _resolvedInstance
     }
-    set {
-      guard scope == .Singleton else { return }
-      _resolvedInstance = newValue
-    }
+  }
+  
+  mutating func resolvedInstance(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, instance: T) {
+    guard scope == .Singleton else { return }
+    _resolvedInstance = instance
+    container.register(self)
   }
   
   private var _resolvedInstance: T?

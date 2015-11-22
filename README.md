@@ -54,13 +54,13 @@ The next paragraphs give you an overview of the Usage of _Dip_ directly, but if 
 
 ## Usage
 
-### Register instances and instance factories
+### Register instance factories
 
-First, create a `DependencyContainer` and use it to register instances and factories with protocols, using those methods:
+First, create a `DependencyContainer` and use it to register instance factories with protocols, using those methods:
 
-* `register(instance: _)` will register a singleton instance with a given protocol.
-* `register(factory: _)` will register an instance factory — which generates a new instance each time you `resolve()`.
-* You need **cast the instance to the protocol type** you want to register it with (e.g. `register(instance: PlistUsersProvider() as UsersListProviderType)`).
+* `register(.Singleton) { … }` will register a singleton instance with a given protocol.
+* `register(.Prototype) { … }` or `register(.ObjectGraph) { … }` will register an instance factory which generates a new instance each time you `resolve()`.
+* You need **cast the instance to the protocol type** you want to register it with (e.g. `register { PlistUsersProvider() as UsersListProviderType }`).
 
 Typically, to register your dependencies as early as possible in your app life-cycle, you will declare a `let dip: DependencyContainer = { … }()` somewhere (for example [in a dedicated `.swift` file](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/DependencyContainers.swift#L22-L27)). In your (non-hosted, standalone) unit tests, you'll probably [reset them in your `func setUp()`](https://github.com/AliSoftware/Dip/blob/master/Example/Tests/SWAPIPersonProviderTests.swift#L17-L21) instead.
 
@@ -68,7 +68,20 @@ Typically, to register your dependencies as early as possible in your app life-c
 
 * `resolve()` will return a new instance matching the requested protocol.
 * Explicitly specify the return type of `resolve` so that Swift's type inference knows which protocol you're trying to resolve.
-* If that protocol was registered as a singleton instance (using `register(instance: …)`, the same instance will be returned each time you call `resolve()` for this protocol type. Otherwise, the instance factory will generate a new instance each time.
+
+```swift
+container.register { ServiceImp() as Service }
+let service = container.resolve() as Service
+```
+
+### Scopes
+
+Dip provides three _scopes_ that you can use to register dependencies:
+
+* The `.Prototype` scope will make the `DependencyContainer` resolve your type as __a new instance every time__ you call `resolve`. It's a default scope.
+* The `.ObjectGraph` scope is like `.Prototype` scope but it will make the `DependencyContainer` to reuse resolved instances during one call to `resolve` method. When this call returns all resolved insances will be discarded and next call to `resolve` will produce new instances. This scope should be used to resolve circular dependencies.
+* The `.Singleton` scope will make the `DependencyContainer` retain the instance once resolved the first time, and reuse it in the next calls to `resolve` during the container lifetime.
+
 
 ### Using block-based initialization
 
@@ -80,8 +93,8 @@ It may not seem to provide much, but given the fact that `DependencyContainers` 
 let dip: DependencyContainer = {
     let dip = DependencyContainer()
 
-    dip.register(instance: ProductionEnvironment(analytics: true) as EnvironmentType)
-    dip.register(instance: WebService() as WebServiceAPI)
+    dip.register { ProductionEnvironment(analytics: true) as EnvironmentType }
+    dip.register { WebService() as WebServiceAPI }
 
     return dip
     }()
@@ -91,8 +104,8 @@ You can instead write this exact equivalent code, which is more compact, and ind
 
 ```swift
 let dip = DependencyContainer { dip in
-    dip.register(instance: ProductionEnvironment(analytics: true) as EnvironmentType)
-    dip.register(instance: WebService() as WebServiceAPI)
+    dip.register { ProductionEnvironment(analytics: true) as EnvironmentType }
+    dip.register { WebService() as WebServiceAPI }
 }
 ```
 
@@ -111,8 +124,8 @@ enum WebService: String {
 }
 
 let wsDependencies = DependencyContainer() { dip in
-    dip.register(tag: WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
-    dip.register(tag: WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
+    dip.register(tag: WebService.PersonWS.tag) { URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer }
+    dip.register(tag: WebService.StashipWS.tag) { URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer }
 }
 
 let networkLayer = dip.resolve(tag: WebService.PersonWS.tag) as NetworkLayer
@@ -137,8 +150,8 @@ let service3 = webServices.resolve(80, NSURL(string: "http://example.url")) as W
 Though Dip provides support for up to six runtime arguments out of the box you can extend this number using following code snippet for seven arguments:
 
 ```
-func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) -> DefinitionOf<T> {
-	return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T)> {
+	return registerFactory(tag, scope: .Prototype, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T)>
 }
 	
 func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) -> T {
@@ -146,6 +159,27 @@ func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _
 }
 
 ```
+
+### Circular dependencies
+
+_Dip_ supports circular dependencies. To resolve them use `ObjectGraph` scope and `resolveDependencies` method of `DefinitionOf` returned by `register` method.
+
+```swift
+container.register(.ObjectGraph) { [unowned container] in
+    ClientImp(server: container.resolve() as Server) as Client 
+}
+
+container.register(.ObjectGraph) { ServerImp() as Server }
+    .resolveDependencies { container, server in 
+        server.client = container.resolve() as Client
+    }
+```
+More infromation about circular dependencies you can find in a playground.
+
+### Thread safety
+
+_Dip_ does not provide thread safety, so you need to make sure you always call `resolve` method of `DependencyContainer` from the single thread. 
+Otherwise if two threads try to resolve the same type they can get different instances where the same instance is expected.
 
 ### Concrete Example
 
@@ -155,10 +189,10 @@ Somewhere in your App target, register the dependencies:
 let dip: DependencyContainer = {
     let dip = DependencyContainer()
     let env = ProductionEnvironment(analytics: true)
-    dip.register(instance: env as EnvironmentType)
-    dip.register(instance: WebService() as WebServiceType)
-    dip.register() { name: String in DummyFriendsProvider(user: name) as FriendsProviderType }
-    dip.register(tag: "me") { _: String in PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
+    dip.register(.Singleton) { env as EnvironmentType }
+    dip.register(.Singleton) { WebService() as WebServiceType }
+    dip.register() { (name: String) in DummyFriendsProvider(user: name) as FriendsProviderType }
+    dip.register(tag: "me") { (_: String) in PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
     return dip
 }
 ```
@@ -210,7 +244,7 @@ This sample uses the Star Wars API provided by swapi.co to fetch Star Wars chara
 ## Credits
 
 This library has been created by [**Olivier Halligon**](olivier@halligon.net).  
-I'd also like to thank **Ilya Puchka** for his big contribution to it, as he added a lot of great features to it.
+I'd also like to thank [**Ilya Puchka**](https://twitter.com/ilyapuchka) for his big contribution to it, as he added a lot of great features to it.
 
 **Dip** is available under the **MIT license**. See the `LICENSE` file for more info.
 
