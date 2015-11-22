@@ -8,7 +8,7 @@
       location = "group:Dip/Dip.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Sample app/DipSampleApp.xcodeproj">
+      location = "group:SampleApp/DipSampleApp.xcodeproj">
    </FileRef>
    <Group
       location = "container:"

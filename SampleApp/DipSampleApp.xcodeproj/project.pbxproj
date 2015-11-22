@@ -18,10 +18,11 @@
 		090012401BC704C60079C600 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; };
 		090012421BC7059E0079C600 /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; };
 		090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012431BC708A00079C600 /* DummyStarshipProvider.swift */; };
-		097291071BF4F556001EB6BC /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 097291061BF4F556001EB6BC /* Dip.framework */; };
 		099022621BC123C000E76F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099022611BC123C000E76F43 /* AppDelegate.swift */; };
 		099022691BC123C000E76F43 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 099022681BC123C000E76F43 /* Assets.xcassets */; };
 		0990226C1BC123C000E76F43 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */; };
+		09B041B71C01F8CB000D383F /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09B041B61C01F8CB000D383F /* Dip.framework */; };
+		09B041B81C01F8D1000D383F /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09B041B61C01F8CB000D383F /* Dip.framework */; };
 		09D795FF1BC71F5A003C68EB /* PersonListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */; };
 		09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796001BC722C0003C68EB /* StarshipListViewController.swift */; };
 		09D796031BC72691003C68EB /* StarshipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D796021BC72691003C68EB /* StarshipCell.swift */; };
@@ -44,7 +45,6 @@
 		09D796291BCA86D4003C68EB /* SWAPICommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */; };
 		09D7962C1BCA8AD4003C68EB /* NetworkMock.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7962A1BCA8AB3003C68EB /* NetworkMock.swift */; };
 		09D7962F1BCA922E003C68EB /* SWAPIStarshipProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D7962D1BCA91D3003C68EB /* SWAPIStarshipProviderTests.swift */; };
-		09D8055F1BF3D018006EBC12 /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 09D8055E1BF3D018006EBC12 /* Dip.framework */; };
 		607FACEC1AFB9204008FA782 /* SWAPIPersonProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* SWAPIPersonProviderTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -60,12 +60,12 @@
 		0900123F1BC704C60079C600 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		090012411BC7059E0079C600 /* Starship.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Starship.swift; sourceTree = "<group>"; };
 		090012431BC708A00079C600 /* DummyStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyStarshipProvider.swift; sourceTree = "<group>"; };
-		097291061BF4F556001EB6BC /* Dip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Dip.framework; path = "../Dip/build/Debug-iphoneos/Dip.framework"; sourceTree = "<group>"; };
 		0990225F1BC123C000E76F43 /* DipSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DipSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		099022611BC123C000E76F43 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		099022681BC123C000E76F43 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0990226B1BC123C000E76F43 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0990226D1BC123C000E76F43 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		09B041B61C01F8CB000D383F /* Dip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Dip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		09D795FE1BC71F5A003C68EB /* PersonListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonListViewController.swift; sourceTree = "<group>"; };
 		09D796001BC722C0003C68EB /* StarshipListViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipListViewController.swift; sourceTree = "<group>"; };
 		09D796021BC72691003C68EB /* StarshipCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipCell.swift; sourceTree = "<group>"; };
@@ -80,13 +80,9 @@
 		09D7961C1BC9C62E003C68EB /* SWAPICommon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPICommon.swift; sourceTree = "<group>"; };
 		09D7962A1BCA8AB3003C68EB /* NetworkMock.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetworkMock.swift; sourceTree = "<group>"; };
 		09D7962D1BCA91D3003C68EB /* SWAPIStarshipProviderTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SWAPIStarshipProviderTests.swift; sourceTree = "<group>"; };
-		09D8055E1BF3D018006EBC12 /* Dip.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Dip.framework; path = "../Dip/build/Debug-iphoneos/Dip.framework"; sourceTree = "<group>"; };
-		2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		304AD039660A2C58EB08D985 /* Pods_DipTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACE51AFB9204008FA782 /* DipSampleAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipSampleAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* SWAPIPersonProviderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SWAPIPersonProviderTests.swift; sourceTree = "<group>"; };
-		A2C6C3A848EB4F91A56B8CE2 /* Pods_DipSampleAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_DipSampleAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,7 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				09D8055F1BF3D018006EBC12 /* Dip.framework in Frameworks */,
+				09B041B71C01F8CB000D383F /* Dip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -102,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				097291071BF4F556001EB6BC /* Dip.framework in Frameworks */,
+				09B041B81C01F8D1000D383F /* Dip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,11 +198,7 @@
 		1A92CB92072DE61786F63E4C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				097291061BF4F556001EB6BC /* Dip.framework */,
-				09D8055E1BF3D018006EBC12 /* Dip.framework */,
-				2FE9C70E965FF88C3F20AC76 /* Pods_DipSampleApp.framework */,
-				304AD039660A2C58EB08D985 /* Pods_DipTests.framework */,
-				A2C6C3A848EB4F91A56B8CE2 /* Pods_DipSampleAppTests.framework */,
+				09B041B61C01F8CB000D383F /* Dip.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
