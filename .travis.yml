@@ -2,16 +2,14 @@ language: objective-c
 osx_image: xcode7
 
 # cache: cocoapods
-# podfile: Example/Podfile
 # before_install:
 # - gem install cocoapods # Since Travis is not always on latest version
-# - pod install --project-directory=Example
 
 install:
 - gem install xcpretty --no-rdoc --no-ri --no-document --quiet
 
 script:
-- set -o pipefail && xcodebuild test -project Dip/Dip.xcodeproj -scheme Dip -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
-- set -o pipefail && xcodebuild test -workspace Example/DipSampleApp.xcworkspace -scheme DipSampleApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
+- set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
+- set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme DipSampleApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
 - pod lib lint --quick
 

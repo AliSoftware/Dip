@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:DipPlayground.playground">
+   </FileRef>
+   <FileRef
+      location = "group:Dip/Dip.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:SampleApp/DipSampleApp.xcodeproj">
+   </FileRef>
+   <Group
+      location = "container:"
+      name = "Podspec Metadata">
+      <FileRef
+         location = "group:Dip.podspec">
+      </FileRef>
+      <FileRef
+         location = "group:README.md">
+      </FileRef>
+      <FileRef
+         location = "group:LICENSE">
+      </FileRef>
+      <FileRef
+         location = "group:CHANGELOG.md">
+      </FileRef>
+   </Group>
+</Workspace>

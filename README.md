@@ -36,6 +36,22 @@ it, simply add the following line to your Podfile:
 pod "Dip"
 ```
 
+If you use _Carthage_ add this line to your Cartfile:
+
+```
+github "AliSoftware/Dip"
+```
+
+## Playground
+
+Dip comes with a **Playground** to introduce you to Inversion of Control, Dependency Injection, and how to use Dip in practice.
+
+To play with it, [open `Dip.xcworkspace`](Dip/Dip.xcworkspace), then click on the `DipPlayground` entry in Xcode's Project Navigator and let it be your guide.
+
+_Note: Do not open the `DipPlayground.playground` file directly, as it needs to be part of the workspace to access the Dip framework so that the demo code it contains can work._
+
+The next paragraphs give you an overview of the Usage of _Dip_ directly, but if you're new to Dependency Injection, the Playground is probably a better start.
+
 ## Usage
 
 ### Register instances and instance factories
@@ -83,7 +99,7 @@ let dip = DependencyContainer { dip in
 ### Using tags to associate various factories to one protocol
 
 * If you give a `tag` in the parameter to `register()`, it will associate that instance or factory with this tag, which can be used later during `resolve` (see below).
-* `resolve(tag)` will try to find an instance (or instance factory) that match both the requested protocol _and_ the tag. If it doesn't find any, it will fallback to an instance (or instance factory) that only match the requested protocol.
+* `resolve(tag: tag)` will try to find an instance (or instance factory) that match both the requested protocol _and_ the tag. If it doesn't find any, it will fallback to an instance (or instance factory) that only match the requested protocol.
 * The tags can be StringLiteralType or IntegerLiteralType. That said you can use plain strings or integers as tags.
 
 
@@ -95,11 +111,41 @@ enum WebService: String {
 }
 
 let wsDependencies = DependencyContainer() { dip in
-    dip.register(WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
-    dip.register(WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
+    dip.register(tag: WebService.PersonWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://prod.myapi.com/api/")! as NetworkLayer)
+    dip.register(tag: WebService.StashipWS.tag, instance: URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer)
 }
+
+let networkLayer = dip.resolve(tag: WebService.PersonWS.tag) as NetworkLayer
 ```
 
+### Runtime arguments
+
+You can register factories that accept up to six arguments. When you resolve dependency you can pass those arguments to `resolve()` method and they will be passed to the factory. Note that _number_, _types_ and _order_ of parameters matters. Also use of optional parameter and not optional parameter will result in two factories registered in container.
+
+```swift
+let webServices = DependencyContainer() { webServices in
+	webServices.register { (url: NSURL, port: Int) in WebServiceImp1(url, port: port) as WebServiceAPI }
+	webServices.register { (port: Int, url: NSURL) in WebServiceImp2(url, port: port) as WebServiceAPI }
+	webServices.register { (port: Int, url: NSURL?) in WebServiceImp3(url!, port: port) as WebServiceAPI }
+}
+
+let service1 = webServices.resolve(NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1 is WebServiceImp1
+let service2 = webServices.resolve(80, NSURL(string: "http://example.url")!) as WebServiceAPI // service2 is WebServiceImp2
+let service3 = webServices.resolve(80, NSURL(string: "http://example.url")) as WebServiceAPI // service3 is WebServiceImp3
+
+```
+Though Dip provides support for up to six runtime arguments out of the box you can extend this number using following code snippet for seven arguments:
+
+```
+func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) -> DefinitionOf<T> {
+	return register(tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+}
+	
+func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) -> T {
+	return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
+}
+
+```
 
 ### Concrete Example
 
@@ -111,8 +157,8 @@ let dip: DependencyContainer = {
     let env = ProductionEnvironment(analytics: true)
     dip.register(instance: env as EnvironmentType)
     dip.register(instance: WebService() as WebServiceType)
-    dip.register() { DummyFriendsProvider(user: $0 ?? "Jane Doe") as FriendsProviderType }
-    dip.register("me") { PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
+    dip.register() { name: String in DummyFriendsProvider(user: name) as FriendsProviderType }
+    dip.register(tag: "me") { _: String in PlistFriendsProvider(plist: "myfriends") as FriendsProviderType }
     return dip
 }
 ```
@@ -134,7 +180,7 @@ struct SomeViewModel {
   let ws: WebServiceType = dip.resolve()
   var friendsProvider: FriendsProviderType
   init(userName: String) {
-    friendsProvider = dip.resolve(userName)
+    friendsProvider = dip.resolve(tag: userName, userName)
   }
   func foo() {
     ws.someMethodDeclaredOnWebServiceType()
@@ -146,13 +192,13 @@ struct SomeViewModel {
 This way, when running your app target:
 
 * `ws` will be resolved as your singleton instance `WebService` registered before.
-* `friendsProvider` will be resolved as a new instance each time, which will be an instance created via `PlistFriendsProvider(plist: "myfriends")` if `userName` is `me` and created via `DummyFriendsProvider(userName)` for any other `userName` value (because `resolve(userName)` will fallback to `resolve(nil)` in that case, using the instance factory which was registered without a tag).
+* `friendsProvider` will be resolved as a new instance each time, which will be an instance created via `PlistFriendsProvider(plist: "myfriends")` if `userName` is `me` and created via `DummyFriendsProvider(userName)` for any other `userName` value (because `resolve(tag: userName, userName)` will fallback to `resolve(tag: nil, userName)` in that case, using the instance factory which was registered without a tag, but will pass `userName` as argument).
 
 But when running your Unit tests target, it will probably resolve to other instances, depending on how you registered your dependencies in your Test Case.
 
 ### Complete Example Project
 
-You can find a complete example in the `Example/DipSampleApp` project provided in this repository.
+In addition to this Usage overview and to the aforementioned playground, you can also find a complete example in the `SampleApp/DipSampleApp` project provided in this repository.
 
 This sample project is a bit more complex, but closer to real-world applications (even if this sample is all about StarWars!),
 by declaring protocols like `NetworkLayer` which can be resolved to a `URLSessionNetworkLayer` in the real app, but to a dummy
@@ -163,7 +209,8 @@ This sample uses the Star Wars API provided by swapi.co to fetch Star Wars chara
 
 ## Credits
 
-This library is authored by **Olivier Halligon**, olivier@halligon.net
+This library has been created by [**Olivier Halligon**](olivier@halligon.net).  
+I'd also like to thank **Ilya Puchka** for his big contribution to it, as he added a lot of great features to it.
 
 **Dip** is available under the **MIT license**. See the `LICENSE` file for more info.
 

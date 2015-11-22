@@ -1,9 +1,25 @@
 //
-//  Dip.swift
-//  Dip
+// Dip
 //
-//  Created by Olivier Halligon on 11/09/2015.
-//  Copyright © 2015 AliSoftware. All rights reserved.
+// Copyright (c) 2015 Olivier Halligon <olivier@halligon.net>
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 //
 
 import Foundation
@@ -25,49 +41,29 @@ public class DependencyContainer {
     case String(StringLiteralType)
     case Int(IntegerLiteralType)
   }
-
-  /**
-   *  Internal representation of a key to associate protocols & tags to an instance factory
-   */
-  private struct LookupKey : Hashable, Equatable, CustomDebugStringConvertible {
-    var protocolType: Any.Type
-    var associatedTag: Tag?
-    
-    var hashValue: Int {
-      return "\(protocolType)-\(associatedTag)".hashValue
-    }
-    
-    var debugDescription: String {
-      return "type: \(protocolType), tag: \(associatedTag)"
-    }
-  }
   
-  private typealias InstanceType = Any
-  private typealias InstanceFactory = Tag?->InstanceType
-  private typealias Key = LookupKey
-  
-  private var dependencies = [Key : InstanceFactory]()
+  private var dependencies = [DefinitionKey : Definition]()
   private var lock: OSSpinLock = OS_SPINLOCK_INIT
   
-  // MARK: - Init & Reset
-
   /**
    Designated initializer for a DependencyContainer
    
    - parameter configBlock: A configuration block in which you typically put all you `register` calls.
    
-   - note: The `configBlock` is simply called at the end of the `init` to let you configure everything.
-   It is only present for convenience to have a cleaner syntax when declaring and initializing
-   your `DependencyContainer` instances.
+   - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
+           It is only present for convenience to have a cleaner syntax when declaring and initializing
+           your `DependencyContainer` instances.
    
-   - returns: A new DependencyContainer
+   - returns: A new DependencyContainer.
    */
-  public init(@noescape configBlock: (DependencyContainer->Void) = { _ in }) {
+  public init(@noescape configBlock: (DependencyContainer->()) = { _ in }) {
     configBlock(self)
   }
   
+  // MARK: - Reset all dependencies
+  
   /**
-  Clear all the previously registered dependencies on this container
+  Clear all the previously registered dependencies on this container.
   */
   public func reset() {
     lockAndDo {
@@ -78,90 +74,124 @@ public class DependencyContainer {
   // MARK: Register dependencies
   
   /**
-  Register a `TagType?->T` factory (which takes the tag as parameter) with a given tag
+  Register a Void->T factory associated with optional tag.
   
-  - parameter tag:     The arbitrary tag to associate this factory with when registering with that protocol. `nil` to associate with any tag.
-  - parameter factory: The factory to register, typed/casted as the protocol you want to register it as
+  - parameter tag: The arbitrary tag to associate this factory with when registering with that protocol. Pass `nil` to associate with any tag. Default value is `nil`.
+  - parameter factory: The factory to register, with return type of protocol you want to register it for
   
   - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
   */
-  public func register<T>(tag: Tag? = nil, factory: Tag?->T) {
-    let key = Key(protocolType: T.self, associatedTag: tag)
-    lockAndDo {
-      dependencies[key] = { factory($0) }
-    }
+  public func register<T>(tag tag: Tag? = nil, factory: ()->T) -> DefinitionOf<T> {
+    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
   }
   
   /**
-   Register a Void->T factory (which don't care about the tag used)
+   Register a Singleton instance associated with optional tag.
    
-   - parameter tag:     The arbitrary tag to associate this factory with when registering with that protocol. `nil` to associate with any tag.
-   - parameter factory: The factory to register, typed/casted as the protocol you want to register it as
-   
-   - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
-   */
-  public func register<T>(tag: Tag? = nil, factory: Void->T) {
-    let key = Key(protocolType: T.self, associatedTag: tag)
-    lockAndDo {
-      dependencies[key] = { _ in factory() }
-    }
-  }
-  
-  /**
-   Register a Singleton instance
-   
-   
-   - parameter tag:      The arbitrary tag to associate this instance with when registering with that protocol. `nil` to associate with any tag.
-   - parameter instance: The instance to register, typed/casted as the protocol you want to register it as
+   - parameter tag: The arbitrary tag to associate this instance with when registering with that protocol. `nil` to associate with any tag.
+   - parameter instance: The instance to register, with return type of protocol you want to register it for
    
    - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
    */
-  public func register<T>(tag: Tag? = nil, @autoclosure(escaping) instance factory: Void->T) {
-    let key = Key(protocolType: T.self, associatedTag: tag)
+  public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T> {
+    return register(tag: tag, factory: { factory() }, scope: .Singleton)
+  }
+  
+  /**
+   Register generic factory associated with optional tag.
+   
+   - parameter tag: The arbitrary tag to look for when resolving this protocol.
+   - parameter factory: generic factory that should be used to create concrete instance of type
+   - parameter scope: scope of the component. Default value is `Prototype`
+   
+   - note: You should not call this method directly, instead call any of other `register` methods.
+           You _should_ use this method only to register dependency with more runtime arguments
+           than _Dip_ supports (currently it's up to six) like in this example:
+   
+   ```swift
+   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T> {
+     return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+   }
+   ```
+   
+   Though before you do that you should probably review your design and try to reduce number of depnedencies.
+   
+   */
+  public func register<T, F>(tag tag: Tag? = nil, factory: F, scope: ComponentScope) -> DefinitionOf<T> {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+    let definition = DefinitionOf<T>(factory: factory, scope: scope)
     lockAndDo {
-      dependencies[key] = { _ in
-        let instance = factory()
-        self.dependencies[key] = { _ in return instance }
-        return instance
-      }
+      dependencies[key] = definition
     }
+    return definition
   }
   
   // MARK: Resolve dependencies
   
   /**
-  Resolve a dependency
+  Resolve a dependency. 
+  
+  If no instance/factory was registered with this `tag` for this `protocol`, it will try to resolve the instance/factory associated with `nil` (no tag).
   
   - parameter tag: The arbitrary tag to look for when resolving this protocol.
-  If no instance/factory was registered with this `tag` for this `protocol`,
-  it will resolve to the instance/factory associated with `nil` (no tag).
   */
-  public func resolve<T>(tag: Tag? = nil) -> T! {
-    let key = Key(protocolType: T.self, associatedTag: tag)
-    let nilKey = Key(protocolType: T.self, associatedTag: nil)
+  public func resolve<T>(tag tag: Tag? = nil) -> T {
+    return resolve(tag: tag) { (factory: ()->T) in factory() }
+  }
+  
+  /**
+   Resolve a dependency using generic builder closure that accepts generic factory and returns created instance.
+   
+   - parameter tag: The arbitrary tag to look for when resolving this protocol.
+   - parameter builder: Generic closure that accepts generic factory and returns inctance produced by that factory
+   
+   - note: You should not call this method directly, instead call any of other `resolve` methods. (see `RuntimeArguments.swift`).
+           You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports
+           (currently it's up to six) like in this example:
+   
+   ```swift
+   public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) -> T {
+     return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, ...) -> T) in factory(arg1, arg2, arg3, ...) }
+   }
+   ```
+   
+   Though before you do that you should probably review your design and try to reduce the number of dependencies.
+   
+   */
+  public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) -> T {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+    let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
+    
     var resolved: T!
     lockAndDo { [unowned self] in
-      guard let factory = self.dependencies[key] ?? self.dependencies[nilKey] else {
-        fatalError("No instance factory registered with \(key)")
-      }
-      resolved = factory(tag) as! T
+      resolved = self._resolve(key, nilTagKey: nilTagKey, builder: builder)
     }
     return resolved
   }
+  
+  /// Actually resolve dependency
+  private func _resolve<T, F>(key: DefinitionKey, nilTagKey: DefinitionKey?, builder: F->T) -> T {
+    guard let definition = (self.dependencies[key] ?? self.dependencies[nilTagKey]) as? DefinitionOf<T> else {
+      fatalError("No instance factory registered with \(key) or \(nilTagKey)")
+    }
     
-  // MARK: - Private Helper
+    if let resolvedInstance = definition.resolvedInstance {
+      return resolvedInstance
+    }
+    else {
+      let resolved = builder(definition.factory as! F)
+      definition.resolvedInstance = resolved
+      return resolved
+    }
+  }
+  
+  // MARK: - Private
   
   private func lockAndDo(@noescape block: Void->Void) {
     OSSpinLockLock(&lock)
     defer { OSSpinLockUnlock(&lock) }
     block()
   }
-}
-
-// MARK: - Class Extensions
-
-private func ==(lhs: DependencyContainer.LookupKey, rhs: DependencyContainer.LookupKey) -> Bool {
-  return lhs.protocolType == rhs.protocolType && lhs.associatedTag == rhs.associatedTag
 }
 
 extension DependencyContainer.Tag: IntegerLiteralConvertible {
@@ -195,5 +225,12 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
     return lhsInt == rhsInt
   default:
     return false
+  }
+}
+
+extension Dictionary {
+  subscript(key: Key?) -> Value! {
+    guard let key = key else { return nil }
+    return self[key]
   }
 }
