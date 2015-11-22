@@ -22,7 +22,7 @@ private let FAKE_STARSHIPS = false
 let wsDependencies = DependencyContainer() { dip in
     
     // Register the NetworkLayer, same for everyone here (but we have the ability to register a different one for a specific WebService if we wanted to)
-    dip.register(instance: URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer)
+    dip.register(.Singleton) { URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer }
     
 }
 
@@ -33,13 +33,13 @@ let providerDependencies = DependencyContainer() { dip in
     if FAKE_PERSONS {
         
         // 1) Register the PersonProviderAPI singleton, one generic and one specific for a specific personID
-        dip.register(instance: DummyPilotProvider() as PersonProviderAPI)
-        dip.register(tag: 0, instance: PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI)
+        dip.register(.Singleton) { DummyPilotProvider() as PersonProviderAPI }
+        dip.register(.Singleton, tag: 0) { PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI }
         
     } else {
         
         // 1) Register the SWAPIPersonProvider (that hits the real swapi.co WebService)
-        dip.register(instance: SWAPIPersonProvider() as PersonProviderAPI)
+        dip.register(.Singleton) { SWAPIPersonProvider() as PersonProviderAPI }
 
     }
     
@@ -52,7 +52,7 @@ let providerDependencies = DependencyContainer() { dip in
     } else {
         
         // 2) Register the SWAPIStarshipProvider (that hits the real swapi.co WebService)
-        dip.register(instance: SWAPIStarshipProvider() as StarshipProviderAPI)
+        dip.register(.Singleton) { SWAPIStarshipProvider() as StarshipProviderAPI }
 
     }
     
