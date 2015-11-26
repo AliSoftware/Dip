@@ -144,9 +144,9 @@ let webServices = DependencyContainer() { webServices in
 	webServices.register { (port: Int, url: NSURL?) in WebServiceImp3(url!, port: port) as WebServiceAPI }
 }
 
-let service1 = webServices.resolve(NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1 is WebServiceImp1
-let service2 = webServices.resolve(80, NSURL(string: "http://example.url")!) as WebServiceAPI // service2 is WebServiceImp2
-let service3 = webServices.resolve(80, NSURL(string: "http://example.url")) as WebServiceAPI // service3 is WebServiceImp3
+let service1 = webServices.resolve(withArguments: NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1 is WebServiceImp1
+let service2 = webServices.resolve(withArguments: 80, NSURL(string: "http://example.url")!) as WebServiceAPI // service2 is WebServiceImp2
+let service3 = webServices.resolve(withArguments: 80, NSURL(string: "http://example.url")) as WebServiceAPI // service3 is WebServiceImp3
 
 ```
 Though Dip provides support for up to six runtime arguments out of the box you can extend this number using following code snippet for seven arguments:
@@ -156,7 +156,7 @@ func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag: Tag? = nil, scop
 	return registerFactory(tag, scope: .Prototype, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T)>
 }
 	
-func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) -> T {
+func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) -> T {
 	return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
 }
 
