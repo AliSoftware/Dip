@@ -7,6 +7,26 @@
 * Parameter `tag` is now named in all register/resolve methods.
 * Playground added to project.  
   [#10](https://github.com/AliSoftware/Dip/pull/10), [@ilyapuchka](https://github.com/ilyapuchka)
+  
+  ###Note on migration from 2.0.0 to 3.0.0:
+  If you used tags to register and resolve your components you have to add `tag` name for tag parameter. Don't forget to add it both in `register` and `resolve` methods. If you forget to add it in `resolve` call then tag value will be treated as first runtime argument for a factory, but there is no such factory registerd, so resolve will fail.
+  
+  **Example**:
+  
+  This code: 
+  
+  ```swift
+  container.register("some tag") as SomeProtocol
+  container.resolve("some tag") as SomeProtocol
+  ```
+  
+  becomes this:
+  
+  ```swift
+  container.register(tag: "some tag") as SomeProtocol
+  container.resolve(tag: "some tag") as SomeProtocol
+  ```
+  
 
 ## 2.0.0
 
