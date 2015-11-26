@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## 3.1.0
+
+* Deprecated `register(tag:instance:)` method in favor of `register(.Singleton) { … }`.
+* Added name for the first runtime argument in `resolve(tag:withArguments: … )` methods to make more clear separation between tag and factory runtime arguments.
+`resolve(tag:_: … )` methods are deprecated.
+
+
 ## 3.0.0
 
 * Added support for factories with up to six runtime arguments.  

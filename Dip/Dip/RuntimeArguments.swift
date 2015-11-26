@@ -56,6 +56,12 @@ extension DependencyContainer {
    
    - seealso: `resolve(tag:)`
    */
+  public func resolve<T, Arg1>(tag tag: Tag? = nil, withArguments arg1: Arg1) -> T {
+    return resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }
+  }
+  
+  ///**Deprecated** Use `resolve(tag:withArguments:)` method instead.
+  @available(*, deprecated, message="Use `resolve(tag:withArguments:)` method instead.")
   public func resolve<T, Arg1>(tag tag: Tag? = nil, _ arg1: Arg1) -> T {
     return resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }
   }
@@ -68,6 +74,12 @@ extension DependencyContainer {
   }
   
   /// - seealso: `resolve(tag:_:)`
+  public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2) -> T {
+    return resolve(tag: tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
+  }
+
+  ///**Deprecated** Use `resolve(tag:withArguments:_:)` method instead.
+  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:)` method instead.")
   public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2) -> T {
     return resolve(tag: tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
   }
@@ -78,7 +90,13 @@ extension DependencyContainer {
     return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
   }
   
-  /// - seealso: `resolve(tag:_:)`
+  /// - seealso: `resolve(tag:withArguments:)`
+  public func resolve<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) -> T {
+    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
+  }
+
+  ///**Deprecated** Use `resolve(tag:withArguments:_:_:)` method instead.
+  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:)` method instead.")
   public func resolve<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) -> T {
     return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
   }
@@ -89,29 +107,47 @@ extension DependencyContainer {
     return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
   }
   
-  /// - seealso: `resolve(tag:_:)`
+  /// - seealso: `resolve(tag:withArguments:)`
+  public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) -> T {
+    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
+  }
+
+  ///**Deprecated** Use `resolve(tag:withArguments:_:_:_:)` method instead.
+  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:_:)` method instead.")
   public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) -> T {
     return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
   }
   
-  // MARK: 4 Runtime Arguments
+  // MARK: 5 Runtime Arguments
   
   public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T> {
     return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
   }
   
-  /// - seealso: `resolve(tag:_:)`
+  /// - seealso: `resolve(tag:withArguments:)`
+  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) -> T {
+    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
+  }
+
+  ///**Deprecated** Use `resolve(tag:withArguments:_:_:_:_:)` method instead.
+  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:_:_:)` method instead.")
   public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) -> T {
     return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
   }
   
-  // MARK: 5 Runtime Arguments
+  // MARK: 6 Runtime Arguments
   
   public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T> {
     return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
   }
   
-  /// - seealso: `resolve(tag:_:)`
+  /// - seealso: `resolve(tag:withArguments:)`
+  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) -> T {
+    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
+  }
+
+  ///**Deprecated** Use `resolve(tag:withArguments:_:_:_:_:_:)` method instead.
+  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:_:_:_:)` method instead.")
   public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) -> T {
     return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
   }
