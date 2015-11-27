@@ -81,8 +81,8 @@ public class DependencyContainer {
   
   - note: You must cast the factory return type to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
   */
-  public func register<T>(tag tag: Tag? = nil, factory: ()->T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: .Prototype) as DefinitionOf<T>
+  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: ()->T) -> DefinitionOf<T> {
+    return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
   }
   
   /**
@@ -92,7 +92,11 @@ public class DependencyContainer {
    - parameter instance: The instance to register, with return type of protocol you want to register it for
    
    - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
-   */
+
+   **Deprecated**: Use `register(.Singleton){}` method instead to define singleton scope.
+  */
+
+  @available(*, deprecated, message="Use `register(.Singleton){}` method instead to define singleton scope.")
   public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T> {
     return register(tag: tag, factory: { factory() }, scope: .Singleton)
   }
