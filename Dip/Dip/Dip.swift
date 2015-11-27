@@ -162,8 +162,8 @@ public class DependencyContainer {
   ```
   
   */
-  public func resolve<T>(tag tag: Tag? = nil) -> T {
-    return resolve(tag: tag) { (factory: ()->T) in factory() }
+  public func resolve<T>(tag tag: Tag? = nil) throws -> T {
+    return try resolve(tag: tag) { (factory: ()->T) in factory() }
   }
   
   /**
@@ -186,13 +186,12 @@ public class DependencyContainer {
    Though before you do that you should probably review your design and try to reduce the number of dependencies.
    
    */
-  public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) -> T {
+  public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) throws -> T {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
     guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
-      fatalError("No definition registered with " + (tag == nil ? "\(key)" : "\(key) or \(nilTagKey)") + ". "
-        + "Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`.")
+      throw DipError.DefinitionNotFound(key)
     }
 
     let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
@@ -299,6 +298,17 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
     return lhsInt == rhsInt
   default:
     return false
+  }
+}
+
+enum DipError: ErrorType, CustomStringConvertible {
+  case DefinitionNotFound(DefinitionKey)
+  
+  var description: String {
+    switch self {
+    case let .DefinitionNotFound(key):
+      return "No definition registered for \(key). Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`."
+    }
   }
 }
 

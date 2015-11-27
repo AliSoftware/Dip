@@ -9,7 +9,7 @@
 import Foundation
 
 struct SWAPIStarshipProvider : StarshipProviderAPI {
-    let ws = wsDependencies.resolve(tag: WebService.StarshipWS.tag) as NetworkLayer
+    let ws = try! wsDependencies.resolve(tag: WebService.StarshipWS.tag) as NetworkLayer
     
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("starships") { response in

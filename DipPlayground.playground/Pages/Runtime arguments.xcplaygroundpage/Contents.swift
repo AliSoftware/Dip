@@ -18,10 +18,10 @@ container.register { (port: Int, url: NSURL?) in ServiceImp4(name: "3", baseURL:
 container.register { (port: Int, url: NSURL!) in ServiceImp4(name: "4", baseURL: url, port: port) as Service }
 
 let url: NSURL = NSURL(string: "http://example.com")!
-let service1 = container.resolve(withArguments: url, 80) as Service
-let service2 = container.resolve(withArguments: 80, url) as Service
-let service3 = container.resolve(withArguments: 80, NSURL(string: "http://example.com")) as Service
-let service4 = container.resolve(withArguments: 80, NSURL(string: "http://example.com")! as NSURL!) as Service
+let service1 = try! container.resolve(withArguments: url, 80) as Service
+let service2 = try! container.resolve(withArguments: 80, url) as Service
+let service3 = try! container.resolve(withArguments: 80, NSURL(string: "http://example.com")) as Service
+let service4 = try! container.resolve(withArguments: 80, NSURL(string: "http://example.com")! as NSURL!) as Service
 
 (service1 as! ServiceImp4).name
 (service2 as! ServiceImp4).name
@@ -39,8 +39,8 @@ extension DependencyContainer {
         return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T>
     }
     
-    public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) -> T {
-        return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
+    public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) throws -> T {
+        return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
     }
 }
 

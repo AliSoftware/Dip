@@ -53,7 +53,7 @@ class DipTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     
     //when
-    let serviceInstance = container.resolve() as Service
+    let serviceInstance = try! container.resolve() as Service
     
     //then
     XCTAssertTrue(serviceInstance is ServiceImp1)
@@ -64,7 +64,7 @@ class DipTests: XCTestCase {
     container.register(tag: "service") { ServiceImp1() as Service }
     
     //when
-    let serviceInstance = container.resolve(tag: "service") as Service
+    let serviceInstance = try! container.resolve(tag: "service") as Service
     
     //then
     XCTAssertTrue(serviceInstance is ServiceImp1)
@@ -76,8 +76,8 @@ class DipTests: XCTestCase {
     container.register(tag: "service2") { ServiceImp2() as Service }
     
     //when
-    let service1Instance = container.resolve(tag: "service1") as Service
-    let service2Instance = container.resolve(tag: "service2") as Service
+    let service1Instance = try! container.resolve(tag: "service1") as Service
+    let service2Instance = try! container.resolve(tag: "service2") as Service
     
     //then
     XCTAssertTrue(service1Instance is ServiceImp1)
@@ -87,11 +87,11 @@ class DipTests: XCTestCase {
   func testThatNewRegistrationOverridesPreviousRegistration() {
     //given
     container.register { ServiceImp1() as Service }
-    let service1 = container.resolve() as Service
+    let service1 = try! container.resolve() as Service
     
     //when
     container.register { ServiceImp2() as Service }
-    let service2 = container.resolve() as Service
+    let service2 = try! container.resolve() as Service
     
     //then
     XCTAssertTrue(service1 is ServiceImp1)
@@ -106,7 +106,7 @@ class DipTests: XCTestCase {
     }
     
     //when
-    container.resolve() as Service
+    try! container.resolve() as Service
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)

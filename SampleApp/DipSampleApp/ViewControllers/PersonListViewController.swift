@@ -13,11 +13,11 @@ class PersonListViewController: UITableViewController, FetchableTrait {
     var batchRequestID = 0
         
     func fetchIDs(completion: [Int] -> Void) {
-        let provider = providerDependencies.resolve() as PersonProviderAPI
+        let provider = try! providerDependencies.resolve() as PersonProviderAPI
         return provider.fetchIDs(completion)
     }
     func fetchOne(personID: Int, completion: Person? -> Void) {
-        let provider = providerDependencies.resolve(tag: .Int(personID)) as PersonProviderAPI
+        let provider = try! providerDependencies.resolve(tag: .Int(personID)) as PersonProviderAPI
         return provider.fetch(personID, completion: completion)
     }
     

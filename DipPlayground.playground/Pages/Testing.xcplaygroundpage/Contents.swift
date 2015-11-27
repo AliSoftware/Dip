@@ -57,7 +57,7 @@ Register fake implementation as `Service`:
     
     func testThatDoSomethingIsCalled() {
         let sut = Client()
-        sut.service = container.resolve() as Service
+        sut.service = try! container.resolve() as Service
 
         sut.callService()
         
