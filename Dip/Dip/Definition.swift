@@ -64,7 +64,7 @@ public enum ComponentScope {
  
  For example `DefinitionOf<Service,(String)->Service>` is the type of definition that during resolution will produce instance of type `Service` using closure that accepts `String` argument.
 */
-public struct DefinitionOf<T, F>: Definition {
+public final class DefinitionOf<T, F>: Definition {
   
   /**
    Sets the block that will be used to resolve dependencies of the component. 
@@ -88,25 +88,21 @@ public struct DefinitionOf<T, F>: Definition {
    ```
    
    */
-  public func resolveDependencies(container: DependencyContainer, block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
+  public func resolveDependencies(block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
     guard resolveDependenciesBlock == nil else {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
-    var newDefinition = self
-    newDefinition.resolveDependenciesBlock = block
-    container.register(newDefinition)
-    return newDefinition
+    resolveDependenciesBlock = block
+    return self
   }
   
   let factory: F
   var scope: ComponentScope
   var resolveDependenciesBlock: ((DependencyContainer, T) -> ())?
-  let tag: DependencyContainer.Tag?
   
-  init(factory: F, scope: ComponentScope, tag: DependencyContainer.Tag?) {
+  init(factory: F, scope: ComponentScope) {
     self.factory = factory
     self.scope = scope
-    self.tag = tag
   }
   
   ///Will be stored only if scope is `Singleton`
@@ -115,16 +111,14 @@ public struct DefinitionOf<T, F>: Definition {
       guard scope == .Singleton else { return nil }
       return _resolvedInstance
     }
-  }
-  
-  mutating func resolvedInstance(container: DependencyContainer, tag: DependencyContainer.Tag? = nil, instance: T) {
-    guard scope == .Singleton else { return }
-    _resolvedInstance = instance
-    container.register(self)
+    set {
+      guard scope == .Singleton else { return }
+      _resolvedInstance = newValue
+    }
   }
   
   private var _resolvedInstance: T?
 }
 
 ///Dummy protocol to store definitions for different types in collection
-protocol Definition {}
+protocol Definition: class {}

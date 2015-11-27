@@ -74,8 +74,8 @@ public class DependencyContainer {
    - parameter tag: tag used to register definition
    - parameter definition: definition to remove
   */
-  public func remove<T, F>(definition: DefinitionOf<T, F>) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: definition.tag)
+  public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     definitions[key] = nil
   }
   
@@ -86,8 +86,8 @@ public class DependencyContainer {
    - parameter tag: The arbitrary tag to associate definition with
    - parameter definition: definition to register in container
   */
-  public func register<T, F>(definition: DefinitionOf<T, F>) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: definition.tag)
+  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     definitions[key] = definition
   }
   
@@ -158,7 +158,7 @@ public class DependencyContainer {
    */
   public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    let definition = DefinitionOf<T, F>(factory: factory, scope: scope, tag: tag)
+    let definition = DefinitionOf<T, F>(factory: factory, scope: scope)
     definitions[key] = definition
     return definition
   }
@@ -219,7 +219,7 @@ public class DependencyContainer {
   }
   
   /// Actually resolve dependency
-  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, var definition: DefinitionOf<T, F>, builder: F->T) -> T {
+  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F->T) -> T {
     
     return resolvedInstances.resolve {
       
@@ -237,7 +237,7 @@ public class DependencyContainer {
         }
         
         resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key)
-        definition.resolvedInstance(self, tag: tag, instance: resolvedInstance)
+        definition.resolvedInstance = resolvedInstance
         definition.resolveDependenciesBlock?(self, resolvedInstance)
         
         return resolvedInstance
