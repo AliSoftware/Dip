@@ -25,7 +25,7 @@
 import Foundation
 
 ///Internal representation of a key used to associate definitons and factories by tag, type and factory.
-struct DefinitionKey : Hashable, Equatable, CustomDebugStringConvertible {
+struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
   var protocolType: Any.Type
   var factoryType: Any.Type
   var associatedTag: DependencyContainer.Tag?
@@ -34,7 +34,7 @@ struct DefinitionKey : Hashable, Equatable, CustomDebugStringConvertible {
     return "\(protocolType)-\(factoryType)-\(associatedTag)".hashValue
   }
   
-  var debugDescription: String {
+  var description: String {
     return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag)"
   }
 }
@@ -122,3 +122,9 @@ public final class DefinitionOf<T, F>: Definition {
 
 ///Dummy protocol to store definitions for different types in collection
 protocol Definition: class {}
+
+extension DefinitionOf: CustomStringConvertible {
+  public var description: String {
+    return "type: \(T.self), factory: \(F.self), scope: \(scope), resolved instance: \(resolvedInstance)"
+  }
+}

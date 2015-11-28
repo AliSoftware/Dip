@@ -279,6 +279,14 @@ public class DependencyContainer {
   
 }
 
+extension DependencyContainer: CustomStringConvertible {
+  
+  public var description: String {
+    return "Definitions:\n" + definitions.map { "Key with tag: \($0.0.associatedTag)\n\tDefinition: \($0.1)\n" }.joinWithSeparator("\n")
+  }
+  
+}
+
 extension DependencyContainer.Tag: IntegerLiteralConvertible {
   public init(integerLiteral value: IntegerLiteralType) {
     self = .Int(value)
@@ -325,3 +333,10 @@ extension Dictionary {
     }
   }
 }
+
+extension Optional: CustomStringConvertible {
+  public var description: String {
+    return self.map { "\($0)" } ?? "nil"
+  }
+}
+
