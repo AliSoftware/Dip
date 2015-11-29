@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-
 // MARK: - DependencyContainer
 
 /**
@@ -79,18 +77,6 @@ public class DependencyContainer {
     definitions[key] = nil
   }
   
-  /**
-   Registers new definiton in container and associate it with provided tag.
-   Will override already registered definition for the same type and factory associated with the same tag.
-   
-   - parameter tag: The arbitrary tag to associate definition with
-   - parameter definition: definition to register in container
-  */
-  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    definitions[key] = definition
-  }
-  
   // MARK: Register dependencies
   
   /**
@@ -119,23 +105,6 @@ public class DependencyContainer {
   }
   
   /**
-   Register a Singleton instance associated with optional tag.
-   
-   - parameter tag: The arbitrary tag to associate this instance with when registering with that protocol. 
-   Pass `nil` to associate with any tag.
-   - parameter instance: The instance to register, with return type of protocol you want to register it for
-   
-   - note: You must cast the instance to the protocol you want to register it with (e.g `MyClass() as MyAPI`)
-
-   **Deprecated**: Use `register(.Singleton){}` method instead to define singleton scope.
-  */
-
-  @available(*, deprecated, message="Use `register(.Singleton){}` method instead to define singleton scope.")
-  public func register<T>(tag tag: Tag? = nil, @autoclosure(escaping) instance factory: ()->T) -> DefinitionOf<T,()->T> {
-    return registerFactory(tag: tag, scope: .Singleton, factory: { factory() })
-  }
-  
-  /**
    Register generic factory associated with optional tag.
    
    - parameter tag: The arbitrary tag to look for when resolving this protocol.
@@ -161,6 +130,18 @@ public class DependencyContainer {
     let definition = DefinitionOf<T, F>(factory: factory, scope: scope)
     definitions[key] = definition
     return definition
+  }
+  
+  /**
+   Registers new definiton in container and associate it with provided tag.
+   Will override already registered definition for the same type and factory associated with the same tag.
+   
+   - parameter tag: The arbitrary tag to associate definition with
+   - parameter definition: definition to register in container
+   */
+  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+    definitions[key] = definition
   }
   
   // MARK: Resolve dependencies

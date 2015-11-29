@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-
 ///Internal representation of a key used to associate definitons and factories by tag, type and factory.
 struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
   var protocolType: Any.Type
