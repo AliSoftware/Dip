@@ -4,7 +4,9 @@
 
 #### New Features
 
-* Added support for circular dependencies by adding `ObjectGraph` scope to reuse resolved instances.  
+* Added support for circular dependencies:
+    * Added `ObjectGraph` scope to reuse resolved instances 
+    * Added `resolveDependencies` method on `DefinitionOf` class to resolve dependencies of resolved instance.  
   [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
 * Added methods to register/remove individual definitions.  
   [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
@@ -14,6 +16,7 @@
 * Removed container thread-safety to enable recursion calls to `resolve`.  
   **Access to container from multiple threads should be handled by clients** from now on.
 * Deprecated `register(tag:instance:)` method in favor of `register(.Singleton, …)`.
+* Added name for the first runtime argument in `resolve(tag:withArguments:)` methods to make more clear separation between tag and factory runtime arguments.
 
 ## 3.0.0
 
