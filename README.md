@@ -54,7 +54,9 @@ The next paragraphs give you an overview of the Usage of _Dip_ directly, but if 
 
 ## Usage
 
-### Register instance factories
+*See [CHANGELOG.md](https://github.com/AliSoftware/Dip/blob/master/CHANGELOG.md) for instructions to migrate from 2.0.0 to 3.0.0*
+
+### Register instances and instance factories
 
 First, create a `DependencyContainer` and use it to register instance factories with protocols, using those methods:
 
