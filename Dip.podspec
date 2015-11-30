@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
 
   s.homepage         = "https://github.com/AliSoftware/Dip"
   s.license          = 'MIT'
-  s.author           = { "Olivier Halligon" => "olivier@halligon.net" }
+  s.authors          = { "Olivier Halligon" => "olivier@halligon.net", "Ilya Puchka" => "ilya@puchka.me" }
   s.source           = { :git => "https://github.com/AliSoftware/Dip.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/aligatr'
 
