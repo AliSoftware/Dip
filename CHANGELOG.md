@@ -28,14 +28,14 @@
   This code: 
   
   ```swift
-  container.register("some tag") as SomeProtocol
+  container.register("some tag") { SomeClass() as SomeProtocol }
   container.resolve("some tag") as SomeProtocol
   ```
   
   becomes this:
   
   ```swift
-  container.register(tag: "some tag") as SomeProtocol
+  container.register(tag: "some tag") { SomeClass() as SomeProtocol }
   container.resolve(tag: "some tag") as SomeProtocol
   ```
   
