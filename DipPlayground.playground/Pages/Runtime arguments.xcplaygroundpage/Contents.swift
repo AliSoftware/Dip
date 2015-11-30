@@ -18,10 +18,10 @@ container.register { (port: Int, url: NSURL?) in ServiceImp3(name: "3", baseURL:
 container.register { (port: Int, url: NSURL!) in ServiceImp3(name: "4", baseURL: url, port: port) as Service }
 
 let url: NSURL = NSURL(string: "http://example.com")!
-let service1 = container.resolve(url, 80) as Service
-let service2 = container.resolve(80, url) as Service
-let service3 = container.resolve(80, NSURL(string: "http://example.com")) as Service
-let service4 = container.resolve(80, NSURL(string: "http://example.com")! as NSURL!) as Service
+let service1 = container.resolve(withArguments: url, 80) as Service
+let service2 = container.resolve(withArguments: 80, url) as Service
+let service3 = container.resolve(withArguments: 80, NSURL(string: "http://example.com")) as Service
+let service4 = container.resolve(withArguments: 80, NSURL(string: "http://example.com")! as NSURL!) as Service
 
 (service1 as! ServiceImp3).name
 (service2 as! ServiceImp3).name

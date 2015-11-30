@@ -98,7 +98,7 @@ class DipTests: XCTestCase {
   
   func testThatItReusesInstanceRegisteredAsSingleton() {
     //given
-    container.register(instance: ServiceImp1() as Service)
+    container.register(.Singleton) { ServiceImp1() as Service }
     
     //when
     let service1 = container.resolve() as Service
