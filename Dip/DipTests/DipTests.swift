@@ -112,16 +112,61 @@ class DipTests: XCTestCase {
     XCTAssertTrue(resolveDependenciesCalled)
   }
   
-  func testThatItReusesInstanceRegisteredAsSingleton() {
+  func testThatItThrowsErrorIfCanNotFindDefinitionForType() {
     //given
-    container.register(.Singleton) { ServiceImp1() as Service }
+    container.register { ServiceImp1() as ServiceImp1 }
     
     //when
-    let service1 = container.resolve() as Service
-    let service2 = container.resolve() as Service
+    do {
+      try container.resolve() as Service
+      XCTFail("Unexpectedly resolved protocol")
+    }
+    catch DipError.DefinitionNotFound(let key) {
+      typealias F = ()->Service
+      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
+      XCTAssertEqual(key, expectedKey)
+    }
+    catch {
+      XCTFail("Thrown unexpected error")
+    }
+  }
+  
+  func testThatItThrowsErrorIfCanNotFindDefinitionForTag() {
+    //given
+    container.register(tag: "some tag") { ServiceImp1() as Service }
     
-    //then
-    XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+    //when
+    do {
+      try container.resolve(tag: "other tag") as Service
+      XCTFail("Unexpectedly resolved protocol")
+    }
+    catch DipError.DefinitionNotFound(let key) {
+      typealias F = ()->Service
+      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: "other tag")
+      XCTAssertEqual(key, expectedKey)
+    }
+    catch {
+      XCTFail("Thrown unexpected error")
+    }
+  }
+  
+  func testThatItThrowsErrorIfCanNotFindDefinitionForFactory() {
+    //given
+    container.register { ServiceImp1() as Service }
+    
+    //when
+    do {
+      try container.resolve(withArguments: "some string") as Service
+      XCTFail("Unexpectedly resolved protocol")
+    }
+    catch DipError.DefinitionNotFound(let key) {
+      typealias F = (String)->Service
+      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
+      XCTAssertEqual(key, expectedKey)
+    }
+    catch {
+      XCTFail("Thrown unexpected error")
+    }
   }
   
 }
