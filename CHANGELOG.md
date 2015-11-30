@@ -13,7 +13,17 @@
 
 * Removed container thread-safety to enable recursion calls to `resolve`.  
   **Access to container from multiple threads should be handled by clients** from now on.
-* Deprecated `register(tag:instance:)` method in favor of `register(.Singleton, …)`.
+
+## 3.1.0
+
+#### New
+
+* Added name for the first runtime argument in `resolve(tag:withArguments: … )` methods to make more clear separation between tag and factory runtime arguments.
+
+#### Depreciations
+
+* `resolve(tag:_: … )` methods are deprecated in favor of those new `resolve(tag:withArguments: … )` methods.
+* Deprecated `register(tag:instance:)` method in favor of `register(.Singleton) { … }`.
 
 ## 3.0.0
 
@@ -23,7 +33,8 @@
 * Playground added to project.  
   [#10](https://github.com/AliSoftware/Dip/pull/10), [@ilyapuchka](https://github.com/ilyapuchka)
   
-  ###Note on migration from 2.0.0 to 3.0.0:
+  ### Note on migration from 2.0.0 to 3.0.0:
+
   If you used tags to register and resolve your components you have to add `tag` name for tag parameter. Don't forget to add it both in `register` and `resolve` methods. If you forget to add it in `resolve` call then tag value will be treated as first runtime argument for a factory, but there is no such factory registerd, so resolve will fail.
   
   **Example**:
@@ -31,14 +42,14 @@
   This code: 
   
   ```swift
-  container.register("some tag") as SomeProtocol
+  container.register("some tag") { SomeClass() as SomeProtocol }
   container.resolve("some tag") as SomeProtocol
   ```
   
   becomes this:
   
   ```swift
-  container.register(tag: "some tag") as SomeProtocol
+  container.register(tag: "some tag") { SomeClass() as SomeProtocol }
   container.resolve(tag: "some tag") as SomeProtocol
   ```
   

@@ -112,4 +112,16 @@ class DipTests: XCTestCase {
     XCTAssertTrue(resolveDependenciesCalled)
   }
   
+  func testThatItReusesInstanceRegisteredAsSingleton() {
+    //given
+    container.register(.Singleton) { ServiceImp1() as Service }
+    
+    //when
+    let service1 = container.resolve() as Service
+    let service2 = container.resolve() as Service
+    
+    //then
+    XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+  }
+  
 }

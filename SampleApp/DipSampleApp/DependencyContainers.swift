@@ -34,7 +34,7 @@ let providerDependencies = DependencyContainer() { dip in
         
         // 1) Register the PersonProviderAPI singleton, one generic and one specific for a specific personID
         dip.register(.Singleton) { DummyPilotProvider() as PersonProviderAPI }
-        dip.register(.Singleton, tag: 0) { PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI }
+        dip.register(tag: 0, .Singleton) { PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI }
         
     } else {
         

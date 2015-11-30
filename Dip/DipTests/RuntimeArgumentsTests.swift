@@ -56,7 +56,7 @@ class RuntimeArgumentsTests: XCTestCase {
     })
     
     //when
-    let service = container.resolve(arg1) as Service
+    let service = container.resolve(withArguments: arg1) as Service
     
     //then
     XCTAssertTrue(service is ServiceImp1)
@@ -72,7 +72,7 @@ class RuntimeArgumentsTests: XCTestCase {
     }
     
     //when
-    let service = container.resolve(arg1, arg2) as Service
+    let service = container.resolve(withArguments: arg1, arg2) as Service
     
     //then
     XCTAssertTrue(service is ServiceImp1)
@@ -88,7 +88,7 @@ class RuntimeArgumentsTests: XCTestCase {
     }
     
     //when
-    let service = container.resolve(arg1, arg2, arg3) as Service
+    let service = container.resolve(withArguments: arg1, arg2, arg3) as Service
     
     //then
     XCTAssertTrue(service is ServiceImp1)
@@ -105,7 +105,7 @@ class RuntimeArgumentsTests: XCTestCase {
     }
     
     //when
-    let service = container.resolve(arg1, arg2, arg3, arg4) as Service
+    let service = container.resolve(withArguments: arg1, arg2, arg3, arg4) as Service
     
     //then
     XCTAssertTrue(service is ServiceImp1)
@@ -123,7 +123,7 @@ class RuntimeArgumentsTests: XCTestCase {
     }
     
     //when
-    let service = container.resolve(arg1, arg2, arg3, arg4, arg5) as Service
+    let service = container.resolve(withArguments: arg1, arg2, arg3, arg4, arg5) as Service
     
     //then
     XCTAssertTrue(service is ServiceImp1)
@@ -142,7 +142,7 @@ class RuntimeArgumentsTests: XCTestCase {
     }
     
     //when
-    let service = container.resolve(arg1, arg2, arg3, arg4, arg5, arg6) as Service
+    let service = container.resolve(withArguments: arg1, arg2, arg3, arg4, arg5, arg6) as Service
     
     //then
     XCTAssertTrue(service is ServiceImp1)
@@ -155,8 +155,8 @@ class RuntimeArgumentsTests: XCTestCase {
     container.register { (a1: Int, a2: Int) in ServiceImp2() as Service }
     
     //when
-    let service1 = container.resolve(arg1) as Service
-    let service2 = container.resolve(arg1, arg2) as Service
+    let service1 = container.resolve(withArguments: arg1) as Service
+    let service2 = container.resolve(withArguments: arg1, arg2) as Service
     
     //then
     XCTAssertTrue(service1 is ServiceImp1)
@@ -170,8 +170,8 @@ class RuntimeArgumentsTests: XCTestCase {
     container.register(factory: { (a1: String) in ServiceImp2() as Service })
     
     //when
-    let service1 = container.resolve(arg1) as Service
-    let service2 = container.resolve(arg2) as Service
+    let service1 = container.resolve(withArguments: arg1) as Service
+    let service2 = container.resolve(withArguments: arg2) as Service
     
     //then
     XCTAssertTrue(service1 is ServiceImp1)
@@ -185,8 +185,8 @@ class RuntimeArgumentsTests: XCTestCase {
     container.register { (a1: String, a2: Int) in ServiceImp2() as Service }
     
     //when
-    let service1 = container.resolve(arg1, arg2) as Service
-    let service2 = container.resolve(arg2, arg1) as Service
+    let service1 = container.resolve(withArguments: arg1, arg2) as Service
+    let service2 = container.resolve(withArguments: arg2, arg1) as Service
     
     //then
     XCTAssertTrue(service1 is ServiceImp1)
@@ -197,11 +197,11 @@ class RuntimeArgumentsTests: XCTestCase {
     //given
     let arg1 = 1, arg2 = 2
     container.register { (a1: Int, a2: Int) in ServiceImp1() as Service }
-    let service1 = container.resolve(arg1, arg2) as Service
+    let service1 = container.resolve(withArguments: arg1, arg2) as Service
     
     //when
     container.register { (a1: Int, a2: Int) in ServiceImp2() as Service }
-    let service2 = container.resolve(arg1, arg2) as Service
+    let service2 = container.resolve(withArguments: arg1, arg2) as Service
     
     //then
     XCTAssertTrue(service1 is ServiceImp1)
@@ -217,11 +217,11 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //when
     let url: NSURL = NSURL(string: "http://example.com")!
-    let service1 = container.resolve(80, url) as Service
-    let service2 = container.resolve(80, NSURL(string: "http://example.com")) as Service
+    let service1 = container.resolve(withArguments: 80, url) as Service
+    let service2 = container.resolve(withArguments: 80, NSURL(string: "http://example.com")) as Service
     
-    let service3 = container.resolve(80, NSURL(string: "http://example.com")! as NSURL!) as Service
-    let service4 = container.resolve(80, NSURL(string: "http://example.com")!) as Service
+    let service3 = container.resolve(withArguments: 80, NSURL(string: "http://example.com")! as NSURL!) as Service
+    let service4 = container.resolve(withArguments: 80, NSURL(string: "http://example.com")!) as Service
     
     //then
     XCTAssertEqual(service1.getServiceName(), name1)
