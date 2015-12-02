@@ -96,7 +96,7 @@ public class DependencyContainer {
   container.register(tag: "service") { ServiceImp() as Service }
   container.register(.ObjectGraph) { ServiceImp() as Service }
   container.register { [unowned container] 
-    ClientImp(service: container.resolve() as Service) as Client 
+    ClientImp(service: try! container.resolve() as Service) as Client
   }
   ```
   */
@@ -152,18 +152,21 @@ public class DependencyContainer {
   If no definition was registered with this `tag` for this `protocol`,
   it will try to resolve the definition associated with `nil` (no tag).
   
+  Will throw `DipError.DefinitionNotFound` if no registered definition found
+  that would match type, runtime arguments and tag.
+  
   - parameter tag: The arbitrary tag to look for when resolving this protocol.
   
   **Example**:
   ```swift
-  let service = container.resolve() as Service
-  let service = container.resolve(tag: "service") as Service
-  let service: Service = container.resolve()
+  let service = try! container.resolve() as Service
+  let service = try! container.resolve(tag: "service") as Service
+  let service: Service = try! container.resolve()
   ```
   
   */
-  public func resolve<T>(tag tag: Tag? = nil) -> T {
-    return resolve(tag: tag) { (factory: ()->T) in factory() }
+  public func resolve<T>(tag tag: Tag? = nil) throws -> T {
+    return try resolve(tag: tag) { (factory: ()->T) in factory() }
   }
   
   /**
@@ -178,21 +181,20 @@ public class DependencyContainer {
            (currently it's up to six) like in this example:
    
    ```swift
-   public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) -> T {
-     return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, ...) -> T) in factory(arg1, arg2, arg3, ...) }
+   public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) throws -> T {
+     return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, ...) -> T) in factory(arg1, arg2, arg3, ...) }
    }
    ```
    
    Though before you do that you should probably review your design and try to reduce the number of dependencies.
    
    */
-  public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) -> T {
+  public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) throws -> T {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
     guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
-      fatalError("No definition registered with " + (tag == nil ? "\(key)" : "\(key) or \(nilTagKey)") + ". "
-        + "Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`.")
+      throw DipError.DefinitionNotFound(key)
     }
 
     let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
@@ -299,6 +301,17 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
     return lhsInt == rhsInt
   default:
     return false
+  }
+}
+
+enum DipError: ErrorType, CustomStringConvertible {
+  case DefinitionNotFound(DefinitionKey)
+  
+  var description: String {
+    switch self {
+    case let .DefinitionNotFound(key):
+      return "No definition registered for \(key). Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`."
+    }
   }
 }
 

@@ -22,24 +22,24 @@ container.register(tag: "prototype", .Prototype) { ServiceImp1() as Service }
 container.register(tag: "object graph", .ObjectGraph) { ServiceImp2() as Service }
 container.register(tag: "shared instance", .Singleton) { ServiceImp3() as Service }
 
-let service = container.resolve() as Service
-let anotherService = container.resolve() as Service
+let service = try! container.resolve() as Service
+let anotherService = try! container.resolve() as Service
 // They are different instances as the scope defaults to .Prototype
 service as! ServiceImp1 === anotherService as! ServiceImp1 // false
 
-let prototypeService = container.resolve(tag: "prototype") as Service
-let anotherPrototypeService = container.resolve(tag: "prototype") as Service
+let prototypeService = try! container.resolve(tag: "prototype") as Service
+let anotherPrototypeService = try! container.resolve(tag: "prototype") as Service
 // They are different instances:
 prototypeService as! ServiceImp1 === anotherPrototypeService as! ServiceImp1 // false
 
-let graphService = container.resolve(tag: "object graph") as Service
-let anotherGraphService = container.resolve(tag: "object graph") as Service
+let graphService = try! container.resolve(tag: "object graph") as Service
+let anotherGraphService = try! container.resolve(tag: "object graph") as Service
 // still different instances — the ObjectGraph scope only keep instances during one (recursive) resolution call,
 // so the two calls on the two lines above are different calls and use different instances
 graphService as! ServiceImp2 === anotherGraphService as! ServiceImp2 // false
 
-let sharedService = container.resolve(tag: "shared instance") as Service
-let sameSharedService = container.resolve(tag: "shared instance") as Service
+let sharedService = try! container.resolve(tag: "shared instance") as Service
+let sameSharedService = try! container.resolve(tag: "shared instance") as Service
 // same instances, the singleton scope keep and reuse instances during the lifetime of the container
 sharedService as! ServiceImp3 === sameSharedService as! ServiceImp3
 

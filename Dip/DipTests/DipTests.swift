@@ -53,7 +53,7 @@ class DipTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     
     //when
-    let serviceInstance = container.resolve() as Service
+    let serviceInstance = try! container.resolve() as Service
     
     //then
     XCTAssertTrue(serviceInstance is ServiceImp1)
@@ -64,7 +64,7 @@ class DipTests: XCTestCase {
     container.register(tag: "service") { ServiceImp1() as Service }
     
     //when
-    let serviceInstance = container.resolve(tag: "service") as Service
+    let serviceInstance = try! container.resolve(tag: "service") as Service
     
     //then
     XCTAssertTrue(serviceInstance is ServiceImp1)
@@ -76,8 +76,8 @@ class DipTests: XCTestCase {
     container.register(tag: "service2") { ServiceImp2() as Service }
     
     //when
-    let service1Instance = container.resolve(tag: "service1") as Service
-    let service2Instance = container.resolve(tag: "service2") as Service
+    let service1Instance = try! container.resolve(tag: "service1") as Service
+    let service2Instance = try! container.resolve(tag: "service2") as Service
     
     //then
     XCTAssertTrue(service1Instance is ServiceImp1)
@@ -87,11 +87,11 @@ class DipTests: XCTestCase {
   func testThatNewRegistrationOverridesPreviousRegistration() {
     //given
     container.register { ServiceImp1() as Service }
-    let service1 = container.resolve() as Service
+    let service1 = try! container.resolve() as Service
     
     //when
     container.register { ServiceImp2() as Service }
-    let service2 = container.resolve() as Service
+    let service2 = try! container.resolve() as Service
     
     //then
     XCTAssertTrue(service1 is ServiceImp1)
@@ -106,22 +106,67 @@ class DipTests: XCTestCase {
     }
     
     //when
-    container.resolve() as Service
+    try! container.resolve() as Service
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
   }
   
-  func testThatItReusesInstanceRegisteredAsSingleton() {
+  func testThatItThrowsErrorIfCanNotFindDefinitionForType() {
     //given
-    container.register(.Singleton) { ServiceImp1() as Service }
+    container.register { ServiceImp1() as ServiceImp1 }
     
     //when
-    let service1 = container.resolve() as Service
-    let service2 = container.resolve() as Service
+    do {
+      try container.resolve() as Service
+      XCTFail("Unexpectedly resolved protocol")
+    }
+    catch DipError.DefinitionNotFound(let key) {
+      typealias F = ()->Service
+      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
+      XCTAssertEqual(key, expectedKey)
+    }
+    catch {
+      XCTFail("Thrown unexpected error")
+    }
+  }
+  
+  func testThatItThrowsErrorIfCanNotFindDefinitionForTag() {
+    //given
+    container.register(tag: "some tag") { ServiceImp1() as Service }
     
-    //then
-    XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+    //when
+    do {
+      try container.resolve(tag: "other tag") as Service
+      XCTFail("Unexpectedly resolved protocol")
+    }
+    catch DipError.DefinitionNotFound(let key) {
+      typealias F = ()->Service
+      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: "other tag")
+      XCTAssertEqual(key, expectedKey)
+    }
+    catch {
+      XCTFail("Thrown unexpected error")
+    }
+  }
+  
+  func testThatItThrowsErrorIfCanNotFindDefinitionForFactory() {
+    //given
+    container.register { ServiceImp1() as Service }
+    
+    //when
+    do {
+      try container.resolve(withArguments: "some string") as Service
+      XCTFail("Unexpectedly resolved protocol")
+    }
+    catch DipError.DefinitionNotFound(let key) {
+      typealias F = (String)->Service
+      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
+      XCTAssertEqual(key, expectedKey)
+    }
+    catch {
+      XCTFail("Thrown unexpected error")
+    }
   }
   
 }

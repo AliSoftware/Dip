@@ -10,11 +10,14 @@
   [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
 * Added methods to register/remove individual definitions.  
   [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
+* All `resolve` methods now can throw error if type can not be resolved.  
+  [#15](https://github.com/AliSoftware/Dip/issues/15), [@ilyapuchka](https://github.com/ilyapuchka)
 
 #### Breaking Changes
 
 * Removed container thread-safety to enable recursion calls to `resolve`.  
   **Access to container from multiple threads should be handled by clients** from now on.
+* All `resolve` methods now can throw.
 
 ## 3.1.0
 

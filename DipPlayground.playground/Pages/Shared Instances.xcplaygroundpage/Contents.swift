@@ -112,7 +112,7 @@ class DipViewController: UIViewController {
     
     convenience init(dependencies: DependencyContainer) {
         self.init()
-        self.apiClient = dependencies.resolve() as ApiClientProtocol
+        self.apiClient = try! dependencies.resolve() as ApiClientProtocol
     }
     
     init() {
@@ -136,7 +136,7 @@ protocol ApiClientProvider {
 
 extension DependencyContainer: ApiClientProvider {
   func apiClient() -> ApiClientProtocol {
-    return self.resolve() as ApiClientProtocol
+    return try! self.resolve() as ApiClientProtocol
   }
 }
 

@@ -55,8 +55,8 @@ class ComponentScopeTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     
     //when
-    let service1 = container.resolve() as Service
-    let service2 = container.resolve() as Service
+    let service1 = try! container.resolve() as Service
+    let service2 = try! container.resolve() as Service
     
     //then
     XCTAssertFalse((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
@@ -67,8 +67,8 @@ class ComponentScopeTests: XCTestCase {
     container.register(.Singleton) { ServiceImp1() as Service }
     
     //when
-    let service1 = container.resolve() as Service
-    let service2 = container.resolve() as Service
+    let service1 = try! container.resolve() as Service
+    let service2 = try! container.resolve() as Service
     
     //then
     XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
@@ -90,14 +90,14 @@ class ComponentScopeTests: XCTestCase {
 
   func testThatItReusesInstanceInObjectGraphScopeDuringResolve() {
     //given
-    container.register(.ObjectGraph) { [unowned container] in Client(server: container.resolve()) as Client }
+    container.register(.ObjectGraph) { [unowned container] in Client(server: try! container.resolve()) as Client }
     
     container.register(.ObjectGraph) { Server() as Server }.resolveDependencies { container, server in
-      server.client = container.resolve() as Client
+      server.client = try! container.resolve() as Client
     }
     
     //when
-    let client = container.resolve() as Client
+    let client = try! container.resolve() as Client
     
     //then
     let server = client.server
@@ -106,16 +106,16 @@ class ComponentScopeTests: XCTestCase {
   
   func testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve() {
     //given
-    container.register(.ObjectGraph) { [unowned container] in Client(server: container.resolve()) as Client }
+    container.register(.ObjectGraph) { [unowned container] in Client(server: try! container.resolve()) as Client }
     container.register(.ObjectGraph) { Server() as Server }.resolveDependencies { container, server in
-      server.client = container.resolve() as Client
+      server.client = try! container.resolve() as Client
     }
     
     //when
-    let client = container.resolve() as Client
+    let client = try! container.resolve() as Client
     let server = client.server
     
-    let anotherClient = container.resolve() as Client
+    let anotherClient = try! container.resolve() as Client
     let anotherServer = anotherClient.server
     
     //then
@@ -127,12 +127,12 @@ class ComponentScopeTests: XCTestCase {
     //given
     var service2: Service?
     container.register(.ObjectGraph) { ServiceImp1() as Service }.resolveDependencies { (c, _) in
-      service2 = c.resolve(tag: "service") as Service
+      service2 = try! c.resolve(tag: "service") as Service
     }
     container.register(tag: "service", .ObjectGraph) { ServiceImp2() as Service}
     
     //when
-    let service1 = container.resolve(tag: "tag") as Service
+    let service1 = try! container.resolve(tag: "tag") as Service
     
     //then
     XCTAssertTrue(service1 is ServiceImp1)

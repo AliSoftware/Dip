@@ -44,12 +44,12 @@ Now you can register those classes in container:
 */
 
 container.register(.ObjectGraph) { [unowned container] in
-    Interactor(networkClient: container.resolve()) as NetworkClientDelegate
+    Interactor(networkClient: try! container.resolve()) as NetworkClientDelegate
 }
 
 container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
-    .resolveDependencies(container) { (container, client) -> () in
-        client.delegate = container.resolve() as NetworkClientDelegate
+    .resolveDependencies { (container, client) -> () in
+        client.delegate = try! container.resolve() as NetworkClientDelegate
 }
 
 /*:
@@ -65,14 +65,14 @@ This way `DependencyContainer` breaks infinite recursion that would happen if we
 Now when you resolve `NetworkClientDelegate` you will get an instance of `Interactor` that will have client with delegate referencing the same `Interactor` instance:
 */
 
-let interactor = container.resolve() as NetworkClientDelegate
+let interactor = try! container.resolve() as NetworkClientDelegate
 interactor.networkClient.delegate === interactor // true: they are the same instances
 
 /*:
 **Warning**: Note that one of the properties (`delegate`) is defined as _weak_. That's crucial to avoid retain cycle. But now if you try to resolve `NetworkClient` first it's delegate will be released before `resolve` returns, bcause no one holds a reference to it except the container.
 */
 
-let networkClient = container.resolve() as NetworkClient
+let networkClient = try! container.resolve() as NetworkClient
 networkClient.delegate // delegate was alread released =(
 
 /*:
@@ -91,15 +91,15 @@ If we would have used `.Prototype` for one of the components it will lead to the
 container.reset()
 
 container.register(.Prototype) { [unowned container] in
-    Interactor(networkClient: container.resolve()) as NetworkClientDelegate
+    Interactor(networkClient: try! container.resolve()) as NetworkClientDelegate
 }
 
 container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
-    .resolveDependencies(container) { (container, client) -> () in
-        client.delegate = container.resolve() as NetworkClientDelegate
+    .resolveDependencies { (container, client) -> () in
+        client.delegate = try! container.resolve() as NetworkClientDelegate
 }
 
-let invalidInteractor = container.resolve() as NetworkClientDelegate
+let invalidInteractor = try! container.resolve() as NetworkClientDelegate
 invalidInteractor.networkClient.delegate // that is not valid
 
 //: [Next: Shared Instances](@next)
