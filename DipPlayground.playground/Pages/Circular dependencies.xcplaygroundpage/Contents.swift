@@ -43,7 +43,7 @@ It's very important that _at least one_ of them uses property injection, because
 Now you can register those classes in container:
 */
 
-container.register(.ObjectGraph) { [unowned container] in
+container.register(.ObjectGraph) {
     Interactor(networkClient: try! container.resolve()) as NetworkClientDelegate
 }
 
@@ -60,7 +60,8 @@ Here you can spot the difference in the way we register classes.
 
 This way `DependencyContainer` breaks infinite recursion that would happen if we used constructor injection for both of our components.
 
-*Note*: Capturing container as `unowned` reference is important to avoid retain cycle between container and definition.
+*Note*: You can use container reference inside instance factory without using capture list, there will be [no retain cycle](https://github.com/AliSoftware/Dip/issues/23)
+
 
 Now when you resolve `NetworkClientDelegate` you will get an instance of `Interactor` that will have client with delegate referencing the same `Interactor` instance:
 */
@@ -90,7 +91,7 @@ If we would have used `.Prototype` for one of the components it will lead to the
 
 container.reset()
 
-container.register(.Prototype) { [unowned container] in
+container.register(.Prototype) {
     Interactor(networkClient: try! container.resolve()) as NetworkClientDelegate
 }
 

@@ -88,16 +88,13 @@ public class DependencyContainer {
   - returns: definition created for provided type and factory
   
   - note: You must cast the factory return type to the protocol you want to register it for.
-  Inside factory block if you need to reference container use it as `unowned` to avoid retain cycle.
   
   **Example**:
   ```swift
   container.register { ServiceImp() as Service }
   container.register(tag: "service") { ServiceImp() as Service }
   container.register(.ObjectGraph) { ServiceImp() as Service }
-  container.register { [unowned container] 
-    ClientImp(service: try! container.resolve() as Service) as Client
-  }
+  container.register { ClientImp(service: try! container.resolve() as Service) as Client }
   ```
   */
   public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: ()->T) -> DefinitionOf<T, ()->T> {

@@ -77,7 +77,7 @@ public final class DefinitionOf<T, F>: Definition {
    **Example**
    
    ```swift
-   container.register { [unowned container] ClientImp(service: container.resolve() as Service) as Client }
+   container.register { ClientImp(service: container.resolve() as Service) as Client }
 
    var definition = container.register { ServiceImp() as Service }
    definition.resolveDependencies { container, service in

@@ -167,7 +167,7 @@ func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, w
 _Dip_ supports circular dependencies. To resolve them use `ObjectGraph` scope and `resolveDependencies` method of `DefinitionOf` returned by `register` method.
 
 ```swift
-container.register(.ObjectGraph) { [unowned container] in
+container.register(.ObjectGraph) {
     ClientImp(server: try! container.resolve() as Server) as Client 
 }
 
