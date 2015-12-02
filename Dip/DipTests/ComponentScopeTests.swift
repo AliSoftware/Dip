@@ -90,7 +90,7 @@ class ComponentScopeTests: XCTestCase {
 
   func testThatItReusesInstanceInObjectGraphScopeDuringResolve() {
     //given
-    container.register(.ObjectGraph) { Client(server: try! container.resolve()) as Client }
+    container.register(.ObjectGraph) { Client(server: try! self.container.resolve()) as Client }
     
     container.register(.ObjectGraph) { Server() as Server }.resolveDependencies { container, server in
       server.client = try! container.resolve() as Client
@@ -106,7 +106,7 @@ class ComponentScopeTests: XCTestCase {
   
   func testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve() {
     //given
-    container.register(.ObjectGraph) { Client(server: try! container.resolve()) as Client }
+    container.register(.ObjectGraph) { Client(server: try! self.container.resolve()) as Client }
     container.register(.ObjectGraph) { Server() as Server }.resolveDependencies { container, server in
       server.client = try! container.resolve() as Client
     }
