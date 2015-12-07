@@ -28,7 +28,7 @@
 _Dip_'s Dependency Containers allow you to do very simple **Dependency Injection**
 by associating `protocols` to concrete implementations
 */
-public class DependencyContainer {
+public final class DependencyContainer {
   
   /**
    Use a tag in case you need to register multiple instances or factories

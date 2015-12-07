@@ -12,6 +12,7 @@
   [#11](https://github.com/AliSoftware/Dip/pull/11), [@ilyapuchka](https://github.com/ilyapuchka)
 * All `resolve` methods now can throw error if type can not be resolved.  
   [#15](https://github.com/AliSoftware/Dip/issues/15), [@ilyapuchka](https://github.com/ilyapuchka)
+* `DependencyContainer` is marked as `final`.
 
 #### Breaking Changes
 
