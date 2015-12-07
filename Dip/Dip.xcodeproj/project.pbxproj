@@ -7,66 +7,168 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		094526951BEA1CFF0034E72A /* Dip.h in Headers */ = {isa = PBXBuildFile; fileRef = 094526941BEA1CFF0034E72A /* Dip.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0945269C1BEA1CFF0034E72A /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 094526911BEA1CFF0034E72A /* Dip.framework */; };
-		094526A11BEA1CFF0034E72A /* DipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526A01BEA1CFF0034E72A /* DipTests.swift */; };
-		094526AC1BEA1D200034E72A /* Dip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526AB1BEA1D200034E72A /* Dip.swift */; };
-		094526B41BEA51540034E72A /* RuntimeArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B31BEA51540034E72A /* RuntimeArguments.swift */; };
-		094526B61BEA520B0034E72A /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B51BEA520B0034E72A /* Definition.swift */; };
-		094526B81BEA536A0034E72A /* RuntimeArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */; };
-		0989323F1BEBC8CD00ACDA2B /* ComponentScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0989323E1BEBC8CD00ACDA2B /* ComponentScopeTests.swift */; };
-		098A740D1C0C5CBC005C1296 /* DefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098A740C1C0C5CBC005C1296 /* DefinitionTests.swift */; };
+		0903B3621C161544002241C1 /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0903B3581C161543002241C1 /* Dip.framework */; };
+		0903B3821C1615EC002241C1 /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0903B3781C1615EC002241C1 /* Dip.framework */; };
+		0903B3B01C1618AF002241C1 /* Dip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0903B3A61C1618AF002241C1 /* Dip.framework */; };
+		0919F4D31C16417B00DC3B10 /* Dip.h in Headers */ = {isa = PBXBuildFile; fileRef = 0919F4C91C16417000DC3B10 /* Dip.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0919F4D41C16417B00DC3B10 /* Dip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CA1C16417000DC3B10 /* Dip.swift */; };
+		0919F4D51C16417B00DC3B10 /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4C81C16417000DC3B10 /* Definition.swift */; };
+		0919F4D61C16417B00DC3B10 /* RuntimeArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */; };
+		0919F4D71C16417C00DC3B10 /* Dip.h in Headers */ = {isa = PBXBuildFile; fileRef = 0919F4C91C16417000DC3B10 /* Dip.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0919F4D81C16417C00DC3B10 /* Dip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CA1C16417000DC3B10 /* Dip.swift */; };
+		0919F4D91C16417C00DC3B10 /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4C81C16417000DC3B10 /* Definition.swift */; };
+		0919F4DA1C16417C00DC3B10 /* RuntimeArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */; };
+		0919F4DB1C16417D00DC3B10 /* Dip.h in Headers */ = {isa = PBXBuildFile; fileRef = 0919F4C91C16417000DC3B10 /* Dip.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0919F4DC1C16417D00DC3B10 /* Dip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CA1C16417000DC3B10 /* Dip.swift */; };
+		0919F4DD1C16417D00DC3B10 /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4C81C16417000DC3B10 /* Definition.swift */; };
+		0919F4DE1C16417D00DC3B10 /* RuntimeArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */; };
+		0919F4DF1C16417E00DC3B10 /* Dip.h in Headers */ = {isa = PBXBuildFile; fileRef = 0919F4C91C16417000DC3B10 /* Dip.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0919F4E01C16417E00DC3B10 /* Dip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CA1C16417000DC3B10 /* Dip.swift */; };
+		0919F4E11C16417E00DC3B10 /* Definition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4C81C16417000DC3B10 /* Definition.swift */; };
+		0919F4E21C16417E00DC3B10 /* RuntimeArguments.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */; };
+		0919F4E31C16419300DC3B10 /* DipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4D01C16417000DC3B10 /* DipTests.swift */; };
+		0919F4E41C16419300DC3B10 /* DefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */; };
+		0919F4E51C16419300DC3B10 /* RuntimeArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */; };
+		0919F4E61C16419300DC3B10 /* ComponentScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */; };
+		0919F4E71C16419400DC3B10 /* DipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4D01C16417000DC3B10 /* DipTests.swift */; };
+		0919F4E81C16419400DC3B10 /* DefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */; };
+		0919F4E91C16419400DC3B10 /* RuntimeArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */; };
+		0919F4EA1C16419400DC3B10 /* ComponentScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */; };
+		0919F4EB1C16419500DC3B10 /* DipTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4D01C16417000DC3B10 /* DipTests.swift */; };
+		0919F4EC1C16419500DC3B10 /* DefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */; };
+		0919F4ED1C16419500DC3B10 /* RuntimeArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */; };
+		0919F4EE1C16419500DC3B10 /* ComponentScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		0945269D1BEA1CFF0034E72A /* PBXContainerItemProxy */ = {
+		0903B3631C161544002241C1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 094526881BEA1CFF0034E72A /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 094526901BEA1CFF0034E72A;
-			remoteInfo = Dip;
+			remoteGlobalIDString = 0903B3571C161543002241C1;
+			remoteInfo = "Dip-OSX";
+		};
+		0903B3831C1615EC002241C1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 094526881BEA1CFF0034E72A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0903B3771C1615EC002241C1;
+			remoteInfo = "Dip-iOS";
+		};
+		0903B3B11C1618AF002241C1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 094526881BEA1CFF0034E72A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0903B3A51C1618AF002241C1;
+			remoteInfo = "Dip-tvOS";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		094526911BEA1CFF0034E72A /* Dip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		094526941BEA1CFF0034E72A /* Dip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dip.h; sourceTree = "<group>"; };
-		094526961BEA1CFF0034E72A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0945269B1BEA1CFF0034E72A /* DipTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DipTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		094526A01BEA1CFF0034E72A /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DipTests.swift; sourceTree = "<group>"; };
-		094526A21BEA1CFF0034E72A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		094526AB1BEA1D200034E72A /* Dip.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Dip.swift; sourceTree = "<group>"; };
-		094526B31BEA51540034E72A /* RuntimeArguments.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = RuntimeArguments.swift; sourceTree = "<group>"; tabWidth = 2; };
-		094526B51BEA520B0034E72A /* Definition.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 2; lastKnownFileType = sourcecode.swift; path = Definition.swift; sourceTree = "<group>"; tabWidth = 2; };
-		094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
-		0989323E1BEBC8CD00ACDA2B /* ComponentScopeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentScopeTests.swift; sourceTree = "<group>"; };
-		098A740C1C0C5CBC005C1296 /* DefinitionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DefinitionTests.swift; sourceTree = "<group>"; };
+		0903B3581C161543002241C1 /* Dip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0903B3611C161543002241C1 /* Dip-OSXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dip-OSXTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0903B3781C1615EC002241C1 /* Dip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0903B3811C1615EC002241C1 /* Dip-iOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dip-iOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0903B3A61C1618AF002241C1 /* Dip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0903B3AF1C1618AF002241C1 /* Dip-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Dip-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0903B4041C162862002241C1 /* Dip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Dip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0919F4C81C16417000DC3B10 /* Definition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Definition.swift; sourceTree = "<group>"; };
+		0919F4C91C16417000DC3B10 /* Dip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dip.h; sourceTree = "<group>"; };
+		0919F4CA1C16417000DC3B10 /* Dip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dip.swift; sourceTree = "<group>"; };
+		0919F4CB1C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeArguments.swift; sourceTree = "<group>"; };
+		0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentScopeTests.swift; sourceTree = "<group>"; };
+		0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionTests.swift; sourceTree = "<group>"; };
+		0919F4D01C16417000DC3B10 /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DipTests.swift; sourceTree = "<group>"; };
+		0919F4D11C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		0945268D1BEA1CFF0034E72A /* Frameworks */ = {
+		0903B3541C161543002241C1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		094526981BEA1CFF0034E72A /* Frameworks */ = {
+		0903B35E1C161543002241C1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0945269C1BEA1CFF0034E72A /* Dip.framework in Frameworks */,
+				0903B3621C161544002241C1 /* Dip.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3741C1615EC002241C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B37E1C1615EC002241C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0903B3821C1615EC002241C1 /* Dip.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3A21C1618AF002241C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3AC1C1618AF002241C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0903B3B01C1618AF002241C1 /* Dip.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B4001C162862002241C1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0919F4C71C16417000DC3B10 /* Dip */ = {
+			isa = PBXGroup;
+			children = (
+				0919F4C91C16417000DC3B10 /* Dip.h */,
+				0919F4CA1C16417000DC3B10 /* Dip.swift */,
+				0919F4C81C16417000DC3B10 /* Definition.swift */,
+				0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */,
+				0919F4CB1C16417000DC3B10 /* Info.plist */,
+			);
+			path = Dip;
+			sourceTree = "<group>";
+		};
+		0919F4CD1C16417000DC3B10 /* DipTests */ = {
+			isa = PBXGroup;
+			children = (
+				0919F4D01C16417000DC3B10 /* DipTests.swift */,
+				0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */,
+				0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */,
+				0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */,
+				0919F4D11C16417000DC3B10 /* Info.plist */,
+			);
+			path = DipTests;
+			sourceTree = "<group>";
+		};
 		094526871BEA1CFF0034E72A = {
 			isa = PBXGroup;
 			children = (
-				094526931BEA1CFF0034E72A /* Dip */,
-				0945269F1BEA1CFF0034E72A /* DipTests */,
+				0919F4C71C16417000DC3B10 /* Dip */,
+				0919F4CD1C16417000DC3B10 /* DipTests */,
 				094526921BEA1CFF0034E72A /* Products */,
 			);
 			indentWidth = 2;
@@ -76,85 +178,180 @@
 		094526921BEA1CFF0034E72A /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				094526911BEA1CFF0034E72A /* Dip.framework */,
-				0945269B1BEA1CFF0034E72A /* DipTests.xctest */,
+				0903B3581C161543002241C1 /* Dip.framework */,
+				0903B3611C161543002241C1 /* Dip-OSXTests.xctest */,
+				0903B3781C1615EC002241C1 /* Dip.framework */,
+				0903B3811C1615EC002241C1 /* Dip-iOSTests.xctest */,
+				0903B3A61C1618AF002241C1 /* Dip.framework */,
+				0903B3AF1C1618AF002241C1 /* Dip-tvOSTests.xctest */,
+				0903B4041C162862002241C1 /* Dip.framework */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		094526931BEA1CFF0034E72A /* Dip */ = {
-			isa = PBXGroup;
-			children = (
-				094526941BEA1CFF0034E72A /* Dip.h */,
-				094526AB1BEA1D200034E72A /* Dip.swift */,
-				094526B31BEA51540034E72A /* RuntimeArguments.swift */,
-				094526B51BEA520B0034E72A /* Definition.swift */,
-				094526961BEA1CFF0034E72A /* Info.plist */,
-			);
-			path = Dip;
-			sourceTree = "<group>";
-		};
-		0945269F1BEA1CFF0034E72A /* DipTests */ = {
-			isa = PBXGroup;
-			children = (
-				094526A01BEA1CFF0034E72A /* DipTests.swift */,
-				094526B71BEA536A0034E72A /* RuntimeArgumentsTests.swift */,
-				0989323E1BEBC8CD00ACDA2B /* ComponentScopeTests.swift */,
-				098A740C1C0C5CBC005C1296 /* DefinitionTests.swift */,
-				094526A21BEA1CFF0034E72A /* Info.plist */,
-			);
-			path = DipTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		0945268E1BEA1CFF0034E72A /* Headers */ = {
+		0903B3551C161543002241C1 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				094526951BEA1CFF0034E72A /* Dip.h in Headers */,
+				0919F4D31C16417B00DC3B10 /* Dip.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3751C1615EC002241C1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4D71C16417C00DC3B10 /* Dip.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3A31C1618AF002241C1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4DB1C16417D00DC3B10 /* Dip.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B4011C162862002241C1 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4DF1C16417E00DC3B10 /* Dip.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		094526901BEA1CFF0034E72A /* Dip */ = {
+		0903B3571C161543002241C1 /* Dip-OSX */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 094526A51BEA1CFF0034E72A /* Build configuration list for PBXNativeTarget "Dip" */;
+			buildConfigurationList = 0903B36D1C161544002241C1 /* Build configuration list for PBXNativeTarget "Dip-OSX" */;
 			buildPhases = (
-				0945268C1BEA1CFF0034E72A /* Sources */,
-				0945268D1BEA1CFF0034E72A /* Frameworks */,
-				0945268E1BEA1CFF0034E72A /* Headers */,
-				0945268F1BEA1CFF0034E72A /* Resources */,
+				0903B3531C161543002241C1 /* Sources */,
+				0903B3541C161543002241C1 /* Frameworks */,
+				0903B3551C161543002241C1 /* Headers */,
+				0903B3561C161543002241C1 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Dip;
-			productName = Dip;
-			productReference = 094526911BEA1CFF0034E72A /* Dip.framework */;
+			name = "Dip-OSX";
+			productName = "Dip-OSX";
+			productReference = 0903B3581C161543002241C1 /* Dip.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		0945269A1BEA1CFF0034E72A /* DipTests */ = {
+		0903B3601C161543002241C1 /* Dip-OSXTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 094526A81BEA1CFF0034E72A /* Build configuration list for PBXNativeTarget "DipTests" */;
+			buildConfigurationList = 0903B36E1C161544002241C1 /* Build configuration list for PBXNativeTarget "Dip-OSXTests" */;
 			buildPhases = (
-				094526971BEA1CFF0034E72A /* Sources */,
-				094526981BEA1CFF0034E72A /* Frameworks */,
-				094526991BEA1CFF0034E72A /* Resources */,
+				0903B35D1C161543002241C1 /* Sources */,
+				0903B35E1C161543002241C1 /* Frameworks */,
+				0903B35F1C161543002241C1 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				0945269E1BEA1CFF0034E72A /* PBXTargetDependency */,
+				0903B3641C161544002241C1 /* PBXTargetDependency */,
 			);
-			name = DipTests;
-			productName = DipTests;
-			productReference = 0945269B1BEA1CFF0034E72A /* DipTests.xctest */;
+			name = "Dip-OSXTests";
+			productName = "Dip-OSXTests";
+			productReference = 0903B3611C161543002241C1 /* Dip-OSXTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0903B3771C1615EC002241C1 /* Dip-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0903B3891C1615EC002241C1 /* Build configuration list for PBXNativeTarget "Dip-iOS" */;
+			buildPhases = (
+				0903B3731C1615EC002241C1 /* Sources */,
+				0903B3741C1615EC002241C1 /* Frameworks */,
+				0903B3751C1615EC002241C1 /* Headers */,
+				0903B3761C1615EC002241C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Dip-iOS";
+			productName = "Dip-iOS";
+			productReference = 0903B3781C1615EC002241C1 /* Dip.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		0903B3801C1615EC002241C1 /* Dip-iOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0903B38C1C1615EC002241C1 /* Build configuration list for PBXNativeTarget "Dip-iOSTests" */;
+			buildPhases = (
+				0903B37D1C1615EC002241C1 /* Sources */,
+				0903B37E1C1615EC002241C1 /* Frameworks */,
+				0903B37F1C1615EC002241C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0903B3841C1615EC002241C1 /* PBXTargetDependency */,
+			);
+			name = "Dip-iOSTests";
+			productName = "Dip-iOSTests";
+			productReference = 0903B3811C1615EC002241C1 /* Dip-iOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0903B3A51C1618AF002241C1 /* Dip-tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0903B3B71C1618AF002241C1 /* Build configuration list for PBXNativeTarget "Dip-tvOS" */;
+			buildPhases = (
+				0903B3A11C1618AF002241C1 /* Sources */,
+				0903B3A21C1618AF002241C1 /* Frameworks */,
+				0903B3A31C1618AF002241C1 /* Headers */,
+				0903B3A41C1618AF002241C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Dip-tvOS";
+			productName = "Dip-tvOS";
+			productReference = 0903B3A61C1618AF002241C1 /* Dip.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		0903B3AE1C1618AF002241C1 /* Dip-tvOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0903B3BA1C1618AF002241C1 /* Build configuration list for PBXNativeTarget "Dip-tvOSTests" */;
+			buildPhases = (
+				0903B3AB1C1618AF002241C1 /* Sources */,
+				0903B3AC1C1618AF002241C1 /* Frameworks */,
+				0903B3AD1C1618AF002241C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0903B3B21C1618AF002241C1 /* PBXTargetDependency */,
+			);
+			name = "Dip-tvOSTests";
+			productName = "Dip-tvOSTests";
+			productReference = 0903B3AF1C1618AF002241C1 /* Dip-tvOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		0903B4031C162862002241C1 /* Dip-watchOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0903B4091C162862002241C1 /* Build configuration list for PBXNativeTarget "Dip-watchOS" */;
+			buildPhases = (
+				0903B3FF1C162862002241C1 /* Sources */,
+				0903B4001C162862002241C1 /* Frameworks */,
+				0903B4011C162862002241C1 /* Headers */,
+				0903B4021C162862002241C1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Dip-watchOS";
+			productName = "Dip-watchOS";
+			productReference = 0903B4041C162862002241C1 /* Dip.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 /* End PBXNativeTarget section */
 
@@ -166,11 +363,31 @@
 				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = AliSoftware;
 				TargetAttributes = {
-					094526901BEA1CFF0034E72A = {
-						CreatedOnToolsVersion = 7.1;
+					0903B3571C161543002241C1 = {
+						CreatedOnToolsVersion = 7.1.1;
 					};
-					0945269A1BEA1CFF0034E72A = {
-						CreatedOnToolsVersion = 7.1;
+					0903B3601C161543002241C1 = {
+						CreatedOnToolsVersion = 7.1.1;
+					};
+					0903B3771C1615EC002241C1 = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = 87BXKFRW6K;
+					};
+					0903B3801C1615EC002241C1 = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = 87BXKFRW6K;
+					};
+					0903B3A51C1618AF002241C1 = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = 87BXKFRW6K;
+					};
+					0903B3AE1C1618AF002241C1 = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = 87BXKFRW6K;
+					};
+					0903B4031C162862002241C1 = {
+						CreatedOnToolsVersion = 7.1.1;
+						DevelopmentTeam = 87BXKFRW6K;
 					};
 				};
 			};
@@ -186,21 +403,61 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				094526901BEA1CFF0034E72A /* Dip */,
-				0945269A1BEA1CFF0034E72A /* DipTests */,
+				0903B3571C161543002241C1 /* Dip-OSX */,
+				0903B3601C161543002241C1 /* Dip-OSXTests */,
+				0903B3771C1615EC002241C1 /* Dip-iOS */,
+				0903B3801C1615EC002241C1 /* Dip-iOSTests */,
+				0903B3A51C1618AF002241C1 /* Dip-tvOS */,
+				0903B3AE1C1618AF002241C1 /* Dip-tvOSTests */,
+				0903B4031C162862002241C1 /* Dip-watchOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		0945268F1BEA1CFF0034E72A /* Resources */ = {
+		0903B3561C161543002241C1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		094526991BEA1CFF0034E72A /* Resources */ = {
+		0903B35F1C161543002241C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3761C1615EC002241C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B37F1C1615EC002241C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3A41C1618AF002241C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3AD1C1618AF002241C1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B4021C162862002241C1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -210,38 +467,333 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		0945268C1BEA1CFF0034E72A /* Sources */ = {
+		0903B3531C161543002241C1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				094526AC1BEA1D200034E72A /* Dip.swift in Sources */,
-				094526B61BEA520B0034E72A /* Definition.swift in Sources */,
-				094526B41BEA51540034E72A /* RuntimeArguments.swift in Sources */,
+				0919F4D51C16417B00DC3B10 /* Definition.swift in Sources */,
+				0919F4D41C16417B00DC3B10 /* Dip.swift in Sources */,
+				0919F4D61C16417B00DC3B10 /* RuntimeArguments.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		094526971BEA1CFF0034E72A /* Sources */ = {
+		0903B35D1C161543002241C1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				098A740D1C0C5CBC005C1296 /* DefinitionTests.swift in Sources */,
-				094526A11BEA1CFF0034E72A /* DipTests.swift in Sources */,
-				0989323F1BEBC8CD00ACDA2B /* ComponentScopeTests.swift in Sources */,
-				094526B81BEA536A0034E72A /* RuntimeArgumentsTests.swift in Sources */,
+				0919F4E61C16419300DC3B10 /* ComponentScopeTests.swift in Sources */,
+				0919F4E41C16419300DC3B10 /* DefinitionTests.swift in Sources */,
+				0919F4E31C16419300DC3B10 /* DipTests.swift in Sources */,
+				0919F4E51C16419300DC3B10 /* RuntimeArgumentsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3731C1615EC002241C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4D91C16417C00DC3B10 /* Definition.swift in Sources */,
+				0919F4D81C16417C00DC3B10 /* Dip.swift in Sources */,
+				0919F4DA1C16417C00DC3B10 /* RuntimeArguments.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B37D1C1615EC002241C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4EA1C16419400DC3B10 /* ComponentScopeTests.swift in Sources */,
+				0919F4E81C16419400DC3B10 /* DefinitionTests.swift in Sources */,
+				0919F4E71C16419400DC3B10 /* DipTests.swift in Sources */,
+				0919F4E91C16419400DC3B10 /* RuntimeArgumentsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3A11C1618AF002241C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4DD1C16417D00DC3B10 /* Definition.swift in Sources */,
+				0919F4DC1C16417D00DC3B10 /* Dip.swift in Sources */,
+				0919F4DE1C16417D00DC3B10 /* RuntimeArguments.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3AB1C1618AF002241C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4EE1C16419500DC3B10 /* ComponentScopeTests.swift in Sources */,
+				0919F4EC1C16419500DC3B10 /* DefinitionTests.swift in Sources */,
+				0919F4EB1C16419500DC3B10 /* DipTests.swift in Sources */,
+				0919F4ED1C16419500DC3B10 /* RuntimeArgumentsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0903B3FF1C162862002241C1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0919F4E11C16417E00DC3B10 /* Definition.swift in Sources */,
+				0919F4E01C16417E00DC3B10 /* Dip.swift in Sources */,
+				0919F4E21C16417E00DC3B10 /* RuntimeArguments.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		0945269E1BEA1CFF0034E72A /* PBXTargetDependency */ = {
+		0903B3641C161544002241C1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 094526901BEA1CFF0034E72A /* Dip */;
-			targetProxy = 0945269D1BEA1CFF0034E72A /* PBXContainerItemProxy */;
+			target = 0903B3571C161543002241C1 /* Dip-OSX */;
+			targetProxy = 0903B3631C161544002241C1 /* PBXContainerItemProxy */;
+		};
+		0903B3841C1615EC002241C1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0903B3771C1615EC002241C1 /* Dip-iOS */;
+			targetProxy = 0903B3831C1615EC002241C1 /* PBXContainerItemProxy */;
+		};
+		0903B3B21C1618AF002241C1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0903B3A51C1618AF002241C1 /* Dip-tvOS */;
+			targetProxy = 0903B3B11C1618AF002241C1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		0903B3691C161544002241C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3.1.0;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					"iOS=1",
+				);
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-OSX";
+				PRODUCT_NAME = Dip;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		0903B36A1C161544002241C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 3.1.0;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_VERSION = A;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-OSX";
+				PRODUCT_NAME = Dip;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		0903B36B1C161544002241C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = DipTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-OSXTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		0903B36C1C161544002241C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				"CODE_SIGN_IDENTITY[sdk=*]" = "";
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = DipTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-OSXTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		0903B38A1C1615EC002241C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 3.1.0;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-iOS";
+				PRODUCT_NAME = Dip;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		0903B38B1C1615EC002241C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 3.1.0;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-iOS";
+				PRODUCT_NAME = Dip;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		0903B38D1C1615EC002241C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = DipTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		0903B38E1C1615EC002241C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = DipTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-iOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		0903B3B81C1618AF002241C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 3.1.0;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-tvOS";
+				PRODUCT_NAME = Dip;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		0903B3B91C1618AF002241C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 3.1.0;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-tvOS";
+				PRODUCT_NAME = Dip;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
+		0903B3BB1C1618AF002241C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = DipTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-tvOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Debug;
+		};
+		0903B3BC1C1618AF002241C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				INFOPLIST_FILE = DipTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-tvOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+			};
+			name = Release;
+		};
+		0903B40A1C162862002241C1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-watchOS";
+				PRODUCT_NAME = Dip;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+			};
+			name = Debug;
+		};
+		0903B40B1C162862002241C1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-watchOS";
+				PRODUCT_NAME = Dip;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
+			};
+			name = Release;
+		};
 		094526A31BEA1CFF0034E72A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -279,6 +831,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Dip/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -321,6 +874,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Dip/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
@@ -331,89 +885,77 @@
 			};
 			name = Release;
 		};
-		094526A61BEA1CFF0034E72A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Dip/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-			};
-			name = Debug;
-		};
-		094526A71BEA1CFF0034E72A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = Dip/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
-		094526A91BEA1CFF0034E72A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				INFOPLIST_FILE = DipTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.DipTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Debug;
-		};
-		094526AA1BEA1CFF0034E72A /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				INFOPLIST_FILE = DipTests/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.DipTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0903B36D1C161544002241C1 /* Build configuration list for PBXNativeTarget "Dip-OSX" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0903B3691C161544002241C1 /* Debug */,
+				0903B36A1C161544002241C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0903B36E1C161544002241C1 /* Build configuration list for PBXNativeTarget "Dip-OSXTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0903B36B1C161544002241C1 /* Debug */,
+				0903B36C1C161544002241C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0903B3891C1615EC002241C1 /* Build configuration list for PBXNativeTarget "Dip-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0903B38A1C1615EC002241C1 /* Debug */,
+				0903B38B1C1615EC002241C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0903B38C1C1615EC002241C1 /* Build configuration list for PBXNativeTarget "Dip-iOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0903B38D1C1615EC002241C1 /* Debug */,
+				0903B38E1C1615EC002241C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0903B3B71C1618AF002241C1 /* Build configuration list for PBXNativeTarget "Dip-tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0903B3B81C1618AF002241C1 /* Debug */,
+				0903B3B91C1618AF002241C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0903B3BA1C1618AF002241C1 /* Build configuration list for PBXNativeTarget "Dip-tvOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0903B3BB1C1618AF002241C1 /* Debug */,
+				0903B3BC1C1618AF002241C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0903B4091C162862002241C1 /* Build configuration list for PBXNativeTarget "Dip-watchOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0903B40A1C162862002241C1 /* Debug */,
+				0903B40B1C162862002241C1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		0945268B1BEA1CFF0034E72A /* Build configuration list for PBXProject "Dip" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				094526A31BEA1CFF0034E72A /* Debug */,
 				094526A41BEA1CFF0034E72A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		094526A51BEA1CFF0034E72A /* Build configuration list for PBXNativeTarget "Dip" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				094526A61BEA1CFF0034E72A /* Debug */,
-				094526A71BEA1CFF0034E72A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		094526A81BEA1CFF0034E72A /* Build configuration list for PBXNativeTarget "DipTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				094526A91BEA1CFF0034E72A /* Debug */,
-				094526AA1BEA1CFF0034E72A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
