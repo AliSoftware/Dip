@@ -13,6 +13,9 @@
 * All `resolve` methods now can throw error if type can not be resolved.  
   [#15](https://github.com/AliSoftware/Dip/issues/15), [@ilyapuchka](https://github.com/ilyapuchka)
 * `DependencyContainer` is marked as `final`.
+* Added supprot for OSX, tvOS and watchOS2.  
+[#26](https://github.com/AliSoftware/Dip/pull/26), [@ilyapuchka](https://github.com/ilyapuchka)
+
 
 #### Breaking Changes
 
