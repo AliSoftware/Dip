@@ -371,23 +371,18 @@
 					};
 					0903B3771C1615EC002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = 87BXKFRW6K;
 					};
 					0903B3801C1615EC002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = 87BXKFRW6K;
 					};
 					0903B3A51C1618AF002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = 87BXKFRW6K;
 					};
 					0903B3AE1C1618AF002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = 87BXKFRW6K;
 					};
 					0903B4031C162862002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
-						DevelopmentTeam = 87BXKFRW6K;
 					};
 				};
 			};
@@ -639,6 +634,7 @@
 		0903B38A1C1615EC002241C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 3.1.0;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -656,6 +652,7 @@
 		0903B38B1C1615EC002241C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 3.1.0;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -695,6 +692,7 @@
 		0903B3B81C1618AF002241C1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 3.1.0;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -714,6 +712,7 @@
 		0903B3B91C1618AF002241C1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 3.1.0;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
