@@ -16,4 +16,4 @@ script:
 - set -o pipefail && xcodebuild -workspace Dip.xcworkspace -scheme Dip-watchOS -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch - 38mm,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty - c
 - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme DipSampleApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
 - pod lib lint --quick
-
+- carthage build --no-skip-current
