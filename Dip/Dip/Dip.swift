@@ -301,10 +301,10 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
   }
 }
 
-enum DipError: ErrorType, CustomStringConvertible {
+public enum DipError: ErrorType, CustomStringConvertible {
   case DefinitionNotFound(DefinitionKey)
   
-  var description: String {
+  public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
       return "No definition registered for \(key). Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`."

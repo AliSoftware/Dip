@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Develop
+## 4.0.0
 
 #### New Features
 
@@ -22,6 +22,20 @@
 * Removed container thread-safety to enable recursion calls to `resolve`.  
   **Access to container from multiple threads should be handled by clients** from now on.
 * All `resolve` methods now can throw.
+
+	### Note on migration from 3.x to 4.0.0:
+	* Errors
+
+	In 4.0.0 each `resolve` method can throw `DefinitionNotFound(DefinitionKey)` error, so you need to call it using `try!` or `try?`, or catch the error if it's appropriate for your case. See [#15](https://github.com/AliSoftware/Dip/issues/15) for rationale of this change.
+	
+	* Thread safety
+
+	In 4.0.0 `DependencyContainer` drops any guarantee of thread safety. From now on code that uses Dip must ensure that it's methods are called from a single thread. For example if you have registered type as a singleton and later two threads try to resolve it at the same time you can have two different instances of type instead of one as expected. This change was required to enable recursive calls of `resolve` method to resolve circular dependencies.
+	
+	* Removed methods
+
+	Methods deprecated in 3.1.0 are now removed.
+
 
 ## 3.1.0
 

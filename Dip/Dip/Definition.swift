@@ -23,21 +23,21 @@
 //
 
 ///Internal representation of a key used to associate definitons and factories by tag, type and factory.
-struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
-  var protocolType: Any.Type
-  var factoryType: Any.Type
-  var associatedTag: DependencyContainer.Tag?
+public struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
+  private(set) public var protocolType: Any.Type
+  private(set) public var factoryType: Any.Type
+  private(set) public var associatedTag: DependencyContainer.Tag?
   
-  var hashValue: Int {
+  public var hashValue: Int {
     return "\(protocolType)-\(factoryType)-\(associatedTag)".hashValue
   }
   
-  var description: String {
+  public var description: String {
     return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag)"
   }
 }
 
-func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
+public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
     lhs.protocolType == rhs.protocolType &&
       lhs.factoryType == rhs.factoryType &&
