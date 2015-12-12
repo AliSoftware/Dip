@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "094526901BEA1CFF0034E72A"
+               BlueprintIdentifier = "0903B4031C162862002241C1"
                BuildableName = "Dip.framework"
-               BlueprintName = "Dip"
+               BlueprintName = "Dip-watchOS"
                ReferencedContainer = "container:Dip.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -26,29 +26,9 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0945269A1BEA1CFF0034E72A"
-               BuildableName = "DipTests.xctest"
-               BlueprintName = "DipTests"
-               ReferencedContainer = "container:Dip.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "094526901BEA1CFF0034E72A"
-            BuildableName = "Dip.framework"
-            BlueprintName = "Dip"
-            ReferencedContainer = "container:Dip.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
@@ -65,9 +45,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "094526901BEA1CFF0034E72A"
+            BlueprintIdentifier = "0903B4031C162862002241C1"
             BuildableName = "Dip.framework"
-            BlueprintName = "Dip"
+            BlueprintName = "Dip-watchOS"
             ReferencedContainer = "container:Dip.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -83,9 +63,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "094526901BEA1CFF0034E72A"
+            BlueprintIdentifier = "0903B4031C162862002241C1"
             BuildableName = "Dip.framework"
-            BlueprintName = "Dip"
+            BlueprintName = "Dip-watchOS"
             ReferencedContainer = "container:Dip.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
