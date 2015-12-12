@@ -30,7 +30,7 @@
 	
 	* Thread safety
 
-	In 4.0.0 `DependencyContainer` drops any gauaranty of thread safety. From now on code that uses Dip must ensure that it's methods are called from a single thread. For example if you have registered type as a singleton and later two threads try to resolve it at the same time you can have two different instances of type instead of one as expected.
+	In 4.0.0 `DependencyContainer` drops any gauarantee of thread safety. From now on code that uses Dip must ensure that it's methods are called from a single thread. For example if you have registered type as a singleton and later two threads try to resolve it at the same time you can have two different instances of type instead of one as expected. This change was required to enable recursive calls of `resolve` method to resolve circular dependencies.
 	
 	* Removed methods
 
