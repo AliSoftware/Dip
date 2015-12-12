@@ -183,6 +183,13 @@ More infromation about circular dependencies you can find in a playground.
 _Dip_ does not provide thread safety, so you need to make sure you always call `resolve` method of `DependencyContainer` from the single thread. 
 Otherwise if two threads try to resolve the same type they can get different instances where the same instance is expected.
 
+### Errors
+Resolve operation is potentially dangerous cause you can use the wrong type, factory or a wrong tag. For that reason Dip throws an error
+ `DefinitionNotFond(DefinitionKey)` if it failed to resolve type. When calling `resolve` you need to use `try` operator. 
+ There are rare use cases where your application can recover from this kind of errors (for example you can register new types 
+ when user unlocks some content). In most of the cases you can use `try!` to casue an exception at runtime if error was thrown
+  or `try?` if it is appropriate in your case to have `nil`. This way `try!` surves as an additional mark for developers that resolution can fail.
+
 ### Concrete Example
 
 Somewhere in your App target, register the dependencies:
