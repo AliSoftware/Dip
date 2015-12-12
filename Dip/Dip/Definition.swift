@@ -22,24 +22,22 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-
 ///Internal representation of a key used to associate definitons and factories by tag, type and factory.
-struct DefinitionKey : Hashable, Equatable, CustomDebugStringConvertible {
-  var protocolType: Any.Type
-  var factoryType: Any.Type
-  var associatedTag: DependencyContainer.Tag?
+public struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
+  private(set) public var protocolType: Any.Type
+  private(set) public var factoryType: Any.Type
+  private(set) public var associatedTag: DependencyContainer.Tag?
   
-  var hashValue: Int {
+  public var hashValue: Int {
     return "\(protocolType)-\(factoryType)-\(associatedTag)".hashValue
   }
   
-  var debugDescription: String {
+  public var description: String {
     return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag)"
   }
 }
 
-func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
+public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
     lhs.protocolType == rhs.protocolType &&
       lhs.factoryType == rhs.factoryType &&
@@ -50,20 +48,62 @@ func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
 public enum ComponentScope {
   /// Indicates that a new instance of the component will be created each time it's resolved.
   case Prototype
+  /// Indicates that instances will be reused during resolve but will be discurded when topmost `resolve` method returns.
+  case ObjectGraph
   /// Indicates that resolved component should be retained by container and always reused.
   case Singleton
 }
 
-///Definition of type T describes how instances of this type should be created when they are resolved by container.
-public final class DefinitionOf<T>: Definition {
-  let factory: Any
-  let scope: ComponentScope
+/**
+ Definition of type T describes how instances of this type should be created when this type is resolved by container.
+ 
+ - Generic parameter `T` is the type of the instance to resolve 
+ - Generic parameter `F` is the type of block-factory that creates an instance of T.
+ 
+ For example `DefinitionOf<Service,(String)->Service>` is the type of definition that during resolution will produce instance of type `Service` using closure that accepts `String` argument.
+*/
+public final class DefinitionOf<T, F>: Definition {
   
-  init(factory: Any, scope: ComponentScope = .Prototype) {
+  /**
+   Sets the block that will be used to resolve dependencies of the component. 
+   This block will be called before `resolve` returns.
+   
+   - parameter block: block to use to resolve dependencies
+   
+   - note:  
+   If you have circular dependencies at least one of them should use this block
+   to resolve it's dependencies. Otherwise code enter infinite loop.
+   
+   **Example**
+   
+   ```swift
+   container.register { ClientImp(service: container.resolve() as Service) as Client }
+
+   var definition = container.register { ServiceImp() as Service }
+   definition.resolveDependencies { container, service in
+      service.delegate = container.resolve() as Client
+   }
+   ```
+   
+   */
+  public func resolveDependencies(block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
+    guard resolveDependenciesBlock == nil else {
+      fatalError("You can not change resolveDependencies block after it was set.")
+    }
+    resolveDependenciesBlock = block
+    return self
+  }
+  
+  let factory: F
+  var scope: ComponentScope
+  var resolveDependenciesBlock: ((DependencyContainer, T) -> ())?
+  
+  init(factory: F, scope: ComponentScope) {
     self.factory = factory
     self.scope = scope
   }
   
+  ///Will be stored only if scope is `Singleton`
   var resolvedInstance: T? {
     get {
       guard scope == .Singleton else { return nil }
@@ -79,4 +119,10 @@ public final class DefinitionOf<T>: Definition {
 }
 
 ///Dummy protocol to store definitions for different types in collection
-protocol Definition {}
+protocol Definition: class {}
+
+extension DefinitionOf: CustomStringConvertible {
+  public var description: String {
+    return "type: \(T.self), factory: \(F.self), scope: \(scope), resolved instance: \(resolvedInstance)"
+  }
+}

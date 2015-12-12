@@ -61,7 +61,7 @@ The next paragraphs give you an overview of the Usage of _Dip_ directly, but if 
 First, create a `DependencyContainer` and use it to register instance factories with protocols, using those methods:
 
 * `register(.Singleton) { … }` will register a singleton instance with a given protocol.
-* `register(.Prototype) { … }` (or just `register { … }`) will register an instance factory which generates a new instance each time you `resolve()`.
+* `register(.Prototype) { … }` or `register(.ObjectGraph) { … }` will register an instance factory which generates a new instance each time you `resolve()`.
 * You need **cast the instance to the protocol type** you want to register it with (e.g. `register { PlistUsersProvider() as UsersListProviderType }`).
 
 Typically, to register your dependencies as early as possible in your app life-cycle, you will declare a `let dip: DependencyContainer = { … }()` somewhere (for example [in a dedicated `.swift` file](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/DependencyContainers.swift#L22-L27)). In your (non-hosted, standalone) unit tests, you'll probably [reset them in your `func setUp()`](https://github.com/AliSoftware/Dip/blob/master/Example/Tests/SWAPIPersonProviderTests.swift#L17-L21) instead.
@@ -73,14 +73,15 @@ Typically, to register your dependencies as early as possible in your app life-c
 
 ```swift
 container.register { ServiceImp() as Service }
-let service = container.resolve() as Service
+let service = try! container.resolve() as Service
 ```
 
 ### Scopes
 
-Dip provides two _scopes_ that you can use to register dependencies:
+Dip provides three _scopes_ that you can use to register dependencies:
 
 * The `.Prototype` scope will make the `DependencyContainer` resolve your type as __a new instance every time__ you call `resolve`. It's a default scope.
+* The `.ObjectGraph` scope is like `.Prototype` scope but it will make the `DependencyContainer` to reuse resolved instances during one call to `resolve` method. When this call returns all resolved insances will be discarded and next call to `resolve` will produce new instances. This scope should be used to resolve circular dependencies.
 * The `.Singleton` scope will make the `DependencyContainer` retain the instance once resolved the first time, and reuse it in the next calls to `resolve` during the container lifetime.
 
 
@@ -129,7 +130,7 @@ let wsDependencies = DependencyContainer() { dip in
     dip.register(tag: WebService.StashipWS.tag) { URLSessionNetworkLayer(baseURL: "http://dev.myapi.com/api/")! as NetworkLayer }
 }
 
-let networkLayer = dip.resolve(tag: WebService.PersonWS.tag) as NetworkLayer
+let networkLayer = try! dip.resolve(tag: WebService.PersonWS.tag) as NetworkLayer
 ```
 
 ### Runtime arguments
@@ -143,9 +144,9 @@ let webServices = DependencyContainer() { webServices in
 	webServices.register { (port: Int, url: NSURL?) in WebServiceImp3(url!, port: port) as WebServiceAPI }
 }
 
-let service1 = webServices.resolve(withArguments: NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1 is WebServiceImp1
-let service2 = webServices.resolve(withArguments: 80, NSURL(string: "http://example.url")!) as WebServiceAPI // service2 is WebServiceImp2
-let service3 = webServices.resolve(withArguments: 80, NSURL(string: "http://example.url")) as WebServiceAPI // service3 is WebServiceImp3
+let service1 = try! webServices.resolve(withArguments: NSURL(string: "http://example.url")!, 80) as WebServiceAPI // service1 is WebServiceImp1
+let service2 = try! webServices.resolve(withArguments: 80, NSURL(string: "http://example.url")!) as WebServiceAPI // service2 is WebServiceImp2
+let service3 = try! webServices.resolve(withArguments: 80, NSURL(string: "http://example.url")) as WebServiceAPI // service3 is WebServiceImp3
 
 ```
 Though Dip provides support for up to six runtime arguments out of the box you can extend this number using following code snippet for seven arguments:
@@ -155,11 +156,39 @@ func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag: Tag? = nil, scop
 	return registerFactory(tag, scope: .Prototype, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T)>
 }
 	
-func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) -> T {
-	return resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
+func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) throws -> T {
+	return try resolve(tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
 }
 
 ```
+
+### Circular dependencies
+
+_Dip_ supports circular dependencies. To resolve them use `ObjectGraph` scope and `resolveDependencies` method of `DefinitionOf` returned by `register` method.
+
+```swift
+container.register(.ObjectGraph) {
+    ClientImp(server: try! container.resolve() as Server) as Client 
+}
+
+container.register(.ObjectGraph) { ServerImp() as Server }
+    .resolveDependencies { container, server in 
+        server.client = try! container.resolve() as Client
+    }
+```
+More infromation about circular dependencies you can find in a playground.
+
+### Thread safety
+
+_Dip_ does not provide thread safety, so you need to make sure you always call `resolve` method of `DependencyContainer` from the single thread. 
+Otherwise if two threads try to resolve the same type they can get different instances where the same instance is expected.
+
+### Errors
+The resolve operation is potentially dangerous because you can use the wrong type, factory or a wrong tag. For that reason Dip throws an error
+ `DefinitionNotFond(DefinitionKey)` if it failed to resolve type. When calling `resolve` you need to use a `try` operator. 
+ There are rare use cases where your application can recover from this kind of errors (for example you can register new types 
+ when user unlocks some content). In most of the cases you can use `try!` to cause an exception at runtime if error was thrown
+  or `try?` if it is appropriate in your case to have `nil`. This way `try!` serves as an additional mark for developers that resolution can fail.
 
 ### Concrete Example
 
@@ -184,17 +213,17 @@ Then to use dependencies throughout your app, use `dip.resolve()`, like this:
 
 ```swift
 struct WebService {
-  let env: EnvironmentType = dip.resolve()
+  let env: EnvironmentType = try! dip.resolve()
   func sendRequest(path: String, …) {
     // ... use stuff like env.baseURL here
   }
 }
 
 struct SomeViewModel {
-  let ws: WebServiceType = dip.resolve()
+  let ws: WebServiceType = try! dip.resolve()
   var friendsProvider: FriendsProviderType
   init(userName: String) {
-    friendsProvider = dip.resolve(tag: userName, userName)
+    friendsProvider = try! dip.resolve(tag: userName, userName)
   }
   func foo() {
     ws.someMethodDeclaredOnWebServiceType()

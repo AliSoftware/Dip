@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-
 // MARK: - Register/resolve dependencies with runtime arguments
 
 extension DependencyContainer {
@@ -41,10 +39,10 @@ extension DependencyContainer {
           When you resolve it container will match the type and tag as well as __number__, __types__ and __order__
           of runtime arguments that you pass to `resolve` method.
   
-  - seealso: `register(tag:factory:scope:)`
+  - seealso: `registerFactory(tag:scope:factory:)`
   */
-  public func register<T, Arg1>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
+  public func register<T, Arg1>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1) -> T) -> DefinitionOf<T, (Arg1) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1) -> T>
   }
   
   /**
@@ -54,101 +52,66 @@ extension DependencyContainer {
    - parameter tag: The arbitrary tag to look for when resolving this protocol.
    - parameter arg1: First argument to be passed to factory
    
-   - seealso: `resolve(tag:)`
+   - seealso: `resolve(tag:builder:)`
    */
-  public func resolve<T, Arg1>(tag tag: Tag? = nil, withArguments arg1: Arg1) -> T {
-    return resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }
-  }
-  
-  ///**Deprecated** Use `resolve(tag:withArguments:)` method instead.
-  @available(*, deprecated, message="Use `resolve(tag:withArguments:)` method instead.")
-  public func resolve<T, Arg1>(tag tag: Tag? = nil, _ arg1: Arg1) -> T {
-    return resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }
+  public func resolve<T, Arg1>(tag tag: Tag? = nil, withArguments arg1: Arg1) throws -> T {
+    return try resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }
   }
   
   // MARK: 2 Runtime Arguments
   
   /// - seealso: `register(:factory:scope:)`
-  public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2) -> T) -> DefinitionOf<T, (Arg1, Arg2) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2) -> T>
   }
   
   /// - seealso: `resolve(tag:_:)`
-  public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
+  public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2) throws -> T {
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
   }
 
-  ///**Deprecated** Use `resolve(tag:withArguments:_:)` method instead.
-  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:)` method instead.")
-  public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
-  }
-  
   // MARK: 3 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3) -> T>
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
-  }
-
-  ///**Deprecated** Use `resolve(tag:withArguments:_:_:)` method instead.
-  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:)` method instead.")
-  public func resolve<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
+  public func resolve<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) throws -> T {
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
   }
   
   // MARK: 4 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) -> T>
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
+  public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) throws -> T {
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
   }
 
-  ///**Deprecated** Use `resolve(tag:withArguments:_:_:_:)` method instead.
-  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:_:)` method instead.")
-  public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
-  }
-  
   // MARK: 5 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) -> T>
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
+  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) throws -> T {
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
   }
 
-  ///**Deprecated** Use `resolve(tag:withArguments:_:_:_:_:)` method instead.
-  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:_:_:)` method instead.")
-  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
-  }
-  
   // MARK: 6 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T> {
-    return register(tag: tag, factory: factory, scope: scope) as DefinitionOf<T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T>
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
+  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) throws -> T {
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
   }
 
-  ///**Deprecated** Use `resolve(tag:withArguments:_:_:_:_:_:)` method instead.
-  @available(*, deprecated, message="Use `resolve(tag:withArguments:_:_:_:_:_:)` method instead.")
-  public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) -> T {
-    return resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
-  }
 }

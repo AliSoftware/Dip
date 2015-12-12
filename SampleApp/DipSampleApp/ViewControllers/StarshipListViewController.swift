@@ -14,7 +14,7 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var batchRequestID = 0
     
     private func provider(tag:Int?) -> StarshipProviderAPI {
-        return providerDependencies.resolve(tag: tag.flatMap { .Int($0) })
+        return try! providerDependencies.resolve(tag: tag.flatMap { .Int($0) })
     }
     
     func fetchIDs(completion: [Int] -> Void) {

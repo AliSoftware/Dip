@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "3.1.0"
+  s.version          = "4.0.0"
   s.summary          = "A simple Dependency Resolver: Dependency Injection using Protocol resolution."
 
   s.description      = <<-DESC
@@ -19,12 +19,16 @@ Pod::Spec.new do |s|
 
   s.homepage         = "https://github.com/AliSoftware/Dip"
   s.license          = 'MIT'
-  s.author           = { "Olivier Halligon" => "olivier@halligon.net" }
+  s.authors          = { "Olivier Halligon" => "olivier@halligon.net", "Ilya Puchka" => "ilya@puchka.me" }
   s.source           = { :git => "https://github.com/AliSoftware/Dip.git", :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/aligatr'
 
-  s.platform     = :ios, '8.0'
+  s.ios.deployment_target = '8.0'
+  s.osx.deployment_target = '10.9'
+  s.tvos.deployment_target = '9.0'
+  s.watchos.deployment_target = '2.0'
+
   s.requires_arc = true
 
-  s.source_files = 'Dip/Dip/**/*'
+  s.source_files = 'Dip/Dip/**/*.swift'
 end
