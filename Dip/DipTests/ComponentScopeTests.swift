@@ -25,6 +25,20 @@
 import XCTest
 @testable import Dip
 
+class Server {
+  weak var client: Client?
+  
+  init() {}
+}
+
+class Client {
+  var server: Server
+  
+  init(server: Server) {
+    self.server = server
+  }
+}
+
 class ComponentScopeTests: XCTestCase {
   
   let container = DependencyContainer()
@@ -74,20 +88,6 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
   }
   
-  class Server {
-    weak var client: Client?
-    
-    init() {}
-  }
-  
-  class Client {
-    var server: Server
-    
-    init(server: Server) {
-      self.server = server
-    }
-  }
-
   func testThatItReusesInstanceInObjectGraphScopeDuringResolve() {
     //given
     container.register(.ObjectGraph) { Client(server: try! self.container.resolve()) as Client }
