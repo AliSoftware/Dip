@@ -41,28 +41,33 @@ public final class DependencyContainer {
   }
   
   var definitions = [DefinitionKey : Definition]()
+  var lock: NSRecursiveLock?
   
   /**
    Designated initializer for a DependencyContainer
    
    - parameter configBlock: A configuration block in which you typically put all you `register` calls.
-   
+   - parameter isThreadSafe: If true instance is thread safe, if false not thread safe but
+       slight performance gain. Default is to be thread safe.
    - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
            It is only present for convenience to have a cleaner syntax when declaring and initializing
            your `DependencyContainer` instances.
    
    - returns: A new DependencyContainer.
    */
-  public init(@noescape configBlock: (DependencyContainer->()) = { _ in }) {
+  public init(isThreadSafe: Bool = true, @noescape configBlock: (DependencyContainer->()) = { _ in }) {
+    if isThreadSafe {
+      lock = NSRecursiveLock()
+    }
     configBlock(self)
   }
   
   // MARK: - Thread safety
   func threadSafe(closure: () -> Void) {
     
-    objc_sync_enter(self)
+    lock?.lock()
     defer {
-      objc_sync_exit(self)
+      lock?.unlock()
     }
     closure()
     
@@ -70,9 +75,9 @@ public final class DependencyContainer {
   
   func threadSafe<T>(closure: () -> T) -> T {
     
-    objc_sync_enter(self)
+    lock?.lock()
     defer {
-      objc_sync_exit(self)
+      lock?.unlock()
     }
     return closure()
     
