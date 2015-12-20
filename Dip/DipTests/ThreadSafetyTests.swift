@@ -36,11 +36,16 @@ class ThreadSafetyTests: XCTestCase {
   
   func testSingletonThreadSafety() {
     
-    container.register(.Singleton) { ServiceImp1() as Service }
-    
     let queue = NSOperationQueue()
     let lock = NSRecursiveLock()
     var resultSet = Set<ServiceImp1>()
+    
+    container.register() { ServiceImp2() as HashableService }
+    container.register(.Singleton) { ServiceImp1() as Service }.resolveDependencies {_,_ in
+      queue.addOperationWithBlock{ () -> Void in
+        let _ = try! self.container.resolve() as HashableService
+      }
+    }
     
     for _ in 1...100 {
       queue.addOperationWithBlock {
@@ -59,11 +64,16 @@ class ThreadSafetyTests: XCTestCase {
 
   func testFactoryThreadSafety() {
     
-    container.register() { ServiceImp1() as Service }
-    
     let queue = NSOperationQueue()
     let lock = NSRecursiveLock()
     var resultSet = Set<ServiceImp1>()
+    
+    container.register() { ServiceImp2() as HashableService }
+    container.register() { ServiceImp1() as Service }.resolveDependencies {_,_ in
+      queue.addOperationWithBlock{ () -> Void in
+        let _ = try! self.container.resolve() as HashableService
+      }
+    }
     
     for _ in 1...100 {
       queue.addOperationWithBlock {
@@ -81,70 +91,42 @@ class ThreadSafetyTests: XCTestCase {
   }
   
   func testCircularReferenceThreadSafety() {
-    //given
-    container.register(.ObjectGraph) { Client(server: try! self.container.resolve()) as Client }
+
+    let queue = NSOperationQueue()
+    let lock = NSLock()
+    
+    container.register() { ServiceImp1() as Service }
+
+    container.register(.ObjectGraph) {
+      Client(server: try! self.container.resolve()) as Client
+    }
     
     container.register(.ObjectGraph) { Server() as Server }.resolveDependencies { container, server in
       server.client = try! container.resolve() as Client
+      queue.addOperationWithBlock {
+        let _ = try! container.resolve() as Service
+      }
     }
 
-    let queue = NSOperationQueue()
+    var results = Array<Client>()
 
     for _ in 1...100 {
       queue.addOperationWithBlock {
         //when
         let client = try! self.container.resolve() as Client
 
-        //then
-        let server = client.server
-        XCTAssertTrue(server.client === client)
+        lock.lock()
+        results.append(client)
+        lock.unlock()
       }
     }
 
     queue.waitUntilAllOperationsAreFinished()
-  }
-  
-  func testThreadSafetyPerformance() {
-    container.register() { ServiceImp1() as Service }
 
-    measureBlock() {
-      for _ in 1...10000 {
-        let _ = try! self.container.resolve() as Service
-      }
+    for client in results {
+      let server = client.server
+      XCTAssertTrue(server.client === client)
     }
   }
   
-  func testNoThreadSafetyPerformance() {
-    let unsafeContainer = DependencyContainer(isThreadSafe:false)
-    unsafeContainer.register() { ServiceImp1() as Service }
-    
-    measureBlock() {
-      for _ in 1...10000 {
-        let _ = try! unsafeContainer.resolve() as Service
-      }
-    }
-  }
-  
-  func testNSRecursiveLockPerformance() {
-    
-    let lock = NSRecursiveLock()
-    
-    measureBlock() {
-      for _ in 1...1000000 {
-        lock.lock()
-        lock.unlock()
-      }
-    }
-  }
-  
-  func testObjcSyncEnterExitPerformance() {
-    
-    measureBlock() {
-      for _ in 1...1000000 {
-        objc_sync_enter(self)
-        objc_sync_exit(self)
-      }
-    }
-    
-  }
 }
