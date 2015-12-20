@@ -41,45 +41,40 @@ public final class DependencyContainer {
   }
   
   var definitions = [DefinitionKey : Definition]()
-  var lock: NSRecursiveLock?
+  let lock = NSRecursiveLock()
   
   /**
    Designated initializer for a DependencyContainer
    
    - parameter configBlock: A configuration block in which you typically put all you `register` calls.
-   - parameter isThreadSafe: If true instance is thread safe, if false not thread safe but
-       slight performance gain. Default is to be thread safe.
-   - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
+   - note: The `configBlock` is simply called at the end of the `init` to let you configure everything.
            It is only present for convenience to have a cleaner syntax when declaring and initializing
            your `DependencyContainer` instances.
    
    - returns: A new DependencyContainer.
    */
-  public init(isThreadSafe: Bool = true, @noescape configBlock: (DependencyContainer->()) = { _ in }) {
-    if isThreadSafe {
-      lock = NSRecursiveLock()
-    }
+  public init(@noescape configBlock: (DependencyContainer->()) = { _ in }) {
     configBlock(self)
   }
   
   // MARK: - Thread safety
-  func threadSafe(closure: () -> Void) {
+  private func threadSafe(closure: () -> Void) {
     
-    lock?.lock()
+    lock.lock()
     defer {
-      lock?.unlock()
+      lock.unlock()
     }
     closure()
     
   }
   
-  func threadSafe<T>(closure: () -> T) -> T {
+  private func threadSafe<T>(closure: () throws -> T) throws -> T {
     
-    lock?.lock()
+    lock.lock()
     defer {
-      lock?.unlock()
+      lock.unlock()
     }
-    return closure()
+    return try closure()
     
   }
   // MARK: - Reset all dependencies
@@ -88,7 +83,9 @@ public final class DependencyContainer {
   Clear all the previously registered dependencies on this container.
   */
   public func reset() {
-    definitions.removeAll()
+    threadSafe {
+      self.definitions.removeAll()
+    }
   }
   
   /**
@@ -220,41 +217,39 @@ public final class DependencyContainer {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
-    guard let definition = (threadSafe {
-      return (self.definitions[key] ?? self.definitions[nilTagKey])
-      }) as? DefinitionOf<T, F> else {
-        throw DipError.DefinitionNotFound(key)
+    return try threadSafe {
+      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
+          throw DipError.DefinitionNotFound(key)
+      }
+      
+      let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
+      return self._resolve(tag, key: usingKey, definition: definition, builder: builder)
     }
-    
-    let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
-    return _resolve(tag, key: usingKey, definition: definition, builder: builder)
   }
   
   /// Actually resolve dependency
   private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F->T) -> T {
     
-    return threadSafe {
-      return self.resolvedInstances.resolve {
+    return resolvedInstances.resolve {
+      
+      if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+        return previouslyResolved
+      }
+      else {
+        let resolvedInstance = builder(definition.factory)
         
-        if let previouslyResolved: T = self.resolvedInstances.previouslyResolved(key, definition: definition) {
+        //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
+        //when it returns instance that we try to resolve here can be already resolved
+        //so we return it, throwing away instance created by previous call to builder
+        if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
           return previouslyResolved
         }
-        else {
-          let resolvedInstance = builder(definition.factory)
-          
-          //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
-          //when it returns instance that we try to resolve here can be already resolved
-          //so we return it, throwing away instance created by previous call to builder
-          if let previouslyResolved: T = self.resolvedInstances.previouslyResolved(key, definition: definition) {
-            return previouslyResolved
-          }
-          
-          self.resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key)
-          definition.resolvedInstance = resolvedInstance
-          definition.resolveDependenciesBlock?(self, resolvedInstance)
-          
-          return resolvedInstance
-        }
+        
+        resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key)
+        definition.resolvedInstance = resolvedInstance
+        definition.resolveDependenciesBlock?(self, resolvedInstance)
+        
+        return resolvedInstance
       }
     }
   }
