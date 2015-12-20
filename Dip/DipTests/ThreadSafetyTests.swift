@@ -40,12 +40,7 @@ class ThreadSafetyTests: XCTestCase {
     let lock = NSRecursiveLock()
     var resultSet = Set<ServiceImp1>()
     
-    container.register() { ServiceImp2() as HashableService }
-    container.register(.Singleton) { ServiceImp1() as Service }.resolveDependencies {_,_ in
-      queue.addOperationWithBlock{ () -> Void in
-        let _ = try! self.container.resolve() as HashableService
-      }
-    }
+    container.register(.Singleton) { ServiceImp1() as Service }
     
     for _ in 1...100 {
       queue.addOperationWithBlock {
@@ -68,12 +63,7 @@ class ThreadSafetyTests: XCTestCase {
     let lock = NSRecursiveLock()
     var resultSet = Set<ServiceImp1>()
     
-    container.register() { ServiceImp2() as HashableService }
-    container.register() { ServiceImp1() as Service }.resolveDependencies {_,_ in
-      queue.addOperationWithBlock{ () -> Void in
-        let _ = try! self.container.resolve() as HashableService
-      }
-    }
+    container.register() { ServiceImp1() as Service }
     
     for _ in 1...100 {
       queue.addOperationWithBlock {
@@ -95,17 +85,16 @@ class ThreadSafetyTests: XCTestCase {
     let queue = NSOperationQueue()
     let lock = NSLock()
     
-    container.register() { ServiceImp1() as Service }
-
     container.register(.ObjectGraph) {
       Client(server: try! self.container.resolve()) as Client
     }
     
     container.register(.ObjectGraph) { Server() as Server }.resolveDependencies { container, server in
-      server.client = try! container.resolve() as Client
-      queue.addOperationWithBlock {
-        let _ = try! container.resolve() as Service
+      var client: Client?
+      dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+        client = try! container.resolve() as Client
       }
+      server.client = client!
     }
 
     var results = Array<Client>()
