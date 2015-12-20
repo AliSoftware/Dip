@@ -41,13 +41,13 @@ public final class DependencyContainer {
   }
   
   var definitions = [DefinitionKey : Definition]()
+  let lock = NSRecursiveLock()
   
   /**
    Designated initializer for a DependencyContainer
    
    - parameter configBlock: A configuration block in which you typically put all you `register` calls.
-   
-   - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
+   - note: The `configBlock` is simply called at the end of the `init` to let you configure everything.
            It is only present for convenience to have a cleaner syntax when declaring and initializing
            your `DependencyContainer` instances.
    
@@ -57,13 +57,35 @@ public final class DependencyContainer {
     configBlock(self)
   }
   
+  // MARK: - Thread safety
+  private func threadSafe(closure: () -> Void) {
+    
+    lock.lock()
+    defer {
+      lock.unlock()
+    }
+    closure()
+    
+  }
+  
+  private func threadSafe<T>(closure: () throws -> T) throws -> T {
+    
+    lock.lock()
+    defer {
+      lock.unlock()
+    }
+    return try closure()
+    
+  }
   // MARK: - Reset all dependencies
   
   /**
   Clear all the previously registered dependencies on this container.
   */
   public func reset() {
-    definitions.removeAll()
+    threadSafe {
+      self.definitions.removeAll()
+    }
   }
   
   /**
@@ -74,9 +96,10 @@ public final class DependencyContainer {
   */
   public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    definitions[key] = nil
+    threadSafe {
+      self.definitions[key] = nil
+    }
   }
-  
   // MARK: Register dependencies
   
   /**
@@ -125,7 +148,9 @@ public final class DependencyContainer {
   public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let definition = DefinitionOf<T, F>(factory: factory, scope: scope)
-    definitions[key] = definition
+    threadSafe {
+      self.definitions[key] = definition
+    }
     return definition
   }
   
@@ -138,7 +163,9 @@ public final class DependencyContainer {
    */
   public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    definitions[key] = definition
+    threadSafe {
+      self.definitions[key] = definition
+    }
   }
   
   // MARK: Resolve dependencies
@@ -190,12 +217,14 @@ public final class DependencyContainer {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
-    guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
-      throw DipError.DefinitionNotFound(key)
+    return try threadSafe {
+      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
+          throw DipError.DefinitionNotFound(key)
+      }
+      
+      let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
+      return self._resolve(tag, key: usingKey, definition: definition, builder: builder)
     }
-
-    let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
-    return _resolve(tag, key: usingKey, definition: definition, builder: builder)
   }
   
   /// Actually resolve dependency
@@ -222,9 +251,7 @@ public final class DependencyContainer {
         
         return resolvedInstance
       }
-      
     }
-    
   }
   
   // MARK: - Private
