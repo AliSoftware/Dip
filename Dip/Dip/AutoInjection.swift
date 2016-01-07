@@ -46,10 +46,6 @@ class ClientImp: Client {
 */
 public final class Injected<T>: _InjectedPropertyBox {
   
-  static var tag: DependencyContainer.Tag {
-    return .String("\(Injected<T>.self)")
-  }
-
   var _value: Any?
   
   public var value: T? {
@@ -101,10 +97,6 @@ public final class InjectedWeak<T>: _InjectedWeakPropertyBox {
   //so we just rely on user reading documentation and passing AnyObject in runtime
   //also we will throw fatal error if type can not be casted to AnyObject during resolution
 
-  static var tag: DependencyContainer.Tag {
-    return .String("\(InjectedWeak<T>.self)")
-  }
-
   weak var _value: AnyObject?
   
   public var value: T? {
@@ -150,7 +142,7 @@ extension DependencyContainer {
   public func resolveDependencies(instance: Any) {
     for child in Mirror(reflecting: instance).children {
       do {
-        try (child.value as? _AutoInjectedPropertyBox)?.resolve(self)
+        try (child.value as? _AnyInjectedPropertyBox)?.resolve(self)
       } catch {
         print(error)
       }
@@ -190,28 +182,38 @@ extension DependencyContainer {
 
 }
 
-protocol _AutoInjectedPropertyBox {
+protocol _AnyInjectedPropertyBox: class {
   func resolve(container: DependencyContainer) throws
   static var tag: DependencyContainer.Tag { get }
 }
 
-protocol _InjectedPropertyBox: class, _AutoInjectedPropertyBox {
+extension _AnyInjectedPropertyBox {
+  static var tag: DependencyContainer.Tag {
+    return .String(String(self))
+  }
+  
+  func _resolve<T>(container: DependencyContainer) throws -> T {
+    return try container.resolve(tag: self.dynamicType.tag) as T
+  }
+}
+
+protocol _InjectedPropertyBox: _AnyInjectedPropertyBox {
   var _value: Any? { get set }
 }
 
 extension _InjectedPropertyBox {
   func resolve(container: DependencyContainer) throws {
-    self._value = try container.resolve(tag: self.dynamicType.tag) as Any
+    self._value = try _resolve(container) as Any
   }
 }
 
-protocol _InjectedWeakPropertyBox: class, _AutoInjectedPropertyBox {
+protocol _InjectedWeakPropertyBox: _AnyInjectedPropertyBox {
   weak var _value: AnyObject? { get set }
 }
 
 extension _InjectedWeakPropertyBox {
   func resolve(container: DependencyContainer) throws {
-    self._value = try container.resolve(tag: self.dynamicType.tag) as AnyObject
+    self._value = try _resolve(container) as AnyObject
   }
 }
 
