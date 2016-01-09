@@ -121,7 +121,9 @@ extension DependencyContainer {
    
    - Note:
    Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
-   This will prevent retain cycle between resolved instances.
+   This will prevent a retain cycle between resolved instances.
+   
+   - Warning: If you resolve dependencies of the object created not by container and it has auto-injected circular dependency, container will be not able to resolve it correctly because container does not have this object in it's resolved instances stack. Thus it will create another instance of that type to satisfy circular dependency.
    
    **Example**:
    ```swift
@@ -134,7 +136,7 @@ extension DependencyContainer {
    }
    
    //when resolved client will have service injected
-   let client = container.resolve() as Client
+   let client = try! container.resolve() as Client
    
    ```
    

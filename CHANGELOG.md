@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Develop
+
+* Added auto-injection feature  
+  [#13](https://github.com/AliSoftware/Dip/pull/13), [@ilyapuchka](https://github.com/ilyapuchka)
+
 ## 4.0.0
 
 #### New Features

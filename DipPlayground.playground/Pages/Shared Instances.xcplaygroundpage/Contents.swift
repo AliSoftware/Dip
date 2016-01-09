@@ -158,6 +158,6 @@ If you want to know more about Dependency Injection in general we recomend you t
 
 */
 
-//: [Next: Testing](@next)
+//: [Next: Auto-Injection](@next)
 
 
