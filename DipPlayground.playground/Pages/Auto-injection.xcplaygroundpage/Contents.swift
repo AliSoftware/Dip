@@ -26,8 +26,8 @@ container.register() { LoggerImp() as Logger }
 
 container.register() { ServiceImp() as Service }
     .resolveDependencies { container, service in
-        service.logger = try! container.resolve() as Logger
-        service.tracker = try! container.resolve() as Tracker
+        service.logger = try container.resolve() as Logger
+        service.tracker = try container.resolve() as Tracker
 }
 
 let service = try! container.resolve() as Service
@@ -93,12 +93,12 @@ class ServerClientImp: ServerClient {
 }
 
 container.register(.ObjectGraph) {
-    ServerClientImp(server: try! container.resolve()) as ServerClient
+    ServerClientImp(server: try container.resolve()) as ServerClient
 }
 
 container.register(.ObjectGraph) { ServerImp() as Server }
     .resolveDependencies { container, server in
-        server.client = try! container.resolve() as ServerClient
+        server.client = try container.resolve() as ServerClient
 }
 
 let client = try! container.resolve() as ServerClient
