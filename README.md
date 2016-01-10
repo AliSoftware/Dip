@@ -171,12 +171,12 @@ _Dip_ supports circular dependencies. To resolve them use `ObjectGraph` scope an
 
 ```swift
 container.register(.ObjectGraph) {
-    ClientImp(server: try! container.resolve() as Server) as Client 
+    ClientImp(server: try container.resolve() as Server) as Client 
 }
 
 container.register(.ObjectGraph) { ServerImp() as Server }
     .resolveDependencies { container, server in 
-        server.client = try! container.resolve() as Client
+        server.client = try container.resolve() as Client
     }
 ```
 More infromation about circular dependencies you can find in a playground.

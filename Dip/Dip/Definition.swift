@@ -81,12 +81,12 @@ public final class DefinitionOf<T, F>: Definition {
 
    var definition = container.register { ServiceImp() as Service }
    definition.resolveDependencies { container, service in
-      service.delegate = container.resolve() as Client
+      service.delegate = try container.resolve() as Client
    }
    ```
    
    */
-  public func resolveDependencies(block: (DependencyContainer, T) -> ()) -> DefinitionOf<T, F> {
+  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf<T, F> {
     guard resolveDependenciesBlock == nil else {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
@@ -96,7 +96,7 @@ public final class DefinitionOf<T, F>: Definition {
   
   let factory: F
   var scope: ComponentScope
-  var resolveDependenciesBlock: ((DependencyContainer, T) -> ())?
+  var resolveDependenciesBlock: ((DependencyContainer, T) throws -> ())?
   
   init(factory: F, scope: ComponentScope) {
     self.factory = factory
