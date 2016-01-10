@@ -2,8 +2,10 @@
 
 ## Develop
 
-* Added auto-injection feature  
+* Added auto-injection feature.  
   [#13](https://github.com/AliSoftware/Dip/pull/13), [@ilyapuchka](https://github.com/ilyapuchka)
+* Factories and `resolveDependencies` blocks of `DefinitionOf` are now allowed to `throw`.  
+  [#32](https://github.com/AliSoftware/Dip/pull/13), [@ilyapuchka](https://github.com/ilyapuchka)
 
 ## 4.0.0
 
