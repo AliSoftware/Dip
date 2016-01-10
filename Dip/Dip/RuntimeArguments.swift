@@ -41,8 +41,8 @@ extension DependencyContainer {
   
   - seealso: `registerFactory(tag:scope:factory:)`
   */
-  public func register<T, Arg1>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1) -> T) -> DefinitionOf<T, (Arg1) -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1) -> T>
+  public func register<T, Arg1>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1) throws -> T) -> DefinitionOf<T, (Arg1) throws -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /**
@@ -55,63 +55,63 @@ extension DependencyContainer {
    - seealso: `resolve(tag:builder:)`
    */
   public func resolve<T, Arg1>(tag tag: Tag? = nil, withArguments arg1: Arg1) throws -> T {
-    return try resolve(tag: tag) { (factory: (Arg1) -> T) in factory(arg1) }
+    return try resolve(tag: tag) { (factory: (Arg1) throws -> T) in try factory(arg1) }
   }
   
   // MARK: 2 Runtime Arguments
   
   /// - seealso: `register(:factory:scope:)`
-  public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2) -> T) -> DefinitionOf<T, (Arg1, Arg2) -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2) -> T>
+  public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2) throws -> T) -> DefinitionOf<T, (Arg1, Arg2) throws -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /// - seealso: `resolve(tag:_:)`
   public func resolve<T, Arg1, Arg2>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2) throws -> T {
-    return try resolve(tag: tag) { (factory: (Arg1, Arg2) -> T) in factory(arg1, arg2) }
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2) throws -> T) in try factory(arg1, arg2) }
   }
 
   // MARK: 3 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3) -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3) -> T>
+  public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3) throws -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
   public func resolve<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3) throws -> T {
-    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) -> T) in factory(arg1, arg2, arg3) }
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3) throws -> T) in try factory(arg1, arg2, arg3) }
   }
   
   // MARK: 4 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) -> T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) throws -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
   public func resolve<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4) throws -> T {
-    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) -> T) in factory(arg1, arg2, arg3, arg4) }
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4) throws -> T) in try factory(arg1, arg2, arg3, arg4) }
   }
 
   // MARK: 5 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) -> T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
   public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5) throws -> T {
-    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) -> T) in factory(arg1, arg2, arg3, arg4, arg5) }
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T) in try factory(arg1, arg2, arg3, arg4, arg5) }
   }
 
   // MARK: 6 Runtime Arguments
   
-  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T>
+  public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T> {
+    return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
   public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, withArguments arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6) throws -> T {
-    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) -> T) in factory(arg1, arg2, arg3, arg4, arg5, arg6) }
+    return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T) in try factory(arg1, arg2, arg3, arg4, arg5, arg6) }
   }
 
 }

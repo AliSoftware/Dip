@@ -97,7 +97,7 @@ public final class DependencyContainer {
   container.register { ClientImp(service: try! container.resolve() as Service) as Client }
   ```
   */
-  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: ()->T) -> DefinitionOf<T, ()->T> {
+  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws ->T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
@@ -163,7 +163,7 @@ public final class DependencyContainer {
   
   */
   public func resolve<T>(tag tag: Tag? = nil) throws -> T {
-    return try resolve(tag: tag) { (factory: ()->T) in factory() }
+    return try resolve(tag: tag) { (factory: () throws -> T) in try factory() }
   }
   
   /**
@@ -186,28 +186,30 @@ public final class DependencyContainer {
    Though before you do that you should probably review your design and try to reduce the number of dependencies.
    
    */
-  public func resolve<T, F>(tag tag: Tag? = nil, builder: F->T) throws -> T {
+  public func resolve<T, F>(tag tag: Tag? = nil, builder: F throws -> T) throws -> T {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
     guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
-      throw DipError.DefinitionNotFound(key)
+      let error = DipError.DefinitionNotFound(key)
+      print("\(error)")
+      throw error
     }
 
     let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
-    return _resolve(tag, key: usingKey, definition: definition, builder: builder)
+    return try _resolve(tag, key: usingKey, definition: definition, builder: builder)
   }
   
   /// Actually resolve dependency
-  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F->T) -> T {
+  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F throws -> T) throws -> T {
     
-    return resolvedInstances.resolve {
+    return try resolvedInstances.resolve {
       
       if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
         return previouslyResolved
       }
       else {
-        let resolvedInstance = builder(definition.factory)
+        let resolvedInstance = try builder(definition.factory)
         
         //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
         //when it returns instance that we try to resolve here can be already resolved
@@ -218,7 +220,7 @@ public final class DependencyContainer {
         
         resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key)
         definition.resolvedInstance = resolvedInstance
-        definition.resolveDependenciesBlock?(self, resolvedInstance)
+        try definition.resolveDependenciesBlock?(self, resolvedInstance)
         
         return resolvedInstance
       }
@@ -246,9 +248,9 @@ public final class DependencyContainer {
     
     private var depth: Int = 0
     
-    func resolve<T>(@noescape block: ()->T) -> T {
+    func resolve<T>(@noescape block: () throws ->T) rethrows -> T {
       depth++
-      let resolved = block()
+      let resolved = try block()
       depth--
       if depth == 0 {
         resolvedInstances.removeAll()
@@ -307,7 +309,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
-      return "No definition registered for \(key). Check the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()`."
+      return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     }
   }
 }

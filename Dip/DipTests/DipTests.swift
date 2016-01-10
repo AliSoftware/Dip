@@ -122,7 +122,7 @@ class DipTests: XCTestCase {
       XCTFail("Unexpectedly resolved protocol")
     }
     catch DipError.DefinitionNotFound(let key) {
-      typealias F = ()->Service
+      typealias F = () throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
       XCTAssertEqual(key, expectedKey)
     }
@@ -141,7 +141,7 @@ class DipTests: XCTestCase {
       XCTFail("Unexpectedly resolved protocol")
     }
     catch DipError.DefinitionNotFound(let key) {
-      typealias F = ()->Service
+      typealias F = () throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: "other tag")
       XCTAssertEqual(key, expectedKey)
     }
@@ -160,7 +160,7 @@ class DipTests: XCTestCase {
       XCTFail("Unexpectedly resolved protocol")
     }
     catch DipError.DefinitionNotFound(let key) {
-      typealias F = (String)->Service
+      typealias F = (String) throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
       XCTAssertEqual(key, expectedKey)
     }
