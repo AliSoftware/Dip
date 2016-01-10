@@ -105,7 +105,7 @@ public final class DependencyContainer {
   container.register { ClientImp(service: try! container.resolve() as Service) as Client }
   ```
   */
-  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: ()->T) -> DefinitionOf<T, ()->T> {
+  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws ->T > {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   

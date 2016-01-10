@@ -115,13 +115,13 @@ public final class DefinitionOf<T, F>: Definition {
     self.init(factory: factory)
     self.scope = scope
     
-    if let factory = factory as? ()->T {
-      injectedDefinition = DefinitionOf<Any, ()->Any>(factory: { factory() })
+    if let factory = factory as? () throws -> T {
+      injectedDefinition = DefinitionOf<Any, InjectedFactory>(factory: { try factory() })
       injectedDefinition!.scope = scope
       injectedKey = DefinitionKey(protocolType: Any.self, factoryType: InjectedFactory.self, associatedTag: Injected<T>.tag)
       
-      injectedWeakDefinition = DefinitionOf<AnyObject, ()->AnyObject>(factory: {
-        guard let result = factory() as? AnyObject else {
+      injectedWeakDefinition = DefinitionOf<AnyObject, InjectedWeakFactory>(factory: {
+        guard let result = try factory() as? AnyObject else {
           fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
         }
         return result
@@ -152,11 +152,11 @@ public final class DefinitionOf<T, F>: Definition {
   private var _resolvedInstance: T?
   
   ///Accessory definition used to auto-inject strong properties
-  private(set) var injectedDefinition: DefinitionOf<Any,()->Any>?
+  private(set) var injectedDefinition: DefinitionOf<Any, InjectedFactory>?
   private(set) var injectedKey: DefinitionKey?
   
   ///Accessory definition used to auto-inject weak properties
-  private(set) var injectedWeakDefinition: DefinitionOf<AnyObject,()->AnyObject>?
+  private(set) var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>?
   private(set) var injectedWeakKey: DefinitionKey?
 
 }
@@ -165,10 +165,10 @@ public final class DefinitionOf<T, F>: Definition {
 public protocol Definition: class { }
 
 protocol AutoInjectedDefinition: Definition {
-  var injectedDefinition: DefinitionOf<Any,()->Any>? { get }
+  var injectedDefinition: DefinitionOf<Any, InjectedFactory>? { get }
   var injectedKey: DefinitionKey? { get }
 
-  var injectedWeakDefinition: DefinitionOf<AnyObject,()->AnyObject>? { get }
+  var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>? { get }
   var injectedWeakKey: DefinitionKey? { get }
 }
 

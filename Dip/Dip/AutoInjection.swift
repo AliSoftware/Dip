@@ -155,8 +155,8 @@ extension DependencyContainer {
 
 //MARK: - Private
 
-typealias InjectedFactory = ()->Any
-typealias InjectedWeakFactory = ()->AnyObject
+typealias InjectedFactory = () throws -> Any
+typealias InjectedWeakFactory = () throws -> AnyObject
 
 extension DependencyContainer {
   
