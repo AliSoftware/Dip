@@ -181,9 +181,9 @@ container.register(.ObjectGraph) { ServerImp() as Server }
 ```
 More infromation about circular dependencies you can find in a playground.
 
-### Auto-Injections
+### Auto-Injection
 
-Auto-injection lets your resolve all the dependencies of the instance (created manually or resolved by container) with just one call to `resolve`, also allowing a simpler sintax to register circular dependencies.
+Auto-injection lets your resolve all the dependencies of the instance (created manually or resolved by container) with just one call to `resolve`, also allowing a simpler syntax to register circular dependencies.
 
 ```swift
 protocol Server {
@@ -210,7 +210,7 @@ container.register(.ObjectGraph) { ClientImp() as Client }
 let client = try! container.resolve() as Client
 
 ```
-You can find more use cases for auto-injection in a Playground.
+You can find more use cases for auto-injection in the Playground available in this repository.
 
 ### Thread safety
 

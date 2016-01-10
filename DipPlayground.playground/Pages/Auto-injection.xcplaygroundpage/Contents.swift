@@ -38,7 +38,7 @@ service.tracker
 Not bad so far. Though that `resolveDependencies` block looks heavy. It would be cool if we can get rid of it. Alternatively you can use _constructor injection_ here, which is actually more prefereable by default but not always possible (see [circular dependencies](Circular%20dependencies)).
 Now let's say that you have a bunch of components in your app that require `Logger` or `Tracker` too. You will need to resolve them in a factory for each component again and again. That can be a lot of boilerplate code, simple but still duplicated.
 
-That is one of the scenarios when auto-injection can be usefull. It works with property injection and with it the previous code will transform to this:
+That is one of the scenarios when auto-injection can be useful. It works with property injection and with it the previous code will transform to this:
 */
 
 class AutoInjectedServiceImp: Service {
@@ -128,7 +128,7 @@ injectedClient.server?.client === injectedClient //circular dependencies were re
 /*:
 You can see that component registration looks much simpler now. But on the otherside it requires some boilerplate code in implementations, also tightly coupling them with Dip.
 
-There is one more use case when auto-injection can be very helpfull - when you don't create instances by yourself but system creates them for you. It can be view controllers created by Storyboards. Let's say each view controller in your application requires logger, tracker, data layer service, router, etc. You can end up with code like this:
+There is one more use case when auto-injection can be very helpful - when you don't create instances by yourself but system creates them for you. It can be view controllers created by Storyboards. Let's say each view controller in your application requires logger, tracker, data layer service, router, etc. You can end up with code like this:
 */
 container.register() { RouterImp() as Router }
 container.register() { DataProviderImp() as DataProvider }
