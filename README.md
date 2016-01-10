@@ -27,6 +27,9 @@ This allows you to define the real, concrete types only in one place ([e.g. like
 * Greatly improve testability, as you can register a real instance in your app but a fake instance in your tests dedicated for testing / mocking the fonctionnality
 * Get rid of those `sharedInstances` and avoid the singleton pattern at all costs
 
+
+If you want to know more about Dependency Injection in general we recomend you to read ["Dependency Injection in .Net" by Mark Seemann](https://www.manning.com/books/dependency-injection-in-dot-net). Dip was inspired by implementations of IoC container for .Net platform and shares core principles described in that book.
+
 ## Installation
 
 Dip is available through [CocoaPods](http://cocoapods.org). To install
