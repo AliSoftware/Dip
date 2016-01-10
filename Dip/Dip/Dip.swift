@@ -201,7 +201,7 @@ public final class DependencyContainer {
   }
   
   /// Actually resolve dependency
-  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F throws -> T) throws -> T {
+  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F throws -> T) rethrows -> T {
     
     return try resolvedInstances.resolve {
       
