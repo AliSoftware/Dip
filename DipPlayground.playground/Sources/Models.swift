@@ -53,3 +53,26 @@ public class ClientServiceImp: Service {
     public init() {}
 }
 
+public protocol Logger {}
+public protocol Tracker {}
+public protocol DataProvider {}
+public protocol Router {}
+
+public class LoggerImp: Logger {
+    public init() {}
+}
+
+public class TrackerImp: Tracker {
+    public init() {}
+}
+
+public class RouterImp: Router {
+    public init() {}
+}
+
+public class DataProviderImp: DataProvider {
+    public init() {}
+}
+
+
+

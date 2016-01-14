@@ -28,6 +28,12 @@ public struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
   private(set) public var factoryType: Any.Type
   private(set) public var associatedTag: DependencyContainer.Tag?
   
+  init(protocolType: Any.Type, factoryType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
+    self.protocolType = protocolType
+    self.factoryType = factoryType
+    self.associatedTag = associatedTag
+  }
+  
   public var hashValue: Int {
     return "\(protocolType)-\(factoryType)-\(associatedTag)".hashValue
   }
@@ -90,36 +96,83 @@ public final class DefinitionOf<T, F>: Definition {
     guard resolveDependenciesBlock == nil else {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
-    resolveDependenciesBlock = block
+    self.resolveDependenciesBlock = block
+    self.injectedDefinition?.resolveDependenciesBlock = { try block($0, $1 as! T) }
+    self.injectedWeakDefinition?.resolveDependenciesBlock = { try block($0, $1 as! T) }
     return self
   }
   
   let factory: F
-  var scope: ComponentScope
-  var resolveDependenciesBlock: ((DependencyContainer, T) throws -> ())?
+  private(set) var scope: ComponentScope = .Prototype
   
-  init(factory: F, scope: ComponentScope) {
+  private(set) var resolveDependenciesBlock: ((DependencyContainer, T) throws -> ())?
+  
+  private init(factory: F) {
     self.factory = factory
+  }
+  
+  public convenience init(scope: ComponentScope, factory: F) {
+    self.init(factory: factory)
     self.scope = scope
+    
+    if let factory = factory as? () throws -> T {
+      injectedDefinition = DefinitionOf<Any, InjectedFactory>(factory: { try factory() })
+      injectedDefinition!.scope = scope
+      injectedKey = DefinitionKey(protocolType: Any.self, factoryType: InjectedFactory.self, associatedTag: Injected<T>.tag)
+      
+      injectedWeakDefinition = DefinitionOf<AnyObject, InjectedWeakFactory>(factory: {
+        guard let result = try factory() as? AnyObject else {
+          fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
+        }
+        return result
+        })
+      injectedWeakDefinition!.scope = scope
+      injectedWeakKey = DefinitionKey(protocolType: AnyObject.self, factoryType: InjectedWeakFactory.self, associatedTag: InjectedWeak<T>.tag)
+    }
   }
   
   ///Will be stored only if scope is `Singleton`
   var resolvedInstance: T? {
     get {
       guard scope == .Singleton else { return nil }
-      return _resolvedInstance
+      
+      return _resolvedInstance ??
+        injectedDefinition?._resolvedInstance as? T ??
+        injectedWeakDefinition?._resolvedInstance as? T
     }
     set {
       guard scope == .Singleton else { return }
+      
       _resolvedInstance = newValue
+      injectedDefinition?._resolvedInstance = newValue
+      injectedWeakDefinition?._resolvedInstance = newValue as? AnyObject
     }
   }
   
   private var _resolvedInstance: T?
+  
+  ///Accessory definition used to auto-inject strong properties
+  private(set) var injectedDefinition: DefinitionOf<Any, InjectedFactory>?
+  private(set) var injectedKey: DefinitionKey?
+  
+  ///Accessory definition used to auto-inject weak properties
+  private(set) var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>?
+  private(set) var injectedWeakKey: DefinitionKey?
+
 }
 
 ///Dummy protocol to store definitions for different types in collection
-protocol Definition: class {}
+public protocol Definition: class { }
+
+protocol AutoInjectedDefinition: Definition {
+  var injectedDefinition: DefinitionOf<Any, InjectedFactory>? { get }
+  var injectedKey: DefinitionKey? { get }
+
+  var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>? { get }
+  var injectedWeakKey: DefinitionKey? { get }
+}
+
+extension DefinitionOf: AutoInjectedDefinition {}
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {

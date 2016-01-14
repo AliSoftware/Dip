@@ -31,13 +31,7 @@ class ComponentScopeTests: XCTestCase {
   
   override func setUp() {
     super.setUp()
-    // Put setup code here. This method is called before the invocation of each test method in the class.
     container.reset()
-  }
-  
-  override func tearDown() {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    super.tearDown()
   }
   
   func testThatPrototypeIsDefaultScope() {
@@ -45,8 +39,8 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertEqual(def.scope, ComponentScope.Prototype)
   }
   
-  func testThatCallingInScopeChangesScope() {
-    let def = container.register(ComponentScope.Singleton) { ServiceImp1() as Service }
+  func testThatScopeCanBeChanged() {
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
     XCTAssertEqual(def.scope, ComponentScope.Singleton)
   }
   

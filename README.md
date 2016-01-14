@@ -181,12 +181,44 @@ container.register(.ObjectGraph) { ServerImp() as Server }
 ```
 More infromation about circular dependencies you can find in a playground.
 
+### Auto-Injection
+
+Auto-injection lets your resolve all the dependencies of the instance (created manually or resolved by container) with just one call to `resolve`, also allowing a simpler syntax to register circular dependencies.
+
+```swift
+protocol Server {
+    weak var client: Client? { get }
+}
+
+protocol Client: class {
+    var server: Server? { get }
+}
+
+class ServerImp: Server {
+    private var injectedClient = InjectedWeak<Client>()
+    var client: Client? { return injectedClient.value }
+}
+
+class ClientImp: Client {
+    private var injectedServer = Injected<Server>()
+    var server: Server? { get { return injectedServer.value} }
+}
+
+container.register(.ObjectGraph) { ServerImp() as Server }
+container.register(.ObjectGraph) { ClientImp() as Client }
+
+let client = try! container.resolve() as Client
+
+```
+You can find more use cases for auto-injection in the Playground available in this repository.
+
 ### Thread safety
 
 _Dip_ does not provide thread safety, so you need to make sure you always call `resolve` method of `DependencyContainer` from the single thread. 
 Otherwise if two threads try to resolve the same type they can get different instances where the same instance is expected.
 
 ### Errors
+
 The resolve operation is potentially dangerous because you can use the wrong type, factory or a wrong tag. For that reason Dip throws an error
  `DefinitionNotFond(DefinitionKey)` if it failed to resolve type. When calling `resolve` you need to use a `try` operator. 
  There are rare use cases where your application can recover from this kind of errors (for example you can register new types 

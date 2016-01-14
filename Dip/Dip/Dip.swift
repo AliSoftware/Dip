@@ -57,27 +57,35 @@ public final class DependencyContainer {
     configBlock(self)
   }
   
-  // MARK: - Reset all dependencies
-  
-  /**
-  Clear all the previously registered dependencies on this container.
-  */
-  public func reset() {
-    definitions.removeAll()
-  }
+  // MARK: - Removing definitions
   
   /**
    Removes previously registered definition from container.
    
    - parameter tag: tag used to register definition
    - parameter definition: definition to remove
-  */
+   */
   public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    definitions[key] = nil
+    remove(definition, forKey: key)
   }
   
-  // MARK: Register dependencies
+  public func remove(definition: Definition, forKey key: DefinitionKey) {
+    definitions[key] = nil
+    if let definition = definition as? AutoInjectedDefinition {
+      removeInjected(definition)
+      removeInjectedWeak(definition)
+    }
+  }
+
+  /**
+   Clear all the previously registered dependencies on this container.
+   */
+  public func reset() {
+    definitions.removeAll()
+  }
+
+  // MARK: Register definitions
   
   /**
   Register a Void->T factory associated with optional tag.
@@ -97,7 +105,7 @@ public final class DependencyContainer {
   container.register { ClientImp(service: try! container.resolve() as Service) as Client }
   ```
   */
-  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws ->T> {
+  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws ->T > {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
@@ -123,9 +131,8 @@ public final class DependencyContainer {
    
    */
   public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    let definition = DefinitionOf<T, F>(factory: factory, scope: scope)
-    definitions[key] = definition
+    let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
+    register(definition, forTag: tag)
     return definition
   }
   
@@ -138,13 +145,22 @@ public final class DependencyContainer {
    */
   public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    definitions[key] = definition
+    register(definition, forKey: key)
   }
   
+  public func register(definition: Definition, forKey key: DefinitionKey) {
+    definitions[key] = definition
+    
+    if let definition = definition as? AutoInjectedDefinition where key.associatedTag == nil {
+      registerInjected(definition)
+      registerInjectedWeak(definition)
+    }
+  }
+
   // MARK: Resolve dependencies
   
   /**
-  Resolve a dependency. 
+  Resolve a dependency.
   
   If no definition was registered with this `tag` for this `protocol`,
   it will try to resolve the definition associated with `nil` (no tag).
@@ -174,8 +190,8 @@ public final class DependencyContainer {
    - returns: resolved instance of type T
    
    - note: You should not call this method directly, instead call any of other `resolve` methods. (see `RuntimeArguments.swift`).
-           You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports
-           (currently it's up to six) like in this example:
+   You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports
+   (currently it's up to six) like in this example:
    
    ```swift
    public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) throws -> T {
@@ -206,6 +222,7 @@ public final class DependencyContainer {
     return try resolvedInstances.resolve {
       
       if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+        resolvedInstances.storeResolvedInstance(previouslyResolved, forKey: key, definition: definition)
         return previouslyResolved
       }
       else {
@@ -215,16 +232,17 @@ public final class DependencyContainer {
         //when it returns instance that we try to resolve here can be already resolved
         //so we return it, throwing away instance created by previous call to builder
         if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+          resolvedInstances.storeResolvedInstance(previouslyResolved, forKey: key, definition: definition)
           return previouslyResolved
         }
         
-        resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key)
+        resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, definition: definition)
         definition.resolvedInstance = resolvedInstance
         try definition.resolveDependenciesBlock?(self, resolvedInstance)
+        resolveDependencies(resolvedInstance)
         
         return resolvedInstance
       }
-      
     }
     
   }
@@ -238,12 +256,16 @@ public final class DependencyContainer {
   class ResolvedInstances {
     var resolvedInstances = [DefinitionKey: Any]()
 
-    func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey?) {
-      self.resolvedInstances[key] = instance
+    func storeResolvedInstance<T, F>(instance: T, forKey key: DefinitionKey?, definition: DefinitionOf<T, F>) {
+      resolvedInstances[key] = instance
+      if key != nil {
+        resolvedInstances[definition.injectedKey] = instance
+        resolvedInstances[definition.injectedWeakKey] = instance
+      }
     }
     
     func previouslyResolved<T, F>(key: DefinitionKey?, definition: DefinitionOf<T, F>) -> T? {
-      return (definition.resolvedInstance ?? self.resolvedInstances[key]) as? T
+      return (definition.resolvedInstance ?? resolvedInstances[key]) as? T
     }
     
     private var depth: Int = 0
@@ -276,18 +298,16 @@ extension DependencyContainer.Tag: IntegerLiteralConvertible {
 }
 
 extension DependencyContainer.Tag: StringLiteralConvertible {
-  public typealias ExtendedGraphemeClusterLiteralType = StringLiteralType
-  public typealias UnicodeScalarLiteralType = StringLiteralType
-  
+
   public init(stringLiteral value: StringLiteralType) {
     self = .String(value)
   }
   
-  public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
+  public init(unicodeScalarLiteral value: StringLiteralType) {
     self.init(stringLiteral: value)
   }
   
-  public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
+  public init(extendedGraphemeClusterLiteral value: StringLiteralType) {
     self.init(stringLiteral: value)
   }
 }
@@ -309,6 +329,9 @@ public enum DipError: ErrorType, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
+      if let wrappedType = isInjectedTag(key.associatedTag) {
+        return "No definition registered for \(key). Check if you registered factory with no tag and no runtime arguments for type \(wrappedType)."
+      }
       return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     }
   }
