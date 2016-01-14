@@ -79,19 +79,22 @@ class AutoInjectionTests: XCTestCase {
     container.reset()
     AutoInjectionTests.serverDeallocated = false
     AutoInjectionTests.clientDeallocated = false
-    
-    container.register(.ObjectGraph) { ServerImp() as Server }
-    container.register(.ObjectGraph) { ClientImp() as Client }
   }
 
   func testThatItResolvesInjectedDependencies() {
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
     let client = try! container.resolve() as Client
     let server = client.server
-    XCTAssertTrue(client as! ClientImp === server?.client as! ClientImp)
+    XCTAssertTrue(client === server?.client)
   }
   
   func testThatThereIsNoRetainCycleForCyrcularDependencies() {
     //given
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+
     var client: Client? = try! container.resolve() as Client
     XCTAssertNotNil(client)
     
@@ -104,8 +107,6 @@ class AutoInjectionTests: XCTestCase {
   }
   
   func testThatItResolvesAutoInjectedSingletons() {
-    container.reset()
-    
     //given
     container.register(.Singleton) { ServerImp() as Server }
     container.register(.Singleton) { ClientImp() as Client }
@@ -118,34 +119,36 @@ class AutoInjectionTests: XCTestCase {
     let server = client.server
     
     //then
-    XCTAssertTrue(client as! ClientImp === sharedClient as! ClientImp)
-    XCTAssertTrue(client as! ClientImp === server?.client as! ClientImp)
-    XCTAssertTrue(server as! ServerImp === sharedServer as! ServerImp)
+    XCTAssertTrue(client === sharedClient)
+    XCTAssertTrue(client === server?.client)
+    XCTAssertTrue(server === sharedServer)
   }
   
   func testThatItCallsResolveDependencyBlockOnOriginalDefiniton() {
     var serverBlockWasCalled = false
+    
+    //given
     container.register(.ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { (container, server) -> () in
         serverBlockWasCalled = true
     }
-
-
-    try! container.resolve() as Client
-    XCTAssertTrue(serverBlockWasCalled)
 
     var clientBlockWasCalled = false
     container.register(.ObjectGraph) { ClientImp() as Client }
       .resolveDependencies { (container, client) -> () in
         clientBlockWasCalled = true
     }
-    try! container.resolve() as Server
 
+    //when
+    try! container.resolve() as Client
+    XCTAssertTrue(serverBlockWasCalled)
+    
+    try! container.resolve() as Server
     XCTAssertTrue(clientBlockWasCalled)
   }
   
   func testThatItReuseResolvedAutoInjectedInstences() {
-    
+    //given
     container.register(.ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { (container, server) -> () in
         server.anotherClient = try! container.resolve() as Client
@@ -156,15 +159,17 @@ class AutoInjectionTests: XCTestCase {
         client.anotherServer = try! container.resolve() as Server
     }
 
-    let client = (try! container.resolve() as Client) as! ClientImp
+    //when
+    let client = try! container.resolve() as Client
     
-    let server = client.server as! ServerImp
-    let anotherServer = client.anotherServer as! ServerImp
+    //then
+    let server = client.server
+    let anotherServer = client.anotherServer
     
     XCTAssertTrue(server === anotherServer)
     
-    let oneClient = server.client as! ClientImp
-    let anotherClient = server.anotherClient as! ClientImp
+    let oneClient = server!.client
+    let anotherClient = server!.anotherClient
     
     XCTAssertTrue(oneClient === anotherClient)
     XCTAssertTrue(client === anotherClient)
@@ -201,9 +206,15 @@ class AutoInjectionTests: XCTestCase {
   }
   
   func testThatThereIsNoRetainCycleBetweenCircularDependencies() {
-    var client: Client? = try! container.resolve() as Client
-    weak var server: Server? = client?.server
+    //given
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
 
+    //when
+    var client: Client? = try! container.resolve() as Client
+    
+    //then
+    weak var server: Server? = client?.server
     weak var weakClient = client
     
     XCTAssertNotNil(weakClient)

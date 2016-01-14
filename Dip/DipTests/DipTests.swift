@@ -25,7 +25,7 @@
 import XCTest
 @testable import Dip
 
-protocol Service {
+protocol Service: class {
   func getServiceName() -> String
 }
 

@@ -67,6 +67,15 @@ public final class Injected<T>: _InjectedPropertyBox {
  Otherwise it will cause runtime exception when container will try to resolve the property.
  Use this wrapper to define one of two circular dependencies to avoid retain cycle.
  
+ - note:
+ The only difference between `InjectedWeak` and `Injected` is that `InjectedWeak` uses _weak_ reference
+ to store underlying value, when `Injected` uses _strong_ reference. For that reason if you resolve instance
+ that has _weak_ auto-injected property this property will be released when `resolve` returns because no one else
+ holds reference to it except the container during dependency graph resolution.
+ 
+ Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
+ This will prevent a retain cycle between resolved instances.
+
  - warning:
  Do not define this property as optional or container will not be able to inject it.
  Instead define it with initial value of `InjectedWeak<T>()`.
@@ -80,12 +89,6 @@ If you need to nilify wrapped value, assing property to `InjectedWeak<T>()`.
  }
 
  ```
- 
- - note:
- The only difference between `InjectedWeak` and `Injected` is that `InjectedWeak` uses _weak_ reference
- to store underlying value, when `Injected` uses _strong_ reference.
- For that reason if you resolve instance that holds weakly injected property
- this property will be released when `resolve` returns 'cause no one else holds reference to it.
  
  - seealso: `Injected`, `DependencyContainer.resolveDependencies(_:)`
  

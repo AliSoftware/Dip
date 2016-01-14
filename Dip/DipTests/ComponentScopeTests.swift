@@ -53,7 +53,7 @@ class ComponentScopeTests: XCTestCase {
     let service2 = try! container.resolve() as Service
     
     //then
-    XCTAssertFalse((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+    XCTAssertFalse(service1 === service2)
   }
   
   func testThatItReusesInstanceForSingletonScope() {
@@ -65,7 +65,7 @@ class ComponentScopeTests: XCTestCase {
     let service2 = try! container.resolve() as Service
     
     //then
-    XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+    XCTAssertTrue(service1 === service2)
   }
   
   class Server {
