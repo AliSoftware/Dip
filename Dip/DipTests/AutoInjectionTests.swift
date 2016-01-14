@@ -40,6 +40,9 @@ class AutoInjectionTests: XCTestCase {
   
   static var serverDeallocated: Bool = false
   static var clientDeallocated: Bool = false
+  
+  static var serverDidInjectCalled: Bool = false
+  static var clientDidInjectCalled: Bool = false
 
   private class ServerImp: Server {
     
@@ -47,7 +50,9 @@ class AutoInjectionTests: XCTestCase {
       AutoInjectionTests.serverDeallocated = true
     }
     
-    var _client = InjectedWeak<Client>()
+    var _client = InjectedWeak<Client>() { _ in
+      AutoInjectionTests.clientDidInjectCalled = true
+    }
     
     weak var client: Client? {
       return _client.value
@@ -62,7 +67,10 @@ class AutoInjectionTests: XCTestCase {
       AutoInjectionTests.clientDeallocated = true
     }
     
-    var _server = Injected<Server>()
+    var _server = Injected<Server>() { _ in
+      AutoInjectionTests.serverDidInjectCalled = true
+    }
+    
     var anotherServer: Server?
     
     var server: Server? {
@@ -79,6 +87,8 @@ class AutoInjectionTests: XCTestCase {
     container.reset()
     AutoInjectionTests.serverDeallocated = false
     AutoInjectionTests.clientDeallocated = false
+    AutoInjectionTests.clientDidInjectCalled = false
+    AutoInjectionTests.serverDidInjectCalled = false
   }
 
   func testThatItResolvesInjectedDependencies() {
@@ -224,6 +234,16 @@ class AutoInjectionTests: XCTestCase {
 
     XCTAssertNil(weakClient)
     XCTAssertNil(server)
-
   }
+  
+  func testThatItCallsDidInjectOnInjectedProperty() {
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
+    try! container.resolve() as Client
+    
+    XCTAssertTrue(AutoInjectionTests.clientDidInjectCalled)
+    XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled)
+  }
+
 }

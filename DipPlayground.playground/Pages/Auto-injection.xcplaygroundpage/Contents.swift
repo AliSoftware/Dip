@@ -12,8 +12,8 @@ If you follow Single Responsibility Principle chances are very high that you wil
 */
 
 protocol Service: class {
-    var logger: Logger? { get set }
-    var tracker: Tracker? { get set }
+    var logger: Logger? { get }
+    var tracker: Tracker? { get }
 }
 
 class ServiceImp: Service {
@@ -26,8 +26,8 @@ container.register() { LoggerImp() as Logger }
 
 container.register() { ServiceImp() as Service }
     .resolveDependencies { container, service in
-        service.logger = try container.resolve() as Logger
-        service.tracker = try container.resolve() as Tracker
+        (service as! ServiceImp).logger = try container.resolve() as Logger
+        (service as! ServiceImp).tracker = try container.resolve() as Tracker
 }
 
 let service = try! container.resolve() as Service
@@ -43,10 +43,10 @@ That is one of the scenarios when auto-injection can be useful. It works with pr
 
 class AutoInjectedServiceImp: Service {
     private var injectedLogger = Injected<Logger>()
-    var logger: Logger? { get { return injectedLogger.value } set { injectedLogger.value = newValue } }
+    var logger: Logger? { return injectedLogger.value }
     
     private var injectedTracker = Injected<Tracker>()
-    var tracker: Tracker? { get { return injectedTracker.value } set { injectedTracker.value = newValue } }
+    var tracker: Tracker? { return injectedTracker.value }
 }
 
 container.register() { AutoInjectedServiceImp() as Service }
@@ -73,11 +73,11 @@ Another example of using auto-injection is circular dependencies. Let's say you 
 */
 
 protocol Server: class {
-    weak var client: ServerClient? {get set}
+    weak var client: ServerClient? { get }
 }
 
 protocol ServerClient: class {
-    var server: Server? {get}
+    var server: Server? { get }
 }
 
 class ServerImp: Server {
@@ -97,8 +97,8 @@ container.register(.ObjectGraph) {
 }
 
 container.register(.ObjectGraph) { ServerImp() as Server }
-    .resolveDependencies { container, server in
-        server.client = try container.resolve() as ServerClient
+    .resolveDependencies { (container: DependencyContainer, server: Server) in
+        (server as! ServerImp).client = try container.resolve() as ServerClient
 }
 
 let client = try! container.resolve() as ServerClient
@@ -110,12 +110,12 @@ With auto-injection you will have the following code:
 
 class InjectedServerImp: Server {
     private var injectedClient = InjectedWeak<ServerClient>()
-    var client: ServerClient? { get { return injectedClient.value } set { injectedClient.value = newValue }}
+    var client: ServerClient? { return injectedClient.value }
 }
 
 class InjectedClientImp: ServerClient {
     private var injectedServer = Injected<Server>()
-    var server: Server? { get { return injectedServer.value} }
+    var server: Server? { get { return injectedServer.value } }
 }
 
 container.register(.ObjectGraph) { InjectedServerImp() as Server }
@@ -158,10 +158,10 @@ With auto-injection you can replace that with something like this:
 
 class AutoInjectedViewController: UIViewController {
     
-    var logger = Injected<Logger>()
-    var tracker = Injected<Tracker>()
-    var dataProvider = Injected<DataProvider>()
-    var router = Injected<Router>()
+    let logger = Injected<Logger>()
+    let tracker = Injected<Tracker>()
+    let dataProvider = Injected<DataProvider>()
+    let router = Injected<Router>()
 
     func injectDependencies(container: DependencyContainer) {
         container.resolveDependencies(self)

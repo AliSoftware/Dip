@@ -46,18 +46,23 @@ class ClientImp: Client {
 */
 public final class Injected<T>: _InjectedPropertyBox {
   
-  var _value: Any?
-  
-  public var value: T? {
-    get {
-      return _value as? T
-    }
-    set {
-      _value = newValue
+  var _value: Any? = nil {
+    didSet {
+      if let value = value {
+        didInject(value)
+      }
     }
   }
+  
+  private let didInject: T -> ()
+  
+  public var value: T? {
+    return _value as? T
+  }
 
-  public init() {}
+  public init(didInject: T -> () = { _ in }) {
+    self.didInject = didInject
+  }
 
 }
 
@@ -100,18 +105,23 @@ public final class InjectedWeak<T>: _InjectedWeakPropertyBox {
   //so we just rely on user reading documentation and passing AnyObject in runtime
   //also we will throw fatal error if type can not be casted to AnyObject during resolution
 
-  weak var _value: AnyObject?
-  
-  public var value: T? {
-    get {
-      return _value as? T
-    }
-    set {
-      _value = newValue as? AnyObject
+  weak var _value: AnyObject? = nil {
+    didSet {
+      if let value = value {
+        didInject(value)
+      }
     }
   }
+  
+  private var didInject: T -> ()
+  
+  public var value: T? {
+    return _value as? T
+  }
 
-  public init() {}
+  public init(didInject: T -> () = { _ in }) {
+    self.didInject = didInject
+  }
 
 }
 
