@@ -100,6 +100,16 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(client === server?.client)
   }
   
+  func testThatItThrowsErrorIfFailsToInjectDependency() {
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
+    do {
+      try container.resolveDependencies(ClientImp())
+      XCTFail("Resolve should throw error")
+    }
+    catch { }
+  }
+
   func testThatThereIsNoRetainCycleForCyrcularDependencies() {
     //given
     container.register(.ObjectGraph) { ServerImp() as Server }
@@ -245,5 +255,17 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(AutoInjectionTests.clientDidInjectCalled)
     XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled)
   }
-
+  
+  func testThatRemovingDefinitionAlsoRemovesAutoInjectionDefinitions() {
+    let def = container.register(.ObjectGraph) { ServerImp() as Server }
+    
+    XCTAssertTrue(container.definitions.contains { $0.1 === def.injectedDefinition })
+    XCTAssertTrue(container.definitions.contains { $0.1 === def.injectedWeakDefinition })
+    
+    container.remove(def)
+    
+    XCTAssertFalse(container.definitions.contains { $0.1 === def.injectedDefinition })
+    XCTAssertFalse(container.definitions.contains { $0.1 === def.injectedWeakDefinition })
+  }
+  
 }

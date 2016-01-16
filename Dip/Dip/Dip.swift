@@ -258,7 +258,7 @@ public final class DependencyContainer {
         
         //we perform auto-injection as the last step to be able to reuse instances
         //stored when manually resolving dependencies in resolveDependencies block
-        resolveDependencies(resolvedInstance)
+        try resolveDependencies(resolvedInstance)
         
         return resolvedInstance
       }
@@ -366,7 +366,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
     switch self {
     case let .DefinitionNotFound(key):
       if let wrappedType = isInjectedTag(key.associatedTag) {
-        return "No definition registered for \(key). Check if you registered factory with no tag and no runtime arguments for type \(wrappedType)."
+        return "Failed to auto-inject property of type \(wrappedType). Check if you registered factory with no tag and no runtime arguments for type \(wrappedType)."
       }
       return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     }

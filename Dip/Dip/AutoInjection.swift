@@ -154,14 +154,12 @@ extension DependencyContainer {
    ```
    
    */
-  public func resolveDependencies(instance: Any) {
-    for child in Mirror(reflecting: instance).children {
-      do {
-        try (child.value as? _AnyInjectedPropertyBox)?.resolve(self)
-      } catch {
-        print(error)
-      }
-    }
+  public func resolveDependencies(instance: Any) throws {
+    try Mirror(reflecting: instance).children.forEach(resolveChild)
+  }
+  
+  private func resolveChild(child: Mirror.Child) throws {
+    try (child.value as? _AnyInjectedPropertyBox)?.resolve(self)
   }
 
 }
@@ -174,24 +172,22 @@ typealias InjectedWeakFactory = () throws -> AnyObject
 extension DependencyContainer {
   
   func registerInjected(definition: AutoInjectedDefinition) {
-    guard let key = definition.injectedKey,
-      definition = definition.injectedDefinition else { return }
-    definitions[key] = definition
+    if let key = definition.injectedKey, definition = definition.injectedDefinition {
+        definitions[key] = definition
+    }
   }
   
   func registerInjectedWeak(definition: AutoInjectedDefinition) {
-    guard let key = definition.injectedWeakKey,
-      definition = definition.injectedWeakDefinition else { return }
-    definitions[key] = definition
+    if let key = definition.injectedWeakKey, definition = definition.injectedWeakDefinition {
+        definitions[key] = definition
+    }
   }
   
   func removeInjected(definition: AutoInjectedDefinition) {
-    guard definition.injectedDefinition != nil else { return }
     definitions[definition.injectedKey] = nil
   }
   
   func removeInjectedWeak(definition: AutoInjectedDefinition) {
-    guard definition.injectedWeakDefinition != nil else { return }
     definitions[definition.injectedWeakKey] = nil
   }
 
