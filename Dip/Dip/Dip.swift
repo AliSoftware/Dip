@@ -84,9 +84,9 @@ public final class DependencyContainer {
   func remove(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = nil
-      if let definition = definition as? AutoInjectedDefinition {
-        removeInjected(definition)
-        removeInjectedWeak(definition)
+      if let definition = definition as? _Definition {
+        definitions[definition.injectedKey] = nil
+        definitions[definition.injectedWeakKey] = nil
       }
     }
   }
@@ -167,9 +167,9 @@ public final class DependencyContainer {
     threadSafe {
       definitions[key] = definition
     
-      if let definition = definition as? AutoInjectedDefinition where key.associatedTag == nil {
-        registerInjected(definition)
-        registerInjectedWeak(definition)
+      if let definition = definition as? _Definition where key.associatedTag == nil {
+        definitions[definition.injectedKey] = definition.injectedDefinition
+        definitions[definition.injectedWeakKey] = definition.injectedWeakDefinition
       }
     }
   }
@@ -225,7 +225,7 @@ public final class DependencyContainer {
 
     return try threadSafe {
       guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
-          throw DipError.DefinitionNotFound(key)
+        throw DipError.DefinitionNotFound(key)
       }
       
       let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
@@ -328,9 +328,11 @@ extension DependencyContainer: CustomStringConvertible {
 }
 
 extension DependencyContainer.Tag: IntegerLiteralConvertible {
+
   public init(integerLiteral value: IntegerLiteralType) {
     self = .Int(value)
   }
+
 }
 
 extension DependencyContainer.Tag: StringLiteralConvertible {
@@ -346,6 +348,7 @@ extension DependencyContainer.Tag: StringLiteralConvertible {
   public init(extendedGraphemeClusterLiteral value: StringLiteralType) {
     self.init(stringLiteral: value)
   }
+  
 }
 
 public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
@@ -365,30 +368,10 @@ public enum DipError: ErrorType, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
-      if let wrappedType = isInjectedTag(key.associatedTag) {
+      if let wrappedType = autoInjectedType(key.associatedTag) {
         return "Failed to auto-inject property of type \(wrappedType). Check if you registered factory with no tag and no runtime arguments for type \(wrappedType)."
       }
       return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     }
   }
 }
-
-extension Dictionary {
-  subscript(key: Key?) -> Value? {
-    get {
-      guard let key = key else { return nil }
-      return self[key]
-    }
-    set {
-      guard let key = key else { return }
-      self[key] = newValue
-    }
-  }
-}
-
-extension Optional {
-  public var desc: String {
-    return self.map { "\($0)" } ?? "nil"
-  }
-}
-

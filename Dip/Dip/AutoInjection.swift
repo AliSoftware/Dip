@@ -169,29 +169,6 @@ extension DependencyContainer {
 typealias InjectedFactory = () throws -> Any
 typealias InjectedWeakFactory = () throws -> AnyObject
 
-extension DependencyContainer {
-  
-  func registerInjected(definition: AutoInjectedDefinition) {
-    if let key = definition.injectedKey, definition = definition.injectedDefinition {
-        definitions[key] = definition
-    }
-  }
-  
-  func registerInjectedWeak(definition: AutoInjectedDefinition) {
-    if let key = definition.injectedWeakKey, definition = definition.injectedWeakDefinition {
-        definitions[key] = definition
-    }
-  }
-  
-  func removeInjected(definition: AutoInjectedDefinition) {
-    definitions[definition.injectedKey] = nil
-  }
-  
-  func removeInjectedWeak(definition: AutoInjectedDefinition) {
-    definitions[definition.injectedWeakKey] = nil
-  }
-
-}
 
 protocol _AnyInjectedPropertyBox: class {
   func resolve(container: DependencyContainer) throws
@@ -228,31 +205,11 @@ extension _InjectedWeakPropertyBox {
   }
 }
 
-func isInjectedTag(tag: DependencyContainer.Tag?) -> String? {
+func autoInjectedType(tag: DependencyContainer.Tag?) -> String? {
   guard let tag = tag else { return nil }
   guard case let .String(stringTag) = tag else { return nil }
   
   return try! stringTag.match("^Injected(?:Weak)?<(.+)>$")?.dropFirst().first
 }
 
-extension String {
-  func match(pattern: String) throws -> [String]? {
-    let expr = try NSRegularExpression(pattern: pattern, options: NSRegularExpressionOptions())
-    let result = expr.firstMatchInString(self, options: NSMatchingOptions(), range: NSMakeRange(0, characters.count))
-    return result?.allRanges.flatMap(safeSubstringWithRange)
-  }
-  
-  func safeSubstringWithRange(range: NSRange) -> String? {
-    if NSMaxRange(range) <= self.characters.count {
-      return (self as NSString).substringWithRange(range)
-    }
-    return nil
-  }
-}
-
-extension NSTextCheckingResult {
-  var allRanges: [NSRange] {
-    return (0..<numberOfRanges).map(rangeAtIndex)
-  }
-}
 

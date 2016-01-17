@@ -128,12 +128,12 @@ public final class DefinitionOf<T, F>: Definition {
     self.scope = scope
     
     if let factory = factory as? () throws -> T {
-      self.injectedKey = DefinitionKey(protocolType: Any.self, factoryType: InjectedFactory.self, associatedTag: Injected<T>.tag)
-      self.injectedWeakKey = DefinitionKey(protocolType: AnyObject.self, factoryType: InjectedWeakFactory.self, associatedTag: InjectedWeak<T>.tag)
+      injectedKey = DefinitionKey(protocolType: Any.self, factoryType: InjectedFactory.self, associatedTag: Injected<T>.tag)
+      injectedWeakKey = DefinitionKey(protocolType: AnyObject.self, factoryType: InjectedWeakFactory.self, associatedTag: InjectedWeak<T>.tag)
       
       //these definitions will be used during auto-injection
       injectedDefinition = DefinitionOf<Any, InjectedFactory>(factory: { try factory() })
-      injectedDefinition!.scope = scope
+      injectedDefinition?.scope = scope
       
       injectedWeakDefinition = DefinitionOf<AnyObject, InjectedWeakFactory>(factory: {
         guard let result = try factory() as? AnyObject else {
@@ -141,7 +141,7 @@ public final class DefinitionOf<T, F>: Definition {
         }
         return result
       })
-      injectedWeakDefinition!.scope = scope
+      injectedWeakDefinition?.scope = scope
     }
   }
   
@@ -178,7 +178,7 @@ public final class DefinitionOf<T, F>: Definition {
 ///Dummy protocol to store definitions for different types in collection
 public protocol Definition: class { }
 
-protocol AutoInjectedDefinition: Definition {
+protocol _Definition: Definition {
   var injectedDefinition: DefinitionOf<Any, InjectedFactory>? { get }
   var injectedKey: DefinitionKey? { get }
 
@@ -190,7 +190,7 @@ protocol AutoInjectedDefinition: Definition {
   func resolveDependencies(container: DependencyContainer, resolvedInstance: Any) throws
 }
 
-extension DefinitionOf: AutoInjectedDefinition { }
+extension DefinitionOf: _Definition { }
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {

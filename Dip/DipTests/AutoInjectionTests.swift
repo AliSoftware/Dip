@@ -167,7 +167,7 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(clientBlockWasCalled)
   }
   
-  func testThatItReuseResolvedAutoInjectedInstences() {
+  func testThatItReuseResolvedAutoInjectedInstances() {
     //given
     container.register(.ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { (container, server) -> () in
