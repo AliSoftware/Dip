@@ -223,23 +223,27 @@ func isInjectedTag(tag: DependencyContainer.Tag?) -> String? {
   guard let tag = tag else { return nil }
   guard case let .String(stringTag) = tag else { return nil }
   
-  return try! stringTag.match("^Injected(?:Weak){0,1}<\\((.+)\\)>$")?.first
+  return try! stringTag.match("^Injected(?:Weak)?<(.+)>$")?.dropFirst().first
 }
 
 extension String {
-  private func match(pattern: String) throws -> [String]? {
+  func match(pattern: String) throws -> [String]? {
     let expr = try NSRegularExpression(pattern: pattern, options: NSRegularExpressionOptions())
     let result = expr.firstMatchInString(self, options: NSMatchingOptions(), range: NSMakeRange(0, characters.count))
-    if let result = result {
-      let groups = (1..<result.numberOfRanges).map {
-        (self as NSString).substringWithRange(result.rangeAtIndex($0))
-      }
-      return groups
+    return result?.allRanges.flatMap(safeSubstringWithRange)
+  }
+  
+  func safeSubstringWithRange(range: NSRange) -> String? {
+    if NSMaxRange(range) <= self.characters.count {
+      return (self as NSString).substringWithRange(range)
     }
-    else {
-      return nil
-    }
+    return nil
   }
 }
 
+extension NSTextCheckingResult {
+  var allRanges: [NSRange] {
+    return (0..<numberOfRanges).map(rangeAtIndex)
+  }
+}
 
