@@ -8,8 +8,13 @@
 
 import Foundation
 
+///Provides Starship entities fetching them using web service
 struct SWAPIStarshipProvider : StarshipProviderAPI {
-    let ws = try! wsDependencies.resolve(tag: WebService.StarshipWS.tag) as NetworkLayer
+    let ws: NetworkLayer
+    
+    init(webService: NetworkLayer) {
+        self.ws = webService
+    }
     
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("starships") { response in

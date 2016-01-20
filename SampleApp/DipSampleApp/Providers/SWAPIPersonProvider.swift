@@ -8,8 +8,13 @@
 
 import Foundation
 
+///Provides Person entitis fetching them with web service
 struct SWAPIPersonProvider : PersonProviderAPI {
-    let ws = try! wsDependencies.resolve(tag: WebService.PersonWS.tag) as NetworkLayer
+    let ws: NetworkLayer
+    
+    init(webService: NetworkLayer) {
+        self.ws = webService
+    }
     
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("people") { response in

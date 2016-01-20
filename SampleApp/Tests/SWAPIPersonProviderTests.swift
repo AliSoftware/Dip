@@ -23,9 +23,9 @@ class SWAPIPersonProviderTests: XCTestCase {
     
     func testFetchPersonIDs() {
         let mock = NetworkMock(json: ["results": [fakePerson1, fakePerson2]])
-        wsDependencies.register(tag: WebService.PersonWS.tag, .Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.Singleton) { mock as NetworkLayer }
         
-        let provider = SWAPIPersonProvider()
+        let provider = SWAPIPersonProvider(webService: try! wsDependencies.resolve())
         provider.fetchIDs { personIDs in
             XCTAssertNotNil(personIDs)
             XCTAssertEqual(personIDs.count, 2)
@@ -36,11 +36,10 @@ class SWAPIPersonProviderTests: XCTestCase {
     }
     
     func testFetchOnePerson() {
-        
         let mock = NetworkMock(json: fakePerson1)
-        wsDependencies.register(tag: WebService.PersonWS.tag, .Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.Singleton) { mock as NetworkLayer }
         
-        let provider = SWAPIPersonProvider()
+        let provider = SWAPIPersonProvider(webService: try! wsDependencies.resolve())
         provider.fetch(1) { person in
             XCTAssertNotNil(person)
             XCTAssertEqual(person?.name, "John Doe")
@@ -58,9 +57,9 @@ class SWAPIPersonProviderTests: XCTestCase {
     func testFetchInvalidPerson() {
         let json = ["error":"whoops"]
         let mock = NetworkMock(json: json)
-        wsDependencies.register(tag: WebService.PersonWS.tag, .Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.Singleton) { mock as NetworkLayer }
         
-        let provider = SWAPIPersonProvider()
+        let provider = SWAPIPersonProvider(webService: try! wsDependencies.resolve())
         provider.fetch(12) { person in
             XCTAssertNil(person)
         }

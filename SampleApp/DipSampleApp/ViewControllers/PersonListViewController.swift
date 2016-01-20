@@ -11,14 +11,16 @@ import UIKit
 class PersonListViewController: UITableViewController, FetchableTrait {
     var objects: [Person]?
     var batchRequestID = 0
+    
+    var personProvider: PersonProviderAPI!
+    var starshipProvider: StarshipProviderAPI!
         
     func fetchIDs(completion: [Int] -> Void) {
-        let provider = try! providerDependencies.resolve() as PersonProviderAPI
-        return provider.fetchIDs(completion)
+        return personProvider.fetchIDs(completion)
     }
+    
     func fetchOne(personID: Int, completion: Person? -> Void) {
-        let provider = try! providerDependencies.resolve(tag: .Int(personID)) as PersonProviderAPI
-        return provider.fetch(personID, completion: completion)
+        return personProvider.fetch(personID, completion: completion)
     }
     
     var fetchProgress: (current: Int, total: Int?) = (0, nil) {
@@ -37,7 +39,7 @@ class PersonListViewController: UITableViewController, FetchableTrait {
             else {
                 fatalError()
         }
-        
+        destVC.starshipProvider = starshipProvider
         destVC.loadObjects(person.starshipIDs)
     }
 }
