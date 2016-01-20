@@ -214,13 +214,14 @@ You can find more use cases for auto-injection in the Playground available in th
 
 ### Thread safety
 
-_Dip_ does not provide thread safety, so you need to make sure you always call `resolve` method of `DependencyContainer` from the single thread. 
-Otherwise if two threads try to resolve the same type they can get different instances where the same instance is expected.
+`DependencyContainer` is thread safe, you can register and resolve components from different threads. 
+Still we encourage to register components in the main thread early in the application lifecycle to prevent race conditions 
+when you try to resolve component from one thread while it was not yet registered in container by another thread.
 
 ### Errors
 
 The resolve operation is potentially dangerous because you can use the wrong type, factory or a wrong tag. For that reason Dip throws an error
- `DefinitionNotFond(DefinitionKey)` if it failed to resolve type. When calling `resolve` you need to use a `try` operator. 
+ `DefinitionNotFound(DefinitionKey)` if it failed to resolve type. When calling `resolve` you need to use a `try` operator. 
  There are rare use cases where your application can recover from this kind of errors (for example you can register new types 
  when user unlocks some content). In most of the cases you can use `try!` to cause an exception at runtime if error was thrown
   or `try?` if it is appropriate in your case to have `nil`. This way `try!` serves as an additional mark for developers that resolution can fail.

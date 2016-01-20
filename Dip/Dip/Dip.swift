@@ -41,6 +41,7 @@ public final class DependencyContainer {
   }
   
   var definitions = [DefinitionKey : Definition]()
+  let lock = NSRecursiveLock()
   
   /**
    Designated initializer for a DependencyContainer
@@ -57,6 +58,16 @@ public final class DependencyContainer {
     configBlock(self)
   }
   
+  // MARK: - Thread safety
+  
+  private func threadSafe<T>(closure: () throws -> T) rethrows -> T {
+    lock.lock()
+    defer {
+      lock.unlock()
+    }
+    return try closure()
+  }
+
   // MARK: - Removing definitions
   
   /**
@@ -71,10 +82,12 @@ public final class DependencyContainer {
   }
   
   public func remove(definition: Definition, forKey key: DefinitionKey) {
-    definitions[key] = nil
-    if let definition = definition as? AutoInjectedDefinition {
-      removeInjected(definition)
-      removeInjectedWeak(definition)
+    threadSafe {
+      self.definitions[key] = nil
+      if let definition = definition as? AutoInjectedDefinition {
+        self.removeInjected(definition)
+        self.removeInjectedWeak(definition)
+      }
     }
   }
 
@@ -82,7 +95,9 @@ public final class DependencyContainer {
    Clear all the previously registered dependencies on this container.
    */
   public func reset() {
-    definitions.removeAll()
+    threadSafe {
+      self.definitions.removeAll()
+    }
   }
 
   // MARK: Register definitions
@@ -149,11 +164,13 @@ public final class DependencyContainer {
   }
   
   public func register(definition: Definition, forKey key: DefinitionKey) {
-    definitions[key] = definition
+    threadSafe {
+      self.definitions[key] = definition
     
-    if let definition = definition as? AutoInjectedDefinition where key.associatedTag == nil {
-      registerInjected(definition)
-      registerInjectedWeak(definition)
+      if let definition = definition as? AutoInjectedDefinition where key.associatedTag == nil {
+        self.registerInjected(definition)
+        self.registerInjectedWeak(definition)
+      }
     }
   }
 
@@ -206,14 +223,14 @@ public final class DependencyContainer {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
 
-    guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
-      let error = DipError.DefinitionNotFound(key)
-      print("\(error)")
-      throw error
+    return try threadSafe {
+      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
+          throw DipError.DefinitionNotFound(key)
+      }
+      
+      let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
+      return try self._resolve(tag, key: usingKey, definition: definition, builder: builder)
     }
-
-    let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
-    return try _resolve(tag, key: usingKey, definition: definition, builder: builder)
   }
   
   /// Actually resolve dependency
@@ -244,7 +261,6 @@ public final class DependencyContainer {
         return resolvedInstance
       }
     }
-    
   }
   
   // MARK: - Private
