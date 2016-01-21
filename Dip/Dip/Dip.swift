@@ -239,7 +239,6 @@ public final class DependencyContainer {
     return try resolvedInstances.resolve {
       
       if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
-        resolvedInstances.storeResolvedInstance(previouslyResolved, forKey: key, definition: definition)
         return previouslyResolved
       }
       else {
@@ -249,7 +248,6 @@ public final class DependencyContainer {
         //when it returns instance that we try to resolve here can be already resolved
         //so we return it, throwing away instance created by previous call to builder
         if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
-          resolvedInstances.storeResolvedInstance(previouslyResolved, forKey: key, definition: definition)
           return previouslyResolved
         }
         
@@ -274,6 +272,8 @@ public final class DependencyContainer {
 
     func storeResolvedInstance<T, F>(instance: T, forKey key: DefinitionKey?, definition: DefinitionOf<T, F>) {
       resolvedInstances[key] = instance
+      
+      //to be able to reuse instances for auto-injected properties
       if key != nil {
         resolvedInstances[definition.injectedKey] = instance
         resolvedInstances[definition.injectedWeakKey] = instance
@@ -281,7 +281,19 @@ public final class DependencyContainer {
     }
     
     func previouslyResolved<T, F>(key: DefinitionKey?, definition: DefinitionOf<T, F>) -> T? {
-      return (definition.resolvedInstance ?? resolvedInstances[key]) as? T
+      if let singleton = definition.resolvedInstance {
+        return singleton
+      }
+      else if let resolved = resolvedInstances[key] {
+        return resolved as? T
+      }
+      else if let key = key where key.associatedTag == nil {
+        //for cases when type was previously resolved as auto-injected property
+        if let resolved = resolvedInstances[definition.injectedKey] ?? resolvedInstances[definition.injectedWeakKey] {
+          return resolved as? T
+        }
+      }
+      return nil
     }
     
     private var depth: Int = 0

@@ -170,6 +170,36 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(client === anotherClient)
   }
   
+  func testThatItReuseResolvedAutoInjectedInstancesNoMatterWhat() {
+    
+    class Obj1 {
+      let obj2 = InjectedWeak<Obj2>()
+      let obj3 = Injected<Obj3>()
+    }
+    
+    class Obj2 {
+      let obj1 = Injected<Obj1>()
+    }
+    
+    class Obj3 {
+      
+      weak var obj1: Obj1?
+      
+      init(obj: Obj1) {
+        self.obj1 = obj
+      }
+    }
+    
+    container.register(.ObjectGraph) { Obj1() }
+    container.register(.ObjectGraph) { Obj2() }
+    container.register(.ObjectGraph) { Obj3(obj: try self.container.resolve()) }
+    
+    let obj2 = try! container.resolve() as Obj2
+    XCTAssertTrue(obj2 === obj2.obj1.value!.obj2.value!)
+    XCTAssertTrue(obj2.obj1.value! === obj2.obj1.value!.obj3.value!.obj1)
+    
+  }
+  
   func testThatThereIsNoRetainCycleBetweenCircularDependencies() {
     var client: Client? = try! container.resolve() as Client
     weak var server: Server? = client?.server
