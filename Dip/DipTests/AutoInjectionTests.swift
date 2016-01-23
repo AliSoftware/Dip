@@ -27,13 +27,14 @@ import XCTest
 
 private protocol Server: class {
   weak var client: Client? {get}
-  
   var anotherClient: Client? {get set}
+  var optionalClient: AnyObject? {get}
 }
 
 private protocol Client: class {
   var server: Server? {get}
   var anotherServer: Server? {get set}
+  var optionalServer: AnyObject? {get}
 }
 
 class AutoInjectionTests: XCTestCase {
@@ -59,6 +60,9 @@ class AutoInjectionTests: XCTestCase {
     }
     
     weak var anotherClient: Client?
+    
+    weak var _optionalClient = InjectedWeak<AnyObject>(required: false)
+    var optionalClient: AnyObject? { return _optionalClient?.value }
   }
   
   private class ClientImp: Client {
@@ -72,6 +76,10 @@ class AutoInjectionTests: XCTestCase {
     }
     
     var anotherServer: Server?
+    
+    var _optionalServer = Injected<AnyObject>(required: false)
+    
+    var optionalServer: AnyObject? { return _optionalServer.value }
     
     var server: Server? {
       return _server.value
@@ -266,6 +274,18 @@ class AutoInjectionTests: XCTestCase {
     
     XCTAssertFalse(container.definitions.contains { $0.1 === def.injectedDefinition })
     XCTAssertFalse(container.definitions.contains { $0.1 === def.injectedWeakDefinition })
+  }
+  
+  func testThatOptionalPropertiesAreNotInjectedAndErrorNotThrown() {
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+
+    do {
+      try container.resolve() as Client
+    }
+    catch {
+      XCTFail("Container should not throw error if failed to resolve optional auto-injected properties")
+    }
   }
   
 }
