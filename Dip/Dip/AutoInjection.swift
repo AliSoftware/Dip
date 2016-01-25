@@ -109,8 +109,8 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
     return _value as? T
   }
 
-  public override init(required: Bool = true, didInject: T -> () = { _ in }) {
-    super.init(required: required, didInject: didInject)
+  public override init(required: Bool = true, tag: DependencyContainer.Tag? = nil, didInject: T -> () = { _ in }) {
+    super.init(required: required, tag: tag, didInject: didInject)
   }
   
   private func resolve(container: DependencyContainer) throws {
@@ -169,8 +169,8 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropert
     return _value as? T
   }
 
-  public override init(required: Bool = true, didInject: T -> () = { _ in }) {
-    super.init(required: required, didInject: didInject)
+  public override init(required: Bool = true, tag: DependencyContainer.Tag? = nil, didInject: T -> () = { _ in }) {
+    super.init(required: required, tag: tag, didInject: didInject)
   }
   
   private func resolve(container: DependencyContainer) throws {
@@ -191,19 +191,21 @@ private class _InjectedPropertyBox<T> {
 
   let required: Bool
   let didInject: T -> ()
+  let tag: DependencyContainer.Tag?
 
-  init(required: Bool = true, didInject: T -> () = { _ in }) {
+  init(required: Bool = true, tag: DependencyContainer.Tag?, didInject: T -> () = { _ in }) {
     self.required = required
+    self.tag = tag
     self.didInject = didInject
   }
 
   private func resolve(container: DependencyContainer) throws -> T? {
     let resolved: T?
     if required {
-      resolved = try container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
+      resolved = try container.resolve(tag: tag, builder: { (factory: () throws -> T) in try factory() }) as T
     }
     else {
-      resolved = try? container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
+      resolved = try? container.resolve(tag: tag, builder: { (factory: () throws -> T) in try factory() }) as T
     }
     return resolved
   }

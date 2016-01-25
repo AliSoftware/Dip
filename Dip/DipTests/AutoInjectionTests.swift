@@ -85,6 +85,8 @@ class AutoInjectionTests: XCTestCase {
       return _server.value
     }
     
+    var taggedServer = Injected<Server>(tag: "tagged")
+
   }
 
   let container = DependencyContainer()
@@ -99,7 +101,7 @@ class AutoInjectionTests: XCTestCase {
     AutoInjectionTests.serverDidInjectCalled = false
   }
 
-  func testThatItResolvesInjectedDependencies() {
+  func testThatItResolvesAutoInjectedDependencies() {
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(.ObjectGraph) { ClientImp() as Client }
     
@@ -274,6 +276,23 @@ class AutoInjectionTests: XCTestCase {
     catch {
       XCTFail("Container should not throw error if failed to resolve optional auto-injected properties")
     }
+  }
+  
+  func testThatItResolvesAutoInjectedTaggedDependencies() {
+    //given
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(tag: "tagged", .ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
+    //when
+    let client = try! container.resolve() as Client
+    
+    //then
+    let taggedServer = (client as! ClientImp).taggedServer.value!
+    let server = client.server!
+    
+    //server and tagged server should be resolved as different instances
+    XCTAssertTrue(server !== taggedServer)
   }
   
 }
