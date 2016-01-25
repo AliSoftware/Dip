@@ -211,16 +211,17 @@ public final class DependencyContainer {
    
    */
   public func resolve<T, F>(tag tag: Tag? = nil, builder: F throws -> T) throws -> T {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
-
     return try threadSafe {
-      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
+      let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+      let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
+      
+      if let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> {
+        let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
+        return try self._resolve(tag, key: usingKey, definition: definition, builder: builder)
+      }
+      else {
         throw DipError.DefinitionNotFound(key)
       }
-      
-      let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
-      return try self._resolve(tag, key: usingKey, definition: definition, builder: builder)
     }
   }
   
@@ -343,11 +344,14 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
 
 public enum DipError: ErrorType, CustomStringConvertible {
   case DefinitionNotFound(DefinitionKey)
-  
+  case AutoInjectionFailed(String?, Any.Type, ErrorType)
+
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
       return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
+    case let .AutoInjectionFailed(label, type, error):
+      return "Failed to auto-inject property \"\(label)\" of type \(type). \(error)"
     }
   }
 }
