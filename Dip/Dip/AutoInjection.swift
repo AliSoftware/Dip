@@ -97,7 +97,7 @@ private protocol _AnyInjectedPropertyBox: class {
  - seealso: `InjectedWeak`, `DependencyContainer.resolveDependencies(_:)`
 
 */
-public final class Injected<T>: _AnyInjectedPropertyBox {
+public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
   
   var _value: Any? = nil {
     didSet {
@@ -105,29 +105,17 @@ public final class Injected<T>: _AnyInjectedPropertyBox {
     }
   }
   
-  private let required: Bool
-  private let didInject: T -> ()
-  
   public var value: T? {
     return _value as? T
   }
 
-  public init(required: Bool = true, didInject: T -> () = { _ in }) {
-    self.required = required
-    self.didInject = didInject
+  public override init(required: Bool = true, didInject: T -> () = { _ in }) {
+    super.init(required: required, didInject: didInject)
   }
   
   private func resolve(container: DependencyContainer) throws {
-    if required {
-      self._value = try container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
-    }
-    else {
-      self._value = try? container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
-    }
-  }
-  
-  static var wrappedType: Any.Type {
-    return T.self
+    let resolved: T? = try super.resolve(container)
+    _value = resolved
   }
   
 }
@@ -164,7 +152,7 @@ If you need to nilify wrapped value, assing property to `InjectedWeak<T>()`.
  - seealso: `Injected`, `DependencyContainer.resolveDependencies(_:)`
  
  */
-public final class InjectedWeak<T>: _AnyInjectedPropertyBox {
+public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
 
   //Only classes (means AnyObject) can be used as `weak` properties
   //but we can not make <T: AnyObject> because that will prevent using protocol as generic type
@@ -177,19 +165,39 @@ public final class InjectedWeak<T>: _AnyInjectedPropertyBox {
     }
   }
   
-  private let required: Bool
-  private let didInject: T -> ()
-  
   public var value: T? {
     return _value as? T
   }
 
-  public init(required: Bool = true, didInject: T -> () = { _ in }) {
-    self.required = required
-    self.didInject = didInject
+  public override init(required: Bool = true, didInject: T -> () = { _ in }) {
+    super.init(required: required, didInject: didInject)
   }
   
   private func resolve(container: DependencyContainer) throws {
+    let resolved: T? = try super.resolve(container)
+    guard let resolvedObject = resolved as? AnyObject else {
+      fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
+    }
+    _value = resolvedObject
+  }
+  
+}
+
+private class _InjectedPropertyBox<T> {
+
+  static var wrappedType: Any.Type {
+    return T.self
+  }
+
+  let required: Bool
+  let didInject: T -> ()
+
+  init(required: Bool = true, didInject: T -> () = { _ in }) {
+    self.required = required
+    self.didInject = didInject
+  }
+
+  private func resolve(container: DependencyContainer) throws -> T? {
     let resolved: T?
     if required {
       resolved = try container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
@@ -197,14 +205,7 @@ public final class InjectedWeak<T>: _AnyInjectedPropertyBox {
     else {
       resolved = try? container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
     }
-    guard let resolvedObject = resolved as? AnyObject else {
-      fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
-    }
-    _value = resolvedObject
-  }
-  
-  static var wrappedType: Any.Type {
-    return T.self
+    return resolved
   }
   
 }
