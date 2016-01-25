@@ -42,24 +42,3 @@ extension Optional {
     return self.map { "\($0)" } ?? "nil"
   }
 }
-
-extension String {
-  func match(pattern: String) throws -> [String]? {
-    let expr = try NSRegularExpression(pattern: pattern, options: NSRegularExpressionOptions())
-    let result = expr.firstMatchInString(self, options: NSMatchingOptions(), range: NSMakeRange(0, characters.count))
-    return result?.allRanges.flatMap(safeSubstringWithRange)
-  }
-  
-  func safeSubstringWithRange(range: NSRange) -> String? {
-    if NSMaxRange(range) <= self.characters.count {
-      return (self as NSString).substringWithRange(range)
-    }
-    return nil
-  }
-}
-
-extension NSTextCheckingResult {
-  var allRanges: [NSRange] {
-    return (0..<numberOfRanges).map(rangeAtIndex)
-  }
-}

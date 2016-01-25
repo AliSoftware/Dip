@@ -104,8 +104,6 @@ public final class DefinitionOf<T, F>: Definition {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
     self.resolveDependenciesBlock = block
-    self.injectedDefinition?.resolveDependenciesBlock = { try block($0, $1 as! T) }
-    self.injectedWeakDefinition?.resolveDependenciesBlock = { try block($0, $1 as! T) }
     return self
   }
   
@@ -119,75 +117,34 @@ public final class DefinitionOf<T, F>: Definition {
   
   private(set) var resolveDependenciesBlock: ((DependencyContainer, T) throws -> ())?
   
-  private init(factory: F) {
+  public init(scope: ComponentScope, factory: F) {
     self.factory = factory
-  }
-  
-  public convenience init(scope: ComponentScope, factory: F) {
-    self.init(factory: factory)
     self.scope = scope
-    
-    if let factory = factory as? () throws -> T {
-      injectedKey = DefinitionKey(protocolType: Any.self, factoryType: InjectedFactory.self, associatedTag: Injected<T>.tag)
-      injectedWeakKey = DefinitionKey(protocolType: AnyObject.self, factoryType: InjectedWeakFactory.self, associatedTag: InjectedWeak<T>.tag)
-      
-      //these definitions will be used during auto-injection
-      injectedDefinition = DefinitionOf<Any, InjectedFactory>(factory: { try factory() })
-      injectedDefinition?.scope = scope
-      
-      injectedWeakDefinition = DefinitionOf<AnyObject, InjectedWeakFactory>(factory: {
-        guard let result = try factory() as? AnyObject else {
-          fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
-        }
-        return result
-      })
-      injectedWeakDefinition?.scope = scope
-    }
   }
   
   ///Will be stored only if scope is `Singleton`
   var resolvedInstance: T? {
     get {
       guard scope == .Singleton else { return nil }
-      
-      return _resolvedInstance ??
-        injectedDefinition?._resolvedInstance as? T ??
-        injectedWeakDefinition?._resolvedInstance as? T
+      return _resolvedInstance
     }
     set {
       guard scope == .Singleton else { return }
-      
       _resolvedInstance = newValue
-      injectedDefinition?._resolvedInstance = newValue
-      injectedWeakDefinition?._resolvedInstance = newValue as? AnyObject
     }
   }
   
   private var _resolvedInstance: T?
   
-  ///Accessory definition used to auto-inject strong properties
-  private(set) var injectedDefinition: DefinitionOf<Any, InjectedFactory>?
-  private(set) var injectedKey: DefinitionKey?
-  
-  ///Accessory definition used to auto-inject weak properties
-  private(set) var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>?
-  private(set) var injectedWeakKey: DefinitionKey?
-
 }
 
 ///Dummy protocol to store definitions for different types in collection
 public protocol Definition: class { }
 
 protocol _Definition: Definition {
-  var injectedDefinition: DefinitionOf<Any, InjectedFactory>? { get }
-  var injectedKey: DefinitionKey? { get }
-
-  var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>? { get }
-  var injectedWeakKey: DefinitionKey? { get }
 
   var scope: ComponentScope { get }
 
-  func resolveDependencies(container: DependencyContainer, resolvedInstance: Any) throws
 }
 
 extension DefinitionOf: _Definition { }

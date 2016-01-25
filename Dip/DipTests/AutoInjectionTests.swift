@@ -264,18 +264,6 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled)
   }
   
-  func testThatRemovingDefinitionAlsoRemovesAutoInjectionDefinitions() {
-    let def = container.register(.ObjectGraph) { ServerImp() as Server }
-    
-    XCTAssertTrue(container.definitions.contains { $0.1 === def.injectedDefinition })
-    XCTAssertTrue(container.definitions.contains { $0.1 === def.injectedWeakDefinition })
-    
-    container.remove(def)
-    
-    XCTAssertFalse(container.definitions.contains { $0.1 === def.injectedDefinition })
-    XCTAssertFalse(container.definitions.contains { $0.1 === def.injectedWeakDefinition })
-  }
-  
   func testThatOptionalPropertiesAreNotInjectedAndErrorNotThrown() {
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(.ObjectGraph) { ClientImp() as Client }

@@ -38,13 +38,14 @@ extension DependencyContainer {
    - Warning: If you resolve dependencies of the object created not by container and it has auto-injected circular dependency, container will be not able to resolve it correctly because container does not have this object in it's resolved instances stack. Thus it will create another instance of that type to satisfy circular dependency.
    
    **Example**:
+   
    ```swift
    class ClientImp: Client {
-   var service = Injected<Service>()
+     var service = Injected<Service>()
    }
    
    class ServiceImp: Service {
-   var client = InjectedWeak<Client>()
+     var client = InjectedWeak<Client>()
    }
    
    //when resolved client will have service injected
@@ -63,24 +64,29 @@ extension DependencyContainer {
   
 }
 
-/**
-Use this wrapper to identifiy strong properties of the instance that should be injected when you call
-`resolveDependencies()` on this instance. Type T can be any type.
-
-- warning:
-Do not define this property as optional or container will not be able to inject it.
-Instead define it with initial value of `Injected<T>()`.
-If you need to nilify wrapped value, assing property to `Injected<T>()`.
-
-**Example**:
-
-```swift
-class ClientImp: Client {
-  var service = Injected<Service>()
+private protocol _AnyInjectedPropertyBox: class {
+  func resolve(container: DependencyContainer) throws
 }
 
-```
-- seealso: `InjectedWeak`, `DependencyContainer.resolveDependencies(_:)`
+
+/**
+ Use this wrapper to identifiy strong properties of the instance that should be injected when you call
+ `resolveDependencies()` on this instance. Type T can be any type.
+
+ - warning:
+ Do not define this property as optional or container will not be able to inject it.
+ Instead define it with initial value of `Injected<T>()`.
+ If you need to nilify wrapped value, assing property to `Injected<T>()`.
+
+ **Example**:
+
+ ```swift
+ class ClientImp: Client {
+   var service = Injected<Service>()
+ }
+
+ ```
+ - seealso: `InjectedWeak`, `DependencyContainer.resolveDependencies(_:)`
 
 */
 public final class Injected<T>: _AnyInjectedPropertyBox {
@@ -103,23 +109,19 @@ public final class Injected<T>: _AnyInjectedPropertyBox {
     self.didInject = didInject
   }
   
-  static var tag: DependencyContainer.Tag {
-    return .String(String(Injected<T>))
-  }
-
   private func resolve(container: DependencyContainer) throws {
     if required {
-      self._value = try container._resolve(self) as Any
+      self._value = try container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
     }
     else {
-      self._value = try? container._resolve(self) as Any
+      self._value = try? container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
     }
   }
-
+  
 }
 
 /**
- Use this wrapper to identifiy weak properties of the instance that should be injected when you call
+ Use this wrapper to identify weak properties of the instance that should be injected when you call
  `resolveDependencies()` on this instance. Type T should be a **class** type.
  Otherwise it will cause runtime exception when container will try to resolve the property.
  Use this wrapper to define one of two circular dependencies to avoid retain cycle.
@@ -153,9 +155,9 @@ If you need to nilify wrapped value, assing property to `InjectedWeak<T>()`.
 public final class InjectedWeak<T>: _AnyInjectedPropertyBox {
 
   //Only classes (means AnyObject) can be used as `weak` properties
-  //but we can not make <T: AnyObject> cause that will prevent using protocol as generic type
+  //but we can not make <T: AnyObject> because that will prevent using protocol as generic type
   //so we just rely on user reading documentation and passing AnyObject in runtime
-  //also we will throw fatal error if type can not be casted to AnyObject during resolution
+  //also we will throw fatal error if type can not be casted to AnyObject during resolution.
 
   weak var _value: AnyObject? = nil {
     didSet {
@@ -175,42 +177,20 @@ public final class InjectedWeak<T>: _AnyInjectedPropertyBox {
     self.didInject = didInject
   }
   
-  static var tag: DependencyContainer.Tag {
-    return .String(String(InjectedWeak<T>))
-  }
-
   private func resolve(container: DependencyContainer) throws {
+    let resolved: T?
     if required {
-      self._value = try container._resolve(self) as AnyObject
+      resolved = try container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
     }
     else {
-      self._value = try? container._resolve(self) as AnyObject
+      resolved = try? container.resolve(builder: { (factory: () throws -> T) in try factory() }) as T
     }
+    guard let resolvedObject = resolved as? AnyObject else {
+      fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
+    }
+    _value = resolvedObject
   }
-
-}
-
-//MARK: - Private
-
-typealias InjectedFactory = () throws -> Any
-typealias InjectedWeakFactory = () throws -> AnyObject
-
-private protocol _AnyInjectedPropertyBox: class {
-  static var tag: DependencyContainer.Tag { get }
-  func resolve(container: DependencyContainer) throws
-}
-
-extension DependencyContainer {
-  private func _resolve<T>(injectedPropertyBox: _AnyInjectedPropertyBox) throws -> T {
-    return try resolve(tag: injectedPropertyBox.dynamicType.tag) as T
-  }
-}
-
-func autoInjectedType(tag: DependencyContainer.Tag?) -> String? {
-  guard let tag = tag else { return nil }
-  guard case let .String(stringTag) = tag else { return nil }
   
-  return try! stringTag.match("^Injected(?:Weak)?<(.+)>$")?.dropFirst().first
 }
 
 

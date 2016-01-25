@@ -78,16 +78,12 @@ public final class DependencyContainer {
    */
   public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    remove(definition, forKey: key)
+    remove(definitionForKey: key)
   }
   
-  func remove(definition: Definition, forKey key: DefinitionKey) {
+  func remove(definitionForKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = nil
-      if let definition = definition as? _Definition {
-        definitions[definition.injectedKey] = nil
-        definitions[definition.injectedWeakKey] = nil
-      }
     }
   }
 
@@ -166,11 +162,6 @@ public final class DependencyContainer {
   func register(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = definition
-    
-      if let definition = definition as? _Definition where key.associatedTag == nil {
-        definitions[definition.injectedKey] = definition.injectedDefinition
-        definitions[definition.injectedWeakKey] = definition.injectedWeakDefinition
-      }
     }
   }
 
@@ -276,12 +267,6 @@ public final class DependencyContainer {
 
     func storeResolvedInstance<T, F>(instance: T, forKey key: DefinitionKey?, definition: DefinitionOf<T, F>) {
       resolvedInstances[key] = instance
-      
-      //to be able to reuse instances for auto-injected properties
-      if key != nil {
-        resolvedInstances[definition.injectedKey] = instance
-        resolvedInstances[definition.injectedWeakKey] = instance
-      }
     }
     
     func previouslyResolved<T, F>(key: DefinitionKey?, definition: DefinitionOf<T, F>) -> T? {
@@ -290,12 +275,6 @@ public final class DependencyContainer {
       }
       else if let resolved = resolvedInstances[key] {
         return resolved as? T
-      }
-      else if let key = key where key.associatedTag == nil {
-        //for cases when type was previously resolved as auto-injected property
-        if let resolved = resolvedInstances[definition.injectedKey] ?? resolvedInstances[definition.injectedWeakKey] {
-          return resolved as? T
-        }
       }
       return nil
     }
@@ -368,9 +347,6 @@ public enum DipError: ErrorType, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
-      if let wrappedType = autoInjectedType(key.associatedTag) {
-        return "Failed to auto-inject property of type \(wrappedType). Check if you registered factory with no tag and no runtime arguments for type \(wrappedType)."
-      }
       return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     }
   }
