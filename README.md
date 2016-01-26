@@ -18,7 +18,7 @@ It's inspired by `.NET`'s [Unity Container](https://msdn.microsoft.com/library/f
 * You start by creating `let dc = DependencyContainer()` and **register all your dependencies, by associating a `protocol` to an `instance` or a `factory`**.
 * Then anywhere in your application, you can call `dc.resolve()` to **resolve a `protocol` into an instance of a concrete type** using that `DependencyContainer`.
 
-This allows you to define the real, concrete types only in one place ([e.g. like this in your app](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/DependencyContainers.swift#L22-L27), and [resetting it in your `setUp` for each Unit Tests](https://github.com/AliSoftware/Dip/blob/master/Example/Tests/SWAPIPersonProviderTests.swift#L17-L21)) and then [only work with `protocols` in your code](https://github.com/AliSoftware/Dip/blob/master/Example/DipSampleApp/Providers/SWAPIStarshipProvider.swift#L12) (which only define an API contract), without worrying about the real implementation.
+This allows you to define the real, concrete types only in one place ([e.g. like this in your app](SampleApp/DipSampleApp/DependencyContainers.swift#L22-L27), and [resetting it in your `setUp` for each Unit Tests](SampleApp/Tests/SWAPIPersonProviderTests.swift#L17-L21)) and then [only work with `protocols` in your code](SampleApp/DipSampleApp/Providers/SWAPIStarshipProvider.swift#L12) (which only define an API contract), without worrying about the real implementation.
 
 ## Advantages of DI and loose coupling
 
