@@ -180,4 +180,4 @@ So as you can see there are certain advantages and disadvatages of using auto-in
 So you should decide for yourself whether you prefer to use auto-injection or "the standard" way. At the end they let you achieve the same result.
 */
 
-//: [Next: Testing](@next)
+//: [Next: Multi-injection](@next)
