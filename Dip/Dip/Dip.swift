@@ -60,7 +60,7 @@ public final class DependencyContainer {
   
   // MARK: - Thread safety
   
-  private func threadSafe<T>(closure: () throws -> T) rethrows -> T {
+  private func threadSafe<T>(@noescape closure: () throws -> T) rethrows -> T {
     lock.lock()
     defer {
       lock.unlock()
@@ -83,10 +83,10 @@ public final class DependencyContainer {
   
   public func remove(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
-      self.definitions[key] = nil
+      definitions[key] = nil
       if let definition = definition as? AutoInjectedDefinition {
-        self.removeInjected(definition)
-        self.removeInjectedWeak(definition)
+        removeInjected(definition)
+        removeInjectedWeak(definition)
       }
     }
   }
@@ -96,7 +96,7 @@ public final class DependencyContainer {
    */
   public func reset() {
     threadSafe {
-      self.definitions.removeAll()
+      definitions.removeAll()
     }
   }
 
@@ -165,11 +165,11 @@ public final class DependencyContainer {
   
   public func register(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
-      self.definitions[key] = definition
+      definitions[key] = definition
     
       if let definition = definition as? AutoInjectedDefinition where key.associatedTag == nil {
-        self.registerInjected(definition)
-        self.registerInjectedWeak(definition)
+        registerInjected(definition)
+        registerInjectedWeak(definition)
       }
     }
   }
