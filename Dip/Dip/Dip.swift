@@ -41,6 +41,7 @@ public final class DependencyContainer {
   }
   
   var definitions = [DefinitionKey : Definition]()
+  let resolvedInstances = ResolvedInstances()
   let lock = NSRecursiveLock()
   
   /**
@@ -58,8 +59,6 @@ public final class DependencyContainer {
     configBlock(self)
   }
   
-  // MARK: - Thread safety
-  
   private func threadSafe<T>(@noescape closure: () throws -> T) rethrows -> T {
     lock.lock()
     defer {
@@ -67,36 +66,12 @@ public final class DependencyContainer {
     }
     return try closure()
   }
-
-  // MARK: - Removing definitions
   
-  /**
-   Removes previously registered definition from container.
-   
-   - parameter tag: tag used to register definition
-   - parameter definition: definition to remove
-   */
-  public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    remove(definitionForKey: key)
-  }
-  
-  func remove(definitionForKey key: DefinitionKey) {
-    threadSafe {
-      definitions[key] = nil
-    }
-  }
+}
 
-  /**
-   Clear all the previously registered dependencies on this container.
-   */
-  public func reset() {
-    threadSafe {
-      definitions.removeAll()
-    }
-  }
+// MARK: - Registering definitions
 
-  // MARK: Register definitions
+extension DependencyContainer {
   
   /**
   Register a Void->T factory associated with optional tag.
@@ -165,7 +140,11 @@ public final class DependencyContainer {
     }
   }
 
-  // MARK: Resolve dependencies
+}
+
+// MARK: - Resolve dependencies
+
+extension DependencyContainer {
   
   /**
   Resolve a dependency.
@@ -270,11 +249,7 @@ public final class DependencyContainer {
     }
   }
   
-  // MARK: - Private
-  
-  let resolvedInstances = ResolvedInstances()
-  
-  ///Pool to hold instances, created during call to `resolve()`. 
+  ///Pool to hold instances, created during call to `resolve()`.
   ///Before `resolve()` returns pool is drained.
   class ResolvedInstances {
     var resolvedInstances = [DefinitionKey: Any]()
@@ -310,6 +285,39 @@ public final class DependencyContainer {
     }
   }
   
+}
+
+// MARK: - Removing definitions
+
+extension DependencyContainer {
+  
+  /**
+   Removes definition registered in the container.
+
+   - parameters:
+      - tag: The tag used to register definition.
+      - definition: The definition to remove
+   */
+  public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+    remove(definitionForKey: key)
+  }
+  
+  func remove(definitionForKey key: DefinitionKey) {
+    threadSafe {
+      definitions[key] = nil
+    }
+  }
+
+  /**
+   Removes all definitions registered in the container.
+   */
+  public func reset() {
+    threadSafe {
+      definitions.removeAll()
+    }
+  }
+
 }
 
 extension DependencyContainer: CustomStringConvertible {
