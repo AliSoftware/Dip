@@ -75,17 +75,17 @@ extension DependencyContainer {
    Resolves properties of passed object wrapped with `Injected<T>` or `InjectedWeak<T>`
    */
   func autoInjectProperties(instance: Any) throws {
-    try Mirror(reflecting: instance).children.forEach(resolveChild)
+    try Mirror(reflecting: instance).children.forEach(_resolveChild)
   }
   
-  private func resolveChild(child: Mirror.Child) throws {
+  private func _resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? _AnyInjectedPropertyBox else { return }
     
     do {
       try injectedPropertyBox.resolve(self)
     }
     catch {
-      throw DipError.AutoInjectionFailed(child.label, injectedPropertyBox.dynamicType.wrappedType, error)
+      throw DipError.AutoInjectionFailed(label: child.label, type: injectedPropertyBox.dynamicType.wrappedType, underlyingError: error)
     }
   }
   
@@ -101,10 +101,8 @@ private protocol _AnyInjectedPropertyBox: class {
  Use this wrapper to identifiy strong properties of the instance that should be injected when you call
  `resolveDependencies()` on this instance. Type T can be any type.
 
- - warning:
- Do not define this property as optional or container will not be able to inject it.
- Instead define it with initial value of `Injected<T>()`.
- If you need to nilify wrapped value, assing property to `Injected<T>()`.
+ - warning: Do not define this property as optional or container will not be able to inject it.
+            Instead define it with initial value of `Injected<T>()`.
 
  **Example**:
 
@@ -125,10 +123,22 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
     }
   }
   
+  ///Wrapped value.
   public var value: T? {
     return _value as? T
   }
 
+  /**
+   Creates new wrapper for auto-injected property.
+   
+   - parameters:
+      - required: Defines if the property is required or not. 
+                  If container fails to inject required property it will als fail to resolve 
+                  the instance that defines that property. Default is `true`.
+      - tag: An optional tag to use to lookup definitions when injecting this property. Default is `nil`.
+      - didInject: block that will be called when concrete instance is injected in this property. 
+                   Similar to `didSet` property observer. Default value does nothing.
+  */
   public override init(required: Bool = true, tag: DependencyContainer.Tag? = nil, didInject: T -> () = { _ in }) {
     super.init(required: required, tag: tag, didInject: didInject)
   }
@@ -146,19 +156,17 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
  Otherwise it will cause runtime exception when container will try to resolve the property.
  Use this wrapper to define one of two circular dependencies to avoid retain cycle.
  
- - note:
- The only difference between `InjectedWeak` and `Injected` is that `InjectedWeak` uses _weak_ reference
- to store underlying value, when `Injected` uses _strong_ reference. For that reason if you resolve instance
- that has _weak_ auto-injected property this property will be released when `resolve` returns because no one else
- holds reference to it except the container during dependency graph resolution.
+ - note: The only difference between `InjectedWeak` and `Injected` is that `InjectedWeak` uses 
+         _weak_ reference to store underlying value, when `Injected` uses _strong_ reference. 
+         For that reason if you resolve instance that has _weak_ auto-injected property this property 
+         will be released when `resolve` returns because no one else holds reference to it except 
+         the container during dependency graph resolution.
  
  Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
  This will prevent a retain cycle between resolved instances.
 
- - warning:
- Do not define this property as optional or container will not be able to inject it.
- Instead define it with initial value of `InjectedWeak<T>()`.
-If you need to nilify wrapped value, assing property to `InjectedWeak<T>()`.
+ - warning: Do not define this property as optional or container will not be able to inject it.
+            Instead define it with initial value of `InjectedWeak<T>()`.
 
  **Example**:
  
@@ -185,10 +193,22 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropert
     }
   }
   
+  ///Wrapped value.
   public var value: T? {
     return _value as? T
   }
 
+  /**
+   Creates new wrapper for weak auto-injected property.
+   
+   - parameters:
+      - required: Defines if the property is required or not.
+                  If container fails to inject required property it will als fail to resolve
+                  the instance that defines that property. Default is `true`.
+      - tag: An optional tag to use to lookup definitions when injecting this property. Default is `nil`.
+      - didInject: block that will be called when concrete instance is injected in this property.
+                   Similar to `didSet` property observer. Default value does nothing.
+   */
   public override init(required: Bool = true, tag: DependencyContainer.Tag? = nil, didInject: T -> () = { _ in }) {
     super.init(required: required, tag: tag, didInject: didInject)
   }

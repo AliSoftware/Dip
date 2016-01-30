@@ -25,15 +25,14 @@
 // MARK: - DependencyContainer
 
 /**
-_Dip_'s Dependency Containers allow you to do very simple **Dependency Injection**
-by associating `protocols` to concrete implementations
+`DependencyContainer` allows you to do _Dependency Injection_
+by associating abstractions to concrete implementations.
 */
 public final class DependencyContainer {
   
   /**
-   Use a tag in case you need to register multiple instances or factories
-   with the same protocol, to differentiate them. Tags can be either String
-   or Int, to your convenience.
+   Use a tag in case you need to register multiple factories fo the same type,
+   to differentiate them. Tags can be either String or Int, to your convenience.
    */
   public enum Tag: Equatable {
     case String(StringLiteralType)
@@ -74,47 +73,51 @@ public final class DependencyContainer {
 extension DependencyContainer {
   
   /**
-  Register a Void->T factory associated with optional tag.
-  
-  - parameter tag: The arbitrary tag to associate this factory with when registering with that protocol. Pass `nil` to associate with any tag. Default value is `nil`.
-  - parameter scope: scope to use for this compone
-  - parameter factory: The factory to register, with return type of protocol you want to register it for
-  - returns: definition created for provided type and factory
-  
-  - note: You must cast the factory return type to the protocol you want to register it for.
-  
-  **Example**:
-  ```swift
-  container.register { ServiceImp() as Service }
-  container.register(tag: "service") { ServiceImp() as Service }
-  container.register(.ObjectGraph) { ServiceImp() as Service }
-  container.register { ClientImp(service: try! container.resolve() as Service) as Client }
-  ```
-  */
-  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws ->T > {
+   Register factory for type `T` and associate it with an optional tag.
+
+   - parameters:
+      - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
+      - scope: The scope to use for instance created by the factory.
+      - factory: The factory to register.
+
+   - returns: A registered definition.
+
+   - note: You should cast the factory return type to the protocol you want to register it for
+           (unless you want to register concrete type).
+
+   **Example**:
+   ```swift
+   container.register { ServiceImp() as Service }
+   container.register(tag: "service") { ServiceImp() as Service }
+   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register { ClientImp(service: try! container.resolve() as Service) as Client }
+   ```
+   */
+  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
   /**
-   Register generic factory associated with optional tag.
+   Register generic factory associated with an optional tag.
    
-   - parameter tag: The arbitrary tag to look for when resolving this protocol.
-   - parameter factory: generic factory that should be used to create concrete instance of type
-   - parameter scope: scope of the component. Default value is `Prototype`
-   - returns: definition created for provided type and factory
+   - parameters:
+      - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
+      - scope: The scope to use for instance created by the factory.
+      - factory: The factory to register.
+   
+   - returns: A registered definition.
 
-   - note: You should not call this method directly, instead call any of other `register` methods.
+   - note: You _should not_ call this method directly, instead call any of other `register` methods.
            You _should_ use this method only to register dependency with more runtime arguments
-           than _Dip_ supports (currently it's up to six) like in this example:
+           than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, ...) -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, ...) -> T> {
-     return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, ...) -> T>
+   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, ...) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, ...) throws -> T> {
+     return registerFactory(tag: tag, scope: scope, factory: factory) as DefinitionOf<T, (Arg1, Arg2, Arg3, ...) throws -> T>
    }
    ```
    
-   Though before you do that you should probably review your design and try to reduce number of depnedencies.
-   
+   Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
   public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
     let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
@@ -123,11 +126,13 @@ extension DependencyContainer {
   }
   
   /**
-   Registers new definiton in container and associate it with provided tag.
-   Will override already registered definition for the same type and factory associated with the same tag.
+   Register definiton in the container and associate it with an optional tag.
+   Will override already registered definition for the same type and factory, associated with the same tag.
    
-   - parameter tag: The arbitrary tag to associate definition with
-   - parameter definition: definition to register in container
+   - parameters:
+      - tag: The arbitrary tag to associate this definition with. Pass `nil` to associate with any tag. Default value is `nil`.
+      - definition: The definition to register in the container.
+   
    */
   public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
@@ -147,38 +152,52 @@ extension DependencyContainer {
 extension DependencyContainer {
   
   /**
-  Resolve a dependency.
-  
-  If no definition was registered with this `tag` for this `protocol`,
-  it will try to resolve the definition associated with `nil` (no tag).
-  
-  Will throw `DipError.DefinitionNotFound` if no registered definition found
-  that would match type, runtime arguments and tag.
-  
-  - parameter tag: The arbitrary tag to look for when resolving this protocol.
-  
-  **Example**:
-  ```swift
-  let service = try! container.resolve() as Service
-  let service = try! container.resolve(tag: "service") as Service
-  let service: Service = try! container.resolve()
-  ```
-  
-  */
+   Resolve a an instance of type `T`.
+   
+   If no matching definition was registered with provided `tag`,
+   container will lookup definition associated with `nil` tag.
+   
+   - parameter tag: The arbitrary tag to use to lookup definition.
+   
+   - throws: An error of type `DipError`:
+             `ResolutionFailed` - if some error was thrown during resolution;
+             `DefinitionNotFound` - if no matching definition was registered in that container.
+             `AutoInjectionFailed` - if failed to auto-inject required property
+   
+   - returns: An instance of type `T`.
+   
+   - seealso: `register(tag:_:factory:)`
+   
+   **Example**:
+   ```swift
+   let service = try! container.resolve() as Service
+   let service = try! container.resolve(tag: "service") as Service
+   let service: Service = try! container.resolve()
+   ```
+   
+   */
   public func resolve<T>(tag tag: Tag? = nil) throws -> T {
     return try resolve(tag: tag) { (factory: () throws -> T) in try factory() }
   }
   
   /**
-   Resolve a dependency using generic builder closure that accepts generic factory and returns created instance.
+   Resolve an instance of type `T` using generic builder closure that accepts generic factory and returns created instance.
    
-   - parameter tag: The arbitrary tag to look for when resolving this protocol.
-   - parameter builder: Generic closure that accepts generic factory and returns inctance produced by that factory
-   - returns: resolved instance of type T
+   - parameters:
+      - tag: The arbitrary tag to use to lookup definition.
+      - builder: Generic closure that accepts generic factory and returns inctance created by that factory.
    
-   - note: You should not call this method directly, instead call any of other `resolve` methods. (see `RuntimeArguments.swift`).
-   You _should_ use this method only to resolve dependency with more runtime arguments than _Dip_ supports
-   (currently it's up to six) like in this example:
+   - throws: An error of type `DipError`:
+             `ResolutionFailed` - if some error was thrown during resolution;
+             `DefinitionNotFound` - if no matching definition was registered in that container.
+             `AutoInjectionFailed` - if failed to auto-inject required property
+
+   - returns: An instance of type `T`.
+   
+   - note: You _should not_ call this method directly, instead call any of other 
+           `resolve(tag:)` or `resolve(tag:withArguments:)` methods.
+           You _should_ use this method only to resolve dependency with more runtime arguments than
+           _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
    public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) throws -> T {
@@ -186,8 +205,7 @@ extension DependencyContainer {
    }
    ```
    
-   Though before you do that you should probably review your design and try to reduce the number of dependencies.
-   
+   Though before you do so you should probably review your design and try to reduce the number of dependencies.
    */
   public func resolve<T, F>(tag tag: Tag? = nil, builder: F throws -> T) throws -> T {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
@@ -205,7 +223,7 @@ extension DependencyContainer {
     }
   }
   
-  /// Lookup definition by key or key with `nil` tag and use it to resolve instance.
+  /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
   func _resolveKey<T, F>(key: DefinitionKey, builder: F throws -> T) throws -> T {
     return try threadSafe {
       let nilTagKey = key.associatedTag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
@@ -366,18 +384,15 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
 /**
  Errors thrown by `DependencyContainer`'s methods.
  
- `ResolutionFailed` - some error was thrown during resolution.
- 
- `DefinitionNotFound` - no matching definition was registered in that container.
- 
+ - seealso: `resolve(tag:)`
 */
 public enum DipError: ErrorType, CustomStringConvertible {
   /**
   Thrown by `resolve(tag:)` if some error was thrown during resolution.
    
    - parameters:
-      - key: definition key associated with used definition
-      - underlyingError: the error that caused resolution to fail
+      - key: The key, which is associated with definition used to resolve instance
+      - underlyingError: The error that caused resolution to fail
    */
   case ResolutionFailed(key: DefinitionKey, underlyingError: ErrorType)
   
@@ -388,14 +403,22 @@ public enum DipError: ErrorType, CustomStringConvertible {
   */
   case DefinitionNotFound(key: DefinitionKey)
 
-  case AutoInjectionFailed(String?, Any.Type, ErrorType)
+  /**
+   Thrown by `resolve(tag:)` if failed to auto-inject required property.
+   
+   - parameters:
+      - label: The name of the property
+      - type: The type of the property
+      - underlyingError: The error that caused auto-injection to fail
+  */
+  case AutoInjectionFailed(label: String?, type: Any.Type, underlyingError: ErrorType)
   
   public var description: String {
     switch self {
     case let .ResolutionFailed(key, error):
       return "Failed to resolve type \(key.protocolType). \(error)"
     case let .DefinitionNotFound(key):
-      return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
+      return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
       return "Failed to auto-inject property \"\(label)\" of type \(type). \(error)"
     }

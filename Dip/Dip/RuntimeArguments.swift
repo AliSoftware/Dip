@@ -29,15 +29,16 @@ extension DependencyContainer {
   // MARK: 1 Runtime Argument
   
   /**
-  Registers factory that accepts one runtime argument. You can use up to six runtime arguments.
-  
-  - parameter tag: The arbitrary tag to associate this factory with when registering with that protocol.
-                   Pass `nil` to associate with any tag. Default value is `nil`.
-  - parameter factory: The factory to register, with return type of protocol you want to register it for
-  
-  - note: You can have several factories with different number or types of arguments registered to for same type.
-          When you resolve it container will match the type and tag as well as __number__, __types__ and __order__
-          of runtime arguments that you pass to `resolve` method.
+  Register factory that accepts one runtime argumentof type `Arg1`. You can use up to six runtime arguments.
+
+  - note: You can have several factories with different number or types of arguments registered for same type,
+          optionally associated with some tags. When container resolves that type it matches the type,
+          __number__, __types__ and __order__ of runtime arguments and optional tag that you pass to `resolve(tag:withArguments:)` method.
+
+  - parameters:
+    - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
+    - scope: The scope to use for this component. Default value is `.Prototype`.
+    - factory: The factory to register.
   
   - seealso: `registerFactory(tag:scope:factory:)`
   */
@@ -46,13 +47,19 @@ extension DependencyContainer {
   }
   
   /**
-   Resolve a dependency with runtime argument. Factories will be matched by tag and the type to resolve as well
-   as __number__, __types__ and __order__ of runtime arguments that you pass to this method.
+   Resolve a dependency using one runtime argument.
    
-   - parameter tag: The arbitrary tag to look for when resolving this protocol.
-   - parameter arg1: First argument to be passed to factory
+   - parameters:
+      - tag: The arbitrary tag to lookup registered definition.
+      - arg1: The first argument to pass to the definition's factory.
    
-   - seealso: `resolve(tag:builder:)`
+   - throws: An error of type `DipError`:
+             `ResolutionFailed` - if some error was thrown during resolution;
+             `DefinitionNotFound` - if no matching definition was registered in that container.
+
+   - returns: An instance of type `T`.
+
+   - seealso: `register(tag:_:factory:)`, `resolve(tag:builder:)`
    */
   public func resolve<T, Arg1>(tag tag: Tag? = nil, withArguments arg1: Arg1) throws -> T {
     return try resolve(tag: tag) { (factory: (Arg1) throws -> T) in try factory(arg1) }
@@ -60,7 +67,7 @@ extension DependencyContainer {
   
   // MARK: 2 Runtime Arguments
   
-  /// - seealso: `register(:factory:scope:)`
+  /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2) throws -> T) -> DefinitionOf<T, (Arg1, Arg2) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
@@ -72,6 +79,7 @@ extension DependencyContainer {
 
   // MARK: 3 Runtime Arguments
   
+  /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
@@ -83,6 +91,7 @@ extension DependencyContainer {
   
   // MARK: 4 Runtime Arguments
   
+  /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
@@ -94,6 +103,7 @@ extension DependencyContainer {
 
   // MARK: 5 Runtime Arguments
   
+  /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
@@ -105,6 +115,7 @@ extension DependencyContainer {
 
   // MARK: 6 Runtime Arguments
   
+  /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
