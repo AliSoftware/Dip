@@ -35,21 +35,10 @@ extension Service {
   }
 }
 
-internal func ==(lhs: HashableService, rhs: HashableService) -> Bool {
-  return lhs === rhs
+class ServiceImp1: Service {
 }
 
-class HashableService : Service, Hashable {
-  internal var hashValue: Int { get {
-      return unsafeAddressOf(self).hashValue
-    }
-  }
-}
-
-class ServiceImp1: HashableService {
-}
-
-class ServiceImp2: HashableService {
+class ServiceImp2: Service {
 }
 
 class DipTests: XCTestCase {

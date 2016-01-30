@@ -25,6 +25,23 @@
 import XCTest
 @testable import Dip
 
+protocol HashableService: class, Service, Hashable {}
+extension HashableService {
+  var hashValue: Int {
+    return unsafeAddressOf(self).hashValue
+  }
+}
+
+extension ServiceImp1: HashableService {
+}
+
+extension ServiceImp2: HashableService {
+}
+
+internal func ==<T: HashableService>(lhs: T, rhs: T) -> Bool {
+  return lhs === rhs
+}
+
 class ThreadSafetyTests: XCTestCase {
 
   class Server {
