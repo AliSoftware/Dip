@@ -211,22 +211,35 @@ public final class DependencyContainer {
    
    */
   public func resolve<T, F>(tag tag: Tag? = nil, builder: F throws -> T) throws -> T {
-    return try threadSafe {
-      let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-      let nilTagKey = tag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
-      
-      if let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> {
-        let usingKey: DefinitionKey? = definition.scope == .ObjectGraph ? key : nil
-        return try self._resolve(tag, key: usingKey, definition: definition, builder: builder)
-      }
-      else {
-        throw DipError.DefinitionNotFound(key)
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+
+    do {
+      return try _resolveKey(key, builder: builder)
+    }
+    catch {
+      switch error {
+      case let DipError.DefinitionNotFound(errorKey) where key == errorKey:
+        throw error
+      default:
+        throw DipError.ResolutionFailed(key: key, underlyingError: error)
       }
     }
   }
   
-  /// Actually resolve dependency
-  private func _resolve<T, F>(tag: Tag? = nil, key: DefinitionKey?, definition: DefinitionOf<T, F>, builder: F throws -> T) rethrows -> T {
+  /// Lookup definition by key or key with `nil` tag and use it to resolve instance.
+  func _resolveKey<T, F>(key: DefinitionKey, builder: F throws -> T) throws -> T {
+    return try threadSafe {
+      let nilTagKey = key.associatedTag.map { _ in DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: nil) }
+
+      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
+        throw DipError.DefinitionNotFound(key: key)
+      }
+      return try self._resolveDefinition(definition, usingKey: (definition.scope == .ObjectGraph ? key : nil), builder: builder)
+    }
+  }
+  
+  /// Actually resolve dependency.
+  private func _resolveDefinition<T, F>(definition: DefinitionOf<T, F>, usingKey key: DefinitionKey?, builder: F throws -> T) rethrows -> T {
     
     return try resolvedInstances.resolve {
       
@@ -342,12 +355,37 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
   }
 }
 
+/**
+ Errors thrown by `DependencyContainer`'s methods.
+ 
+ `ResolutionFailed` - some error was thrown during resolution.
+ 
+ `DefinitionNotFound` - no matching definition was registered in that container.
+ 
+*/
 public enum DipError: ErrorType, CustomStringConvertible {
-  case DefinitionNotFound(DefinitionKey)
-  case AutoInjectionFailed(String?, Any.Type, ErrorType)
+  /**
+  Thrown by `resolve(tag:)` if some error was thrown during resolution.
+   
+   - parameters:
+      - key: definition key associated with used definition
+      - underlyingError: the error that caused resolution to fail
+   */
+  case ResolutionFailed(key: DefinitionKey, underlyingError: ErrorType)
+  
+  /**
+   Thrown by `resolve(tag:)` if no matching definition was registered in container.
+   
+   - parameter key: definition key used to lookup matching definition
+  */
+  case DefinitionNotFound(key: DefinitionKey)
 
+  case AutoInjectionFailed(String?, Any.Type, ErrorType)
+  
   public var description: String {
     switch self {
+    case let .ResolutionFailed(key, error):
+      return "Failed to resolve type \(key.protocolType). \(error)"
     case let .DefinitionNotFound(key):
       return "Failed to resolve type \(key.protocolType) - no definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
