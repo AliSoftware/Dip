@@ -24,9 +24,9 @@
 
 ///Internal representation of a key used to associate definitons and factories by tag, type and factory.
 public struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
-  private(set) public var protocolType: Any.Type
-  private(set) public var factoryType: Any.Type
-  private(set) public var associatedTag: DependencyContainer.Tag?
+  public let protocolType: Any.Type
+  public let factoryType: Any.Type
+  public let associatedTag: DependencyContainer.Tag?
   
   init(protocolType: Any.Type, factoryType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
     self.protocolType = protocolType

@@ -81,7 +81,7 @@ public final class DependencyContainer {
     remove(definition, forKey: key)
   }
   
-  public func remove(definition: Definition, forKey key: DefinitionKey) {
+  func remove(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = nil
       if let definition = definition as? AutoInjectedDefinition {
@@ -163,7 +163,7 @@ public final class DependencyContainer {
     register(definition, forKey: key)
   }
   
-  public func register(definition: Definition, forKey key: DefinitionKey) {
+  func register(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = definition
     
