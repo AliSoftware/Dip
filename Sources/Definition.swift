@@ -41,6 +41,13 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
   public var description: String {
     return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag.desc)"
   }
+  
+  //Auto-wiring helper properties
+  
+  ///Number of factory arguments of definition, stored in container by this key.
+  ///If nil then definition stored by that key will not be used for auto-wiring.
+  ///Does not affect hashValue and keys equality (==), but affects their identity (===).
+  var numberOfArguments: Int?
 }
 
 /// Check two definition keys on equality by comparing their `protocolType`, `factoryType` and `associatedTag` properties.
@@ -191,6 +198,15 @@ public final class DefinitionOf<T, F>: Definition {
   
   private var _resolvedInstance: T?
   
+  //Auto-wiring helpers
+  
+  private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
+
+  convenience init(scope: ComponentScope, factory: F, autoWiringFactory: (DependencyContainer, DependencyContainer.Tag?) throws -> T) {
+    self.init(scope: scope, factory: factory)
+    self.autoWiringFactory = autoWiringFactory
+  }
+
 }
 
 ///Dummy protocol to store definitions for different types in collection
@@ -198,9 +214,28 @@ public protocol Definition: class { }
 
 protocol _Definition: Definition {
   var scope: ComponentScope { get }
+
+  var _autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
+  var _factory: Any { get }
+  
+  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
 
-extension DefinitionOf: _Definition { }
+extension DefinitionOf: _Definition {
+  
+  var _resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())? {
+    return resolveDependenciesBlock.map({ block in { try block($0, $1 as! T) } })
+  }
+  
+  var _autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? {
+    return autoWiringFactory.map({ factory in { try factory($0.0, $0.1)} })
+  }
+  
+  var _factory: Any {
+    return factory
+  }
+  
+}
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {

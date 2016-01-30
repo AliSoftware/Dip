@@ -43,7 +43,7 @@ extension DependencyContainer {
   - seealso: `registerFactory(tag:scope:factory:)`
   */
   public func register<T, Arg1>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1) throws -> T) -> DefinitionOf<T, (Arg1) throws -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory)
+    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 1) { container, tag in try factory(try container.resolve(tag: tag)) }
   }
   
   /**
@@ -69,7 +69,7 @@ extension DependencyContainer {
   
   /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2) throws -> T) -> DefinitionOf<T, (Arg1, Arg2) throws -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory)
+    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 2) { container, tag in try factory(try container.resolve(tag: tag), try container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:_:)`
@@ -81,7 +81,7 @@ extension DependencyContainer {
   
   /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3) throws -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory)
+    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 3)  { container, tag in try factory(try container.resolve(tag: tag), try container.resolve(), try container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
@@ -93,7 +93,7 @@ extension DependencyContainer {
   
   /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3, Arg4>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4) throws -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory)
+    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 4) { container, tag in try factory(try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
@@ -105,7 +105,7 @@ extension DependencyContainer {
   
   /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5) throws -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory)
+    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 5) { container, tag in try factory(try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
@@ -117,7 +117,7 @@ extension DependencyContainer {
   
   /// - seealso: `register(tag:scope:factory:)`
   public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6) throws -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory)
+    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 6) { container, tag in try factory(try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag), try container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
@@ -126,3 +126,4 @@ extension DependencyContainer {
   }
 
 }
+
