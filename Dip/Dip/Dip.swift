@@ -300,11 +300,15 @@ public final class DependencyContainer {
     
     func resolve<T>(@noescape block: () throws ->T) rethrows -> T {
       depth++
-      let resolved = try block()
-      depth--
-      if depth == 0 {
-        resolvedInstances.removeAll()
+      
+      defer {
+        depth--
+        if depth == 0 {
+          resolvedInstances.removeAll()
+        }
       }
+      
+      let resolved = try block()
       return resolved
     }
   }
