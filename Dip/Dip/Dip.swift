@@ -318,7 +318,7 @@ public final class DependencyContainer {
 extension DependencyContainer: CustomStringConvertible {
   
   public var description: String {
-    return "Definitions:\n" + definitions.map { "Key with tag: \($0.0.associatedTag)\n\tDefinition: \($0.1)\n" }.joinWithSeparator("\n")
+    return "Definitions: \(definitions.count)\n" + definitions.map({ "\($0.0)" }).joinWithSeparator("\n")
   }
   
 }
@@ -382,8 +382,8 @@ extension Dictionary {
   }
 }
 
-extension Optional: CustomStringConvertible {
-  public var description: String {
+extension Optional {
+  public var desc: String {
     return self.map { "\($0)" } ?? "nil"
   }
 }

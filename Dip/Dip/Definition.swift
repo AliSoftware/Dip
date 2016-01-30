@@ -39,7 +39,7 @@ public struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
   }
   
   public var description: String {
-    return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag)"
+    return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag.desc)"
   }
 }
 
@@ -176,6 +176,7 @@ extension DefinitionOf: AutoInjectedDefinition {}
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {
-    return "type: \(T.self), factory: \(F.self), scope: \(scope), resolved instance: \(resolvedInstance)"
+    return "type: \(T.self), factory: \(F.self), scope: \(scope), resolved instance: \(resolvedInstance.desc)"
   }
 }
+
