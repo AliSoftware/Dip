@@ -114,7 +114,7 @@ class AutoInjectionTests: XCTestCase {
     container.register(.ObjectGraph) { ClientImp() as Client }
     
     do {
-      try container.resolveDependenciesOf(ClientImp() as Client)
+      try container.resolve() as Client
       XCTFail("Resolve should throw error")
     }
     catch { }
@@ -308,85 +308,5 @@ class AutoInjectionTests: XCTestCase {
   
 }
 
-protocol SomeService: class {
-  weak var delegate: SomeServiceDelegate? { get set }
-}
-protocol SomeServiceDelegate: class { }
-class SomeServiceImp: SomeService {
-  weak var delegate: SomeServiceDelegate?
-  init(delegate: SomeServiceDelegate) {
-    self.delegate = delegate
-  }
-  init(){}
-}
-
-protocol OtherService: class {
-  weak var delegate: OtherServiceDelegate? { get set }
-}
-protocol OtherServiceDelegate: class {}
-class OtherServiceImp: OtherService {
-  weak var delegate: OtherServiceDelegate?
-  init(delegate: OtherServiceDelegate){
-    self.delegate = delegate
-  }
-  init(){}
-}
-
-
-protocol SomeScreen: class {
-  var someService: SomeService! { get set }
-  var otherService: OtherService! { get set }
-}
-
-class ViewControllerImp: SomeScreen, SomeServiceDelegate, OtherServiceDelegate {
-  var someService: SomeService!
-  var otherService: OtherService!
-  init(){}
-}
-
-extension AutoInjectionTests {
-  
-  func testThatItDoesNotCreateNewInstanceWhenResolvingDependenciesOfExternalInstance() {
-    //given
-    var factoryCalled = false
-    container.register(.ObjectGraph) { () -> SomeScreen in
-      factoryCalled = true
-      return ViewControllerImp() as SomeScreen
-    }
-    
-    //when
-    let screen = ViewControllerImp()
-    try! container.resolveDependenciesOf(screen as SomeScreen)
-    
-    //then
-    XCTAssertFalse(factoryCalled, "Container should not create new instance when resolving dependencies of external instance.")
-  }
-  
-  func testThatItResolvesInstanceThatImplementsSeveralProtocols() {
-    //given
-    container.register(.ObjectGraph) { ViewControllerImp() as SomeScreen }
-      .resolveDependencies { container, resolved in
-        
-        //manually provide resolved instance for the delegate properties
-        resolved.someService = try container.resolve() as SomeService
-        resolved.someService.delegate = resolved as? SomeServiceDelegate
-        resolved.otherService = try container.resolve(withArguments: resolved as! OtherServiceDelegate) as OtherService
-    }
-    
-    container.register(.ObjectGraph) { SomeServiceImp() as SomeService }
-    container.register(.ObjectGraph) { OtherServiceImp(delegate: $0) as OtherService }
-    
-    //when
-    let screen = try! container.resolve() as SomeScreen
-    
-    //then
-    XCTAssertNotNil(screen.someService)
-    XCTAssertNotNil(screen.otherService)
-    
-    XCTAssertTrue(screen.someService.delegate === screen)
-    XCTAssertTrue(screen.otherService.delegate === screen)
-  }
- 
-}
 
 

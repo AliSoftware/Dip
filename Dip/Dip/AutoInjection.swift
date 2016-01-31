@@ -27,51 +27,6 @@
 extension DependencyContainer {
   
   /**
-   Resolves dependencies of passed in instance.
-   Use this method to resolve dependencies of object created not by container.
-   The type of the instance should be registered in the container.
-   
-   This method will do the same as `resolve(tag:)`, but instead of calling factory
-   will use passed in instance as resolved instance.
-   
-   - parameter instance: object which dependecies should be resolved
-   - parameter tag: optional tag used to register the type in container
-   
-   **Example**:
-   
-   ```swift
-   class ClientImp: Client {
-     var service: Service?
-   }
-   
-   class ServiceImp: Service {
-     weak var client: Client?
-   }
-   
-   container.register(.ObjectGraph) { ClientImp() as Client }
-     .resolveDependencies { container, client in
-       client.service = try container.resolve() as Service
-   }
-   
-   container.register(.ObjectGraph) { ServiceImp() as Service }
-     .resolveDependencies { container, service in
-       service.client = try container.resolve() as Client
-   }
-   
-   let client = ClientImp()
-   container.resolveDependencies(client as Client)
-   //client === service.client
-   
-   ```
-   
-   - seealso: `register(tag:_:factory:)`
-   
-   */
-  public func resolveDependenciesOf<T>(instance: T, forTag tag: Tag? = nil) throws {
-    try resolve(tag: tag) { (factory: () throws -> T) in instance }
-  }
-
-  /**
    Resolves properties of passed object wrapped with `Injected<T>` or `InjectedWeak<T>`
    */
   func autoInjectProperties(instance: Any) throws {
