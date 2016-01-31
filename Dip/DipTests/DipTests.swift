@@ -25,7 +25,7 @@
 import XCTest
 @testable import Dip
 
-protocol Service {
+protocol Service: class {
   func getServiceName() -> String
 }
 
@@ -169,6 +169,73 @@ class DipTests: XCTestCase {
     catch {
       XCTFail("Thrown unexpected error")
     }
+  }
+  
+  func testThatItCanResolveAllImplementationsAsArray() {
+    container.register() { ServiceImp1() as Service }
+    container.register(tag: "service1") { ServiceImp1() as Service }
+    container.register(tag: "service2") { ServiceImp2() as Service }
+
+    let allServices = try! container.resolveAll() as [Service]
+    
+    XCTAssertEqual(allServices.count, 3)
+    XCTAssertTrue(allServices[0] is ServiceImp1)
+    XCTAssertTrue(allServices[1] is ServiceImp1)
+    XCTAssertTrue(allServices[2] is ServiceImp2)
+    
+    XCTAssertFalse(allServices[2] === allServices[1])
+  }
+
+  func testThatItDoesNotReusesInstancesInObjectGraphScopeWhenResolvingAsArray() {
+    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(tag: "service1", .ObjectGraph) { ServiceImp1() as Service }
+    container.register(tag: "service1_1") { ServiceImp1() as Service }
+    
+    let allServices = try! container.resolveAll() as [Service]
+    
+    XCTAssertEqual(allServices.count, 3)
+    
+    XCTAssertFalse(allServices[2] === allServices[1])
+    XCTAssertFalse(allServices[0] === allServices[1])
+  }
+
+  func testThatItCanRemoveAndReAddDefinition() {
+    let def1 = container.register() { ServiceImp1() as Service }
+    container.register(tag: "service2") { ServiceImp2() as Service }
+
+    container.remove(def1)
+    
+    let allServices = try! container.resolveAll() as [Service]
+    XCTAssertEqual(allServices.count, 1)
+    XCTAssertTrue(allServices.last is ServiceImp2)
+    
+    container.register() { ServiceImp1() as Service }
+
+    let newAllServices = try! container.resolveAll() as [Service]
+    XCTAssertEqual(newAllServices.count, 2)
+    XCTAssertTrue(newAllServices.first is ServiceImp1)
+    XCTAssertTrue(newAllServices.last is ServiceImp2)
+  }
+  
+  func testTagsEquality() {
+    XCTAssertEqual(DependencyContainer.Tag.String("a"), DependencyContainer.Tag.String("a"))
+    XCTAssertNotEqual(DependencyContainer.Tag.String("a"), DependencyContainer.Tag.String("b"))
+
+    XCTAssertEqual(DependencyContainer.Tag.Int(0), DependencyContainer.Tag.Int(0))
+    XCTAssertNotEqual(DependencyContainer.Tag.Int(0), DependencyContainer.Tag.Int(1))
+    
+    XCTAssertEqual(DependencyContainer.Tag.String("0"), DependencyContainer.Tag.Int(0))
+    XCTAssertEqual(DependencyContainer.Tag.Int(0), DependencyContainer.Tag.String("0"))
+    
+    XCTAssertNotEqual(DependencyContainer.Tag.String("0"), DependencyContainer.Tag.Int(1))
+    XCTAssertNotEqual(DependencyContainer.Tag.Int(1), DependencyContainer.Tag.String("0"))
+  }
+  
+  func testTagsComparison() {
+    XCTAssertLessThan(DependencyContainer.Tag.String("a"), DependencyContainer.Tag.String("b"))
+    XCTAssertLessThan(DependencyContainer.Tag.Int(0), DependencyContainer.Tag.Int(1))
+    XCTAssertLessThan(DependencyContainer.Tag.Int(0), DependencyContainer.Tag.String("1"))
+    XCTAssertLessThan(DependencyContainer.Tag.String("0"), DependencyContainer.Tag.Int(1))
   }
   
 }
