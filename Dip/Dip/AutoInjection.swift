@@ -27,34 +27,54 @@
 extension DependencyContainer {
   
   /**
-   Resolves dependencies of passed object. Properties that should be injected must be of type `Injected<T>` or `InjectedWeak<T>`. This method will also recursively resolve their dependencies, building full object graph.
+   Resolves dependencies of passed in instance.
+   Use this method to resolve dependencies of object created not by container.
+   The type of the instance should be registered in the container.
    
-   - parameter instance: object whose dependecies should be resolved
+   This method will do the same as `resolve(tag:)`, but instead of calling factory
+   will use passed in instance as resolved instance.
    
-   - Note:
-   Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
-   This will prevent a retain cycle between resolved instances.
-   
-   - Warning: If you resolve dependencies of the object created not by container and it has auto-injected circular dependency, container will be not able to resolve it correctly because container does not have this object in it's resolved instances stack. Thus it will create another instance of that type to satisfy circular dependency.
+   - parameter instance: object which dependecies should be resolved
+   - parameter tag: optional tag used to register the type in container
    
    **Example**:
    
    ```swift
    class ClientImp: Client {
-     var service = Injected<Service>()
+     var service: Service?
    }
    
    class ServiceImp: Service {
-     var client = InjectedWeak<Client>()
+     weak var client: Client?
    }
    
-   //when resolved client will have service injected
-   let client = try! container.resolve() as Client
+   container.register(.ObjectGraph) { ClientImp() as Client }
+     .resolveDependencies { container, client in
+       client.service = try container.resolve() as Service
+   }
+   
+   container.register(.ObjectGraph) { ServiceImp() as Service }
+     .resolveDependencies { container, service in
+       service.client = try container.resolve() as Client
+   }
+   
+   let client = ClientImp()
+   container.resolveDependencies(client as Client)
+   //client === service.client
    
    ```
    
+   - seealso: `register(tag:_:factory:)`
+   
    */
-  public func resolveDependencies(instance: Any) throws {
+  public func resolveDependenciesOf<T>(instance: T, forTag tag: Tag? = nil) throws {
+    try resolve(tag: tag) { (factory: () throws -> T) in instance }
+  }
+
+  /**
+   Resolves properties of passed object wrapped with `Injected<T>` or `InjectedWeak<T>`
+   */
+  func autoInjectProperties(instance: Any) throws {
     try Mirror(reflecting: instance).children.forEach(resolveChild)
   }
   

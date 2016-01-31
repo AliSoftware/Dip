@@ -114,7 +114,7 @@ class AutoInjectionTests: XCTestCase {
     container.register(.ObjectGraph) { ClientImp() as Client }
     
     do {
-      try container.resolveDependencies(ClientImp())
+      try container.resolveDependenciesOf(ClientImp() as Client)
       XCTFail("Resolve should throw error")
     }
     catch { }
@@ -177,7 +177,7 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(clientBlockWasCalled)
   }
   
-  func testThatItReuseResolvedAutoInjectedInstances() {
+  func testThatItReusesResolvedAutoInjectedInstances() {
     //given
     container.register(.ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { (container, server) -> () in
@@ -205,8 +205,8 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(client === anotherClient)
   }
   
-  func testThatItReuseResolvedAutoInjectedInstancesNoMatterWhat() {
-    
+  func testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection() {
+    //given
     class Obj1 {
       let obj2 = InjectedWeak<Obj2>()
       let obj3 = Injected<Obj3>()
@@ -229,13 +229,18 @@ class AutoInjectionTests: XCTestCase {
     container.register(.ObjectGraph) { Obj2() }
     container.register(.ObjectGraph) { Obj3(obj: try self.container.resolve()) }
     
+    //when
     let obj2 = try! container.resolve() as Obj2
-    XCTAssertTrue(obj2 === obj2.obj1.value!.obj2.value!)
-    XCTAssertTrue(obj2.obj1.value! === obj2.obj1.value!.obj3.value!.obj1)
     
+    //then
+    XCTAssertTrue(obj2 === obj2.obj1.value!.obj2.value!,
+      "Auto-injected instance should be reused on next auto-injection")
+    
+    XCTAssertTrue(obj2.obj1.value! === obj2.obj1.value!.obj3.value!.obj1,
+      "Auto-injected instance should be reused on next resolve")
   }
   
-  func testThatThereIsNoRetainCycleBetweenCircularDependencies() {
+  func testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies() {
     //given
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(.ObjectGraph) { ClientImp() as Client }
@@ -256,25 +261,31 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertNil(server)
   }
   
-  func testThatItCallsDidInjectOnInjectedProperty() {
+  func testThatItCallsDidInjectOnAutoInjectedProperty() {
+    //given
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(.ObjectGraph) { ClientImp() as Client }
     
+    //when
     try! container.resolve() as Client
     
+    //then
     XCTAssertTrue(AutoInjectionTests.clientDidInjectCalled)
     XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled)
   }
   
-  func testThatOptionalPropertiesAreNotInjectedAndErrorNotThrown() {
+  func testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected() {
+    //given
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(.ObjectGraph) { ClientImp() as Client }
 
     do {
+      //when
       try container.resolve() as Client
     }
     catch {
-      XCTFail("Container should not throw error if failed to resolve optional auto-injected properties")
+      //then
+      XCTFail("Container should not throw error if failed to resolve optional auto-injected properties.")
     }
   }
   
@@ -296,3 +307,86 @@ class AutoInjectionTests: XCTestCase {
   }
   
 }
+
+protocol SomeService: class {
+  weak var delegate: SomeServiceDelegate? { get set }
+}
+protocol SomeServiceDelegate: class { }
+class SomeServiceImp: SomeService {
+  weak var delegate: SomeServiceDelegate?
+  init(delegate: SomeServiceDelegate) {
+    self.delegate = delegate
+  }
+  init(){}
+}
+
+protocol OtherService: class {
+  weak var delegate: OtherServiceDelegate? { get set }
+}
+protocol OtherServiceDelegate: class {}
+class OtherServiceImp: OtherService {
+  weak var delegate: OtherServiceDelegate?
+  init(delegate: OtherServiceDelegate){
+    self.delegate = delegate
+  }
+  init(){}
+}
+
+
+protocol SomeScreen: class {
+  var someService: SomeService! { get set }
+  var otherService: OtherService! { get set }
+}
+
+class ViewControllerImp: SomeScreen, SomeServiceDelegate, OtherServiceDelegate {
+  var someService: SomeService!
+  var otherService: OtherService!
+  init(){}
+}
+
+extension AutoInjectionTests {
+  
+  func testThatItDoesNotCreateNewInstanceWhenResolvingDependenciesOfExternalInstance() {
+    //given
+    var factoryCalled = false
+    container.register(.ObjectGraph) { () -> SomeScreen in
+      factoryCalled = true
+      return ViewControllerImp() as SomeScreen
+    }
+    
+    //when
+    let screen = ViewControllerImp()
+    try! container.resolveDependenciesOf(screen as SomeScreen)
+    
+    //then
+    XCTAssertFalse(factoryCalled, "Container should not create new instance when resolving dependencies of external instance.")
+  }
+  
+  func testThatItResolvesInstanceThatImplementsSeveralProtocols() {
+    //given
+    container.register(.ObjectGraph) { ViewControllerImp() as SomeScreen }
+      .resolveDependencies { container, resolved in
+        
+        //manually provide resolved instance for the delegate properties
+        resolved.someService = try container.resolve() as SomeService
+        resolved.someService.delegate = resolved as? SomeServiceDelegate
+        resolved.otherService = try container.resolve(withArguments: resolved as! OtherServiceDelegate) as OtherService
+    }
+    
+    container.register(.ObjectGraph) { SomeServiceImp() as SomeService }
+    container.register(.ObjectGraph) { OtherServiceImp(delegate: $0) as OtherService }
+    
+    //when
+    let screen = try! container.resolve() as SomeScreen
+    
+    //then
+    XCTAssertNotNil(screen.someService)
+    XCTAssertNotNil(screen.otherService)
+    
+    XCTAssertTrue(screen.someService.delegate === screen)
+    XCTAssertTrue(screen.otherService.delegate === screen)
+  }
+ 
+}
+
+

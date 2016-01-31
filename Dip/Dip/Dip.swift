@@ -250,7 +250,7 @@ public final class DependencyContainer {
         
         //we perform auto-injection as the last step to be able to reuse instances
         //stored when manually resolving dependencies in resolveDependencies block
-        try resolveDependencies(resolvedInstance)
+        try autoInjectProperties(resolvedInstance)
         
         return resolvedInstance
       }
