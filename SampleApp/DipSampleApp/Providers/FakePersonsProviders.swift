@@ -90,11 +90,12 @@ class PlistPersonProvider : PersonProviderAPI {
 class FakePersonsProvider: PersonProviderAPI {
     
     let dummyProvider: PersonProviderAPI
-    let plistProvider: PersonProviderAPI
+    var plistProvider: PersonProviderAPI!
     
-    init(dummyProvider: PersonProviderAPI, plistProvider: PersonProviderAPI) {
+    //In this class we use both constructor injection and property injection,
+    //nil is a valid local default
+    init(dummyProvider: PersonProviderAPI) {
         self.dummyProvider = dummyProvider
-        self.plistProvider = plistProvider
     }
     
     func fetchIDs(completion: [Int] -> Void) {
@@ -102,7 +103,7 @@ class FakePersonsProvider: PersonProviderAPI {
     }
     
     func fetch(id: Int, completion: Person? -> Void) {
-        if id == 0 {
+        if let plistProvider = plistProvider where id == 0 {
             plistProvider.fetch(id, completion: completion)
         }
         else {

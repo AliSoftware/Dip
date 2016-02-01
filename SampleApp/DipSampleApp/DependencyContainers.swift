@@ -12,8 +12,8 @@ import Dip
 // MARK: Configuration
 
 /* Change this to toggle between real and fake data */
-private let FAKE_PERSONS = true
-private let FAKE_STARSHIPS = true
+private let FAKE_PERSONS = false
+private let FAKE_STARSHIPS = false
 /* ---- */
 
 
@@ -26,11 +26,18 @@ func configureContainer(dip: DependencyContainer) {
     if FAKE_PERSONS {
         
         // 1) Register fake persons provider
-        dip.register() { FakePersonsProvider(dummyProvider: DummyPilotProvider(), plistProvider: PlistPersonProvider(plist: "mainPilot")) as PersonProviderAPI }
+        //Here we use constructor injection for one of the dependencies property injection for another, and we provide dependencies manually
+        dip.register() { FakePersonsProvider(dummyProvider: DummyPilotProvider()) as PersonProviderAPI }
+            .resolveDependencies { (_, resolved: PersonProviderAPI) in
+                //here we resolve optional dependencies
+                //see what happens when you comment this out
+                (resolved as! FakePersonsProvider).plistProvider = PlistPersonProvider(plist: "mainPilot")
+        }
         
     } else {
         
         // 1) Register the SWAPIPersonProvider (that hits the real swapi.co WebService)
+        // Here we use constructor injection again, but let the container to resolve dependency for us
         dip.register() { SWAPIPersonProvider(webService: try dip.resolve()) as PersonProviderAPI }
 
     }
@@ -38,11 +45,24 @@ func configureContainer(dip: DependencyContainer) {
     if FAKE_STARSHIPS {
 
         // 2) Register fake starships provider
-        dip.register() { FakeStarshipProvider(dummyProvider: DummyStarshipProvider(pilotName: "Main Pilot"), hardCodedProvider: HardCodedStarshipProvider()) as StarshipProviderAPI }
+        
+        //Here we register different implementations for the same protocol using tags
+        dip.register(tag: "hardcoded") { HardCodedStarshipProvider() as StarshipProviderAPI }
+        
+        //Here we register factory that will require a runtime argument
+        dip.register(tag: "dummy") { DummyStarshipProvider(pilotName: $0) as StarshipProviderAPI }
+        
+        //Here we use constructor injection, but instead of providing dependencies manually container resolves them for us
+        dip.register() {
+            FakeStarshipProvider(
+                dummyProvider: try dip.resolve(tag: "dummy", withArguments: "Main Pilot"),
+                hardCodedProvider: try dip.resolve(tag: "hardcoded")) as StarshipProviderAPI
+        }
         
     } else {
         
         // 2) Register the SWAPIStarshipProvider (that hits the real swapi.co WebService)
+        // Here we use constructor injection again, but let the container to resolve dependency for us
         dip.register() { SWAPIStarshipProvider(webService: try dip.resolve()) as StarshipProviderAPI }
 
     }
