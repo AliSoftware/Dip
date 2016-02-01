@@ -38,6 +38,10 @@
 		0919F4EC1C16419500DC3B10 /* DefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */; };
 		0919F4ED1C16419500DC3B10 /* RuntimeArgumentsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */; };
 		0919F4EE1C16419500DC3B10 /* ComponentScopeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */; };
+		0982AF0C1C5183A000B62463 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF0B1C5183A000B62463 /* Utils.swift */; };
+		0982AF0D1C5183A000B62463 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF0B1C5183A000B62463 /* Utils.swift */; };
+		0982AF0E1C5183A000B62463 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF0B1C5183A000B62463 /* Utils.swift */; };
+		0982AF0F1C5183A000B62463 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF0B1C5183A000B62463 /* Utils.swift */; };
 		09873F561C1E0237000C02F6 /* AutoInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09873F551C1E0237000C02F6 /* AutoInjection.swift */; };
 		09873F771C1E024E000C02F6 /* AutoInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */; };
 		09873F781C1E024E000C02F6 /* AutoInjectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */; };
@@ -92,6 +96,7 @@
 		0919F4D01C16417000DC3B10 /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DipTests.swift; sourceTree = "<group>"; };
 		0919F4D11C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
+		0982AF0B1C5183A000B62463 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 		09873F551C1E0237000C02F6 /* AutoInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoInjection.swift; sourceTree = "<group>"; };
 		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoInjectionTests.swift; sourceTree = "<group>"; };
 		2C15B94F1C25EF7800EA3486 /* ThreadSafetyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafetyTests.swift; sourceTree = "<group>"; };
@@ -161,6 +166,7 @@
 				0919F4C81C16417000DC3B10 /* Definition.swift */,
 				0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */,
 				09873F551C1E0237000C02F6 /* AutoInjection.swift */,
+				0982AF0B1C5183A000B62463 /* Utils.swift */,
 				0919F4CB1C16417000DC3B10 /* Info.plist */,
 			);
 			path = Dip;
@@ -482,6 +488,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0982AF0C1C5183A000B62463 /* Utils.swift in Sources */,
 				0919F4D51C16417B00DC3B10 /* Definition.swift in Sources */,
 				0919F4D41C16417B00DC3B10 /* Dip.swift in Sources */,
 				09873F561C1E0237000C02F6 /* AutoInjection.swift in Sources */,
@@ -506,6 +513,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0982AF0D1C5183A000B62463 /* Utils.swift in Sources */,
 				0919F4D91C16417C00DC3B10 /* Definition.swift in Sources */,
 				0919F4D81C16417C00DC3B10 /* Dip.swift in Sources */,
 				09873F7A1C1E0252000C02F6 /* AutoInjection.swift in Sources */,
@@ -530,6 +538,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0982AF0E1C5183A000B62463 /* Utils.swift in Sources */,
 				0919F4DD1C16417D00DC3B10 /* Definition.swift in Sources */,
 				0919F4DC1C16417D00DC3B10 /* Dip.swift in Sources */,
 				09873F7B1C1E0253000C02F6 /* AutoInjection.swift in Sources */,
@@ -554,6 +563,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0982AF0F1C5183A000B62463 /* Utils.swift in Sources */,
 				0919F4E11C16417E00DC3B10 /* Definition.swift in Sources */,
 				0919F4E01C16417E00DC3B10 /* Dip.swift in Sources */,
 				09873F7C1C1E0254000C02F6 /* AutoInjection.swift in Sources */,

@@ -22,8 +22,8 @@
 // THE SOFTWARE.
 //
 
-///Internal representation of a key used to associate definitons and factories by tag, type and factory.
-public struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
+///A key used to store definitons in a container.
+public struct DefinitionKey : Hashable, CustomStringConvertible {
   public let protocolType: Any.Type
   public let factoryType: Any.Type
   public let associatedTag: DependencyContainer.Tag?
@@ -43,6 +43,7 @@ public struct DefinitionKey : Hashable, Equatable, CustomStringConvertible {
   }
 }
 
+/// Check two definition keys on equality by comparing their `protocolType`, `factoryType` and `associatedTag` properties.
 public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
     lhs.protocolType == rhs.protocolType &&
@@ -50,44 +51,45 @@ public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
       lhs.associatedTag == rhs.associatedTag
 }
 
-///Describes the lifecycle of instances created by container.
+///Component scope defines a strategy used by the `DependencyContainer` to manage resolved instances life cycle.
 public enum ComponentScope {
-  /// Indicates that a new instance of the component will be created each time it's resolved.
+  /// A new instance will be created each time it's resolved.
   case Prototype
-  /// Indicates that instances will be reused during resolve but will be discurded when topmost `resolve` method returns.
+  /// Resolved instances will be reused until topmost `resolve(tag:)` method returns.
   case ObjectGraph
-  /// Indicates that resolved component should be retained by container and always reused.
+  /// Resolved instance will be retained by the container and always reused. Instance is retained not by container itself but by corresponding definition. Do not mix this lifecycle with _singleton pattern_. Instance will be not shared between defferent containers.
   case Singleton
 }
 
 /**
- Definition of type T describes how instances of this type should be created when this type is resolved by container.
+ `DefinitionOf<T, F>` describes how instances of type `T` should be created when this type is resolved by the `DependencyContainer`.
  
- - Generic parameter `T` is the type of the instance to resolve 
- - Generic parameter `F` is the type of block-factory that creates an instance of T.
+ - `T` is the type of the instance to resolve
+ - `F` is the type of the factory that will create an instance of T.
  
- For example `DefinitionOf<Service,(String)->Service>` is the type of definition that during resolution will produce instance of type `Service` using closure that accepts `String` argument.
+ For example `DefinitionOf<Service, (String) -> Service>` is the type of definition that will create an instance of type `Service` using factory that accepts `String` argument.
 */
 public final class DefinitionOf<T, F>: Definition {
   
   /**
-   Sets the block that will be used to resolve dependencies of the component. 
-   This block will be called before `resolve` returns.
+   Set the block that will be used to resolve dependencies of the instance.
+   This block will be called before `resolve(tag:)` returns. It can be set only once.
    
-   - parameter block: block to use to resolve dependencies
+   - parameter block: The block to use to resolve dependencies of the instance.
    
-   - note:  
-   If you have circular dependencies at least one of them should use this block
-   to resolve it's dependencies. Otherwise code enter infinite loop.
+   - returns: modified definition
+   
+   - note: To resolve circular dependencies at least one of them should use this block
+   to resolve its dependencies. Otherwise the application will enter an infinite loop and crash.
    
    **Example**
    
    ```swift
-   container.register { ClientImp(service: container.resolve() as Service) as Client }
+   container.register { ClientImp(service: try container.resolve() as Service) as Client }
 
-   var definition = container.register { ServiceImp() as Service }
-   definition.resolveDependencies { container, service in
-      service.delegate = try container.resolve() as Client
+   container.register { ServiceImp() as Service }
+     .resolveDependencies { container, service in
+       service.client = try container.resolve() as Client
    }
    ```
    
@@ -97,9 +99,12 @@ public final class DefinitionOf<T, F>: Definition {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
     self.resolveDependenciesBlock = block
-    self.injectedDefinition?.resolveDependenciesBlock = { try block($0, $1 as! T) }
-    self.injectedWeakDefinition?.resolveDependenciesBlock = { try block($0, $1 as! T) }
     return self
+  }
+  
+  func resolveDependencies(container: DependencyContainer, resolvedInstance: Any) throws {
+    guard let resolvedInstance = resolvedInstance as? T else { return }
+    try self.resolveDependenciesBlock?(container, resolvedInstance)
   }
   
   let factory: F
@@ -107,72 +112,37 @@ public final class DefinitionOf<T, F>: Definition {
   
   private(set) var resolveDependenciesBlock: ((DependencyContainer, T) throws -> ())?
   
-  private init(factory: F) {
+  public init(scope: ComponentScope, factory: F) {
     self.factory = factory
-  }
-  
-  public convenience init(scope: ComponentScope, factory: F) {
-    self.init(factory: factory)
     self.scope = scope
-    
-    if let factory = factory as? () throws -> T {
-      injectedDefinition = DefinitionOf<Any, InjectedFactory>(factory: { try factory() })
-      injectedDefinition!.scope = scope
-      injectedKey = DefinitionKey(protocolType: Any.self, factoryType: InjectedFactory.self, associatedTag: Injected<T>.tag)
-      
-      injectedWeakDefinition = DefinitionOf<AnyObject, InjectedWeakFactory>(factory: {
-        guard let result = try factory() as? AnyObject else {
-          fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
-        }
-        return result
-        })
-      injectedWeakDefinition!.scope = scope
-      injectedWeakKey = DefinitionKey(protocolType: AnyObject.self, factoryType: InjectedWeakFactory.self, associatedTag: InjectedWeak<T>.tag)
-    }
   }
   
   ///Will be stored only if scope is `Singleton`
   var resolvedInstance: T? {
     get {
       guard scope == .Singleton else { return nil }
-      
-      return _resolvedInstance ??
-        injectedDefinition?._resolvedInstance as? T ??
-        injectedWeakDefinition?._resolvedInstance as? T
+      return _resolvedInstance
     }
     set {
       guard scope == .Singleton else { return }
-      
       _resolvedInstance = newValue
-      injectedDefinition?._resolvedInstance = newValue
-      injectedWeakDefinition?._resolvedInstance = newValue as? AnyObject
     }
   }
   
   private var _resolvedInstance: T?
   
-  ///Accessory definition used to auto-inject strong properties
-  private(set) var injectedDefinition: DefinitionOf<Any, InjectedFactory>?
-  private(set) var injectedKey: DefinitionKey?
-  
-  ///Accessory definition used to auto-inject weak properties
-  private(set) var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>?
-  private(set) var injectedWeakKey: DefinitionKey?
-
 }
 
 ///Dummy protocol to store definitions for different types in collection
 public protocol Definition: class { }
 
-protocol AutoInjectedDefinition: Definition {
-  var injectedDefinition: DefinitionOf<Any, InjectedFactory>? { get }
-  var injectedKey: DefinitionKey? { get }
+protocol _Definition: Definition {
 
-  var injectedWeakDefinition: DefinitionOf<AnyObject, InjectedWeakFactory>? { get }
-  var injectedWeakKey: DefinitionKey? { get }
+  var scope: ComponentScope { get }
+
 }
 
-extension DefinitionOf: AutoInjectedDefinition {}
+extension DefinitionOf: _Definition { }
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {

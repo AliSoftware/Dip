@@ -65,4 +65,33 @@ class DefinitionTests: XCTestCase {
     XCTAssertNotEqual(keyWithDifferentTag1.hashValue, keyWithDifferentTag2.hashValue)
   }
 
+  func testThatResolveDependenciesCallsResolveDependenciesBlockWhen() {
+    var blockCalled = false
+    
+    //given
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp1() as Service }.resolveDependencies { container, service in
+      blockCalled = true
+    }
+    
+    //when
+   try! def.resolveDependencies(DependencyContainer(), resolvedInstance: ServiceImp1())
+    
+    //then
+    XCTAssertTrue(blockCalled)
+  }
+  
+  func testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance() {
+    var blockCalled = false
+    
+    //given
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp1() as Service }.resolveDependencies { container, service in
+      blockCalled = true
+    }
+    
+    //when
+    try! def.resolveDependencies(DependencyContainer(), resolvedInstance: String())
+    
+    //then
+    XCTAssertFalse(blockCalled)
+  }
 }

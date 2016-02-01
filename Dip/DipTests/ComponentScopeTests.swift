@@ -53,7 +53,7 @@ class ComponentScopeTests: XCTestCase {
     let service2 = try! container.resolve() as Service
     
     //then
-    XCTAssertFalse((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+    XCTAssertFalse(service1 === service2)
   }
   
   func testThatItReusesInstanceForSingletonScope() {
@@ -65,7 +65,7 @@ class ComponentScopeTests: XCTestCase {
     let service2 = try! container.resolve() as Service
     
     //then
-    XCTAssertTrue((service1 as! ServiceImp1) === (service2 as! ServiceImp1))
+    XCTAssertTrue(service1 === service2)
   }
   
   class Server {
@@ -122,15 +122,20 @@ class ComponentScopeTests: XCTestCase {
     var service2: Service?
     container.register(.ObjectGraph) { ServiceImp1() as Service }.resolveDependencies { (c, _) in
       service2 = try c.resolve(tag: "service") as Service
+      
+      //then
+
+      //when service1 is resolved using this definition due to fallback to nil tag
+      //we don't want every next resolve of service reuse it
+      XCTAssertTrue(service2 is ServiceImp2)
     }
     container.register(tag: "service", .ObjectGraph) { ServiceImp2() as Service}
     
     //when
     let service1 = try! container.resolve(tag: "tag") as Service
-    
+
     //then
     XCTAssertTrue(service1 is ServiceImp1)
-    XCTAssertTrue(service2 is ServiceImp2)
   }
 
 }
