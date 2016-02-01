@@ -53,8 +53,8 @@ private protocol _AnyInjectedPropertyBox: class {
 
 
 /**
- Use this wrapper to identifiy strong properties of the instance that should be injected when you call
- `resolveDependencies()` on this instance. Type T can be any type.
+ Use this wrapper to identifiy strong properties of the instance that should be
+ auto-injected by `DependencyContainer`. Type T can be any type.
 
  - warning: Do not define this property as optional or container will not be able to inject it.
             Instead define it with initial value of `Injected<T>()`.
@@ -67,7 +67,7 @@ private protocol _AnyInjectedPropertyBox: class {
  }
 
  ```
- - seealso: `InjectedWeak`, `DependencyContainer.resolveDependencies(_:)`
+ - seealso: `InjectedWeak`
 
 */
 public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
@@ -106,8 +106,8 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
 }
 
 /**
- Use this wrapper to identify weak properties of the instance that should be injected when you call
- `resolveDependencies()` on this instance. Type T should be a **class** type.
+ Use this wrapper to identifiy strong properties of the instance that should be
+ auto-injected by `DependencyContainer`. Type T should be a **class** type.
  Otherwise it will cause runtime exception when container will try to resolve the property.
  Use this wrapper to define one of two circular dependencies to avoid retain cycle.
  
@@ -132,7 +132,7 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
 
  ```
  
- - seealso: `Injected`, `DependencyContainer.resolveDependencies(_:)`
+ - seealso: `Injected`
  
  */
 public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
