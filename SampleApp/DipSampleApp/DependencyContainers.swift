@@ -17,42 +17,53 @@ private let FAKE_STARSHIPS = false
 /* ---- */
 
 
-
-// MARK: Dependency Container for WebServices & NetworkLayer
-let wsDependencies = DependencyContainer() { dip in
+// MARK: Dependency Container for Providers
+func configureContainer(dip: DependencyContainer) {
     
     // Register the NetworkLayer, same for everyone here (but we have the ability to register a different one for a specific WebService if we wanted to)
     dip.register(.Singleton) { URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer }
-    
-}
 
-
-// MARK: Dependency Container for Providers
-let providerDependencies = DependencyContainer() { dip in
-    
     if FAKE_PERSONS {
         
-        // 1) Register the PersonProviderAPI singleton, one generic and one specific for a specific personID
-        dip.register(.Singleton) { DummyPilotProvider() as PersonProviderAPI }
-        dip.register(tag: 0, .Singleton) { PlistPersonProvider(plist: "mainPilot") as PersonProviderAPI }
+        // 1) Register fake persons provider
+        //Here we use constructor injection for one of the dependencies property injection for another, and we provide dependencies manually
+        dip.register() { FakePersonsProvider(dummyProvider: DummyPilotProvider()) as PersonProviderAPI }
+            .resolveDependencies { (_, resolved: PersonProviderAPI) in
+                //here we resolve optional dependencies
+                //see what happens when you comment this out
+                (resolved as! FakePersonsProvider).plistProvider = PlistPersonProvider(plist: "mainPilot")
+        }
         
     } else {
         
         // 1) Register the SWAPIPersonProvider (that hits the real swapi.co WebService)
-        dip.register(.Singleton) { SWAPIPersonProvider() as PersonProviderAPI }
+        // Here we use constructor injection again, but let the container to resolve dependency for us
+        dip.register() { SWAPIPersonProvider(webService: try dip.resolve()) as PersonProviderAPI }
 
     }
     
     if FAKE_STARSHIPS {
 
-        // 2) Register the StarshipProviderAPI factories, one generic and one specific for a specific starshipID
-        dip.register() { HardCodedStarshipProvider() as StarshipProviderAPI }
-        dip.register(tag: 0) { DummyStarshipProvider(pilotName: "Main Pilot") as StarshipProviderAPI }
+        // 2) Register fake starships provider
+        
+        //Here we register different implementations for the same protocol using tags
+        dip.register(tag: "hardcoded") { HardCodedStarshipProvider() as StarshipProviderAPI }
+        
+        //Here we register factory that will require a runtime argument
+        dip.register(tag: "dummy") { DummyStarshipProvider(pilotName: $0) as StarshipProviderAPI }
+        
+        //Here we use constructor injection, but instead of providing dependencies manually container resolves them for us
+        dip.register() {
+            FakeStarshipProvider(
+                dummyProvider: try dip.resolve(tag: "dummy", withArguments: "Main Pilot"),
+                hardCodedProvider: try dip.resolve(tag: "hardcoded")) as StarshipProviderAPI
+        }
         
     } else {
         
         // 2) Register the SWAPIStarshipProvider (that hits the real swapi.co WebService)
-        dip.register(.Singleton) { SWAPIStarshipProvider() as StarshipProviderAPI }
+        // Here we use constructor injection again, but let the container to resolve dependency for us
+        dip.register() { SWAPIStarshipProvider(webService: try dip.resolve()) as StarshipProviderAPI }
 
     }
     
