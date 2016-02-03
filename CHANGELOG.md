@@ -1,12 +1,12 @@
 # CHANGELOG
 
-## Develop
+## 4.1.0
 
 #### New features
 
 * Added auto-injection feature.  
   [#13](https://github.com/AliSoftware/Dip/pull/13), [@ilyapuchka](https://github.com/ilyapuchka)
-* Factories and `resolveDependencies` blocks of `DefinitionOf` are now allowed to `throw`.  
+* Factories and `resolveDependencies` blocks of `DefinitionOf` are now allowed to `throw`. Improved errors handling.
   [#32](https://github.com/AliSoftware/Dip/pull/13), [@ilyapuchka](https://github.com/ilyapuchka)
 * Thread safety reimplemented with support for recursive methods calls.  
   [#31](https://github.com/AliSoftware/Dip/pull/31), [@mwoollard](https://github.com/mwoollard)

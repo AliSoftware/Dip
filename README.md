@@ -227,6 +227,7 @@ The resolve operation has a potential to fail because you can use the wrong type
  There are very rare use cases when your application can recover from this kind of error. In most of the cases you can use `try!` 
  to cause an exception at runtime if error was thrown or `try?` if a dependency is optional. 
  This way `try!` serves as an additional mark for developers that resolution can fail.
+ Dip also provides helpful descriptions for errors that can occur when you call `resolve`. See the source code documentation to know more about that.
 
 ### Concrete Example
 
