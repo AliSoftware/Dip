@@ -44,12 +44,12 @@ Now you can register those classes in container:
 */
 
 container.register(.ObjectGraph) {
-    Interactor(networkClient: try! container.resolve()) as NetworkClientDelegate
+    Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
 container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
     .resolveDependencies { (container, client) -> () in
-        client.delegate = try! container.resolve() as NetworkClientDelegate
+        client.delegate = try container.resolve() as NetworkClientDelegate
 }
 
 /*:
@@ -92,12 +92,12 @@ If we would have used `.Prototype` for one of the components it will lead to the
 container.reset()
 
 container.register(.Prototype) {
-    Interactor(networkClient: try! container.resolve()) as NetworkClientDelegate
+    Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
 container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
     .resolveDependencies { (container, client) -> () in
-        client.delegate = try! container.resolve() as NetworkClientDelegate
+        client.delegate = try container.resolve() as NetworkClientDelegate
 }
 
 let invalidInteractor = try! container.resolve() as NetworkClientDelegate

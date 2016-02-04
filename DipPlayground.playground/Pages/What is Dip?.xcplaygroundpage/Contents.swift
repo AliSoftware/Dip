@@ -16,6 +16,9 @@ If you follow [Protocol-Oriented programming](https://developer.apple.com/videos
 But still there should be some point in your program where concrete instances are created. The thing is that it's better to have one well defined point for that than to scatter setup logic all over the place with different factories and lazy properties. IoC containers like _Dip_ play the role of that point.
 
 The following pages in this Playground demonstrates how to use _Dip_ to adopt all those concepts in practice.
+
+If you want to know more about Dependency Injection in general we recomend you to read ["Dependency Injection in .Net" by Mark Seemann](https://www.manning.com/books/dependency-injection-in-dot-net). Dip was inspired by implementations of IoC container for .Net platform and shares core principles described in that book.
+
 */
 //: [Next: Creating a DependencyContainer](@next)
 

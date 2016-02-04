@@ -8,8 +8,17 @@
 
 import Foundation
 
+///Provides Starship entities fetching them using web service
 struct SWAPIStarshipProvider : StarshipProviderAPI {
-    let ws = try! wsDependencies.resolve(tag: WebService.StarshipWS.tag) as NetworkLayer
+    let ws: NetworkLayer
+    
+    //Here we inject dependency using _constructor injection_ pattern.
+    //The alternative way is a _property injection_
+    //but it should be used only for optional dependencies 
+    //where there is a good local default implementation
+    init(webService: NetworkLayer) {
+        self.ws = webService
+    }
     
     func fetchIDs(completion: [Int] -> Void) {
         ws.request("starships") { response in
