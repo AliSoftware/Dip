@@ -22,6 +22,8 @@
 // THE SOFTWARE.
 //
 
+import Foundation
+
 // MARK: - DependencyContainer
 
 /**
@@ -289,10 +291,10 @@ extension DependencyContainer {
     private var depth: Int = 0
     
     func resolve<T>(@noescape block: () throws ->T) rethrows -> T {
-      depth++
+      depth = depth + 1
       
       defer {
-        depth--
+        depth = depth - 1
         if depth == 0 {
           resolvedInstances.removeAll()
         }
