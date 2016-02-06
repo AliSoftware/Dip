@@ -43,7 +43,7 @@ public final class DependencyContainer {
   
   var definitions = [DefinitionKey : Definition]()
   let resolvedInstances = ResolvedInstances()
-  let lock = NSRecursiveLock()
+  let lock = RecursiveLock()
   
   /**
    Designated initializer for a DependencyContainer

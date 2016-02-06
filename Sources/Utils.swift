@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 
-import Foundation
-
 extension Dictionary {
   subscript(key: Key?) -> Value? {
     get {
@@ -42,3 +40,46 @@ extension Optional {
     return self.map { "\($0)" } ?? "nil"
   }
 }
+
+#if os(Linux)
+  import Glibc
+  class RecursiveLock {
+    private var _lock = _initializeRecursiveMutex()
+    
+    func lock() {
+      _lock.lock()
+    }
+    
+    func unlock() {
+      _lock.unlock()
+    }
+    
+    deinit {
+      pthread_mutex_destroy(&_lock)
+    }
+    
+  }
+  
+  private func _initializeRecursiveMutex() -> pthread_mutex_t {
+    var mutex: pthread_mutex_t = pthread_mutex_t()
+    var mta: pthread_mutexattr_t = pthread_mutexattr_t()
+    pthread_mutex_init(&mutex, nil)
+    pthread_mutexattr_init(&mta)
+    pthread_mutexattr_settype(&mta, PTHREAD_MUTEX_RECURSIVE)
+    pthread_mutex_init(&mutex, &mta)
+    return mutex
+  }
+  
+  extension pthread_mutex_t {
+    mutating func lock() {
+      pthread_mutex_lock(&self)
+    }
+    mutating func unlock() {
+      pthread_mutex_unlock(&self)
+    }
+  }
+  
+#else
+  import Foundation
+  typealias RecursiveLock = NSRecursiveLock
+#endif
