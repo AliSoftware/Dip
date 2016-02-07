@@ -102,7 +102,8 @@ public final class DefinitionOf<T, F>: Definition {
     return self
   }
   
-  func resolveDependencies(container: DependencyContainer, resolvedInstance: Any) throws {
+  /// Calls `resolveDependencies` block if it was set.
+  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
     guard let resolvedInstance = resolvedInstance as? T else { return }
     try self.resolveDependenciesBlock?(container, resolvedInstance)
   }
@@ -139,7 +140,7 @@ public protocol Definition: class { }
 protocol _Definition: Definition {
 
   var scope: ComponentScope { get }
-
+  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
 
 extension DefinitionOf: _Definition { }

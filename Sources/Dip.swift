@@ -258,7 +258,7 @@ extension DependencyContainer {
         resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, definition: definition)
         definition.resolvedInstance = resolvedInstance
         
-        try definition.resolveDependenciesBlock?(self, resolvedInstance)
+        try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
         
         //we perform auto-injection as the last step to be able to reuse instances
         //stored when manually resolving dependencies in resolveDependencies block
