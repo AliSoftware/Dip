@@ -53,11 +53,80 @@ public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
 
 ///Component scope defines a strategy used by the `DependencyContainer` to manage resolved instances life cycle.
 public enum ComponentScope {
-  /// A new instance will be created each time it's resolved.
+  /**
+   A new instance will be created every time it's resolved.
+   This is a default strategy. Use this strategy when you don't want instances to be shared
+   between different consumers (i.e. if it is not thread safe).
+   
+   **Example**:
+   
+   ```
+   container.register { ServiceImp() as Service }
+   container.register { 
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
+   }
+   let consumer = container.resolve() as ServiceConsumer
+   consumer.service1 !== consumer.service2 //true
+   
+   ```
+   */
   case Prototype
-  /// Resolved instances will be reused until topmost `resolve(tag:)` method returns.
+  
+  /**
+   Instance resolved with the same definition will be reused until topmost `resolve(tag:)` method returns.
+   When you resolve the same object graph again the container will create new instances.
+   Use this strategy if you want different object in objects graph to share the same instance.
+   
+   - warning: Make sure this component is thread safe or accessed always from the same thread.
+   
+   **Example**:
+   
+   ```
+   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register {
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
+   }
+   let consumer1 = container.resolve() as ServiceConsumer
+   let consumer2 = container.resolve() as ServiceConsumer
+   consumer1.service1 === consumer1.service2 //true
+   consumer2.service1 === consumer2.service2 //true
+   consumer1.service1 !== consumer2.service1 //true
+   ```
+   */
   case ObjectGraph
-  /// Resolved instance will be retained by the container and always reused. Do not mix this lifecycle with _singleton pattern_. Instance will be not shared between defferent containers.
+
+  /**
+   Resolved instance will be retained by the container and always reused.
+   Do not mix this life cycle with _singleton pattern_.
+   Instance will be not shared between defferent containers.
+   
+   - warning: Make sure this component is thread safe or accessed always from the same thread.
+   
+   - note: When you remove definition from the container an instance that was resolved with this definition will be released. When you reset the container it will release all singleton instances.
+   
+   **Example**:
+   
+   ```
+   container.register(.Singleton) { ServiceImp() as Service }
+   container.register {
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
+   }
+   let consumer1 = container.resolve() as ServiceConsumer
+   let consumer2 = container.resolve() as ServiceConsumer
+   consumer1.service1 === consumer1.service2 //true
+   consumer2.service1 === consumer2.service2 //true
+   consumer1.service1 === consumer2.service1 //true
+   ```
+   */
   case Singleton
 }
 
