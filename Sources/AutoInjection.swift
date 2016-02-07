@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 
-//MARK: Public
-
 extension DependencyContainer {
   
   /**

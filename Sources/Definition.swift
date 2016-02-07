@@ -57,7 +57,7 @@ public enum ComponentScope {
   case Prototype
   /// Resolved instances will be reused until topmost `resolve(tag:)` method returns.
   case ObjectGraph
-  /// Resolved instance will be retained by the container and always reused. Instance is retained not by container itself but by corresponding definition. Do not mix this lifecycle with _singleton pattern_. Instance will be not shared between defferent containers.
+  /// Resolved instance will be retained by the container and always reused. Do not mix this lifecycle with _singleton pattern_. Instance will be not shared between defferent containers.
   case Singleton
 }
 
@@ -118,18 +118,6 @@ public final class DefinitionOf<T, F>: Definition {
     self.scope = scope
   }
   
-  ///Will be stored only if scope is `Singleton`
-  var resolvedInstance: T? {
-    get {
-      guard scope == .Singleton else { return nil }
-      return _resolvedInstance
-    }
-    set {
-      guard scope == .Singleton else { return }
-      _resolvedInstance = newValue
-    }
-  }
-  
   private var _resolvedInstance: T?
   
 }
@@ -147,7 +135,7 @@ extension DefinitionOf: _Definition { }
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {
-    return "type: \(T.self), factory: \(F.self), scope: \(scope), resolved instance: \(resolvedInstance.desc)"
+    return "type: \(T.self), factory: \(F.self), scope: \(scope)"
   }
 }
 
