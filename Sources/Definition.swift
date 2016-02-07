@@ -126,9 +126,7 @@ public final class DefinitionOf<T, F>: Definition {
 public protocol Definition: class { }
 
 protocol _Definition: Definition {
-
   var scope: ComponentScope { get }
-  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
 
 extension DefinitionOf: _Definition { }

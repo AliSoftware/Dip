@@ -326,6 +326,7 @@ extension DependencyContainer {
   func remove(definitionForKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = nil
+      resolvedInstances.singletons[key] = nil
     }
   }
 
@@ -335,6 +336,7 @@ extension DependencyContainer {
   public func reset() {
     threadSafe {
       definitions.removeAll()
+      resolvedInstances.singletons.removeAll()
     }
   }
 
