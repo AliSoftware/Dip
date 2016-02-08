@@ -104,7 +104,7 @@ public enum ComponentScope {
   /**
    Resolved instance will be retained by the container and always reused.
    Do not mix this life cycle with _singleton pattern_.
-   Instance will be not shared between defferent containers.
+   Instance will be not shared between different containers.
    
    - warning: Make sure this component is thread safe or accessed always from the same thread.
    
