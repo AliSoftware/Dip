@@ -53,11 +53,80 @@ public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
 
 ///Component scope defines a strategy used by the `DependencyContainer` to manage resolved instances life cycle.
 public enum ComponentScope {
-  /// A new instance will be created each time it's resolved.
+  /**
+   A new instance will be created every time it's resolved.
+   This is a default strategy. Use this strategy when you don't want instances to be shared
+   between different consumers (i.e. if it is not thread safe).
+   
+   **Example**:
+   
+   ```
+   container.register { ServiceImp() as Service }
+   container.register { 
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
+   }
+   let consumer = container.resolve() as ServiceConsumer
+   consumer.service1 !== consumer.service2 //true
+   
+   ```
+   */
   case Prototype
-  /// Resolved instances will be reused until topmost `resolve(tag:)` method returns.
+  
+  /**
+   Instance resolved with the same definition will be reused until topmost `resolve(tag:)` method returns.
+   When you resolve the same object graph again the container will create new instances.
+   Use this strategy if you want different object in objects graph to share the same instance.
+   
+   - warning: Make sure this component is thread safe or accessed always from the same thread.
+   
+   **Example**:
+   
+   ```
+   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register {
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
+   }
+   let consumer1 = container.resolve() as ServiceConsumer
+   let consumer2 = container.resolve() as ServiceConsumer
+   consumer1.service1 === consumer1.service2 //true
+   consumer2.service1 === consumer2.service2 //true
+   consumer1.service1 !== consumer2.service1 //true
+   ```
+   */
   case ObjectGraph
-  /// Resolved instance will be retained by the container and always reused. Instance is retained not by container itself but by corresponding definition. Do not mix this lifecycle with _singleton pattern_. Instance will be not shared between defferent containers.
+
+  /**
+   Resolved instance will be retained by the container and always reused.
+   Do not mix this life cycle with _singleton pattern_.
+   Instance will be not shared between different containers.
+   
+   - warning: Make sure this component is thread safe or accessed always from the same thread.
+   
+   - note: When you remove definition from the container an instance that was resolved with this definition will be released. When you reset the container it will release all singleton instances.
+   
+   **Example**:
+   
+   ```
+   container.register(.Singleton) { ServiceImp() as Service }
+   container.register {
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
+   }
+   let consumer1 = container.resolve() as ServiceConsumer
+   let consumer2 = container.resolve() as ServiceConsumer
+   consumer1.service1 === consumer1.service2 //true
+   consumer2.service1 === consumer2.service2 //true
+   consumer1.service1 === consumer2.service1 //true
+   ```
+   */
   case Singleton
 }
 
@@ -102,7 +171,8 @@ public final class DefinitionOf<T, F>: Definition {
     return self
   }
   
-  func resolveDependencies(container: DependencyContainer, resolvedInstance: Any) throws {
+  /// Calls `resolveDependencies` block if it was set.
+  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
     guard let resolvedInstance = resolvedInstance as? T else { return }
     try self.resolveDependenciesBlock?(container, resolvedInstance)
   }
@@ -117,18 +187,6 @@ public final class DefinitionOf<T, F>: Definition {
     self.scope = scope
   }
   
-  ///Will be stored only if scope is `Singleton`
-  var resolvedInstance: T? {
-    get {
-      guard scope == .Singleton else { return nil }
-      return _resolvedInstance
-    }
-    set {
-      guard scope == .Singleton else { return }
-      _resolvedInstance = newValue
-    }
-  }
-  
   private var _resolvedInstance: T?
   
 }
@@ -137,16 +195,14 @@ public final class DefinitionOf<T, F>: Definition {
 public protocol Definition: class { }
 
 protocol _Definition: Definition {
-
   var scope: ComponentScope { get }
-
 }
 
 extension DefinitionOf: _Definition { }
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {
-    return "type: \(T.self), factory: \(F.self), scope: \(scope), resolved instance: \(resolvedInstance.desc)"
+    return "type: \(T.self), factory: \(F.self), scope: \(scope)"
   }
 }
 

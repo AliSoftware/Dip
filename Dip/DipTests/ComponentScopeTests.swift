@@ -68,6 +68,48 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertTrue(service1 === service2)
   }
   
+  func testThatSingletonIsNotReusedAcrossContainers() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let secondContainer = DependencyContainer()
+    secondContainer.register(def, forTag: nil)
+    
+    //when
+    let service1 = try! container.resolve() as Service
+    let service2 = try! secondContainer.resolve() as Service
+    
+    //then
+    XCTAssertTrue(service1 !== service2, "Singleton instances should not be reused across containers")
+  }
+  
+  func testThatSingletonIsReleasedWhenDefinitionIsRemoved() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let service1 = try! container.resolve() as Service
+    
+    //when
+    container.remove(def, forTag: nil)
+    container.register(def, forTag: nil)
+    
+    //then
+    let service2 = try! container.resolve() as Service
+    XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container")
+  }
+  
+  func testThatSingletonIsReleasedWhenContainerIsReset() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let service1 = try! container.resolve() as Service
+    
+    //when
+    container.reset()
+    container.register(def, forTag: nil)
+    
+    //then
+    let service2 = try! container.resolve() as Service
+    XCTAssertTrue(service1 !== service2, "Singleton instances should be released when container is reset")
+  }
+  
   class Server {
     weak var client: Client?
     
