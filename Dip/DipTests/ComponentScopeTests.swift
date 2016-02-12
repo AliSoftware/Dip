@@ -96,6 +96,19 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container")
   }
   
+  func testThatSingletonIsReleasedWhenDefinitionIsOverridden() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let service1 = try! container.resolve() as Service
+    
+    //when
+    container.register(def, forTag: nil)
+    
+    //then
+    let service2 = try! container.resolve() as Service
+    XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is overridden")
+  }
+  
   func testThatSingletonIsReleasedWhenContainerIsReset() {
     //given
     let def = container.register(.Singleton) { ServiceImp1() as Service }

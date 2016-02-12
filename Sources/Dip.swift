@@ -142,6 +142,7 @@ extension DependencyContainer {
   func register(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = definition
+      resolvedInstances.singletons[key] = nil
     }
   }
 

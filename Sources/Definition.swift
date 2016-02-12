@@ -108,7 +108,9 @@ public enum ComponentScope {
    
    - warning: Make sure this component is thread safe or accessed always from the same thread.
    
-   - note: When you remove definition from the container an instance that was resolved with this definition will be released. When you reset the container it will release all singleton instances.
+   - note: When you override or remove definition from the container an instance 
+           that was resolved with this definition will be released. When you reset 
+           the container it will release all singleton instances.
    
    **Example**:
    
