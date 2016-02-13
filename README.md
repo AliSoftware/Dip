@@ -47,6 +47,27 @@ If you use _Carthage_ add this line to your Cartfile:
 github "AliSoftware/Dip"
 ```
 
+If you use [_Swift Package Manager_](https://swift.org/package-manager/) add Dip as dependency to you `Package.swift`:
+
+```
+let package = Package(
+  name: "MyPackage",
+  dependencies: [
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.2.0")
+  ]
+)
+```
+
+## Running tests
+
+On OSX you can run tests from Xcode. On Linux you need to have Swift Package Manager installed and use it to build test executable:
+
+```
+cd Dip/DipTests
+swift build
+./.build/debug/DipTests
+```
+
 ## Playground
 
 Dip comes with a **Playground** to introduce you to Inversion of Control, Dependency Injection, and how to use Dip in practice.

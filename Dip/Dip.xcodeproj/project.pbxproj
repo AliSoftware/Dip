@@ -49,6 +49,9 @@
 		09873F7A1C1E0252000C02F6 /* AutoInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09873F551C1E0237000C02F6 /* AutoInjection.swift */; };
 		09873F7B1C1E0253000C02F6 /* AutoInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09873F551C1E0237000C02F6 /* AutoInjection.swift */; };
 		09873F7C1C1E0254000C02F6 /* AutoInjection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09873F551C1E0237000C02F6 /* AutoInjection.swift */; };
+		09D598331C6F9EC100F24D49 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D598321C6F9EC100F24D49 /* Utils.swift */; };
+		09D598341C6F9EC100F24D49 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D598321C6F9EC100F24D49 /* Utils.swift */; };
+		09D598351C6F9EC100F24D49 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09D598321C6F9EC100F24D49 /* Utils.swift */; };
 		2C15B9511C25F01200EA3486 /* ThreadSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C15B94F1C25EF7800EA3486 /* ThreadSafetyTests.swift */; };
 		2C15B9521C25F01300EA3486 /* ThreadSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C15B94F1C25EF7800EA3486 /* ThreadSafetyTests.swift */; };
 		2C15B9531C25F01500EA3486 /* ThreadSafetyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C15B94F1C25EF7800EA3486 /* ThreadSafetyTests.swift */; };
@@ -91,15 +94,16 @@
 		0919F4CA1C16417000DC3B10 /* Dip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Dip.swift; path = ../../Sources/Dip.swift; sourceTree = "<group>"; };
 		0919F4CB1C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RuntimeArguments.swift; path = ../../Sources/RuntimeArguments.swift; sourceTree = "<group>"; };
-		0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentScopeTests.swift; sourceTree = "<group>"; };
-		0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionTests.swift; sourceTree = "<group>"; };
-		0919F4D01C16417000DC3B10 /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DipTests.swift; sourceTree = "<group>"; };
+		0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ComponentScopeTests.swift; path = Sources/ComponentScopeTests.swift; sourceTree = "<group>"; };
+		0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DefinitionTests.swift; path = Sources/DefinitionTests.swift; sourceTree = "<group>"; };
+		0919F4D01C16417000DC3B10 /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DipTests.swift; path = Sources/DipTests.swift; sourceTree = "<group>"; };
 		0919F4D11C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
+		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RuntimeArgumentsTests.swift; path = Sources/RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
 		0982AF0B1C5183A000B62463 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = ../../Sources/Utils.swift; sourceTree = "<group>"; };
 		09873F551C1E0237000C02F6 /* AutoInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjection.swift; path = ../../Sources/AutoInjection.swift; sourceTree = "<group>"; };
-		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoInjectionTests.swift; sourceTree = "<group>"; };
-		2C15B94F1C25EF7800EA3486 /* ThreadSafetyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafetyTests.swift; sourceTree = "<group>"; };
+		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjectionTests.swift; path = Sources/AutoInjectionTests.swift; sourceTree = "<group>"; };
+		09D598321C6F9EC100F24D49 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = Sources/Utils.swift; sourceTree = "<group>"; };
+		2C15B94F1C25EF7800EA3486 /* ThreadSafetyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ThreadSafetyTests.swift; path = Sources/ThreadSafetyTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -181,6 +185,7 @@
 				0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */,
 				09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */,
 				2C15B94F1C25EF7800EA3486 /* ThreadSafetyTests.swift */,
+				09D598321C6F9EC100F24D49 /* Utils.swift */,
 				0919F4D11C16417000DC3B10 /* Info.plist */,
 			);
 			path = DipTests;
@@ -503,6 +508,7 @@
 				0919F4E61C16419300DC3B10 /* ComponentScopeTests.swift in Sources */,
 				2C15B9511C25F01200EA3486 /* ThreadSafetyTests.swift in Sources */,
 				0919F4E41C16419300DC3B10 /* DefinitionTests.swift in Sources */,
+				09D598331C6F9EC100F24D49 /* Utils.swift in Sources */,
 				0919F4E31C16419300DC3B10 /* DipTests.swift in Sources */,
 				0919F4E51C16419300DC3B10 /* RuntimeArgumentsTests.swift in Sources */,
 				09873F771C1E024E000C02F6 /* AutoInjectionTests.swift in Sources */,
@@ -528,6 +534,7 @@
 				0919F4EA1C16419400DC3B10 /* ComponentScopeTests.swift in Sources */,
 				2C15B9521C25F01300EA3486 /* ThreadSafetyTests.swift in Sources */,
 				0919F4E81C16419400DC3B10 /* DefinitionTests.swift in Sources */,
+				09D598341C6F9EC100F24D49 /* Utils.swift in Sources */,
 				0919F4E71C16419400DC3B10 /* DipTests.swift in Sources */,
 				0919F4E91C16419400DC3B10 /* RuntimeArgumentsTests.swift in Sources */,
 				09873F781C1E024E000C02F6 /* AutoInjectionTests.swift in Sources */,
@@ -553,6 +560,7 @@
 				0919F4EE1C16419500DC3B10 /* ComponentScopeTests.swift in Sources */,
 				2C15B9531C25F01500EA3486 /* ThreadSafetyTests.swift in Sources */,
 				0919F4EC1C16419500DC3B10 /* DefinitionTests.swift in Sources */,
+				09D598351C6F9EC100F24D49 /* Utils.swift in Sources */,
 				0919F4EB1C16419500DC3B10 /* DipTests.swift in Sources */,
 				0919F4ED1C16419500DC3B10 /* RuntimeArgumentsTests.swift in Sources */,
 				09873F791C1E024F000C02F6 /* AutoInjectionTests.swift in Sources */,

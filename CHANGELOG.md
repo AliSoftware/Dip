@@ -2,6 +2,10 @@
 
 ## Develop
 
+* Added support for Swift Package Manager.  
+  [#41](https://github.com/AliSoftware/Dip/pull/41), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added Linux support.  
+  [#42](https://github.com/AliSoftware/Dip/pull/42), [#46](https://github.com/AliSoftware/Dip/pull/46), [@ilyapuchka](https://github.com/ilyapuchka)
 * Fixed the issue that could cause singleton instances to be reused between different containers.  
   [#43](https://github.com/AliSoftware/Dip/pull/43), [@ilyapuchka](https://github.com/ilyapuchka)
 * Added public `AutoInjectedPropertyBox` protocol for user-defined auto-injected property wrappers.  
