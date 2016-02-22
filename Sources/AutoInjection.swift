@@ -32,7 +32,7 @@ extension DependencyContainer {
   }
   
   private func _resolveChild(child: Mirror.Child) throws {
-    guard let injectedPropertyBox = child.value as? _AnyInjectedPropertyBox else { return }
+    guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
     do {
       try injectedPropertyBox.resolve(self)
@@ -44,8 +44,39 @@ extension DependencyContainer {
   
 }
 
-private protocol _AnyInjectedPropertyBox: class {
+/**
+ Implement this protocol if you want to use your own type to wrap auto-injected properties
+ instead of using `Injected<T>` or `InjectedWeak<T>` types.
+ 
+ **Example**:
+ ```swift
+ class MyCustomBox<T> {
+   private(set) var value: T?
+   init() {}
+ }
+ 
+ extension MyCustomBox: AutoInjectedPropertyBox {
+   static var wrappedType: Any.Type { return T.self }
+ 
+   func resolve(container: DependencyContainer) throws {
+     value = try container.resolve() as T
+   }
+ }
+ ```
+
+*/
+public protocol AutoInjectedPropertyBox: class {
+  ///Should return type of the property that this box wraps
   static var wrappedType: Any.Type { get }
+  
+  /**
+   Will be called by `DependencyContainer` during processing resolved instance properties.
+
+   In this method you should resolve the instance that the box wraps and store a reference to it.
+   
+  -note: This method is not intended to be called manually, 
+         `DependencyContainer` will call it for you.
+   */
   func resolve(container: DependencyContainer) throws
 }
 
@@ -68,17 +99,17 @@ private protocol _AnyInjectedPropertyBox: class {
  - seealso: `InjectedWeak`
 
 */
-public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
+public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
   
-  var _value: Any? = nil {
+  public static var wrappedType: Any.Type {
+    return T.self
+  }
+
+  ///Wrapped value.
+  public private(set) var value: T? {
     didSet {
       if let value = value { didInject(value) }
     }
-  }
-  
-  ///Wrapped value.
-  public var value: T? {
-    return _value as? T
   }
 
   /**
@@ -96,9 +127,9 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
     super.init(required: required, tag: tag, didInject: didInject)
   }
   
-  private func resolve(container: DependencyContainer) throws {
+  public func resolve(container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(container)
-    _value = resolved
+    value = resolved
   }
   
 }
@@ -133,12 +164,16 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
  - seealso: `Injected`
  
  */
-public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
+public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
 
   //Only classes (means AnyObject) can be used as `weak` properties
   //but we can not make <T: AnyObject> because that will prevent using protocol as generic type
   //so we just rely on user reading documentation and passing AnyObject in runtime
   //also we will throw fatal error if type can not be casted to AnyObject during resolution.
+
+  public static var wrappedType: Any.Type {
+    return T.self
+  }
 
   weak var _value: AnyObject? = nil {
     didSet {
@@ -166,21 +201,18 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropert
     super.init(required: required, tag: tag, didInject: didInject)
   }
   
-  private func resolve(container: DependencyContainer) throws {
+  public
+  func resolve(container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(container)
-    guard let resolvedObject = resolved as? AnyObject else {
+    if required && !(resolved is AnyObject) {
       fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
     }
-    _value = resolvedObject
+    _value = resolved as? AnyObject
   }
   
 }
 
 private class _InjectedPropertyBox<T> {
-
-  static var wrappedType: Any.Type {
-    return T.self
-  }
 
   let required: Bool
   let didInject: T -> ()
@@ -195,10 +227,10 @@ private class _InjectedPropertyBox<T> {
   private func resolve(container: DependencyContainer) throws -> T? {
     let resolved: T?
     if required {
-      resolved = try container.resolve(tag: tag, builder: { (factory: () throws -> T) in try factory() }) as T
+      resolved = try container.resolve(tag: tag) as T
     }
     else {
-      resolved = try? container.resolve(tag: tag, builder: { (factory: () throws -> T) in try factory() }) as T
+      resolved = try? container.resolve(tag: tag) as T
     }
     return resolved
   }
