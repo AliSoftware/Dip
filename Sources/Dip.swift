@@ -22,6 +22,70 @@
 // THE SOFTWARE.
 //
 
+public enum DependencyTag: Equatable {
+  case String(StringLiteralType)
+  case Int(IntegerLiteralType)
+}
+
+extension DependencyTag: IntegerLiteralConvertible {
+  
+  public init(integerLiteral value: IntegerLiteralType) {
+    self = .Int(value)
+  }
+  
+}
+
+extension DependencyTag: StringLiteralConvertible {
+  
+  public init(stringLiteral value: StringLiteralType) {
+    self = .String(value)
+  }
+  
+  public init(unicodeScalarLiteral value: StringLiteralType) {
+    self.init(stringLiteral: value)
+  }
+  
+  public init(extendedGraphemeClusterLiteral value: StringLiteralType) {
+    self.init(stringLiteral: value)
+  }
+  
+}
+
+public func ==(lhs: DependencyTag, rhs: DependencyTag) -> Bool {
+  switch (lhs, rhs) {
+  case let (.String(lhsString), .String(rhsString)):
+    return lhsString == rhsString
+  case let (.Int(lhsInt), .Int(rhsInt)):
+    return lhsInt == rhsInt
+  default:
+    return false
+  }
+}
+
+
+
+public protocol DependencyTagConvertible {
+  func toTag() -> DependencyTag
+}
+
+extension DependencyTag: DependencyTagConvertible {
+  public func toTag() -> DependencyTag {
+    return self
+  }
+}
+
+extension String: DependencyTagConvertible {
+  public func toTag() -> DependencyTag {
+    return DependencyTag.String(self)
+  }
+}
+
+extension Int: DependencyTagConvertible {
+  public func toTag() -> DependencyTag {
+    return DependencyTag.Int(self)
+  }
+}
+
 // MARK: - DependencyContainer
 
 /**
@@ -34,10 +98,6 @@ public final class DependencyContainer {
    Use a tag in case you need to register multiple factories fo the same type,
    to differentiate them. Tags can be either String or Int, to your convenience.
    */
-  public enum Tag: Equatable {
-    case String(StringLiteralType)
-    case Int(IntegerLiteralType)
-  }
   
   var definitions = [DefinitionKey : Definition]()
   let resolvedInstances = ResolvedInstances()
@@ -93,7 +153,7 @@ extension DependencyContainer {
    container.register { ClientImp(service: try! container.resolve() as Service) as Client }
    ```
    */
-  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
+  public func register<T>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory)
   }
   
@@ -119,7 +179,7 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
-  public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
+  public func registerFactory<T, F>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
     let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
     register(definition, forTag: tag)
     return definition
@@ -134,8 +194,8 @@ extension DependencyContainer {
       - definition: The definition to register in the container.
    
    */
-  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: DependencyTagConvertible? = nil) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag?.toTag())
     register(definition, forKey: key)
   }
   
@@ -177,7 +237,7 @@ extension DependencyContainer {
    ```
    
    */
-  public func resolve<T>(tag tag: Tag? = nil) throws -> T {
+  public func resolve<T>(tag tag: DependencyTagConvertible? = nil) throws -> T {
     return try resolve(tag: tag) { (factory: () throws -> T) in try factory() }
   }
   
@@ -208,8 +268,8 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce the number of dependencies.
    */
-  public func resolve<T, F>(tag tag: Tag? = nil, builder: F throws -> T) throws -> T {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+  public func resolve<T, F>(tag tag: DependencyTagConvertible? = nil, builder: F throws -> T) throws -> T {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag?.toTag())
 
     do {
       return try _resolveKey(key, builder: builder)
@@ -317,8 +377,8 @@ extension DependencyContainer {
       - tag: The tag used to register definition.
       - definition: The definition to remove
    */
-  public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
+  public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: DependencyTagConvertible? = nil) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag?.toTag())
     remove(definitionForKey: key)
   }
   
@@ -347,41 +407,6 @@ extension DependencyContainer: CustomStringConvertible {
     return "Definitions: \(definitions.count)\n" + definitions.map({ "\($0.0)" }).joinWithSeparator("\n")
   }
   
-}
-
-extension DependencyContainer.Tag: IntegerLiteralConvertible {
-
-  public init(integerLiteral value: IntegerLiteralType) {
-    self = .Int(value)
-  }
-
-}
-
-extension DependencyContainer.Tag: StringLiteralConvertible {
-
-  public init(stringLiteral value: StringLiteralType) {
-    self = .String(value)
-  }
-  
-  public init(unicodeScalarLiteral value: StringLiteralType) {
-    self.init(stringLiteral: value)
-  }
-  
-  public init(extendedGraphemeClusterLiteral value: StringLiteralType) {
-    self.init(stringLiteral: value)
-  }
-  
-}
-
-public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
-  switch (lhs, rhs) {
-  case let (.String(lhsString), .String(rhsString)):
-    return lhsString == rhsString
-  case let (.Int(lhsInt), .Int(rhsInt)):
-    return lhsInt == rhsInt
-  default:
-    return false
-  }
 }
 
 /**

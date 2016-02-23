@@ -17,6 +17,17 @@ private let FAKE_STARSHIPS = false
 /* ---- */
 
 
+enum DependencyTags: Int {
+    case Hardcoded
+    case Dummy
+}
+
+extension DependencyTags: DependencyTagConvertible {
+    func toTag() -> DependencyTag {
+        return DependencyTag.Int(self.rawValue)
+    }
+}
+
 // MARK: Dependency Container for Providers
 func configureContainer(dip: DependencyContainer) {
     
@@ -47,16 +58,16 @@ func configureContainer(dip: DependencyContainer) {
         // 2) Register fake starships provider
         
         //Here we register different implementations for the same protocol using tags
-        dip.register(tag: "hardcoded") { HardCodedStarshipProvider() as StarshipProviderAPI }
+        dip.register(tag: DependencyTags.Hardcoded) { HardCodedStarshipProvider() as StarshipProviderAPI }
         
         //Here we register factory that will require a runtime argument
-        dip.register(tag: "dummy") { DummyStarshipProvider(pilotName: $0) as StarshipProviderAPI }
+        dip.register(tag: DependencyTags.Dummy) { DummyStarshipProvider(pilotName: $0) as StarshipProviderAPI }
         
         //Here we use constructor injection, but instead of providing dependencies manually container resolves them for us
         dip.register() {
             FakeStarshipProvider(
-                dummyProvider: try dip.resolve(tag: "dummy", withArguments: "Main Pilot"),
-                hardCodedProvider: try dip.resolve(tag: "hardcoded")) as StarshipProviderAPI
+                dummyProvider: try dip.resolve(tag: DependencyTags.Dummy, withArguments: "Main Pilot"),
+                hardCodedProvider: try dip.resolve(tag: DependencyTags.Hardcoded)) as StarshipProviderAPI
         }
         
     } else {
