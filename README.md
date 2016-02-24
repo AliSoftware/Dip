@@ -185,7 +185,7 @@ More information about circular dependencies you can find in the Playground.
 
 ### Auto-Injection
 
-Auto-injection lets your resolve all the dependencies of the instance (created manually or resolved by container) with just one call, also allowing a simpler syntax to register circular dependencies.
+Auto-injection lets your resolve all the dependencies of the instance resolved by container with just one call, also allowing a simpler syntax to register circular dependencies.
 
 ```swift
 protocol Server {
@@ -214,6 +214,8 @@ let client = try! container.resolve() as Client
 ```
 You can find more use cases for auto-injection in the Playground available in this repository.
 
+> Tip: You can use either `Injected<T>` and `InjectedWeak<T>` wrappers provided by Dip, or your own wrappers (even plain `Box<T>`) that conform to `AutoInjectedPropertyBox` protocol.
+
 ### Thread safety
 
 `DependencyContainer` is thread safe, you can register and resolve components from different threads. 
@@ -222,12 +224,9 @@ when you try to resolve component from one thread while it was not yet registere
 
 ### Errors
 
-The resolve operation has a potential to fail because you can use the wrong type, factory or a wrong tag. For that reason Dip throws an error
- `DefinitionNotFound(DefinitionKey)` if it failed to resolve a type. Thus when calling `resolve` you need to use a `try` operator. 
- There are very rare use cases when your application can recover from this kind of error. In most of the cases you can use `try!` 
- to cause an exception at runtime if error was thrown or `try?` if a dependency is optional. 
- This way `try!` serves as an additional mark for developers that resolution can fail.
- Dip also provides helpful descriptions for errors that can occur when you call `resolve`. See the source code documentation to know more about that.
+The resolve operation has a potential to fail because you can use the wrong type, factory or a wrong tag. For that reason Dip throws a `DipError` if it fails to resolve a type. Thus when calling `resolve` you need to use a `try` operator. 
+There are very rare use cases when your application can recover from this kind of error. In most of the cases you can use `try!` to cause an exception at runtime if error was thrown or `try?` if a dependency is optional. This way `try!` serves as an additional mark for developers that resolution can fail. 
+Dip also provides helpful descriptions for errors that can occur when you call `resolve`. See the source code documentation to know more about that.
 
 ### Concrete Example
 
