@@ -25,13 +25,29 @@
 import XCTest
 @testable import Dip
 
+private protocol Service {}
+private class ServiceImp: Service {}
+
 class DefinitionTests: XCTestCase {
 
-  typealias F1 = ()->Service
-  typealias F2 = (String)->Service
+  private typealias F1 = () -> Service
+  private typealias F2 = (String) -> Service
   
   let tag1 = DependencyContainer.Tag.String("tag1")
   let tag2 = DependencyContainer.Tag.String("tag2")
+  
+  #if os(Linux)
+  var allTests: [(String, () throws -> Void)] {
+    return [
+      ("testThatDefinitionKeyIsEqualBy_Type_Factory_Tag", testThatDefinitionKeyIsEqualBy_Type_Factory_Tag),
+      ("testThatDefinitionKeysWithDifferentTypesAreNotEqual", testThatDefinitionKeysWithDifferentTypesAreNotEqual),
+      ("testThatDefinitionKeysWithDifferentFactoriesAreNotEqual", testThatDefinitionKeysWithDifferentFactoriesAreNotEqual),
+      ("testThatDefinitionKeysWithDifferentTagsAreNotEqual", testThatDefinitionKeysWithDifferentTagsAreNotEqual),
+      ("testThatResolveDependenciesCallsResolveDependenciesBlock", testThatResolveDependenciesCallsResolveDependenciesBlock),
+      ("testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance", testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance)
+    ]
+  }
+  #endif
 
   func testThatDefinitionKeyIsEqualBy_Type_Factory_Tag() {
     let equalKey1 = DefinitionKey(protocolType: Service.self, factoryType: F1.self, associatedTag: tag1)
@@ -65,16 +81,16 @@ class DefinitionTests: XCTestCase {
     XCTAssertNotEqual(keyWithDifferentTag1.hashValue, keyWithDifferentTag2.hashValue)
   }
 
-  func testThatResolveDependenciesCallsResolveDependenciesBlockWhen() {
+  func testThatResolveDependenciesCallsResolveDependenciesBlock() {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp1() as Service }.resolveDependencies { container, service in
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }.resolveDependencies { container, service in
       blockCalled = true
     }
     
     //when
-    try! def.resolveDependenciesOf(ServiceImp1(), withContainer: DependencyContainer())
+    try! def.resolveDependenciesOf(ServiceImp(), withContainer: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -84,7 +100,7 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp1() as Service }.resolveDependencies { container, service in
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }.resolveDependencies { container, service in
       blockCalled = true
     }
     
@@ -95,3 +111,4 @@ class DefinitionTests: XCTestCase {
     XCTAssertFalse(blockCalled)
   }
 }
+

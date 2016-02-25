@@ -25,27 +25,57 @@
 import XCTest
 @testable import Dip
 
-class ServiceImp3: Service {
+private protocol Service {
+  var name: String { get }
+}
+
+private class ServiceImp: Service {
   
   let name: String
   
-  init(name: String, baseURL: NSURL, port: Int) {
+  init(name: String, baseURL: String, port: Int) {
     self.name = name
   }
   
-  func getServiceName() -> String {
-    return name
-  }
+}
+
+private class ServiceImp1: Service {
+  let name: String = "ServiceImp1"
+}
+
+private class ServiceImp2: Service {
+  let name: String = "ServiceImp2"
 }
 
 class RuntimeArgumentsTests: XCTestCase {
   
   let container = DependencyContainer()
-  
-  override func setUp() {
-    super.setUp()
+ 
+  #if os(Linux)
+  var allTests: [(String, () throws -> Void)] {
+    return [
+      ("testThatItResolvesInstanceWithOneArgument", testThatItResolvesInstanceWithOneArgument),
+      ("testThatItResolvesInstanceWithTwoArguments", testThatItResolvesInstanceWithTwoArguments),
+      ("testThatItResolvesInstanceWithThreeArguments", testThatItResolvesInstanceWithThreeArguments),
+      ("testThatItResolvesInstanceWithFourArguments", testThatItResolvesInstanceWithFourArguments),
+      ("testThatItResolvesInstanceWithFiveArguments", testThatItResolvesInstanceWithFiveArguments),
+      ("testThatItResolvesInstanceWithSixArguments", testThatItResolvesInstanceWithSixArguments),
+      ("testThatItRegistersDifferentFactoriesForDifferentNumberOfArguments", testThatItRegistersDifferentFactoriesForDifferentNumberOfArguments),
+      ("testThatItRegistersDifferentFactoriesForDifferentTypesOfArguments", testThatItRegistersDifferentFactoriesForDifferentTypesOfArguments),
+      ("testThatItRegistersDifferentFactoriesForDifferentOrderOfArguments", testThatItRegistersDifferentFactoriesForDifferentOrderOfArguments),
+      ("testThatNewRegistrationWithSameArgumentsOverridesPreviousRegistration", testThatNewRegistrationWithSameArgumentsOverridesPreviousRegistration),
+      ("testThatDifferentFactoriesRegisteredIfArgumentIsOptional", testThatDifferentFactoriesRegisteredIfArgumentIsOptional)
+    ]
+  }
+
+  func setUp() {
     container.reset()
   }
+  #else
+  override func setUp() {
+    container.reset()
+  }
+  #endif
   
   func testThatItResolvesInstanceWithOneArgument() {
     //given
@@ -211,23 +241,20 @@ class RuntimeArgumentsTests: XCTestCase {
   func testThatDifferentFactoriesRegisteredIfArgumentIsOptional() {
     //given
     let name1 = "1", name2 = "2", name3 = "3"
-    container.register { (port: Int, url: NSURL) in ServiceImp3(name: name1, baseURL: url, port: port) as Service }
-    container.register { (port: Int, url: NSURL?) in ServiceImp3(name: name2, baseURL: url!, port: port) as Service }
-    container.register { (port: Int, url: NSURL!) in ServiceImp3(name: name3, baseURL: url, port: port) as Service }
+    container.register { (port: Int, url: String) in ServiceImp(name: name1, baseURL: url, port: port) as Service }
+    container.register { (port: Int, url: String?) in ServiceImp(name: name2, baseURL: url!, port: port) as Service }
+    container.register { (port: Int, url: String!) in ServiceImp(name: name3, baseURL: url, port: port) as Service }
     
     //when
-    let url: NSURL = NSURL(string: "http://example.com")!
-    let service1 = try! container.resolve(withArguments: 80, url) as Service
-    let service2 = try! container.resolve(withArguments: 80, NSURL(string: "http://example.com")) as Service
-    
-    let service3 = try! container.resolve(withArguments: 80, NSURL(string: "http://example.com")! as NSURL!) as Service
-    let service4 = try! container.resolve(withArguments: 80, NSURL(string: "http://example.com")!) as Service
+    let service1 = try! container.resolve(withArguments: 80, "http://example.com") as Service
+    let service2 = try! container.resolve(withArguments: 80, "http://example.com" as String?) as Service
+    let service3 = try! container.resolve(withArguments: 80, "http://example.com" as String!) as Service
     
     //then
-    XCTAssertEqual(service1.getServiceName(), name1)
-    XCTAssertEqual(service2.getServiceName(), name2)
-    XCTAssertEqual(service3.getServiceName(), name3)
-    XCTAssertEqual(service4.getServiceName(), name1) //implicitly unwrapped optional parameter is the same as not optional parameter
+    XCTAssertEqual(service1.name, name1)
+    XCTAssertEqual(service2.name, name2)
+    XCTAssertEqual(service3.name, name3)
   }
   
 }
+
