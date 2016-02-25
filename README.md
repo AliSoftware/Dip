@@ -20,6 +20,7 @@ It's aimed to be as simple as possible yet provide rich functionality usual for 
 
 This allows you to define the real, concrete types only in one place ([e.g. like this in your app](SampleApp/DipSampleApp/DependencyContainers.swift#L22-L27), and [resetting it in your `setUp` for each Unit Tests](SampleApp/Tests/SWAPIPersonProviderTests.swift#L17-L21)) and then [only work with `protocols` in your code](SampleApp/DipSampleApp/Providers/SWAPIStarshipProvider.swift#L12) (which only define an API contract), without worrying about the real implementation.
 
+> You can easily use Dip along with Storyboards and Nibs - checkout [Dip-UI](https://github.com/AliSoftware/Dip-UI) extensions. 
 
 ## Advantages of DI and loose coupling
 

@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Develop
+## 4.2.0
 
 * Added support for Swift Package Manager.  
   [#41](https://github.com/AliSoftware/Dip/pull/41), [@ilyapuchka](https://github.com/ilyapuchka)
