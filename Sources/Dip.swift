@@ -423,7 +423,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
     case let .DefinitionNotFound(key):
       return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
-      return "Failed to auto-inject property \"\(label)\" of type \(type). \(error)"
+      return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
     }
   }
 }
