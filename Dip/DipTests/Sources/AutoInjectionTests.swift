@@ -28,78 +28,96 @@ import XCTest
 private protocol Server: class {
   weak var client: Client? {get}
   var anotherClient: Client? {get set}
-  var optionalClient: AnyObject? {get}
+  var optionalProperty: AnyObject? {get}
 }
 
 private protocol Client: class {
   var server: Server? {get}
   var anotherServer: Server? {get set}
-  var optionalServer: AnyObject? {get}
+  var optionalProperty: AnyObject? {get}
+}
+
+private class ServerImp: Server {
+  
+  var _client = InjectedWeak<Client>() { _ in
+    AutoInjectionTests.clientDidInjectCalled = true
+  }
+  var client: Client? {
+    return _client.value
+  }
+  
+  weak var anotherClient: Client?
+  
+  weak var _optionalProperty = InjectedWeak<AnyObject>(required: false)
+  var optionalProperty: AnyObject? { return _optionalProperty?.value }
+}
+
+private class ClientImp: Client {
+  
+  var _server = Injected<Server>() { _ in
+    AutoInjectionTests.serverDidInjectCalled = true
+  }
+  var server: Server? {
+    return _server.value
+  }
+
+  var anotherServer: Server?
+  
+  var _optionalProperty = Injected<AnyObject>(required: false)
+  var optionalProperty: AnyObject? { return _optionalProperty.value }
+  
+  var taggedServer = Injected<Server>(tag: "tagged")
+}
+
+private class Obj1 {
+  let obj2 = InjectedWeak<Obj2>()
+  let obj3 = Injected<Obj3>()
+}
+
+private class Obj2 {
+  let obj1 = Injected<Obj1>()
+}
+
+private class Obj3 {
+  
+  weak var obj1: Obj1?
+  
+  init(obj: Obj1) {
+    self.obj1 = obj
+  }
 }
 
 class AutoInjectionTests: XCTestCase {
   
-  static var serverDeallocated: Bool = false
-  static var clientDeallocated: Bool = false
-  
   static var serverDidInjectCalled: Bool = false
   static var clientDidInjectCalled: Bool = false
 
-  private class ServerImp: Server {
-    
-    deinit {
-      AutoInjectionTests.serverDeallocated = true
-    }
-    
-    var _client = InjectedWeak<Client>() { _ in
-      AutoInjectionTests.clientDidInjectCalled = true
-    }
-    
-    weak var client: Client? {
-      return _client.value
-    }
-    
-    weak var anotherClient: Client?
-    
-    weak var _optionalClient = InjectedWeak<AnyObject>(required: false)
-    var optionalClient: AnyObject? { return _optionalClient?.value }
-  }
-  
-  private class ClientImp: Client {
-    
-    deinit {
-      AutoInjectionTests.clientDeallocated = true
-    }
-    
-    var _server = Injected<Server>() { _ in
-      AutoInjectionTests.serverDidInjectCalled = true
-    }
-    
-    var anotherServer: Server?
-    
-    var _optionalServer = Injected<AnyObject>(required: false)
-    
-    var optionalServer: AnyObject? { return _optionalServer.value }
-    
-    var server: Server? {
-      return _server.value
-    }
-    
-    var taggedServer = Injected<Server>(tag: "tagged")
-
-  }
-
   let container = DependencyContainer()
   
-  override func setUp() {
-    super.setUp()
-
-    container.reset()
-    AutoInjectionTests.serverDeallocated = false
-    AutoInjectionTests.clientDeallocated = false
-    AutoInjectionTests.clientDidInjectCalled = false
-    AutoInjectionTests.serverDidInjectCalled = false
+  #if os(Linux)
+  var allTests: [(String, () throws -> Void)] {
+    return [
+      ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
+      ("testThatItThrowsErrorIfFailsToAutoInjectDependency", testThatItThrowsErrorIfFailsToAutoInjectDependency),
+      ("testThatItResolvesAutoInjectedSingletons", testThatItResolvesAutoInjectedSingletons),
+      ("testThatItCallsResolveDependencyBlockWhenAutoInjecting", testThatItCallsResolveDependencyBlockWhenAutoInjecting),
+      ("testThatItReusesResolvedAutoInjectedInstances", testThatItReusesResolvedAutoInjectedInstances),
+      ("testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection", testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection),
+      ("testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies", testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies),
+      ("testThatItCallsDidInjectOnAutoInjectedProperty", testThatItCallsDidInjectOnAutoInjectedProperty),
+      ("testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected", testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected),
+      ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties)
+    ]
   }
+
+  func setUp() {
+  container.reset()
+  }
+  #else
+  override func setUp() {
+    container.reset()
+  }
+  #endif
 
   func testThatItResolvesAutoInjectedDependencies() {
     container.register(.ObjectGraph) { ServerImp() as Server }
@@ -110,32 +128,12 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(client === server?.client)
   }
   
-  func testThatItThrowsErrorIfFailsToInjectDependency() {
+  func testThatItThrowsErrorIfFailsToAutoInjectDependency() {
     container.register(.ObjectGraph) { ClientImp() as Client }
     
-    do {
-      try container.resolve() as Client
-      XCTFail("Resolve should throw error")
-    }
-    catch { }
+    AssertThrows(expression: try container.resolve() as Client)
   }
 
-  func testThatThereIsNoRetainCycleForCyrcularDependencies() {
-    //given
-    container.register(.ObjectGraph) { ServerImp() as Server }
-    container.register(.ObjectGraph) { ClientImp() as Client }
-
-    var client: Client? = try! container.resolve() as Client
-    XCTAssertNotNil(client)
-    
-    //when
-    client = nil
-    
-    //then
-    XCTAssertTrue(AutoInjectionTests.clientDeallocated)
-    XCTAssertTrue(AutoInjectionTests.serverDeallocated)
-  }
-  
   func testThatItResolvesAutoInjectedSingletons() {
     //given
     container.register(.Singleton) { ServerImp() as Server }
@@ -154,7 +152,7 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(server === sharedServer)
   }
   
-  func testThatItCallsResolveDependencyBlockOnOriginalDefiniton() {
+  func testThatItCallsResolveDependencyBlockWhenAutoInjecting() {
     var serverBlockWasCalled = false
     
     //given
@@ -207,24 +205,6 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection() {
     //given
-    class Obj1 {
-      let obj2 = InjectedWeak<Obj2>()
-      let obj3 = Injected<Obj3>()
-    }
-    
-    class Obj2 {
-      let obj1 = Injected<Obj1>()
-    }
-    
-    class Obj3 {
-      
-      weak var obj1: Obj1?
-      
-      init(obj: Obj1) {
-        self.obj1 = obj
-      }
-    }
-    
     container.register(.ObjectGraph) { Obj1() }
     container.register(.ObjectGraph) { Obj2() }
     container.register(.ObjectGraph) { Obj3(obj: try self.container.resolve()) }
@@ -249,19 +229,22 @@ class AutoInjectionTests: XCTestCase {
     var client: Client? = try! container.resolve() as Client
     
     //then
-    weak var server: Server? = client?.server
+    weak var weakServer: Server? = client?.server
     weak var weakClient = client
     
     XCTAssertNotNil(weakClient)
-    XCTAssertNotNil(server)
+    XCTAssertNotNil(weakServer)
     
     client = nil
 
     XCTAssertNil(weakClient)
-    XCTAssertNil(server)
+    XCTAssertNil(weakServer)
   }
   
   func testThatItCallsDidInjectOnAutoInjectedProperty() {
+    AutoInjectionTests.clientDidInjectCalled = false
+    AutoInjectionTests.serverDidInjectCalled = false
+    
     //given
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(.ObjectGraph) { ClientImp() as Client }
@@ -279,17 +262,10 @@ class AutoInjectionTests: XCTestCase {
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(.ObjectGraph) { ClientImp() as Client }
 
-    do {
-      //when
-      try container.resolve() as Client
-    }
-    catch {
-      //then
-      XCTFail("Container should not throw error if failed to resolve optional auto-injected properties.")
-    }
+    AssertNoThrow(expression: try container.resolve() as Client, "Container should not throw error if failed to resolve optional auto-injected properties.")
   }
   
-  func testThatItResolvesAutoInjectedTaggedDependencies() {
+  func testThatItResolvesTaggedAutoInjectedProperties() {
     //given
     container.register(.ObjectGraph) { ServerImp() as Server }
     container.register(tag: "tagged", .ObjectGraph) { ServerImp() as Server }
@@ -307,6 +283,4 @@ class AutoInjectionTests: XCTestCase {
   }
   
 }
-
-
 

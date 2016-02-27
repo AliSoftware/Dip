@@ -41,7 +41,7 @@ public final class DependencyContainer {
   
   var definitions = [DefinitionKey : Definition]()
   let resolvedInstances = ResolvedInstances()
-  let lock = NSRecursiveLock()
+  let lock = RecursiveLock()
   
   /**
    Designated initializer for a DependencyContainer
@@ -142,6 +142,7 @@ extension DependencyContainer {
   func register(definition: Definition, forKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = definition
+      resolvedInstances.singletons[key] = nil
     }
   }
 
@@ -231,16 +232,14 @@ extension DependencyContainer {
       guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? DefinitionOf<T, F> else {
         throw DipError.DefinitionNotFound(key: key)
       }
-      return try self._resolveDefinition(definition, usingKey: (definition.scope == .ObjectGraph ? key : nil), builder: builder)
+      return try self._resolveDefinition(definition, key: key, builder: builder)
     }
   }
   
   /// Actually resolve dependency.
-  private func _resolveDefinition<T, F>(definition: DefinitionOf<T, F>, usingKey key: DefinitionKey?, builder: F throws -> T) rethrows -> T {
-    
+  private func _resolveDefinition<T, F>(definition: DefinitionOf<T, F>, key: DefinitionKey, builder: F throws -> T) rethrows -> T {
     return try resolvedInstances.resolve {
-      
-      if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+      if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
         return previouslyResolved
       }
       else {
@@ -249,14 +248,13 @@ extension DependencyContainer {
         //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
         //when it returns instance that we try to resolve here can be already resolved
         //so we return it, throwing away instance created by previous call to builder
-        if let previouslyResolved: T = resolvedInstances.previouslyResolved(key, definition: definition) {
+        if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
           return previouslyResolved
         }
         
-        resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, definition: definition)
-        definition.resolvedInstance = resolvedInstance
+        resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
         
-        try definition.resolveDependenciesBlock?(self, resolvedInstance)
+        try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
         
         //we perform auto-injection as the last step to be able to reuse instances
         //stored when manually resolving dependencies in resolveDependencies block
@@ -271,28 +269,31 @@ extension DependencyContainer {
   ///Before `resolve()` returns pool is drained.
   class ResolvedInstances {
     var resolvedInstances = [DefinitionKey: Any]()
+    var singletons = [DefinitionKey: Any]()
 
-    func storeResolvedInstance<T, F>(instance: T, forKey key: DefinitionKey?, definition: DefinitionOf<T, F>) {
-      resolvedInstances[key] = instance
+    func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey, inScope scope: ComponentScope) {
+      switch scope {
+      case .Singleton: singletons[key] = instance
+      case .ObjectGraph: resolvedInstances[key] = instance
+      case .Prototype: break
+      }
     }
     
-    func previouslyResolved<T, F>(key: DefinitionKey?, definition: DefinitionOf<T, F>) -> T? {
-      if let singleton = definition.resolvedInstance {
-        return singleton
+    func previouslyResolvedInstance<T>(forKey key: DefinitionKey, inScope scope: ComponentScope) -> T? {
+      switch scope {
+      case .Singleton: return singletons[key] as? T
+      case .ObjectGraph: return resolvedInstances[key] as? T
+      case .Prototype: return nil
       }
-      else if let resolved = resolvedInstances[key] {
-        return resolved as? T
-      }
-      return nil
     }
     
     private var depth: Int = 0
     
     func resolve<T>(@noescape block: () throws ->T) rethrows -> T {
-      depth++
+      depth = depth + 1
       
       defer {
-        depth--
+        depth = depth - 1
         if depth == 0 {
           resolvedInstances.removeAll()
         }
@@ -324,6 +325,7 @@ extension DependencyContainer {
   func remove(definitionForKey key: DefinitionKey) {
     threadSafe {
       definitions[key] = nil
+      resolvedInstances.singletons[key] = nil
     }
   }
 
@@ -333,6 +335,7 @@ extension DependencyContainer {
   public func reset() {
     threadSafe {
       definitions.removeAll()
+      resolvedInstances.singletons.removeAll()
     }
   }
 
@@ -420,7 +423,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
     case let .DefinitionNotFound(key):
       return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
-      return "Failed to auto-inject property \"\(label)\" of type \(type). \(error)"
+      return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
     }
   }
 }

@@ -25,14 +25,53 @@
 import XCTest
 @testable import Dip
 
+private protocol Service: class {}
+private class ServiceImp1: Service {}
+private class ServiceImp2: Service {}
+
+private class Server {
+  weak var client: Client?
+  
+  init() {}
+}
+
+private class Client {
+  var server: Server
+  
+  init(server: Server) {
+    self.server = server
+  }
+}
+
 class ComponentScopeTests: XCTestCase {
   
   let container = DependencyContainer()
   
-  override func setUp() {
-    super.setUp()
+  #if os(Linux)
+  var allTests: [(String, () throws -> Void)] {
+    return [
+      ("testThatPrototypeIsDefaultScope", testThatPrototypeIsDefaultScope),
+      ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),
+      ("testThatItResolvesTypeAsNewInstanceForPrototypeScope", testThatItResolvesTypeAsNewInstanceForPrototypeScope),
+      ("testThatItReusesInstanceForSingletonScope", testThatItReusesInstanceForSingletonScope),
+      ("testThatSingletonIsNotReusedAcrossContainers", testThatSingletonIsNotReusedAcrossContainers),
+      ("testThatSingletonIsReleasedWhenDefinitionIsRemoved", testThatSingletonIsReleasedWhenDefinitionIsRemoved),
+      ("testThatSingletonIsReleasedWhenDefinitionIsOverridden", testThatSingletonIsReleasedWhenDefinitionIsOverridden),
+      ("testThatSingletonIsReleasedWhenContainerIsReset", testThatSingletonIsReleasedWhenContainerIsReset),
+      ("testThatItReusesInstanceInObjectGraphScopeDuringResolve", testThatItReusesInstanceInObjectGraphScopeDuringResolve),
+      ("testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve", testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve),
+      ("testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag)
+    ]
+  }
+  
+  func setUp() {
     container.reset()
   }
+  #else
+  override func setUp() {
+    container.reset()
+  }
+  #endif
   
   func testThatPrototypeIsDefaultScope() {
     let def = container.register { ServiceImp1() as Service }
@@ -68,20 +107,61 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertTrue(service1 === service2)
   }
   
-  class Server {
-    weak var client: Client?
+  func testThatSingletonIsNotReusedAcrossContainers() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let secondContainer = DependencyContainer()
+    secondContainer.register(def, forTag: nil)
     
-    init() {}
+    //when
+    let service1 = try! container.resolve() as Service
+    let service2 = try! secondContainer.resolve() as Service
+    
+    //then
+    XCTAssertTrue(service1 !== service2, "Singleton instances should not be reused across containers")
   }
   
-  class Client {
-    var server: Server
+  func testThatSingletonIsReleasedWhenDefinitionIsRemoved() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let service1 = try! container.resolve() as Service
     
-    init(server: Server) {
-      self.server = server
-    }
+    //when
+    container.remove(def, forTag: nil)
+    container.register(def, forTag: nil)
+    
+    //then
+    let service2 = try! container.resolve() as Service
+    XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container")
   }
-
+  
+  func testThatSingletonIsReleasedWhenDefinitionIsOverridden() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let service1 = try! container.resolve() as Service
+    
+    //when
+    container.register(def, forTag: nil)
+    
+    //then
+    let service2 = try! container.resolve() as Service
+    XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is overridden")
+  }
+  
+  func testThatSingletonIsReleasedWhenContainerIsReset() {
+    //given
+    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let service1 = try! container.resolve() as Service
+    
+    //when
+    container.reset()
+    container.register(def, forTag: nil)
+    
+    //then
+    let service2 = try! container.resolve() as Service
+    XCTAssertTrue(service1 !== service2, "Singleton instances should be released when container is reset")
+  }
+  
   func testThatItReusesInstanceInObjectGraphScopeDuringResolve() {
     //given
     container.register(.ObjectGraph) { Client(server: try self.container.resolve()) as Client }
@@ -139,3 +219,4 @@ class ComponentScopeTests: XCTestCase {
   }
 
 }
+

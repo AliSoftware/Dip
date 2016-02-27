@@ -22,8 +22,6 @@
 // THE SOFTWARE.
 //
 
-//MARK: Public
-
 extension DependencyContainer {
   
   /**
@@ -34,7 +32,7 @@ extension DependencyContainer {
   }
   
   private func _resolveChild(child: Mirror.Child) throws {
-    guard let injectedPropertyBox = child.value as? _AnyInjectedPropertyBox else { return }
+    guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
     do {
       try injectedPropertyBox.resolve(self)
@@ -46,14 +44,44 @@ extension DependencyContainer {
   
 }
 
-private protocol _AnyInjectedPropertyBox: class {
+/**
+ Implement this protocol if you want to use your own type to wrap auto-injected properties
+ instead of using `Injected<T>` or `InjectedWeak<T>` types.
+ 
+ **Example**:
+ ```swift
+ class MyCustomBox<T> {
+   private(set) var value: T?
+   init() {}
+ }
+ 
+ extension MyCustomBox: AutoInjectedPropertyBox {
+   static var wrappedType: Any.Type { return T.self }
+ 
+   func resolve(container: DependencyContainer) throws {
+     value = try container.resolve() as T
+   }
+ }
+ ```
+
+*/
+public protocol AutoInjectedPropertyBox: class {
+  ///The type of wrapped property.
   static var wrappedType: Any.Type { get }
+  
+  /**
+   This method will be called by `DependencyContainer` during processing resolved instance properties.
+   In this method you should resolve an instance for wrapped property and store a reference to it.
+   
+   - parameter container: A container to be used to resolve an instance
+   
+  -note: This method is not intended to be called manually, `DependencyContainer` will call it by itself.
+   */
   func resolve(container: DependencyContainer) throws
 }
 
-
 /**
- Use this wrapper to identifiy strong properties of the instance that should be
+ Use this wrapper to identify _strong_ properties of the instance that should be
  auto-injected by `DependencyContainer`. Type T can be any type.
 
  - warning: Do not define this property as optional or container will not be able to inject it.
@@ -70,21 +98,21 @@ private protocol _AnyInjectedPropertyBox: class {
  - seealso: `InjectedWeak`
 
 */
-public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
+public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
   
-  var _value: Any? = nil {
+  public static var wrappedType: Any.Type {
+    return T.self
+  }
+
+  ///Wrapped value.
+  public private(set) var value: T? {
     didSet {
       if let value = value { didInject(value) }
     }
   }
-  
-  ///Wrapped value.
-  public var value: T? {
-    return _value as? T
-  }
 
   /**
-   Creates new wrapper for auto-injected property.
+   Creates a new wrapper for auto-injected property.
    
    - parameters:
       - required: Defines if the property is required or not. 
@@ -98,24 +126,23 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
     super.init(required: required, tag: tag, didInject: didInject)
   }
   
-  private func resolve(container: DependencyContainer) throws {
+  public func resolve(container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(container)
-    _value = resolved
+    value = resolved
   }
   
 }
 
 /**
- Use this wrapper to identifiy strong properties of the instance that should be
+ Use this wrapper to identify _weak_ properties of the instance that should be
  auto-injected by `DependencyContainer`. Type T should be a **class** type.
  Otherwise it will cause runtime exception when container will try to resolve the property.
  Use this wrapper to define one of two circular dependencies to avoid retain cycle.
  
  - note: The only difference between `InjectedWeak` and `Injected` is that `InjectedWeak` uses 
          _weak_ reference to store underlying value, when `Injected` uses _strong_ reference. 
-         For that reason if you resolve instance that has _weak_ auto-injected property this property 
-         will be released when `resolve` returns because no one else holds reference to it except 
-         the container during dependency graph resolution.
+         For that reason if you resolve instance that has a _weak_ auto-injected property this property
+         will be released when `resolve` will complete.
  
  Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
  This will prevent a retain cycle between resolved instances.
@@ -135,12 +162,16 @@ public final class Injected<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox
  - seealso: `Injected`
  
  */
-public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropertyBox {
+public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
 
   //Only classes (means AnyObject) can be used as `weak` properties
   //but we can not make <T: AnyObject> because that will prevent using protocol as generic type
   //so we just rely on user reading documentation and passing AnyObject in runtime
   //also we will throw fatal error if type can not be casted to AnyObject during resolution.
+
+  public static var wrappedType: Any.Type {
+    return T.self
+  }
 
   weak var _value: AnyObject? = nil {
     didSet {
@@ -154,7 +185,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropert
   }
 
   /**
-   Creates new wrapper for weak auto-injected property.
+   Creates a new wrapper for weak auto-injected property.
    
    - parameters:
       - required: Defines if the property is required or not.
@@ -168,21 +199,17 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, _AnyInjectedPropert
     super.init(required: required, tag: tag, didInject: didInject)
   }
   
-  private func resolve(container: DependencyContainer) throws {
+  public func resolve(container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(container)
-    guard let resolvedObject = resolved as? AnyObject else {
+    if required && !(resolved is AnyObject) {
       fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
     }
-    _value = resolvedObject
+    _value = resolved as? AnyObject
   }
   
 }
 
 private class _InjectedPropertyBox<T> {
-
-  static var wrappedType: Any.Type {
-    return T.self
-  }
 
   let required: Bool
   let didInject: T -> ()
@@ -197,10 +224,10 @@ private class _InjectedPropertyBox<T> {
   private func resolve(container: DependencyContainer) throws -> T? {
     let resolved: T?
     if required {
-      resolved = try container.resolve(tag: tag, builder: { (factory: () throws -> T) in try factory() }) as T
+      resolved = try container.resolve(tag: tag) as T
     }
     else {
-      resolved = try? container.resolve(tag: tag, builder: { (factory: () throws -> T) in try factory() }) as T
+      resolved = try? container.resolve(tag: tag) as T
     }
     return resolved
   }

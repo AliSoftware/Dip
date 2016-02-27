@@ -25,31 +25,39 @@
 import XCTest
 @testable import Dip
 
-protocol Service: class {
-  func getServiceName() -> String
-}
-
-extension Service {
-  func getServiceName() -> String {
-    return "\(self.dynamicType)"
-  }
-}
-
-class ServiceImp1: Service {
-}
-
-class ServiceImp2: Service {
-}
+private protocol Service: class { }
+private class ServiceImp1: Service { }
+private class ServiceImp2: Service { }
 
 class DipTests: XCTestCase {
-  
+
   let container = DependencyContainer()
-  
-  override func setUp() {
-    super.setUp()
+
+  #if os(Linux)
+  var allTests: [(String, () throws -> Void)] {
+    return [
+      ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
+      ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
+      ("testThatItResolvesDifferentInstancesRegisteredForDifferentTags", testThatItResolvesDifferentInstancesRegisteredForDifferentTags),
+      ("testThatNewRegistrationOverridesPreviousRegistration", testThatNewRegistrationOverridesPreviousRegistration),
+      ("testThatItCallsResolveDependenciesOnDefinition", testThatItCallsResolveDependenciesOnDefinition),
+      ("testThatItThrowsErrorIfCanNotFindDefinitionForType", testThatItThrowsErrorIfCanNotFindDefinitionForType),
+      ("testThatItThrowsErrorIfCanNotFindDefinitionForTag", testThatItThrowsErrorIfCanNotFindDefinitionForTag),
+      ("testThatItThrowsErrorIfCanNotFindDefinitionForFactoryWithArguments", testThatItThrowsErrorIfCanNotFindDefinitionForFactoryWithArguments),
+      ("testThatItThrowsErrorIfConstructorThrows", testThatItThrowsErrorIfConstructorThrows),
+      ("testThatItThrowsErrorIfFailsToResolveDependency", testThatItThrowsErrorIfFailsToResolveDependency)
+    ]
+  }
+
+  func setUp() {
     container.reset()
   }
-  
+  #else
+  override func setUp() {
+    container.reset()
+  }
+  #endif
+
   func testThatItResolvesInstanceRegisteredWithoutTag() {
     //given
     container.register { ServiceImp1() as Service }
@@ -60,7 +68,7 @@ class DipTests: XCTestCase {
     //then
     XCTAssertTrue(serviceInstance is ServiceImp1)
   }
-  
+
   func testThatItResolvesInstanceRegisteredWithTag() {
     //given
     container.register(tag: "service") { ServiceImp1() as Service }
@@ -119,18 +127,15 @@ class DipTests: XCTestCase {
     container.register { ServiceImp1() as ServiceImp1 }
     
     //when
-    do {
-      try container.resolve() as Service
-      XCTFail("Unexpectedly resolved protocol")
-    }
-    catch let DipError.DefinitionNotFound(key) {
+    AssertThrows(expression: try container.resolve() as Service) { error in
+      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      
       //then
       typealias F = () throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
       XCTAssertEqual(key, expectedKey)
-    }
-    catch {
-      XCTFail("Thrown unexpected error")
+
+      return true
     }
   }
   
@@ -139,18 +144,15 @@ class DipTests: XCTestCase {
     container.register(tag: "some tag") { ServiceImp1() as Service }
     
     //when
-    do {
-      try container.resolve(tag: "other tag") as Service
-      XCTFail("Unexpectedly resolved protocol")
-    }
-    catch let DipError.DefinitionNotFound(key) {
+    AssertThrows(expression: try container.resolve(tag: "other tag") as Service) { error in
+      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      
       //then
       typealias F = () throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: "other tag")
       XCTAssertEqual(key, expectedKey)
-    }
-    catch {
-      XCTFail("Thrown unexpected error")
+      
+      return true
     }
   }
   
@@ -159,18 +161,15 @@ class DipTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     
     //when
-    do {
-      try container.resolve(withArguments: "some string") as Service
-      XCTFail("Unexpectedly resolved protocol")
-    }
-    catch let DipError.DefinitionNotFound(key) {
+    AssertThrows(expression: try container.resolve(withArguments: "some string") as Service) { error in
+      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      
       //then
       typealias F = (String) throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
       XCTAssertEqual(key, expectedKey)
-    }
-    catch {
-      XCTFail("Thrown unexpected error")
+
+      return true
     }
   }
   
@@ -181,24 +180,16 @@ class DipTests: XCTestCase {
     container.register { () throws -> Service in throw expectedError }
     
     //when
-    do {
-      try container.resolve() as Service
-    }
-    catch let DipError.ResolutionFailed(key, error) {
+    AssertThrows(expression: try container.resolve() as Service) { error in
+      guard case let DipError.ResolutionFailed(key, error) = error else { return false }
+      guard case let DipError.DefinitionNotFound(subKey) = error where subKey == failedKey else { return false }
+      
       //then
       typealias F = () throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self)
       XCTAssertEqual(key, expectedKey)
       
-      switch error {
-      case let DipError.DefinitionNotFound(subKey) where subKey == failedKey:
-        break
-      default:
-        XCTFail()
-      }
-    }
-    catch {
-      XCTFail("Thrown unexpected error")
+      return true
     }
   }
   
@@ -213,25 +204,19 @@ class DipTests: XCTestCase {
     }
     
     //when
-    do {
-      try container.resolve() as Service
-    }
-    catch let DipError.ResolutionFailed(key, error) {
+    AssertThrows(expression: try container.resolve() as Service) { error in
+      guard case let DipError.ResolutionFailed(key, error) = error else { return false }
+      guard case let DipError.DefinitionNotFound(subKey) = error where subKey == failedKey else { return false }
+      
       //then
       typealias F = () throws -> Service
       let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self)
       XCTAssertEqual(key, expectedKey)
       
-      switch error {
-      case let DipError.DefinitionNotFound(subKey) where subKey == failedKey:
-        break
-      default:
-        XCTFail()
-      }
-    }
-    catch {
-      XCTFail("Thrown unexpected error")
+      return true
     }
   }
-  
+
 }
+
+
