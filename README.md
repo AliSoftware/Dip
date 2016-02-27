@@ -164,7 +164,7 @@ enum WebService: String {
     case Production
     case Development
     
-    var tag: Tag { return Tag.String(self.rawValue) }
+    var tag: DependencyContainer.Tag { return DependencyContainer.Tag.String(self.rawValue) }
 }
 
 let wsDependencies = DependencyContainer() { dip in
