@@ -255,10 +255,8 @@ extension DependencyContainer {
         resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
         
         try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
-        
-        //we perform auto-injection as the last step to be able to reuse instances
-        //stored when manually resolving dependencies in resolveDependencies block
         try autoInjectProperties(resolvedInstance)
+        (resolvedInstance as? Resolvable)?.didResolveDependencies()
         
         return resolvedInstance
       }
@@ -382,6 +380,12 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
   default:
     return false
   }
+}
+
+/// Conform to this protocol when you need to have a callback when all the dependencies are injected.
+public protocol Resolvable {
+  /// This method is called by the container when all dependencies of the instance are resolved.
+  func didResolveDependencies()
 }
 
 /**
