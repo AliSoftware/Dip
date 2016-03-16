@@ -216,7 +216,7 @@ private class _InjectedPropertyBox<T> {
 
   let required: Bool
   let didInject: T -> ()
-  let tag: DependencyTag?
+  let tag: DependencyContainer.Tag?
 
   init(required: Bool = true, tag: DependencyTagConvertible?, didInject: T -> () = { _ in }) {
     self.required = required
