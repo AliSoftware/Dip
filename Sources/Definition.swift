@@ -26,9 +26,9 @@
 public struct DefinitionKey : Hashable, CustomStringConvertible {
   public let protocolType: Any.Type
   public let factoryType: Any.Type
-  public let associatedTag: DependencyTag?
+  public let associatedTag: DependencyContainer.Tag?
   
-  init(protocolType: Any.Type, factoryType: Any.Type, associatedTag: DependencyTag? = nil) {
+  init(protocolType: Any.Type, factoryType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
     self.protocolType = protocolType
     self.factoryType = factoryType
     self.associatedTag = associatedTag

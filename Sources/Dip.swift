@@ -22,12 +22,8 @@
 // THE SOFTWARE.
 //
 
-public enum DependencyTag: Equatable {
-  case String(StringLiteralType)
-  case Int(IntegerLiteralType)
-}
 
-extension DependencyTag: IntegerLiteralConvertible {
+extension DependencyContainer.Tag: IntegerLiteralConvertible {
   
   public init(integerLiteral value: IntegerLiteralType) {
     self = .Int(value)
@@ -35,7 +31,7 @@ extension DependencyTag: IntegerLiteralConvertible {
   
 }
 
-extension DependencyTag: StringLiteralConvertible {
+extension DependencyContainer.Tag: StringLiteralConvertible {
   
   public init(stringLiteral value: StringLiteralType) {
     self = .String(value)
@@ -51,7 +47,7 @@ extension DependencyTag: StringLiteralConvertible {
   
 }
 
-public func ==(lhs: DependencyTag, rhs: DependencyTag) -> Bool {
+public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
   switch (lhs, rhs) {
   case let (.String(lhsString), .String(rhsString)):
     return lhsString == rhsString
@@ -65,24 +61,24 @@ public func ==(lhs: DependencyTag, rhs: DependencyTag) -> Bool {
 
 
 public protocol DependencyTagConvertible {
-  func toTag() -> DependencyTag
+  func toTag() -> DependencyContainer.Tag
 }
 
-extension DependencyTag: DependencyTagConvertible {
-  public func toTag() -> DependencyTag {
+extension DependencyContainer.Tag: DependencyTagConvertible {
+  public func toTag() -> DependencyContainer.Tag {
     return self
   }
 }
 
 extension String: DependencyTagConvertible {
-  public func toTag() -> DependencyTag {
-    return DependencyTag.String(self)
+  public func toTag() -> DependencyContainer.Tag {
+    return DependencyContainer.Tag.String(self)
   }
 }
 
 extension Int: DependencyTagConvertible {
-  public func toTag() -> DependencyTag {
-    return DependencyTag.Int(self)
+  public func toTag() -> DependencyContainer.Tag {
+    return DependencyContainer.Tag.Int(self)
   }
 }
 
@@ -93,6 +89,11 @@ extension Int: DependencyTagConvertible {
 by associating abstractions to concrete implementations.
 */
 public final class DependencyContainer {
+  
+  public enum Tag: Equatable {
+    case String(StringLiteralType)
+    case Int(IntegerLiteralType)
+  }
   
   /**
    Use a tag in case you need to register multiple factories fo the same type,

@@ -23,8 +23,8 @@ enum DependencyTags: Int {
 }
 
 extension DependencyTags: DependencyTagConvertible {
-    func toTag() -> DependencyTag {
-        return DependencyTag.Int(self.rawValue)
+    func toTag() -> DependencyContainer.Tag {
+        return .Int(self.rawValue)
     }
 }
 
