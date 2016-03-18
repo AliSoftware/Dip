@@ -217,6 +217,26 @@ class DipTests: XCTestCase {
     }
   }
 
+  func testThatItCallsDidResolveDependenciesOnResolvableIntance() {
+    
+    class ResolvableService: Service, Resolvable {
+      var didResolveDependenciesCalled = false
+      
+      func didResolveDependencies() {
+        didResolveDependenciesCalled = true
+      }
+    }
+    
+    container.register { ResolvableService() as Service }
+      .resolveDependencies { _, service in
+        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
+        return
+    }
+    
+    let service = try! container.resolve() as Service
+    XCTAssertTrue((service as! ResolvableService).didResolveDependenciesCalled)
+  }
+  
 }
 
 
