@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Develop
+
+* Auto-wiring.  
+  [#55](https://github.com/AliSoftware/Dip/pull/55), [@ilyapuchka](https://github.com/ilyapuchka)
+
+
 ## 4.2.0
 
 * Added support for Swift Package Manager.  

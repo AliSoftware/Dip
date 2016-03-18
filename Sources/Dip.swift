@@ -100,7 +100,29 @@ extension DependencyContainer {
     return definition
   }
   
-  @available(*, deprecated=4.3.0, message="Use registerFactory<T, F>(tag:scope:factory:numberOfArguments:autoWiringFactory:")
+  /**
+   Register generic factory associated with an optional tag.
+   
+   - parameters:
+      - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
+      - scope: The scope to use for instance created by the factory.
+      - factory: The factory to register.
+   
+   - returns: A registered definition.
+   
+   - note: You _should not_ call this method directly, instead call any of other `register` methods.
+   You _should_ use this method only to register dependency with more runtime arguments
+   than _Dip_ supports (currently it's up to six) like in the following example:
+   
+   ```swift
+   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, ...) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, ...) throws -> T> {
+     return registerFactory(tag: tag, scope: scope, factory: factory)
+   }
+   ```
+   
+   Though before you do so you should probably review your design and try to reduce number of depnedencies.
+   */
+  @available(*, deprecated=4.3.0, message="Use registerFactory(tag:scope:factory:numberOfArguments:autoWiringFactory:) instead.")
   public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
     let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
     register(definition, forTag: tag)
@@ -108,14 +130,14 @@ extension DependencyContainer {
   }
 
   /**
-   Register generic factory associated with an optional tag.
+   Register generic factory and auto-wiring factory and associate it with an optional tag.
    
    - parameters:
-   - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
-   - scope: The scope to use for instance created by the factory.
-   - factory: The factory to register.
-   - numberOfArguments: The number of factory arguments.
-   - autoWiringFactory: The factory that uses container to resolve all its arguments.
+      - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
+      - scope: The scope to use for instance created by the factory.
+      - factory: The factory to register.
+      - numberOfArguments: The number of factory arguments. Will be used on auto-wiring to sort definitions.
+      - autoWiringFactory: The factory to be used on auto-wiring to resolve component.
    
    - returns: A registered definition.
    

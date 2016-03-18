@@ -9,6 +9,7 @@
         <page name='Scopes'/>
         <page name='Circular dependencies'/>
         <page name='Shared Instances'/>
+        <page name='Auto-wiring'/>
         <page name='Auto-injection'/>
         <page name='Testing'/>
     </pages>
