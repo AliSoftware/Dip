@@ -6,5 +6,6 @@ XCTMain([
   RuntimeArgumentsTests(), 
   ComponentScopeTests(),
   AutoInjectionTests(),
-  ThreadSafetyTests()
+  ThreadSafetyTests(),
+  AutoWiringTests()
 ])

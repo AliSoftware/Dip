@@ -8,7 +8,9 @@ let container = DependencyContainer()
 
 ### Auto-Injection
 
-If you follow Single Responsibility Principle chances are very high that you will end up with more than two collaborating components in your system. Let's say you have a component that depends on few others. Using _Dip_ you can register all of the dependencies in a container as well as that component itself and register a factory that will create that component and feed it with the dependencies resolving them with a container:
+On the previous page you saw how auto-wiring helps us get rid of boilerplate code when registering and resolving components with consturctor injection. Auto-injection solves the same problem for property injection.
+
+Let's say you have following related components:
 */
 
 protocol Service: class {
@@ -21,13 +23,18 @@ class ServiceImp: Service {
     var tracker: Tracker?
 }
 
+/*:
+When you register them in a container you will end up with something like this:
+*/
+
 container.register() { TrackerImp() as Tracker }
 container.register() { LoggerImp() as Logger }
 
 container.register() { ServiceImp() as Service }
     .resolveDependencies { container, service in
-        (service as! ServiceImp).logger = try container.resolve() as Logger
-        (service as! ServiceImp).tracker = try container.resolve() as Tracker
+        let service = service as! ServiceImp
+        service.logger = try container.resolve() as Logger
+        service.tracker = try container.resolve() as Tracker
 }
 
 let service = try! container.resolve() as Service
@@ -35,10 +42,8 @@ service.logger
 service.tracker
 
 /*:
-Not bad so far. Though that `resolveDependencies` block looks heavy. It would be cool if we can get rid of it. Alternatively you can use _constructor injection_ here, which is actually more prefereable by default but not always possible (see [circular dependencies](Circular%20dependencies)).
-Now let's say that you have a bunch of components in your app that require `Logger` or `Tracker` too. You will need to resolve them in a factory for each component again and again. That can be a lot of boilerplate code, simple but still duplicated.
-
-That is one of the scenarios when auto-injection can be useful. It works with property injection and with it the previous code will transform to this:
+Notice that the same boilerplate code that we saw in constructor injection now moved to `resolveDepedencies` block.
+With auto-injection your code transforms to this:
 */
 
 class AutoInjectedServiceImp: Service {
@@ -60,9 +65,11 @@ As you can see we added two private properties to our implementation of `Service
 
 What is happening under the hood is that after concrete instance of resolved type is created (`Service` in that case), container will iterate through its properties using `Mirror`. For each of the properties wrapped with `Injected<T>` or `InjectedWeak<T>` it will search a definition that can be used to create an instance of wrapped type and use it to create and inject a concrete instance in a `value` property of a wrapper. The fact that wrappers are _classes_ or _reference types_ makes it possible at runtime to inject dependency in instance of resolved type.
 
-You can provide closure that will be called when the dependency will be injected in the property. It is similar to `didSet` property observer.
+The requirement for auto-injection is that types injected types should be registered in a container and should use factories with no runtime arguments.
 
 Auto-injected properties can be marked with tag. Then container will search for definition tagged by the same tag to resolve this property.
+
+You can provide closure that will be called when the dependency will be injected in the property. It is similar to `didSet` property observer.
 
 Auto-injected properties are required by default. That means that if container fails to resolve any of auto-injected properties of the instance (or any of its dependencies) it will fail resolution of the object graph in whole.
 */
@@ -198,11 +205,9 @@ autoViewController.router.value
 /*:
 In such scenario when view controller is created by storyboard you will need to use property injection anyway, so the overhead of adding additional properties for auto-injection is smaller. Also all the boilerplate code of unwrapping injected properties (if you need that) can be moved to extension, cleaning implementation a bit.
 
-> **Note**: For such cases concider using [DipUI](https://github.com/AliSoftware/Dip-UI). It is a small extension for Dip that allows you to do exactly what we need in this example - inject dependencies in instances created by storyboards. It does not require to use auto-injection feature.
+> **Note**: For such cases concider using [DipUI](https://github.com/AliSoftware/Dip-UI). It is a small extension for Dip that allows you to do exactly what we need in this example - inject dependencies in instances created by storyboards. It does not require to use auto-injection feature but plays nice with it.
 
-So as you can see there are certain advantages and disadvatages of using auto-injection. It makes your definitions simpler, especially if there are circular dependencies involved or the number of dependencies is high. But it requires additional properties and some boilerplate code in your implementations, makes your implementatios tightly coupled with Dip. It has also some limitations like that it requires factories for auto-injected types that accept no runtime arguments to be registered in a container.
-
-So you should decide for yourself whether you prefer to use auto-injection or "the standard" way. At the end they let you achieve the same result.
+So as you can see there are certain advantages and disadvatages of using auto-injection. It makes your definitions simpler, especially if there are circular dependencies involved or the number of dependencies is high, removing boilerplate calls to `resolve` method in `resolveDependencies` block of your definitions. But it requires additional properties and some boilerplate code in your implementations, makes your implementatios tightly coupled with Dip. You can avoid tight coupoling by using your own boxing classes instead of `Injected<T>` and `InjectedWeak<T>` (see `AutoInjectedPropertyBox`).
 */
 
 //: [Next: Testing](@next)
