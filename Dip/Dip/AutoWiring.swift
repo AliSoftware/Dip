@@ -29,43 +29,42 @@ extension DependencyContainer {
     typealias NoArgumentsFactory = () throws -> T
     guard key.factoryType == NoArgumentsFactory.self else { return nil }
     
-    var autoWiringDefinitionsKeys = self.definitions
-      //filter only definitions with auto-wiring factory
-      .filter({ ($0.1 as? _Definition)?._autoWiringFactory != nil })
-      .map({ $0.0 }) //get definition keys
+    let autoWiringDefinitions = self.autoWiringDefinitionsFor(T.self, tag: key.associatedTag)
+    return try _resolveEnumeratingKeys(autoWiringDefinitions, tag: key.associatedTag)
+  }
+  
+  private func autoWiringDefinitionsFor(type: Any.Type, tag: DependencyContainer.Tag?) -> [(DefinitionKey, _Definition)] {
+    var definitions = self.definitions
+      .map({ ($0.0, $0.1 as! _Definition) })
+    
+    //filter definitions
+    definitions =  definitions
+      .filter({ $0.1.supportsAutoWiring() })
+      .filter({ $0.0.protocolType == type })
+      .filter({ $0.0.associatedTag == tag || $0.0.associatedTag == nil })
+    
+    //order definitions
+    definitions = definitions
+      .sort({ $0.1.numberOfArguments > $1.1.numberOfArguments })
 
-    autoWiringDefinitionsKeys = autoWiringDefinitionsKeys
-      //filter keys for T and factories with arguments
-      .filter({ $0.protocolType == T.self && $0.numberOfArguments > 0 })
-      //filter keys with the same or nil tag
-      .filter({ $0.associatedTag == key.associatedTag || $0.associatedTag == nil })
-      //sort filtered keys by number of factory arguments
-      .sort({ $0.numberOfArguments > $1.numberOfArguments })
-    
-    guard !autoWiringDefinitionsKeys.isEmpty else { return nil }
-    
-    autoWiringDefinitionsKeys =
-      //first we try tagged definitions
-      autoWiringDefinitionsKeys.filter({ $0.associatedTag == key.associatedTag }) +
-      //if non of them worked we fallback to not-tagged definitions
-      autoWiringDefinitionsKeys.filter({ $0.associatedTag != key.associatedTag })
-    
-    return try _resolveEnumeratingKeys(autoWiringDefinitionsKeys, tag: key.associatedTag)
+    definitions =
+      //first will try to use tagged definitions
+      definitions.filter({ $0.0.associatedTag == tag }) +
+      //then will use not tagged definitions
+      definitions.filter({ $0.0.associatedTag != tag })
+
+    return definitions
   }
   
   /// Tries definitions one by one until one of them succeeds, otherwise returns nil
-  private func _resolveEnumeratingKeys<T>(keys: [DefinitionKey], tag: DependencyContainer.Tag?) throws -> T? {
-    for (index, key) in keys.enumerate() {
-      //if this and the next definition have the same number of arguments
-      //we can not choose one of them
-      if let
-        nextKey = keys[next: index] where
-        nextKey.numberOfArguments == key.numberOfArguments &&
-        nextKey.associatedTag == key.associatedTag {
-          throw DipError.AmbiguousDefinitions(key)
+  private func _resolveEnumeratingKeys<T>(definitions: [(DefinitionKey, _Definition)], tag: DependencyContainer.Tag?) throws -> T? {
+    for (index, definition) in definitions.enumerate() {
+      //If the next definition matches current definition then they are ambigous
+      if case definition? = definitions[next: index] {
+          throw DipError.AmbiguousDefinitions(definition.0, definition.1.numberOfArguments)
       }
       
-      if let resolved: T = _resolveKey(key, tag: tag) {
+      if let resolved: T = _resolveKey(definition.0, tag: tag) {
         return resolved
       }
     }
@@ -73,19 +72,14 @@ extension DependencyContainer {
   }
   
   private func _resolveKey<T>(key: DefinitionKey, tag: DependencyContainer.Tag?) -> T? {
-    do {
-      let key = DefinitionKey(protocolType: key.protocolType, factoryType: key.factoryType, associatedTag: tag)
-      
-      return try _resolveKey(key, builder: { definition throws -> T in
-        guard let resolved = try definition._autoWiringFactory!(self, tag) as? T else {
-          fatalError("Internal inconsistency exception! Expected type: \(T.self); Definition: \(definition)")
-        }
-        return resolved
-      })
-    }
-    catch {
-      return nil
-    }
+    let key = DefinitionKey(protocolType: key.protocolType, factoryType: key.factoryType, associatedTag: tag)
+
+    return try? _resolveKey(key, builder: { definition throws -> T in
+      guard let resolved = try definition._autoWiringFactory!(self, tag) as? T else {
+        fatalError("Internal inconsistency exception! Expected type: \(T.self); Definition: \(definition)")
+      }
+      return resolved
+    })
   }
   
 }
@@ -98,4 +92,12 @@ extension CollectionType {
   subscript(next index: Index) -> Generator.Element? {
     return self[safe: index.advancedBy(1)]
   }
+}
+
+/// Definitions are matched if they are registered for the same tag and thier factoris accept the same number of runtime arguments.
+private func ~=(lhs: (DefinitionKey, _Definition), rhs: (DefinitionKey, _Definition)) -> Bool {
+  return
+    lhs.0.protocolType == rhs.0.protocolType &&
+      lhs.0.associatedTag == rhs.0.associatedTag &&
+      lhs.1.numberOfArguments == rhs.1.numberOfArguments
 }

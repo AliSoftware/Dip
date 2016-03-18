@@ -156,8 +156,8 @@ extension DependencyContainer {
    Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
   public func registerFactory<T, F>(tag tag: Tag? = nil, scope: ComponentScope, factory: F, numberOfArguments: Int, autoWiringFactory: (DependencyContainer, Tag?) throws -> T) -> DefinitionOf<T, F> {
-    let definition = DefinitionOf<T, F>(scope: scope, factory: factory, autoWiringFactory: autoWiringFactory)
-    register(definition, forTag: tag, numberOfArguments: numberOfArguments)
+    let definition = DefinitionOf<T, F>(scope: scope, factory: factory, autoWiringFactory: autoWiringFactory, numberOfArguments: numberOfArguments)
+    register(definition, forTag: tag)
     return definition
   }
 
@@ -170,9 +170,8 @@ extension DependencyContainer {
       - definition: The definition to register in the container.
    
    */
-  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil, numberOfArguments: Int? = nil) {
-    var key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
-    key.numberOfArguments = numberOfArguments
+  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: Tag? = nil) {
+    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag)
     register(definition, forKey: key)
   }
   
@@ -465,7 +464,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
   */
   case AutoInjectionFailed(label: String?, type: Any.Type, underlyingError: ErrorType)
 
-  case AmbiguousDefinitions(DefinitionKey)
+  case AmbiguousDefinitions(DefinitionKey, Int)
   
   public var description: String {
     switch self {
@@ -475,8 +474,8 @@ public enum DipError: ErrorType, CustomStringConvertible {
       return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
       return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
-    case let .AmbiguousDefinitions(key):
-      return "Ambiguous definitions for \(key.protocolType) with factories that accept the same number of runtime arguments (\(key.numberOfArguments.desc))."
+    case let .AmbiguousDefinitions(key, numberOfArguments):
+      return "Ambiguous definitions for \(key.protocolType) with factories that accept the same number of runtime arguments (\(numberOfArguments))."
     }
   }
 }

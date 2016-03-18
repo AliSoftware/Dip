@@ -42,12 +42,6 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
     return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag.desc)"
   }
   
-  //Auto-wiring helper properties
-  
-  ///Number of factory arguments of definition, stored in container by this key.
-  ///If nil then definition stored by that key will not be used for auto-wiring.
-  ///Does not affect hashValue and keys equality (==), but affects their identity (===).
-  var numberOfArguments: Int?
 }
 
 /// Check two definition keys on equality by comparing their `protocolType`, `factoryType` and `associatedTag` properties.
@@ -201,10 +195,12 @@ public final class DefinitionOf<T, F>: Definition {
   //Auto-wiring helpers
   
   private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
+  private(set) var numberOfArguments: Int = 0
 
-  convenience init(scope: ComponentScope, factory: F, autoWiringFactory: (DependencyContainer, DependencyContainer.Tag?) throws -> T) {
+  convenience init(scope: ComponentScope, factory: F, autoWiringFactory: (DependencyContainer, DependencyContainer.Tag?) throws -> T, numberOfArguments: Int) {
     self.init(scope: scope, factory: factory)
     self.autoWiringFactory = autoWiringFactory
+    self.numberOfArguments = numberOfArguments
   }
 
 }
@@ -217,8 +213,15 @@ protocol _Definition: Definition {
 
   var _autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
   var _factory: Any { get }
+  var numberOfArguments: Int { get }
   
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
+}
+
+extension _Definition {
+  func supportsAutoWiring() -> Bool {
+    return _autoWiringFactory != nil && numberOfArguments > 0
+  }
 }
 
 extension DefinitionOf: _Definition {

@@ -133,8 +133,8 @@ class AutoWiringTests: XCTestCase {
       XCTFail("Container should throw error on ambiguous factories")
     }
       //then
-    catch let DipError.AmbiguousDefinitions(key) {
-      XCTAssertEqual(key.numberOfArguments, 1)
+    catch let DipError.AmbiguousDefinitions(_, numberOfArguments) {
+      XCTAssertEqual(numberOfArguments, 1)
     }
     catch {
       XCTFail("Thrown unexpected error")
