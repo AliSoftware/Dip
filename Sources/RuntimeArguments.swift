@@ -55,9 +55,7 @@ extension DependencyContainer {
       - tag: The arbitrary tag to lookup registered definition.
       - arg1: The first argument to pass to the definition's factory.
    
-   - throws: An error of type `DipError`:
-             `ResolutionFailed` - if some error was thrown during resolution;
-             `DefinitionNotFound` - if no matching definition was registered in that container.
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`
 
    - returns: An instance of type `T`.
 

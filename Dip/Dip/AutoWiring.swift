@@ -61,7 +61,10 @@ extension DependencyContainer {
     for (index, definition) in definitions.enumerate() {
       //If the next definition matches current definition then they are ambigous
       if case definition? = definitions[next: index] {
-          throw DipError.AmbiguousDefinitions(definition.0, definition.1.numberOfArguments)
+          throw DipError.AmbiguousDefinitions(
+            type: definition.0.protocolType,
+            definitions: [definition.1, definitions[next: index]!.1]
+        )
       }
       
       if let resolved: T = _resolveKey(definition.0, tag: tag) {

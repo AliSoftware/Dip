@@ -188,15 +188,10 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
-      guard case let DipError.ResolutionFailed(key, error) = error else { return false }
-      guard case let DipError.DefinitionNotFound(subKey) = error where subKey == failedKey else { return false }
-      
-      //then
-      typealias F = () throws -> Service
-      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self)
-      XCTAssertEqual(key, expectedKey)
-      
-      return true
+      switch error {
+      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      default: return false
+      }
     }
   }
   
@@ -212,15 +207,10 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
-      guard case let DipError.ResolutionFailed(key, error) = error else { return false }
-      guard case let DipError.DefinitionNotFound(subKey) = error where subKey == failedKey else { return false }
-      
-      //then
-      typealias F = () throws -> Service
-      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self)
-      XCTAssertEqual(key, expectedKey)
-      
-      return true
+      switch error {
+      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      default: return false
+      }
     }
   }
 
