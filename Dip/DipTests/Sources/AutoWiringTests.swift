@@ -201,6 +201,7 @@ class AutoWiringTests: XCTestCase {
   }
   
   func testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency() {
+    //given
     container.register(.ObjectGraph) { AutoWiredClientImp() as AutoWiredClient }
       .resolveDependencies { container, resolved in
         resolved.service1 = try container.resolve() as Service
@@ -220,6 +221,7 @@ class AutoWiringTests: XCTestCase {
     container.register(.ObjectGraph) { ServiceImp1() as Service }
     container.register(.ObjectGraph) { ServiceImp2() }
     
+    //then
     AssertThrows(expression: try container.resolve() as AutoWiredClient,
       "Container should not use auto-wiring when definition for resolved type is registered.")
   }
