@@ -110,7 +110,7 @@
 		09873F551C1E0237000C02F6 /* AutoInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjection.swift; path = ../../Sources/AutoInjection.swift; sourceTree = "<group>"; };
 		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjectionTests.swift; path = Sources/AutoInjectionTests.swift; sourceTree = "<group>"; };
 		09B035FB1C5D2AD6001EA5B7 /* AutoWiringTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoWiringTests.swift; path = Sources/AutoWiringTests.swift; sourceTree = "<group>"; };
-		09B035FF1C5D2B83001EA5B7 /* AutoWiring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AutoWiring.swift; sourceTree = "<group>"; };
+		09B035FF1C5D2B83001EA5B7 /* AutoWiring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoWiring.swift; path = ../../Sources/AutoWiring.swift; sourceTree = "<group>"; };
 		09C20EBF1C8B3BC3009A082B /* ThreadSafetyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ThreadSafetyTests.swift; path = Sources/ThreadSafetyTests.swift; sourceTree = "<group>"; };
 		09D598321C6F9EC100F24D49 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = Sources/Utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
