@@ -122,7 +122,7 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
       - didInject: block that will be called when concrete instance is injected in this property. 
                    Similar to `didSet` property observer. Default value does nothing.
   */
-  public override init(required: Bool = true, tag: DependencyContainer.Tag? = nil, didInject: T -> () = { _ in }) {
+  public override init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
     super.init(required: required, tag: tag, didInject: didInject)
   }
   
@@ -195,7 +195,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
       - didInject: block that will be called when concrete instance is injected in this property.
                    Similar to `didSet` property observer. Default value does nothing.
    */
-  public override init(required: Bool = true, tag: DependencyContainer.Tag? = nil, didInject: T -> () = { _ in }) {
+  public override init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
     super.init(required: required, tag: tag, didInject: didInject)
   }
   
@@ -215,9 +215,9 @@ private class _InjectedPropertyBox<T> {
   let didInject: T -> ()
   let tag: DependencyContainer.Tag?
 
-  init(required: Bool = true, tag: DependencyContainer.Tag?, didInject: T -> () = { _ in }) {
+  init(required: Bool = true, tag: DependencyTagConvertible?, didInject: T -> () = { _ in }) {
     self.required = required
-    self.tag = tag
+    self.tag = tag?.toTag()
     self.didInject = didInject
   }
 
