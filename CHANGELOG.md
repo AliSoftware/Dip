@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 4.3.0
+
+* Added `DependencyTagConvertible` protocol for better typed tags.  
+  [#50](https://github.com/AliSoftware/Dip/pull/50), [@gavrix](https://github.com/gavrix)
+* Auto-wiring. `DependencyContainer` resolves constructor arguments automatically.  
+  [#55](https://github.com/AliSoftware/Dip/pull/55), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added `Resolvable` protocol to get a callback when dependencies graph is complete.  
+  [#57](https://github.com/AliSoftware/Dip/pull/57), [@ilyapuchka](https://github.com/ilyapuchka)
+* Removed `DipError.ResolutionFailed` error for better consistency.  
+  [#58](https://github.com/AliSoftware/Dip/pull/58), [@ilyapuchka](https://github.com/ilyapuchka)
+
+
 ## 4.2.0
 
 * Added support for Swift Package Manager.  

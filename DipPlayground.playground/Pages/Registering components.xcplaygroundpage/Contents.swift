@@ -31,11 +31,17 @@ container.register(factory: factory.someService)
 
 /*:
 Optionally you can associate definitions with Integer or String tags. This way you can register different implementations for the same protocol.  
-You can use String or Integer literals, or the `DependencyContainer.Tag` enum.
+You can use `DependencyContainer.Tag` enum, String or Integer literals, or instances of types that conform to `DependencyTagConvertible` protocol.
 */
 
 container.register(tag: "tag") { ServiceImp1() as Service }
-container.register(tag: DependencyContainer.Tag.Int(0)) { ServiceImp1() as Service }
+container.register(tag: .Int(0)) { ServiceImp1() as Service }
+
+enum MyCustomTag: String, DependencyTagConvertible {
+    case SomeTag
+}
+
+container.register(tag: MyCustomTag.SomeTag) { ServiceImp1() as Service }
 
 /*:
 We recommand you to use constants for the tags, to make the intent clear and avoid magic numbers and typos.
@@ -44,6 +50,7 @@ You can remove all registered definitions or register and remove them one by one
 */
 
 let serviceDefinition = container.register { ServiceImp1() as Service }
+container
 container.remove(serviceDefinition)
 
 container.reset()

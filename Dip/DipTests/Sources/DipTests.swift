@@ -29,6 +29,13 @@ private protocol Service: class { }
 private class ServiceImp1: Service { }
 private class ServiceImp2: Service { }
 
+private protocol Server: class {
+  weak var client: Client? { get }
+}
+private protocol Client: class {
+  var server: Server? { get }
+}
+
 class DipTests: XCTestCase {
 
   let container = DependencyContainer()
@@ -45,7 +52,9 @@ class DipTests: XCTestCase {
       ("testThatItThrowsErrorIfCanNotFindDefinitionForTag", testThatItThrowsErrorIfCanNotFindDefinitionForTag),
       ("testThatItThrowsErrorIfCanNotFindDefinitionForFactoryWithArguments", testThatItThrowsErrorIfCanNotFindDefinitionForFactoryWithArguments),
       ("testThatItThrowsErrorIfConstructorThrows", testThatItThrowsErrorIfConstructorThrows),
-      ("testThatItThrowsErrorIfFailsToResolveDependency", testThatItThrowsErrorIfFailsToResolveDependency)
+      ("testThatItThrowsErrorIfFailsToResolveDependency", testThatItThrowsErrorIfFailsToResolveDependency),
+      ("testThatItCallsDidResolveDependenciesOnResolvableIntance", testThatItCallsDidResolveDependenciesOnResolvableIntance),
+      ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies)
     ]
   }
 
@@ -181,15 +190,10 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
-      guard case let DipError.ResolutionFailed(key, error) = error else { return false }
-      guard case let DipError.DefinitionNotFound(subKey) = error where subKey == failedKey else { return false }
-      
-      //then
-      typealias F = () throws -> Service
-      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self)
-      XCTAssertEqual(key, expectedKey)
-      
-      return true
+      switch error {
+      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      default: return false
+      }
     }
   }
   
@@ -205,18 +209,125 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
-      guard case let DipError.ResolutionFailed(key, error) = error else { return false }
-      guard case let DipError.DefinitionNotFound(subKey) = error where subKey == failedKey else { return false }
-      
-      //then
-      typealias F = () throws -> Service
-      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self)
-      XCTAssertEqual(key, expectedKey)
-      
-      return true
+      switch error {
+      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      default: return false
+      }
     }
   }
 
+  func testThatItCallsDidResolveDependenciesOnResolvableIntance() {
+    
+    class ResolvableService: Service, Resolvable {
+      var didResolveDependenciesCalled = false
+      
+      func didResolveDependencies() {
+        XCTAssertFalse(didResolveDependenciesCalled, "didResolveDependencies should be called only once per instance")
+        didResolveDependenciesCalled = true
+      }
+    }
+    
+    container.register { ResolvableService() as Service }
+      .resolveDependencies { _, service in
+        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
+        return
+    }
+
+    container.register(tag: "graph", .ObjectGraph) { ResolvableService() as Service }
+      .resolveDependencies { _, service in
+        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
+        return
+    }
+
+    container.register(tag: "singleton", .Singleton) { ResolvableService() as Service }
+      .resolveDependencies { _, service in
+        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
+        return
+    }
+
+    let service = try! container.resolve() as Service
+    XCTAssertTrue((service as! ResolvableService).didResolveDependenciesCalled)
+
+    let graphService = try! container.resolve(tag: "graph") as Service
+    XCTAssertTrue((graphService as! ResolvableService).didResolveDependenciesCalled)
+    
+    let singletonService = try! container.resolve(tag: "singleton") as Service
+    let _ = try! container.resolve(tag: "singleton") as Service
+    XCTAssertTrue((singletonService as! ResolvableService).didResolveDependenciesCalled)
+  }
+  
+  func testThatItResolvesCircularDependencies() {
+    
+    class ResolvableServer: Server, Resolvable {
+      weak var client: Client?
+      weak var secondClient: Client?
+      
+      init(client: Client) {
+        self.client = client
+      }
+      
+      var didResolveDependenciesCalled = false
+      
+      func didResolveDependencies() {
+        XCTAssertFalse(didResolveDependenciesCalled, "didResolveDependencies should be called only once per instance")
+        didResolveDependenciesCalled = true
+
+        XCTAssertNotNil(self.client)
+        XCTAssertNotNil(self.secondClient)
+        XCTAssertNotNil(self.client?.server)
+        XCTAssertNotNil(self.secondClient)
+        XCTAssertNotNil(self.secondClient?.server)
+      }
+      
+    }
+    
+    class ResolvableClient: Client, Resolvable {
+      var server: Server?
+      var secondServer: Server?
+      
+      init() {}
+      
+      var didResolveDependenciesCalled = false
+      
+      func didResolveDependencies() {
+        XCTAssertFalse(didResolveDependenciesCalled, "didResolveDependencies should be called only once per instance")
+        didResolveDependenciesCalled = true
+
+        XCTAssertNotNil(self.server)
+        XCTAssertNotNil(self.secondServer)
+        XCTAssertNotNil(self.server?.client)
+        XCTAssertNotNil(self.secondServer?.client)
+      }
+      
+    }
+
+    container.register(.ObjectGraph) { try ResolvableServer(client: self.container.resolve()) as Server }
+      .resolveDependencies { (container: DependencyContainer, server: Server) in
+        let server = server as! ResolvableServer
+        server.secondClient = try container.resolve() as Client
+    }
+    
+    container.register(.ObjectGraph) { ResolvableClient() as Client }
+      .resolveDependencies { (container: DependencyContainer, client: Client) in
+        let client = client as! ResolvableClient
+        client.server = try container.resolve() as Server
+        client.secondServer = try container.resolve() as Server
+    }
+
+    let client = (try! container.resolve() as Client) as! ResolvableClient
+    let server = client.server as! ResolvableServer
+    let secondServer = client.secondServer as! ResolvableServer
+    let secondClient = server.secondClient as! ResolvableClient
+    
+    XCTAssertTrue(client === server.client)
+    XCTAssertTrue(client === server.secondClient)
+    XCTAssertTrue(client === secondServer.client)
+    XCTAssertTrue(client === secondServer.secondClient)
+    XCTAssertTrue(client === secondClient)
+    XCTAssertTrue(server === secondServer)
+    
+    XCTAssertTrue(client.didResolveDependenciesCalled)
+    XCTAssertTrue(server.didResolveDependenciesCalled)
+  }
+  
 }
-
-

@@ -111,7 +111,7 @@ class AutoInjectionTests: XCTestCase {
   }
 
   func setUp() {
-  container.reset()
+    container.reset()
   }
   #else
   override func setUp() {

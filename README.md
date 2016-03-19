@@ -54,7 +54,7 @@ If you use [_Swift Package Manager_](https://swift.org/package-manager/) add Dip
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.2.0")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.3.0")
   ]
 )
 ```
@@ -205,9 +205,27 @@ container.register(.ObjectGraph) { ServerImp() as Server }
 ```
 More information about circular dependencies you can find in the Playground.
 
-### Auto-Injection
+### Auto-wiring
 
-Auto-injection lets your resolve all the dependencies of the instance resolved by container with just one call, also allowing a simpler syntax to register circular dependencies.
+When you use constructor injection to inject dependencies in your component auto-wiring enables you to resolve it just with one call to `resolve` method without carying about how to resolve all constructor arguments - container will resolve them for you.
+
+```swift
+class PresenterImp: Presenter {
+    init(view: ViewOutput, interactor: Interactor, router: Router) { ... }
+    ...
+}
+
+container.register { RouterImp() as Router }
+container.register { View() as ViewOutput }
+container.register { InteractorImp() as Interactor }
+container.register { PresenterImp(view: $0, interactor: $1, router: $2) as Presenter }
+
+let presenter = try! container.resolve() as Presenter
+```
+
+### Auto-injection
+
+Auto-injection lets your resolve all property dependencies of the instance resolved by container with just one call, also allowing a simpler syntax to register circular dependencies.
 
 ```swift
 protocol Server {
