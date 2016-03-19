@@ -217,7 +217,7 @@ private class _InjectedPropertyBox<T> {
 
   init(required: Bool = true, tag: DependencyTagConvertible?, didInject: T -> () = { _ in }) {
     self.required = required
-    self.tag = tag?.toTag()
+    self.tag = tag?.dependencyTag
     self.didInject = didInject
   }
 

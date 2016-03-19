@@ -17,15 +17,9 @@ private let FAKE_STARSHIPS = false
 /* ---- */
 
 
-enum DependencyTags: Int {
+enum DependencyTags: Int, DependencyTagConvertible {
     case Hardcoded
     case Dummy
-}
-
-extension DependencyTags: DependencyTagConvertible {
-    func toTag() -> DependencyContainer.Tag {
-        return .Int(self.rawValue)
-    }
 }
 
 // MARK: Dependency Container for Providers
