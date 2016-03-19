@@ -303,7 +303,6 @@ extension DependencyContainer {
         
         try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
         try autoInjectProperties(resolvedInstance)
-        (resolvedInstance as? Resolvable)?.didResolveDependencies()
         
         return resolvedInstance
       }
@@ -315,12 +314,17 @@ extension DependencyContainer {
   class ResolvedInstances {
     var resolvedInstances = [DefinitionKey: Any]()
     var singletons = [DefinitionKey: Any]()
+    var resolvableInstances = [Resolvable]()
 
     func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey, inScope scope: ComponentScope) {
       switch scope {
       case .Singleton: singletons[key] = instance
       case .ObjectGraph: resolvedInstances[key] = instance
       case .Prototype: break
+      }
+      
+      if let resolvable = instance as? Resolvable {
+        resolvableInstances.append(resolvable)
       }
     }
     
@@ -340,7 +344,13 @@ extension DependencyContainer {
       defer {
         depth = depth - 1
         if depth == 0 {
+          // We call didResolveDependencies only at this point
+          // because this is a point when dependencies graph is complete.
+          for resolvedInstance in resolvableInstances {
+            resolvedInstance.didResolveDependencies()
+          }
           resolvedInstances.removeAll()
+          resolvableInstances.removeAll()
         }
       }
       
