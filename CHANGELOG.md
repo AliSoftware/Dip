@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Develop
+## 4.3.0
 
 * Added `DependencyTagConvertible` protocol for better typed tags.  
   [#50](https://github.com/AliSoftware/Dip/pull/50), [@gavrix](https://github.com/gavrix)
