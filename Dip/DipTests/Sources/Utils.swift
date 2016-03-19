@@ -49,7 +49,7 @@ func AssertThrows<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autocl
     XCTFail(message, file: file, line: line)
   }
   catch {
-    XCTAssertTrue(checkError(error), "Thrown unexpected error: \(error)")
+    XCTAssertTrue(checkError(error), "Thrown unexpected error: \(error)", file: file, line: line)
   }
 }
 

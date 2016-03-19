@@ -128,16 +128,11 @@ class AutoWiringTests: XCTestCase {
     container.register(.ObjectGraph) { ServiceImp2() }
     
     //when
-    do {
-      try container.resolve() as AutoWiredClient
-      XCTFail("Container should throw error on ambiguous factories")
-    }
-      //then
-    catch let DipError.AmbiguousDefinitions(_, numberOfArguments) {
-      XCTAssertEqual(numberOfArguments, 1)
-    }
-    catch {
-      XCTFail("Thrown unexpected error")
+    AssertThrows(expression: try container.resolve() as AutoWiredClient) { error -> Bool in
+      switch error {
+      case DipError.AmbiguousDefinitions: return true
+      default: return false
+      }
     }
   }
   
@@ -201,13 +196,8 @@ class AutoWiringTests: XCTestCase {
     
     //when
     let service = try! container.resolve() as Service
-    do {
-      try container.resolve(withArguments: service) as AutoWiredClient
-      XCTFail("Container should not use auto-wiring when resolving with runtime arguments")
-    }
-    catch {
-      //should fail as no definition with 1 argument was not registered
-    }
+    AssertThrows(expression: try container.resolve(withArguments: service) as AutoWiredClient,
+      "Container should not use auto-wiring when resolving with runtime arguments")
   }
   
   func testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency() {
@@ -230,14 +220,8 @@ class AutoWiringTests: XCTestCase {
     container.register(.ObjectGraph) { ServiceImp1() as Service }
     container.register(.ObjectGraph) { ServiceImp2() }
     
-    do {
-      try container.resolve() as AutoWiredClient
-      XCTFail("Container should not use auto-wiring when definition for resolved type is registered.")
-    }
-    catch {
-      //should fail as there was an error while resolving object graph
-    }
-    
+    AssertThrows(expression: try container.resolve() as AutoWiredClient,
+      "Container should not use auto-wiring when definition for resolved type is registered.")
   }
   
   func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain() {

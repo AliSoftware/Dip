@@ -195,10 +195,7 @@ extension DependencyContainer {
    
    - parameter tag: The arbitrary tag to use to lookup definition.
    
-   - throws: An error of type `DipError`:
-             `ResolutionFailed` - if some error was thrown during resolution;
-             `DefinitionNotFound` - if no matching definition was registered in that container.
-             `AutoInjectionFailed` - if failed to auto-inject required property
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`
    
    - returns: An instance of type `T`.
    
@@ -223,11 +220,8 @@ extension DependencyContainer {
       - tag: The arbitrary tag to use to lookup definition.
       - builder: Generic closure that accepts generic factory and returns inctance created by that factory.
    
-   - throws: An error of type `DipError`:
-             `ResolutionFailed` - if some error was thrown during resolution;
-             `DefinitionNotFound` - if no matching definition was registered in that container.
-             `AutoInjectionFailed` - if failed to auto-inject required property
-
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`
+   
    - returns: An instance of type `T`.
    
    - note: You _should not_ call this method directly, instead call any of other 
@@ -266,7 +260,7 @@ extension DependencyContainer {
           return resolved
         }
       default:
-        throw DipError.ResolutionFailed(key: key, underlyingError: error)
+        throw error
       }
     }
   }
@@ -493,14 +487,6 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
  - seealso: `resolve(tag:)`
 */
 public enum DipError: ErrorType, CustomStringConvertible {
-  /**
-  Thrown by `resolve(tag:)` if some error was thrown during resolution.
-   
-   - parameters:
-      - key: The key, which is associated with definition used to resolve instance
-      - underlyingError: The error that caused resolution to fail
-   */
-  case ResolutionFailed(key: DefinitionKey, underlyingError: ErrorType)
   
   /**
    Thrown by `resolve(tag:)` if no matching definition was registered in container.
@@ -519,18 +505,24 @@ public enum DipError: ErrorType, CustomStringConvertible {
   */
   case AutoInjectionFailed(label: String?, type: Any.Type, underlyingError: ErrorType)
 
-  case AmbiguousDefinitions(DefinitionKey, Int)
+  /**
+   Thrown by `resolve(tag:)` if found ambigous definitions registered for resolved type
+   
+   - parameters:
+      - type: The type that failed to be resolved
+      - definitions: Ambiguous definitions
+  */
+  case AmbiguousDefinitions(type: Any.Type, definitions: [Definition])
   
   public var description: String {
     switch self {
-    case let .ResolutionFailed(key, error):
-      return "Failed to resolve type \(key.protocolType). \(error)"
     case let .DefinitionNotFound(key):
       return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
       return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
-    case let .AmbiguousDefinitions(key, numberOfArguments):
-      return "Ambiguous definitions for \(key.protocolType) with factories that accept the same number of runtime arguments (\(numberOfArguments))."
+    case let .AmbiguousDefinitions(type, definitions):
+      return "Ambiguous definitions for \(type):\n" +
+      definitions.map({ "\($0)" }).joinWithSeparator(";\n")
     }
   }
 }
