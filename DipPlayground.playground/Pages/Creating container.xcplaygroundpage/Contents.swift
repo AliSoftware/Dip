@@ -29,7 +29,7 @@ Both syntaxes are equivalent. The one using the configuration block is simply a 
 
 ### When/where to create container?
 
-While there is an option to use container as a global variable we advise instead to create and configure container in your app delegate and pass it between your objects.
+While there is an option to use container as a global variable we advise instead to create and configure container in your app delegate and pass it between your objects (see [Shared Instances](Shared%20Instances)).
 
 */
 //: [Next: Registering Components](@next)

@@ -10,14 +10,12 @@
 		090012291BC6FECA0079C600 /* BaseCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012161BC6FECA0079C600 /* BaseCell.swift */; };
 		0900122A1BC6FECA0079C600 /* PersonCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012171BC6FECA0079C600 /* PersonCell.swift */; };
 		0900122C1BC6FECA0079C600 /* PersonProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */; };
-		0900122D1BC6FECA0079C600 /* DummyPilotProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */; };
-		0900122E1BC6FECA0079C600 /* HardCodedStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */; };
-		0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */; };
 		0900123B1BC6FF4D0079C600 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0900123A1BC6FF4D0079C600 /* Main.storyboard */; };
 		0900123D1BC7012A0079C600 /* StarshipProviderAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */; };
 		090012401BC704C60079C600 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0900123F1BC704C60079C600 /* Person.swift */; };
 		090012421BC7059E0079C600 /* Starship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012411BC7059E0079C600 /* Starship.swift */; };
-		090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090012431BC708A00079C600 /* DummyStarshipProvider.swift */; };
+		0982AF081C503EEE00B62463 /* FakePersonsProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF071C503EEE00B62463 /* FakePersonsProviders.swift */; };
+		0982AF0A1C50401800B62463 /* FakeStarshipProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF091C50401800B62463 /* FakeStarshipProvider.swift */; };
 		099022621BC123C000E76F43 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 099022611BC123C000E76F43 /* AppDelegate.swift */; };
 		099022691BC123C000E76F43 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 099022681BC123C000E76F43 /* Assets.xcassets */; };
 		0990226C1BC123C000E76F43 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0990226A1BC123C000E76F43 /* LaunchScreen.storyboard */; };
@@ -52,14 +50,12 @@
 		090012161BC6FECA0079C600 /* BaseCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BaseCell.swift; sourceTree = "<group>"; };
 		090012171BC6FECA0079C600 /* PersonCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonCell.swift; sourceTree = "<group>"; };
 		0900121B1BC6FECA0079C600 /* PersonProviderAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PersonProviderAPI.swift; sourceTree = "<group>"; };
-		0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyPilotProvider.swift; sourceTree = "<group>"; };
-		0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HardCodedStarshipProvider.swift; sourceTree = "<group>"; };
-		0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PlistPersonProvider.swift; sourceTree = "<group>"; };
 		0900123A1BC6FF4D0079C600 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		0900123C1BC7012A0079C600 /* StarshipProviderAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StarshipProviderAPI.swift; sourceTree = "<group>"; };
 		0900123F1BC704C60079C600 /* Person.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		090012411BC7059E0079C600 /* Starship.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Starship.swift; sourceTree = "<group>"; };
-		090012431BC708A00079C600 /* DummyStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DummyStarshipProvider.swift; sourceTree = "<group>"; };
+		0982AF071C503EEE00B62463 /* FakePersonsProviders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FakePersonsProviders.swift; sourceTree = "<group>"; };
+		0982AF091C50401800B62463 /* FakeStarshipProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FakeStarshipProvider.swift; sourceTree = "<group>"; };
 		0990225F1BC123C000E76F43 /* DipSampleApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DipSampleApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		099022611BC123C000E76F43 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		099022681BC123C000E76F43 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -150,8 +146,7 @@
 		090012381BC6FEFD0079C600 /* PersonProviders */ = {
 			isa = PBXGroup;
 			children = (
-				0900121C1BC6FECA0079C600 /* DummyPilotProvider.swift */,
-				0900121E1BC6FECA0079C600 /* PlistPersonProvider.swift */,
+				0982AF071C503EEE00B62463 /* FakePersonsProviders.swift */,
 				09D796121BC9A5BC003C68EB /* SWAPIPersonProvider.swift */,
 			);
 			name = PersonProviders;
@@ -160,8 +155,7 @@
 		090012391BC6FF080079C600 /* StarshipProviders */ = {
 			isa = PBXGroup;
 			children = (
-				090012431BC708A00079C600 /* DummyStarshipProvider.swift */,
-				0900121D1BC6FECA0079C600 /* HardCodedStarshipProvider.swift */,
+				0982AF091C50401800B62463 /* FakeStarshipProvider.swift */,
 				09D7961A1BC9BE65003C68EB /* SWAPIStarshipProvider.swift */,
 			);
 			name = StarshipProviders;
@@ -342,25 +336,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				09D796151BC9A5FC003C68EB /* NetworkLayer.swift in Sources */,
+				0982AF081C503EEE00B62463 /* FakePersonsProviders.swift in Sources */,
 				09D795FF1BC71F5A003C68EB /* PersonListViewController.swift in Sources */,
 				0900122A1BC6FECA0079C600 /* PersonCell.swift in Sources */,
 				09D796011BC722C0003C68EB /* StarshipListViewController.swift in Sources */,
 				0900122C1BC6FECA0079C600 /* PersonProviderAPI.swift in Sources */,
 				09D7961D1BC9C62E003C68EB /* SWAPICommon.swift in Sources */,
 				090012291BC6FECA0079C600 /* BaseCell.swift in Sources */,
-				0900122D1BC6FECA0079C600 /* DummyPilotProvider.swift in Sources */,
 				099022621BC123C000E76F43 /* AppDelegate.swift in Sources */,
 				09D796131BC9A5BC003C68EB /* SWAPIPersonProvider.swift in Sources */,
 				090012421BC7059E0079C600 /* Starship.swift in Sources */,
 				0900123D1BC7012A0079C600 /* StarshipProviderAPI.swift in Sources */,
+				0982AF0A1C50401800B62463 /* FakeStarshipProvider.swift in Sources */,
 				09D7961B1BC9BE65003C68EB /* SWAPIStarshipProvider.swift in Sources */,
-				0900122E1BC6FECA0079C600 /* HardCodedStarshipProvider.swift in Sources */,
 				09D796071BC73E8B003C68EB /* StoryboardConstants.swift in Sources */,
 				09D796031BC72691003C68EB /* StarshipCell.swift in Sources */,
 				090012401BC704C60079C600 /* Person.swift in Sources */,
-				090012441BC708A00079C600 /* DummyStarshipProvider.swift in Sources */,
 				09D7960D1BC7431C003C68EB /* FetchableTrait.swift in Sources */,
-				0900122F1BC6FECA0079C600 /* PlistPersonProvider.swift in Sources */,
 				09D796191BC9BA49003C68EB /* DependencyContainers.swift in Sources */,
 				09D796171BC9B53D003C68EB /* URLSessionNetworkLayer.swift in Sources */,
 			);

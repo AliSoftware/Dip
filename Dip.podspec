@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "4.0.0"
+  s.version          = "4.3.0"
   s.summary          = "A simple Dependency Resolver: Dependency Injection using Protocol resolution."
 
   s.description      = <<-DESC
@@ -30,5 +30,5 @@ Pod::Spec.new do |s|
 
   s.requires_arc = true
 
-  s.source_files = 'Dip/Dip/**/*.swift'
+  s.source_files = 'Sources/**/*.swift'
 end

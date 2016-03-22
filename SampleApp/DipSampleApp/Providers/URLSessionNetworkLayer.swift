@@ -8,6 +8,7 @@
 
 import Foundation
 
+///NetworkLayer implementation on top of NSURLSession
 struct URLSessionNetworkLayer : NetworkLayer {
     let baseURL: NSURL
     let session: NSURLSession
