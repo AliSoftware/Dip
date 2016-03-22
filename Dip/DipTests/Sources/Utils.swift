@@ -24,26 +24,20 @@
 
 import XCTest
 
-#if os(Linux)
-typealias FileString = StaticString
-#else
-typealias FileString = String
-#endif
-  
 
-func AssertThrows<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autoclosure expression: () throws -> T) {
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T) {
   AssertThrows(file, line: line, expression: expression, "")
 }
 
-func AssertThrows<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autoclosure expression: () throws -> T, _ message: String) {
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, _ message: String) {
   AssertThrows(expression: expression, checkError: { _ in true }, message)
 }
 
-func AssertThrows<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autoclosure expression: () throws -> T, checkError: ErrorType -> Bool) {
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, checkError: ErrorType -> Bool) {
   AssertThrows(file, line: line, expression: expression, checkError: checkError, "")
 }
 
-func AssertThrows<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autoclosure expression: () throws -> T, checkError: ErrorType -> Bool, _ message: String) {
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, checkError: ErrorType -> Bool, _ message: String) {
   do {
     try expression()
     XCTFail(message, file: file, line: line)
@@ -53,11 +47,11 @@ func AssertThrows<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autocl
   }
 }
 
-func AssertNoThrow<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autoclosure expression: () throws -> T) {
+func AssertNoThrow<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T) {
   AssertNoThrow(file, line: line, expression: expression, "")
 }
 
-func AssertNoThrow<T>(file: FileString = __FILE__, line: UInt = __LINE__, @autoclosure expression: () throws -> T, _ message: String) {
+func AssertNoThrow<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, _ message: String) {
   do {
     try expression()
   }
