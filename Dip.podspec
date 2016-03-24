@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "4.3.0"
+  s.version          = "4.3.1"
   s.summary          = "A simple Dependency Resolver: Dependency Injection using Protocol resolution."
 
   s.description      = <<-DESC
