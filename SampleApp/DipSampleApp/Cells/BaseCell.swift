@@ -36,6 +36,6 @@ extension BaseCell where Self : UITableViewCell {
 }
 
 protocol FillableCell: BaseCell {
-    typealias ObjectType
+    associatedtype ObjectType
     func fillWithObject(object: ObjectType)
 }

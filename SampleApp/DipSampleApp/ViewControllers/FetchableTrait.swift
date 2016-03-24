@@ -9,7 +9,7 @@
 import UIKit
 
 protocol FetchableTrait: class {
-    typealias ObjectType
+    associatedtype ObjectType
     var objects: [ObjectType]? { get set }
     var batchRequestID: Int { get set }
     var tableView: UITableView! { get }
