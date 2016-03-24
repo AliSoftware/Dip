@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 4.3.1
+
+* Fix Swift 2.2 compile errors in tests  
+  [#62](https://github.com/AliSoftware/Dip/pull/62), [@mwoollard](https://github.com/mwoollard)
+
 ## 4.3.0
 
 * Added `DependencyTagConvertible` protocol for better typed tags.  

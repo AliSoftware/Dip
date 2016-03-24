@@ -35,6 +35,8 @@ If you want to know more about Dependency Injection in general we recomend you t
 
 ## Installation
 
+Since version 4.3.1 Dip is built with Swift 2.2. The lates version built with Swift 2.1 is 4.3.0.
+
 Dip is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
@@ -54,7 +56,7 @@ If you use [_Swift Package Manager_](https://swift.org/package-manager/) add Dip
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.3.0")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.3.1")
   ]
 )
 ```
