@@ -340,7 +340,7 @@ extension DependencyContainer {
         if depth == 0 {
           // We call didResolveDependencies only at this point
           // because this is a point when dependencies graph is complete.
-          for resolvedInstance in resolvableInstances {
+          for resolvedInstance in resolvableInstances.reverse() {
             resolvedInstance.didResolveDependencies()
           }
           resolvedInstances.removeAll()

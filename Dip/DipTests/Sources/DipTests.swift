@@ -54,6 +54,7 @@ class DipTests: XCTestCase {
       ("testThatItThrowsErrorIfConstructorThrows", testThatItThrowsErrorIfConstructorThrows),
       ("testThatItThrowsErrorIfFailsToResolveDependency", testThatItThrowsErrorIfFailsToResolveDependency),
       ("testThatItCallsDidResolveDependenciesOnResolvableIntance", testThatItCallsDidResolveDependenciesOnResolvableIntance),
+      ("testThatItCallsDidResolveDependenciesInReverseOrder", testThatItCallsDidResolveDependenciesInReverseOrder),
       ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies)
     ]
   }
@@ -254,6 +255,33 @@ class DipTests: XCTestCase {
     let singletonService = try! container.resolve(tag: "singleton") as Service
     let _ = try! container.resolve(tag: "singleton") as Service
     XCTAssertTrue((singletonService as! ResolvableService).didResolveDependenciesCalled)
+  }
+  
+  func testThatItCallsDidResolveDependenciesInReverseOrder() {
+    
+    class ResolvableService: Service, Resolvable {
+      static var resolved: [Service] = []
+      
+      func didResolveDependencies() {
+        ResolvableService.resolved.append(self)
+      }
+    }
+    
+    var resolveDependenciesCalled = false
+    var service2: Service!
+    container.register { ResolvableService() as Service }
+      .resolveDependencies { _, service in
+        if !resolveDependenciesCalled {
+          resolveDependenciesCalled = true
+          service2 = try! self.container.resolve() as Service
+        }
+        return
+    }
+
+    let service1 = try! container.resolve() as Service
+    
+    XCTAssertTrue(ResolvableService.resolved.first === service2)
+    XCTAssertTrue(ResolvableService.resolved.last === service1)
   }
   
   func testThatItResolvesCircularDependencies() {
