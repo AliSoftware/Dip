@@ -44,7 +44,7 @@ public final class DependencyContainer {
   let lock = RecursiveLock()
   
   private(set) var bootstrapped = false
-  private var bootstrapQueue: [()->()] = []
+  private var bootstrapQueue: [() throws -> ()] = []
 
   /**
    Designated initializer for a DependencyContainer
@@ -66,11 +66,13 @@ public final class DependencyContainer {
    you can not add or remove definitions. Trying to do so will cause runtime exception.
    You can completely reset container, after reset you can bootstrap it again. 
    During bootsrap container will instantiate components registered with `EagerSingleton` scope.
+   
+   - throws: `DipError` if failed to instantiate any component
   */
-  public func bootstrap() {
-    threadSafe {
+  public func bootstrap() throws {
+    try threadSafe {
       bootstrapped = true
-      bootstrapQueue.forEach({ $0() })
+      try bootstrapQueue.forEach({ try $0() })
       bootstrapQueue.removeAll()
     }
   }
@@ -191,7 +193,7 @@ extension DependencyContainer {
     register(definition, forKey: key)
 
     if case .EagerSingleton = definition.scope {
-      bootstrapQueue.append({ let _ = try? self.resolve(tag: tag) as T })
+      bootstrapQueue.append({ let _ = try self.resolve(tag: tag) as T })
     }
   }
   
