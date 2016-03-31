@@ -263,12 +263,12 @@ class ComponentScopeTests: XCTestCase {
       .resolveDependencies { container, service in XCTFail() }
     
     //when
-    container.bootstrap()
+    try! container.bootstrap()
     XCTAssertTrue(eagerSingletonResolved)
   }
   
   func testThatContainerCanBeBootstrappedAgainAfterReset() {
-    container.bootstrap()
+    try! container.bootstrap()
     XCTAssertTrue(container.bootstrapped)
     
     container.reset()
