@@ -13,6 +13,7 @@ Dip supports three different scopes of objects: _Prototype_, _ObjectGraph_ and _
 * The `.Prototype` scope will make the `DependencyContainer` resolve your type as __a new instance every time__ you call `resolve`. This is the default scope.
 * The `.ObjectGraph` scope is like `.Prototype` scope, but it will make the `DependencyContainer` to reuse resolved instances during one (recursive) call to `resolve` method. When this call returns, all resolved instances will be discarded and next call to `resolve` will produce new instances. This scope should be used to resolve [circular dependencies](Circular%20dependencies).
 * The `.Singleton` scope will make the `DependencyContainer` retain the instance once resolved the first time, and reuse it in the next calls to `resolve` during the container lifetime.
+* The `.EagerSingleton` scope is the same as `.Singleton` scope but instances with this cope will be created when you call `bootstrap()` method on the container.
 
 The `.Prototype` scope is the default. To set a scope you pass it as an argument to `register` method.
 */
@@ -42,6 +43,24 @@ let sharedService = try! container.resolve(tag: "shared instance") as Service
 let sameSharedService = try! container.resolve(tag: "shared instance") as Service
 // same instances, the singleton scope keep and reuse instances during the lifetime of the container
 sharedService as! ServiceImp3 === sameSharedService as! ServiceImp3
+
+/*:
+ ### Bootstrapping
+ 
+ You can use `bootstrap()` method to fix your container setup and initialise components registered with `EagerSingleton` scope.
+ After bootstrapping if you try to add or remove any definition it will cause runtime exception. Call `boostrap` when you registered all the components, for example at the end of initialization block if you use `init(configBlock:)`.
+ */
+
+var resolvedEagerSingleton = false
+let definition = container.register(tag: "eager shared instance", .EagerSingleton) { ServiceImp1() as Service }
+    .resolveDependencies { _ in resolvedEagerSingleton = true }
+
+try! container.bootstrap()
+resolvedEagerSingleton
+
+let eagerSharedService = try! container.resolve(tag: "eager shared instance") as Service
+
+container.remove(definition)
 
 //: [Next: Circular Dependencies](@next)
 

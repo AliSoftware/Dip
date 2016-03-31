@@ -62,7 +62,7 @@ public final class DependencyContainer {
   }
   
   /**
-   Call this method to complete container setup. After container is bootstraped
+   Call this method to complete container setup. After container is bootstrapped
    you can not add or remove definitions. Trying to do so will cause runtime exception.
    You can completely reset container, after reset you can bootstrap it again. 
    During bootsrap container will instantiate components registered with `EagerSingleton` scope.
