@@ -58,7 +58,7 @@ If you use [_Swift Package Manager_](https://swift.org/package-manager/) add Dip
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.3.1")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.4.0")
   ]
 )
 ```
