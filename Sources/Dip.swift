@@ -43,6 +43,9 @@ public final class DependencyContainer {
   let resolvedInstances = ResolvedInstances()
   let lock = RecursiveLock()
   
+  private(set) var bootstrapped = false
+  private var bootstrapQueue: [()->()] = []
+
   /**
    Designated initializer for a DependencyContainer
    
@@ -56,6 +59,20 @@ public final class DependencyContainer {
    */
   public init(@noescape configBlock: (DependencyContainer->()) = { _ in }) {
     configBlock(self)
+  }
+  
+  /**
+   Call this method to complete container setup. After container is bootstraped
+   you can not add or remove definitions. Trying to do so will cause runtime exception.
+   You can completely reset container, after reset you can bootstrap it again. 
+   During bootsrap container will instantiate components registered with `EagerSingleton` scope.
+  */
+  public func bootstrap() {
+    threadSafe {
+      bootstrapped = true
+      bootstrapQueue.forEach({ $0() })
+      bootstrapQueue.removeAll()
+    }
   }
   
   private func threadSafe<T>(@noescape closure: () throws -> T) rethrows -> T {
@@ -172,9 +189,15 @@ extension DependencyContainer {
   public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: DependencyTagConvertible? = nil) {
     let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag?.dependencyTag)
     register(definition, forKey: key)
+
+    if case .EagerSingleton = definition.scope {
+      bootstrapQueue.append({ let _ = try? self.resolve(tag: tag) as T })
+    }
   }
   
-  func register(definition: Definition, forKey key: DefinitionKey) {
+  func register(definition: _Definition, forKey key: DefinitionKey) {
+    precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
+    
     threadSafe {
       definitions[key] = definition
       resolvedInstances.singletons[key] = nil
@@ -312,7 +335,7 @@ extension DependencyContainer {
 
     func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey, inScope scope: ComponentScope) {
       switch scope {
-      case .Singleton: singletons[key] = instance
+      case .Singleton, .EagerSingleton: singletons[key] = instance
       case .ObjectGraph: resolvedInstances[key] = instance
       case .Prototype: break
       }
@@ -324,7 +347,7 @@ extension DependencyContainer {
     
     func previouslyResolvedInstance<T>(forKey key: DefinitionKey, inScope scope: ComponentScope) -> T? {
       switch scope {
-      case .Singleton: return singletons[key] as? T
+      case .Singleton, .EagerSingleton: return singletons[key] as? T
       case .ObjectGraph: return resolvedInstances[key] as? T
       case .Prototype: return nil
       }
@@ -372,6 +395,8 @@ extension DependencyContainer {
   }
   
   func remove(definitionForKey key: DefinitionKey) {
+    precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
+    
     threadSafe {
       definitions[key] = nil
       resolvedInstances.singletons[key] = nil
@@ -385,6 +410,7 @@ extension DependencyContainer {
     threadSafe {
       definitions.removeAll()
       resolvedInstances.singletons.removeAll()
+      bootstrapped = false
     }
   }
 

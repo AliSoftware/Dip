@@ -49,6 +49,7 @@ extension DependencyContainer {
  instead of using `Injected<T>` or `InjectedWeak<T>` types.
  
  **Example**:
+ 
  ```swift
  class MyCustomBox<T> {
    private(set) var value: T?
@@ -75,7 +76,7 @@ public protocol AutoInjectedPropertyBox: class {
    
    - parameter container: A container to be used to resolve an instance
    
-  -note: This method is not intended to be called manually, `DependencyContainer` will call it by itself.
+  - note: This method is not intended to be called manually, `DependencyContainer` will call it by itself.
    */
   func resolve(container: DependencyContainer) throws
 }
@@ -93,7 +94,6 @@ public protocol AutoInjectedPropertyBox: class {
  class ClientImp: Client {
    var service = Injected<Service>()
  }
-
  ```
  - seealso: `InjectedWeak`
 
