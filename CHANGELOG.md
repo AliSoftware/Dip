@@ -1,8 +1,15 @@
 # CHANGELOG
 
+## 4.4.0
+
+* Added `.EagerSingleton` scope for objectes requiring early instantiation and `bootstrap()` method on `DepenencyContainer`.  
+  [#65](https://github.com/AliSoftware/Dip/pull/65), [@ilyapuchka](https://github.com/ilyapuchka)
+* Reverted order of `Resolvable` callbacks.  
+  [#67](https://github.com/AliSoftware/Dip/pull/67), [@ilyapuchka](https://github.com/ilyapuchka)
+
 ## 4.3.1
 
-* Fix Swift 2.2 compile errors in tests  
+* Fix Swift 2.2 compile errors in tests.  
   [#62](https://github.com/AliSoftware/Dip/pull/62), [@mwoollard](https://github.com/mwoollard)
 
 ## 4.3.0

@@ -131,6 +131,11 @@ public enum ComponentScope {
    ```
    */
   case Singleton
+  
+  /**
+   The same scope as `Singleton`, but instance will be created when container is bootstrapped.
+  */
+  case EagerSingleton
 }
 
 /**

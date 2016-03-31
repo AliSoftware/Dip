@@ -5,6 +5,8 @@
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
+[![Swift Version](https://img.shields.io/badge/Linux-compatible-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
+[![Swift Version](https://img.shields.io/badge/Swift-2.2-F16D39.svg?style=flat)](https://developer.apple.com/swift)
 
 ![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)  
 _Photo courtesy of [www.kevinandamanda.com](http://www.kevinandamanda.com/recipes/appetizer/homemade-soft-cinnamon-sugar-pretzel-bites-with-salted-caramel-dipping-sauce.html)_
@@ -56,7 +58,7 @@ If you use [_Swift Package Manager_](https://swift.org/package-manager/) add Dip
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.3.1")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.4.0")
   ]
 )
 ```
@@ -113,11 +115,11 @@ let service: ServiceImp = try! container.resolve()
 
 ### Scopes
 
-Dip provides three _scopes_ that you can use to register dependencies:
+Dip provides four _scopes_ that you can use to register dependencies:
 
 * The `.Prototype` scope will make the `DependencyContainer` resolve your type as __a new instance every time__ you call `resolve`. It's a default scope.
 * The `.ObjectGraph` scope is like `.Prototype` scope but it will make the `DependencyContainer` to reuse resolved instances during one call to `resolve` method. When this call returns all resolved insances will be discarded and next call to `resolve` will produce new instances. This scope _must_ be used to properly resolve circular dependencies.
-* The `.Singleton` scope will make the `DependencyContainer` retain the instance once resolved the first time, and reuse it in the next calls to `resolve` during the container lifetime.
+* The `.Singleton` and `.EagerSingleton` scopes will make the `DependencyContainer` retain the instance once resolved the first time, and reuse it in the next calls to `resolve` during the container lifetime.
 
 You specify scope when you register dependency like that:
 
