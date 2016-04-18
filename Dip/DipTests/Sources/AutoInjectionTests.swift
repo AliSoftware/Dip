@@ -28,13 +28,11 @@ import XCTest
 private protocol Server: class {
   weak var client: Client? {get}
   var anotherClient: Client? {get set}
-  var optionalProperty: AnyObject? {get}
 }
 
 private protocol Client: class {
   var server: Server? {get}
   var anotherServer: Server? {get set}
-  var optionalProperty: AnyObject? {get}
 }
 
 private class ServerImp: Server {
@@ -49,7 +47,6 @@ private class ServerImp: Server {
   weak var anotherClient: Client?
   
   weak var _optionalProperty = InjectedWeak<AnyObject>(required: false)
-  var optionalProperty: AnyObject? { return _optionalProperty?.value }
 }
 
 private class ClientImp: Client {
@@ -64,7 +61,6 @@ private class ClientImp: Client {
   var anotherServer: Server?
   
   var _optionalProperty = Injected<AnyObject>(required: false)
-  var optionalProperty: AnyObject? { return _optionalProperty.value }
   
   var taggedServer = Injected<Server>(tag: "tagged")
 }
@@ -98,6 +94,7 @@ class AutoInjectionTests: XCTestCase {
   var allTests: [(String, () throws -> Void)] {
     return [
       ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
+      ("testThatItCanSetInjectedProperty", testThatItCanSetInjectedProperty),
       ("testThatItThrowsErrorIfFailsToAutoInjectDependency", testThatItThrowsErrorIfFailsToAutoInjectDependency),
       ("testThatItResolvesAutoInjectedSingletons", testThatItResolvesAutoInjectedSingletons),
       ("testThatItCallsResolveDependencyBlockWhenAutoInjecting", testThatItCallsResolveDependencyBlockWhenAutoInjecting),
@@ -126,6 +123,22 @@ class AutoInjectionTests: XCTestCase {
     let client = try! container.resolve() as Client
     let server = client.server
     XCTAssertTrue(client === server?.client)
+  }
+  
+  func testThatItCanSetInjectedProperty() {
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
+    let client = (try! container.resolve() as Client) as! ClientImp
+    let server = client.server as! ServerImp
+    
+    let newServer = ServerImp()
+    let newClient = ClientImp()
+    client._server = client._server.setValue(newServer)
+    server._client = server._client.setValue(newClient)
+    
+    XCTAssertTrue(client.server === newServer)
+    XCTAssertTrue(server.client === newClient)
   }
   
   func testThatItThrowsErrorIfFailsToAutoInjectDependency() {
