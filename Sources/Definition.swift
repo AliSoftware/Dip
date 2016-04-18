@@ -25,21 +25,21 @@
 ///A key used to store definitons in a container.
 public struct DefinitionKey : Hashable, CustomStringConvertible {
   public let protocolType: Any.Type
-  public let factoryType: Any.Type
+  public let argumentsType: Any.Type
   public let associatedTag: DependencyContainer.Tag?
   
-  init(protocolType: Any.Type, factoryType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
+  init(protocolType: Any.Type, argumentsType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
     self.protocolType = protocolType
-    self.factoryType = factoryType
+    self.argumentsType = argumentsType
     self.associatedTag = associatedTag
   }
   
   public var hashValue: Int {
-    return "\(protocolType)-\(factoryType)-\(associatedTag)".hashValue
+    return "\(protocolType)-\(argumentsType)-\(associatedTag)".hashValue
   }
   
   public var description: String {
-    return "type: \(protocolType), factory: \(factoryType), tag: \(associatedTag.desc)"
+    return "type: \(protocolType), arguemnts: \(argumentsType), tag: \(associatedTag.desc)"
   }
   
 }
@@ -48,7 +48,7 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
 public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
     lhs.protocolType == rhs.protocolType &&
-      lhs.factoryType == rhs.factoryType &&
+      lhs.argumentsType == rhs.argumentsType &&
       lhs.associatedTag == rhs.associatedTag
 }
 
@@ -148,6 +148,22 @@ public enum ComponentScope {
 */
 public final class DefinitionOf<T, F>: Definition {
   
+  let factory: F
+  let scope: ComponentScope
+  
+  private(set) var weakFactory: (Any throws -> Any)!
+  private var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
+  
+  //Auto-wiring helpers
+  
+  private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
+  private(set) var numberOfArguments: Int = 0
+  
+  init(scope: ComponentScope, factory: F) {
+    self.factory = factory
+    self.scope = scope
+  }
+
   /**
    Set the block that will be used to resolve dependencies of the instance.
    This block will be called before `resolve(tag:)` returns. It can be set only once.
@@ -171,11 +187,11 @@ public final class DefinitionOf<T, F>: Definition {
    ```
    
    */
-  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf<T, F> {
+  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
     guard resolveDependenciesBlock == nil else {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
-    self.resolveDependenciesBlock = block
+    self.resolveDependenciesBlock = { try block($0, $1 as! T) }
     return self
   }
   
@@ -185,29 +201,6 @@ public final class DefinitionOf<T, F>: Definition {
     try self.resolveDependenciesBlock?(container, resolvedInstance)
   }
   
-  let factory: F
-  private(set) var scope: ComponentScope = .Prototype
-  
-  private(set) var resolveDependenciesBlock: ((DependencyContainer, T) throws -> ())?
-  
-  public init(scope: ComponentScope, factory: F) {
-    self.factory = factory
-    self.scope = scope
-  }
-  
-  private var _resolvedInstance: T?
-  
-  //Auto-wiring helpers
-  
-  private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
-  private(set) var numberOfArguments: Int = 0
-
-  convenience init(scope: ComponentScope, factory: F, autoWiringFactory: (DependencyContainer, DependencyContainer.Tag?) throws -> T, numberOfArguments: Int) {
-    self.init(scope: scope, factory: factory)
-    self.autoWiringFactory = autoWiringFactory
-    self.numberOfArguments = numberOfArguments
-  }
-
 }
 
 ///Dummy protocol to store definitions for different types in collection
@@ -216,30 +209,24 @@ public protocol Definition: class { }
 protocol _Definition: Definition {
   var scope: ComponentScope { get }
 
-  var _autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
-  var _factory: Any { get }
+  var baseFactory: Any { get }
+  var weakFactory: (Any throws -> Any)! { get }
+
   var numberOfArguments: Int { get }
+  var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
   
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
 
 extension _Definition {
   func supportsAutoWiring() -> Bool {
-    return _autoWiringFactory != nil && numberOfArguments > 0
+    return autoWiringFactory != nil && numberOfArguments > 0
   }
 }
 
 extension DefinitionOf: _Definition {
   
-  var _resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())? {
-    return resolveDependenciesBlock.map({ block in { try block($0, $1 as! T) } })
-  }
-  
-  var _autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? {
-    return autoWiringFactory.map({ factory in { try factory($0.0, $0.1)} })
-  }
-  
-  var _factory: Any {
+  var baseFactory: Any {
     return factory
   }
   
@@ -248,6 +235,35 @@ extension DefinitionOf: _Definition {
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {
     return "type: \(T.self), factory: \(F.self), scope: \(scope)"
+  }
+}
+
+/// Internal class used to build definition
+class DefinitionBuilder<T, U> {
+  typealias F = U throws -> T
+  
+  var scope: ComponentScope!
+  var factory: F!
+  
+  var numberOfArguments: Int = 0
+  var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
+  
+  init(@noescape configure: (DefinitionBuilder -> ())) {
+    configure(self)
+  }
+  
+  func build() -> DefinitionOf<T, F> {
+    let factory = self.factory
+    let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
+    definition.numberOfArguments = numberOfArguments
+    definition.autoWiringFactory = autoWiringFactory
+    definition.weakFactory = {
+      guard let args = $0 as? U else {
+        fatalError("Internal inconsistency exception! Expected arguments: \(U.self); passed arguments:\($0); Definition: \(definition)")
+      }
+      return try factory(args)
+    }
+    return definition
   }
 }
 

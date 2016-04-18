@@ -50,32 +50,32 @@ class DefinitionTests: XCTestCase {
   #endif
 
   func testThatDefinitionKeyIsEqualBy_Type_Factory_Tag() {
-    let equalKey1 = DefinitionKey(protocolType: Service.self, factoryType: F1.self, associatedTag: tag1)
-    let equalKey2 = DefinitionKey(protocolType: Service.self, factoryType: F1.self, associatedTag: tag1)
+    let equalKey1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag1)
+    let equalKey2 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag1)
     
     XCTAssertEqual(equalKey1, equalKey2)
     XCTAssertEqual(equalKey1.hashValue, equalKey2.hashValue)
   }
   
   func testThatDefinitionKeysWithDifferentTypesAreNotEqual() {
-    let keyWithDifferentType1 = DefinitionKey(protocolType: Service.self, factoryType: F1.self, associatedTag: nil)
-    let keyWithDifferentType2 = DefinitionKey(protocolType: AnyObject.self, factoryType: F1.self, associatedTag: nil)
+    let keyWithDifferentType1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: nil)
+    let keyWithDifferentType2 = DefinitionKey(protocolType: AnyObject.self, argumentsType: F1.self, associatedTag: nil)
     
     XCTAssertNotEqual(keyWithDifferentType1, keyWithDifferentType2)
     XCTAssertNotEqual(keyWithDifferentType1.hashValue, keyWithDifferentType2.hashValue)
   }
   
   func testThatDefinitionKeysWithDifferentFactoriesAreNotEqual() {
-    let keyWithDifferentFactory1 = DefinitionKey(protocolType: Service.self, factoryType: F1.self, associatedTag: nil)
-    let keyWithDifferentFactory2 = DefinitionKey(protocolType: Service.self, factoryType: F2.self, associatedTag: nil)
+    let keyWithDifferentFactory1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: nil)
+    let keyWithDifferentFactory2 = DefinitionKey(protocolType: Service.self, argumentsType: F2.self, associatedTag: nil)
     
     XCTAssertNotEqual(keyWithDifferentFactory1, keyWithDifferentFactory2)
     XCTAssertNotEqual(keyWithDifferentFactory1.hashValue, keyWithDifferentFactory2.hashValue)
   }
   
   func testThatDefinitionKeysWithDifferentTagsAreNotEqual() {
-    let keyWithDifferentTag1 = DefinitionKey(protocolType: Service.self, factoryType: F1.self, associatedTag: tag1)
-    let keyWithDifferentTag2 = DefinitionKey(protocolType: Service.self, factoryType: F1.self, associatedTag: tag2)
+    let keyWithDifferentTag1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag1)
+    let keyWithDifferentTag2 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag2)
     
     XCTAssertNotEqual(keyWithDifferentTag1, keyWithDifferentTag2)
     XCTAssertNotEqual(keyWithDifferentTag1.hashValue, keyWithDifferentTag2.hashValue)
@@ -85,8 +85,9 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }.resolveDependencies { container, service in
-      blockCalled = true
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+      .resolveDependencies { container, service in
+        blockCalled = true
     }
     
     //when
@@ -100,8 +101,9 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }.resolveDependencies { container, service in
-      blockCalled = true
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+      .resolveDependencies { container, service in
+        blockCalled = true
     }
     
     //when

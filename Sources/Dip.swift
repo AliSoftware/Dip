@@ -39,7 +39,7 @@ public final class DependencyContainer {
     case Int(IntegerLiteralType)
   }
   
-  var definitions = [DefinitionKey : Definition]()
+  var definitions = [DefinitionKey : _Definition]()
   let resolvedInstances = ResolvedInstances()
   let lock = RecursiveLock()
   
@@ -112,8 +112,11 @@ extension DependencyContainer {
    container.register { ClientImp(service: try! container.resolve() as Service) as Client }
    ```
    */
-  public func register<T>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
-    let definition = DefinitionOf<T, () throws -> T>(scope: scope, factory: factory)
+  public func register<T>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
+    let definition = DefinitionBuilder<T, ()> {
+      $0.scope = scope
+      $0.factory = factory
+    }.build()
     register(definition, forTag: tag)
     return definition
   }
@@ -133,7 +136,7 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, ...) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, ...) throws -> T> {
+   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
      return registerFactory(tag: tag, scope: scope, factory: factory)
    }
    ```
@@ -141,8 +144,11 @@ extension DependencyContainer {
    Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
   @available(*, deprecated=4.3.0, message="Use registerFactory(tag:scope:factory:numberOfArguments:autoWiringFactory:) instead.")
-  public func registerFactory<T, F>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: F) -> DefinitionOf<T, F> {
-    let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
+  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T) -> DefinitionOf<T, U throws -> T> {
+    let definition = DefinitionBuilder<T, U> {
+      $0.scope = scope
+      $0.factory = factory
+    }.build()
     register(definition, forTag: tag)
     return definition
   }
@@ -164,7 +170,7 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, Arg1, Arg2, Arg3, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, ...) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, ...) throws -> T> {
+   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
      return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: ...) { container, tag in
         try factory(try container.resolve(tag: tag), ...)
       }
@@ -173,8 +179,13 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
-  public func registerFactory<T, F>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: F, numberOfArguments: Int, autoWiringFactory: (DependencyContainer, Tag?) throws -> T) -> DefinitionOf<T, F> {
-    let definition = DefinitionOf<T, F>(scope: scope, factory: factory, autoWiringFactory: autoWiringFactory, numberOfArguments: numberOfArguments)
+  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T, numberOfArguments: Int, autoWiringFactory: (DependencyContainer, Tag?) throws -> T) -> DefinitionOf<T, U throws -> T> {
+    let definition = DefinitionBuilder<T, U> {
+      $0.scope = scope
+      $0.factory = factory
+      $0.numberOfArguments = numberOfArguments
+      $0.autoWiringFactory = autoWiringFactory
+    }.build()
     register(definition, forTag: tag)
     return definition
   }
@@ -188,8 +199,8 @@ extension DependencyContainer {
       - definition: The definition to register in the container.
    
    */
-  public func register<T, F>(definition: DefinitionOf<T, F>, forTag tag: DependencyTagConvertible? = nil) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag?.dependencyTag)
+  public func register<T, U>(definition: DefinitionOf<T, U throws -> T>, forTag tag: DependencyTagConvertible? = nil) {
+    let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
     register(definition, forKey: key)
 
     if case .EagerSingleton = definition.scope {
@@ -255,47 +266,42 @@ extension DependencyContainer {
            _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func resolve<T, Arg1, Arg2, Arg3, ...>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, ...) throws -> T {
-     return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, ...) -> T) in factory(arg1, arg2, arg3, ...) }
+   public func resolve<T, A, B, C, ...>(tag tag: Tag? = nil, _ arg1: A, _ arg2: B, _ arg3: C, ...) throws -> T {
+     return try resolve(tag: tag) { factory in factory(arg1, arg2, arg3, ...) }
    }
    ```
    
    Though before you do so you should probably review your design and try to reduce the number of dependencies.
    */
-  public func resolve<T, F>(tag tag: DependencyTagConvertible? = nil, builder: F throws -> T) throws -> T {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag?.dependencyTag)
+  public func resolve<T, U>(tag tag: DependencyTagConvertible? = nil, builder: (U throws -> T) throws -> T) throws -> T {
+    let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
 
     do {
       //first we try to find defintion that exactly matches parameters
       return try _resolveKey(key, builder: { definition throws -> T in
-        guard let factory = definition._factory as? F else {
+        typealias F = U throws -> T
+        guard let factory = definition.baseFactory as? F else {
           throw DipError.DefinitionNotFound(key: key)
         }
         return try builder(factory)
       })
     }
     catch {
-      switch error {
-      case let DipError.DefinitionNotFound(errorKey) where key == errorKey:
-        //then if no definition found we try atuo-wiring
-        return try threadSafe {
-          guard let resolved: T = try _resolveByAutoWiring(key) else {
-            throw error
-          }
-          return resolved
-        }
-      default:
+      guard let resolved = try _autoWireOrRethrow(key, type: T.self, error: error) as? T else {
         throw error
       }
+      return resolved
     }
   }
-
+  
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
   func _resolveKey<T>(key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
     return try threadSafe {
-      let nilTagKey = key.associatedTag.map { _ in DefinitionKey(protocolType: T.self, factoryType: key.factoryType, associatedTag: nil) }
+      let nilTagKey = key.associatedTag.map { _ in
+        DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: nil)
+      }
 
-      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) as? _Definition else {
+      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) else {
         throw DipError.DefinitionNotFound(key: key)
       }
       return try self._resolveDefinition(definition, usingKey: key, builder: builder)
@@ -380,6 +386,51 @@ extension DependencyContainer {
   
 }
 
+//MARK: - Auto-wiring
+
+extension DependencyContainer {
+  
+  private func _autoWireOrRethrow(key: DefinitionKey, type: Any.Type, error: ErrorType) throws -> Any? {
+    switch error {
+    case let DipError.DefinitionNotFound(errorKey) where key == errorKey:
+      //if no definition found for key that we were trying to resolve - try atuo-wiring
+      return try threadSafe {
+        guard let resolved = try _resolveByAutoWiring(key, type: type) else {
+          throw error
+        }
+        return resolved
+      }
+    default:
+      throw error
+    }
+  }
+
+}
+
+//MARK: - Weakly typed resolve
+
+extension DependencyContainer {
+  
+  public func resolve(type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
+    return try self.resolve(type, tag: tag) { factory in try factory(())}
+  }
+  
+  public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) throws -> Any {
+    let key = DefinitionKey(protocolType: type, argumentsType: U.self, associatedTag: tag?.dependencyTag)
+    
+    do {
+      //first we try to find defintion that exactly matches parameters
+      return try _resolveKey(key, builder: { definition throws -> Any in
+        try builder(definition.weakFactory)
+      })
+    }
+    catch {
+      return try _autoWireOrRethrow(key, type: type, error: error)
+    }
+  }
+  
+}
+
 // MARK: - Removing definitions
 
 extension DependencyContainer {
@@ -391,8 +442,8 @@ extension DependencyContainer {
       - tag: The tag used to register definition.
       - definition: The definition to remove
    */
-  public func remove<T, F>(definition: DefinitionOf<T, F>, forTag tag: DependencyTagConvertible? = nil) {
-    let key = DefinitionKey(protocolType: T.self, factoryType: F.self, associatedTag: tag?.dependencyTag)
+  public func remove<T, U>(definition: DefinitionOf<T, U>, forTag tag: DependencyTagConvertible? = nil) {
+    let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
     remove(definitionForKey: key)
   }
   

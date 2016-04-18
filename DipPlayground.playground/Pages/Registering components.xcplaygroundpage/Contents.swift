@@ -35,7 +35,7 @@ You can use `DependencyContainer.Tag` enum, String or Integer literals, or insta
 */
 
 container.register(tag: "tag") { ServiceImp1() as Service }
-container.register(tag: .Int(0)) { ServiceImp1() as Service }
+container.register(tag: 0) { ServiceImp1() as Service }
 
 enum MyCustomTag: String, DependencyTagConvertible {
     case SomeTag

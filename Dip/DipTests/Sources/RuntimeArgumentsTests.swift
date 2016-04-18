@@ -90,6 +90,12 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //then
     XCTAssertTrue(service is ServiceImp1)
+    
+    //when
+    let anyService = try! container.resolve(Service.self, withArguments: arg1)
+    
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
   }
   
   func testThatItResolvesInstanceWithTwoArguments() {
@@ -106,6 +112,12 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //then
     XCTAssertTrue(service is ServiceImp1)
+
+    //when
+    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2)
+    
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
   }
   
   func testThatItResolvesInstanceWithThreeArguments() {
@@ -122,6 +134,12 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //then
     XCTAssertTrue(service is ServiceImp1)
+    
+    //when
+    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3)
+    
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
   }
   
   func testThatItResolvesInstanceWithFourArguments() {
@@ -139,6 +157,12 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //then
     XCTAssertTrue(service is ServiceImp1)
+    
+    //when
+    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3, arg4)
+    
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
   }
   
   func testThatItResolvesInstanceWithFiveArguments() {
@@ -157,6 +181,12 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //then
     XCTAssertTrue(service is ServiceImp1)
+    
+    //when
+    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3, arg4, arg5)
+    
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
   }
   
   func testThatItResolvesInstanceWithSixArguments() {
@@ -176,6 +206,12 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //then
     XCTAssertTrue(service is ServiceImp1)
+    
+    //when
+    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3, arg4, arg5, arg6)
+    
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
   }
   
   func testThatItRegistersDifferentFactoriesForDifferentNumberOfArguments() {
