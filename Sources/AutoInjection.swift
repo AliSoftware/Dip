@@ -123,7 +123,12 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
       - didInject: block that will be called when concrete instance is injected in this property. 
                    Similar to `didSet` property observer. Default value does nothing.
   */
-  public override init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
+  public override convenience init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
+    self.init(value: nil, required: required, tag: tag, didInject: didInject)
+  }
+  
+  private init(value: T?, required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> ()) {
+    self.value = value
     super.init(required: required, tag: tag, didInject: didInject)
   }
   
@@ -138,9 +143,7 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
       fatalError("Can not set required property to nil.")
     }
     
-    let injected = Injected(required: required, tag: tag, didInject: didInject)
-    injected.value = value
-    return injected
+    return Injected(value: value, required: required, tag: tag, didInject: didInject)
   }
   
 }
@@ -186,7 +189,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
     return T.self
   }
 
-  weak var _value: AnyObject? = nil {
+  private weak var _value: AnyObject? = nil {
     didSet {
       if let value = value { didInject(value) }
     }
@@ -208,10 +211,15 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
       - didInject: block that will be called when concrete instance is injected in this property.
                    Similar to `didSet` property observer. Default value does nothing.
    */
-  public override init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
+  public override convenience init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
+    self.init(value: nil, required: required, tag: tag, didInject: didInject)
+  }
+
+  private init(value: T?, required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> ()) {
+    self._value = value as? AnyObject
     super.init(required: required, tag: tag, didInject: didInject)
   }
-  
+
   public func resolve(container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(container)
     if required && !(resolved is AnyObject) {
@@ -230,9 +238,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
       fatalError("Can not set required property to nil.")
     }
 
-    let injected = InjectedWeak(required: required, tag: tag, didInject: didInject)
-    injected._value = _value
-    return injected
+    return InjectedWeak(value: value, required: required, tag: tag, didInject: didInject)
   }
 
 }
