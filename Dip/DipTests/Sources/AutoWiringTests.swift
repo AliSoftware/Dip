@@ -89,6 +89,12 @@ class AutoWiringTests: XCTestCase {
     XCTAssertTrue(service1 is ServiceImp1)
     let service2 = client.service2
     XCTAssertTrue(service2 is ServiceImp2)
+    
+    //when
+    let anyClient = try! container.resolve(AutoWiredClient.self)
+    
+    //then
+    XCTAssertTrue(anyClient is AutoWiredClientImp)
   }
   
   func testThatItUsesAutoWireFactoryWithMostNumberOfArguments() {
@@ -208,7 +214,7 @@ class AutoWiringTests: XCTestCase {
         resolved.service2 = try container.resolve() as ServiceImp2
         
         //simulate that something goes wrong on the way
-        throw DipError.DefinitionNotFound(key: DefinitionKey(protocolType: ServiceImp1.self, factoryType: Any.self))
+        throw DipError.DefinitionNotFound(key: DefinitionKey(protocolType: ServiceImp1.self, argumentsType: Any.self))
     }
     
     container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }

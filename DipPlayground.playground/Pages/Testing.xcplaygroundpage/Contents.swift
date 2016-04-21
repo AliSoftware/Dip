@@ -7,7 +7,7 @@
 
 Dip is convenient to use for testing. Here is s simple example of how you can write tests with Dip.
 
-__Note__: That's a very simple example just to demostrate use of Dip in tests, not how you should or should not tests your code in general. 
+__Note__: That's a very simple example just to demostrate use of Dip in tests, not how you should or should not test your code in general. 
 You can learn more about testing based on state verification vs behavior verification [here](http://martinfowler.com/articles/mocksArentStubs.html).
 
 */

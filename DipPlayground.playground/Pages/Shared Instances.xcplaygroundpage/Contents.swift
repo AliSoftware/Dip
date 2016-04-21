@@ -127,32 +127,9 @@ class DipViewController: UIViewController {
 var dipController = DipViewController(dependencies: container)
 
 /*:
-Of cource `DependencyContainer` should not be a singleton too. Instead, inject it to objects that need to access it. And use a protocol for that. For example if your view controller needs to access API client, it does not need a reference to `DependencyContainer`, it only needs a reference to _something_ that can provide it an API client instance.
-*/
+Of cource `DependencyContainer` should not be a singleton too. There is just no need for that because you never should call `DependencyContainer` from inside of your components. That will make it a [service locator antipatter]((http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/)). You may only call `DependencyContainer` from the _Composition root_ - the place where all the components are configured and wired together.
 
-protocol ApiClientProvider {
-  func apiClient() -> ApiClientProtocol
-}
-
-extension DependencyContainer: ApiClientProvider {
-  func apiClient() -> ApiClientProtocol {
-    return try! self.resolve() as ApiClientProtocol
-  }
-}
-
-extension DipViewController {
-    convenience init(apiClientProvider: ApiClientProvider) {
-        self.init()
-        self.apiClient = apiClientProvider.apiClient()
-    }
-}
-
-dipController = DipViewController(apiClientProvider: container)
-
-/*:
-This way you also does not depend directly on Dip. Instead you provide a boundary between Dip — that you don't have control of — and your source code. So when something chagnes in Dip, you update only the boundary code.
-
-Dependency Injection is a pattern (more precisely - a set of patterns) as well as a singleton. And any pattern can be abused. DI can be used in a [wrong way]((http://www.loosecouplings.com/2011/01/dependency-injection-using-di-container.html)), container can easily become a [service locator](http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/). You should carefully decide when to use DI, you should not inject everything and everywhere and define a protocol for every single class you use. For every tool there is a right time and the same way as singleton can harm you the same way DI and protocols abuse can make your code unnececerry complex.
+Dependency Injection is a pattern (more precisely - a set of patterns) as well as a singleton. And any pattern can be abused. DI can be used in a [wrong way]((http://www.loosecouplings.com/2011/01/dependency-injection-using-di-container.html)), container can easily become a service locator. You should carefully decide when to use DI, you should not inject everything and everywhere and define a protocol for every single class you use. For every tool there is a right time and the same way as singleton can harm you the same way DI and protocols abuse can make your code unnececerry complex.
 
 If you want to know more about Dependency Injection in general we recomend you to read ["Dependency Injection in .Net" by Mark Seemann](https://www.manning.com/books/dependency-injection-in-dot-net). Dip was inspired by implementations of IoC container for .Net platform and shares core principles described in that book.
 

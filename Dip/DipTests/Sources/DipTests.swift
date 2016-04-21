@@ -77,6 +77,9 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(serviceInstance is ServiceImp1)
+    
+    let anyService = try! container.resolve(Service.self)
+    XCTAssertTrue(anyService is ServiceImp1)
   }
 
   func testThatItResolvesInstanceRegisteredWithTag() {
@@ -141,8 +144,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      typealias F = () throws -> Service
-      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
+      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: nil)
       XCTAssertEqual(key, expectedKey)
 
       return true
@@ -158,8 +160,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      typealias F = () throws -> Service
-      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: "other tag")
+      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: "other tag")
       XCTAssertEqual(key, expectedKey)
       
       return true
@@ -175,8 +176,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      typealias F = (String) throws -> Service
-      let expectedKey = DefinitionKey(protocolType: Service.self, factoryType: F.self, associatedTag: nil)
+      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: String.self, associatedTag: nil)
       XCTAssertEqual(key, expectedKey)
 
       return true
@@ -185,7 +185,7 @@ class DipTests: XCTestCase {
   
   func testThatItThrowsErrorIfConstructorThrows() {
     //given
-    let failedKey = DefinitionKey(protocolType: Any.self, factoryType: Any.self)
+    let failedKey = DefinitionKey(protocolType: Any.self, argumentsType: Any.self)
     let expectedError = DipError.DefinitionNotFound(key: failedKey)
     container.register { () throws -> Service in throw expectedError }
     
@@ -200,7 +200,7 @@ class DipTests: XCTestCase {
   
   func testThatItThrowsErrorIfFailsToResolveDependency() {
     //given
-    let failedKey = DefinitionKey(protocolType: Any.self, factoryType: Any.self)
+    let failedKey = DefinitionKey(protocolType: Any.self, argumentsType: Any.self)
     let expectedError = DipError.DefinitionNotFound(key: failedKey)
     container.register { ServiceImp1() as Service }
       .resolveDependencies { container, service in

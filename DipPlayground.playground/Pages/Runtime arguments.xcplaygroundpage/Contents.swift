@@ -35,12 +35,13 @@ _Dip_ supports up to six runtime arguments. If that is not enougth you can exten
 */
 
 extension DependencyContainer {
-    public func register<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _ scope: ComponentScope = .Prototype, factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) throws -> T) -> DefinitionOf<T, (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) throws -> T> {
-        return registerFactory(tag: tag, scope: scope, factory: factory)
+    public func register<T, A, B, C, D, E, F, G>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B, C, D, E, F, G) throws -> T) -> DefinitionOf<T, (A, B, C, D, E, F, G) throws -> T> {
+        return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 7) { container, tag in try factory(container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag))
+        }
     }
     
-    public func resolve<T, Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7>(tag tag: Tag? = nil, _ arg1: Arg1, _ arg2: Arg2, _ arg3: Arg3, _ arg4: Arg4, _ arg5: Arg5, _ arg6: Arg6, _ arg7: Arg7) throws -> T {
-        return try resolve(tag: tag) { (factory: (Arg1, Arg2, Arg3, Arg4, Arg5, Arg6, Arg7) throws -> T) in try factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
+    public func resolve<T, A, B, C, D, E, F, G>(tag tag: DependencyTagConvertible? = nil, _ arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F, _ arg7: G) throws -> T {
+        return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5, arg6, arg7) }
     }
 }
 
