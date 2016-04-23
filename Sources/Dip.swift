@@ -309,7 +309,11 @@ extension DependencyContainer {
         return previouslyResolved
       }
       else {
-        let resolvedInstance = try builder(definition)
+        var resolvedInstance = try builder(definition)
+        
+        if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
+          resolvedInstance = unboxed
+        }
         
         //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
         //when it returns instance that we try to resolve here can be already resolved
@@ -578,6 +582,29 @@ public enum DipError: ErrorType, CustomStringConvertible {
     case let .AmbiguousDefinitions(type, definitions):
       return "Ambiguous definitions for \(type):\n" +
       definitions.map({ "\($0)" }).joinWithSeparator(";\n")
+    }
+  }
+}
+
+///Internal protocol used to unwrap optional values.
+protocol BoxType {
+  var unboxed: Any? { get }
+}
+
+extension Optional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .Some(value): return value
+    default: return nil
+    }
+  }
+}
+
+extension ImplicitlyUnwrappedOptional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .Some(value): return value
+    default: return nil
     }
   }
 }

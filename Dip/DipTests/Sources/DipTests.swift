@@ -46,6 +46,7 @@ class DipTests: XCTestCase {
     return [
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
       ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
+      ("testThatItResolvesOptionalInstance", testThatItResolvesOptionalInstance),
       ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
       ("testThatItResolvesDifferentInstancesRegisteredForDifferentTags", testThatItResolvesDifferentInstancesRegisteredForDifferentTags),
       ("testThatNewRegistrationOverridesPreviousRegistration", testThatNewRegistrationOverridesPreviousRegistration),
@@ -160,6 +161,68 @@ class DipTests: XCTestCase {
     
     //but no throw with weakly typed resolve
     AssertNoThrow(expression: try container.resolve(NSCoder.self))
+  }
+  
+  func testThatItResolvesOptionalInstance() {
+    //given
+    var resolveDependenciesCalled = false
+    container.register { ServiceImp1() as Service }
+      .resolveDependencies { _ in
+        resolveDependenciesCalled = true
+    }
+    
+    //when
+    let serviceInstance = try! container.resolve() as Service?
+    
+    //then
+    XCTAssertTrue(serviceInstance is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+
+    //when
+    resolveDependenciesCalled = false
+    let implServiceInstance = try! container.resolve() as Service!
+    
+    //then
+    XCTAssertTrue(implServiceInstance is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+
+    //when
+    resolveDependenciesCalled = false
+    let anyService = try! container.resolve((Service?).self)
+
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+
+    //when
+    resolveDependenciesCalled = false
+    let implAnyService = try! container.resolve((Service!).self)
+    
+    //then
+    XCTAssertTrue(implAnyService is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+    
+    let anyObject = try! container.resolve((Service?).self)
+    XCTAssertTrue(anyObject is ServiceImp1)
+    
+    var otherService: Service!
+    var impOtherService: Service!
+    var anyOtherService: Any!
+    var anyImpOtherService: Any!
+    
+    container.register(.ObjectGraph) { ServiceImp1() as Service }
+      .resolveDependencies { container, service in
+        otherService = try! container.resolve() as Service
+        impOtherService = try! container.resolve() as Service!
+        anyOtherService = try! container.resolve((Service?).self)
+        anyImpOtherService = try! container.resolve((Service!).self)
+    }
+    
+    let service = try! container.resolve((Service?).self)
+    XCTAssertTrue(otherService as! ServiceImp1 === service as! ServiceImp1)
+    XCTAssertTrue(impOtherService as! ServiceImp1 === service as! ServiceImp1)
+    XCTAssertTrue(anyOtherService as! ServiceImp1 === service as! ServiceImp1)
+    XCTAssertTrue(anyImpOtherService as! ServiceImp1 === service as! ServiceImp1)
   }
 
   func testThatItResolvesInstanceRegisteredWithTag() {

@@ -38,7 +38,7 @@ private class AutoWiredClientImp: AutoWiredClient {
   var service1: Service!
   var service2: Service!
   
-  init(service1: Service, service2: ServiceImp2) {
+  init(service1: Service?, service2: ServiceImp2) {
     self.service1 = service1
     self.service2 = service2
   }
@@ -279,7 +279,7 @@ class AutoWiringTests: XCTestCase {
     XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
   }
   
-  func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTagged() {
+  func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag() {
     
     //given
     container.register(.ObjectGraph) { ServiceImp1() as Service }
