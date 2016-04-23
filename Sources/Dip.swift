@@ -176,6 +176,7 @@ extension DependencyContainer {
     }
   }
   
+  //Actually register definition
   func register(definition: _Definition, forKey key: DefinitionKey) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
@@ -217,6 +218,21 @@ extension DependencyContainer {
     return try resolve(tag: tag) { (factory: () throws -> T) in try factory() }
   }
   
+  /**
+   Resolve a an instance of provided type. Weakly-typed alternative of `resolve(tag:)`
+   
+   - warning: This method does not make any type checks, so there is no guaranty that
+              resulting instance is actually an instance of requrested type.
+              That can happen if you register forwarded type that is not implemented by resolved instance.
+   
+   **Example**:
+   ```swift
+   let service = try! container.resolve(Service.self) as! Service
+   let service = try! container.resolve(Service.self, tag: "service") as! Service
+   ```
+   
+   - seealso: `resolve(tag:)`, `register(tag:_:factory:)`, `implements(_:)`
+   */
   public func resolve(type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
     return try self.resolve(type, tag: tag) { factory in try factory(())}
   }
@@ -259,6 +275,11 @@ extension DependencyContainer {
     return resolved as! T
   }
   
+  /**
+   Resolve an instance of provided type using builder closure. Weakly-typed alternative of `resolve(tag:builder:)`
+   
+   - seealso: `resolve(tag:builder:)`
+  */
   public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) throws -> Any {
     let key = DefinitionKey(protocolType: type, argumentsType: U.self, associatedTag: tag?.dependencyTag)
     
@@ -307,6 +328,7 @@ extension DependencyContainer {
     }
   }
   
+  /// Searches for definition that matches provided key
   private func matchDefinition(key: DefinitionKey) -> (_Definition, DefinitionKey)? {
     let nilTagKey = key.associatedTag.map { _ in
       DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: nil)
@@ -316,6 +338,20 @@ extension DependencyContainer {
       return (definition, key)
     }
     
+    //search for type forwarding definitions with the same tag
+    for (_key, definition) in definitions where _key.associatedTag == key.associatedTag {
+      if definition.implementingTypes.contains({ $0 == key.protocolType }) {
+        return (definition, _key)
+      }
+    }
+
+    //search for type forwarding definitions with no tag
+    for (_key, definition) in definitions where _key.associatedTag == nil {
+      if definition.implementingTypes.contains({ $0 == key.protocolType }) {
+        return (definition, _key)
+      }
+    }
+
     return nil
   }
   
@@ -337,7 +373,7 @@ extension DependencyContainer {
     remove(definitionForKey: key)
   }
   
-  func remove(definitionForKey key: DefinitionKey) {
+  private func remove(definitionForKey key: DefinitionKey) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {

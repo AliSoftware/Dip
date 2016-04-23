@@ -134,6 +134,8 @@ public enum ComponentScope {
   
   /**
    The same scope as `Singleton`, but instance will be created when container is bootstrapped.
+   
+   - seealso: `bootstrap()`
   */
   case EagerSingleton
 }
@@ -195,6 +197,86 @@ public final class DefinitionOf<T, F>: Definition {
     return self
   }
   
+  /**
+   Provides information about forwarded types that are also implemented by registered instance.
+   Use this method to reuse the same definition to resolve different types.
+   You can register up to 4 forwarded types. You can not change forwarded types after they were set once.
+   Every type implicitly registers its optional variants as forwarded types.
+   
+   - warning: Currently in Swift there is no way to guaranty type safety in this method.
+              That is - there is no way to ensure that an instance produced by this definition
+              actually implements forwarded type. If you provide forwarded type that is not
+              actually implemented by a produced instance container will throw
+              an error when you will try to resolve forwarded type (unless weakly-typed `resolve` is used).
+   
+   - parameter a: Forwarded type
+   
+   - returns: modified definition
+   
+   **Example**:
+   
+   ```swift
+   class ServiceImp: Service, AnotherService { ... }
+   
+   container.register { ServiceImp() as Service }
+     .implements(AnotherService.self)
+   
+   let service = try! container.resolve() as Service
+   let service = try! container.resolve() as AnotherService
+   ```
+   
+  */
+  public func implements<A>(a: A.Type) -> DefinitionOf {
+    let types: [Any.Type] = [a, Optional<A>.self, ImplicitlyUnwrappedOptional<A>.self]
+    _implementingTypes.appendContentsOf(types)
+    return self
+  }
+
+  /// - seealso: `implements(_:)`
+  public func implements<A, B>(a: A.Type, _ b: B.Type) -> DefinitionOf {
+    let types: [Any.Type] = [
+      a, (A?).self, (A!).self,
+      b, (B?).self, (B!).self
+    ]
+    _implementingTypes.appendContentsOf(types)
+    return self
+  }
+
+  /// - seealso: `implements(_:)`
+  public func implements<A, B, C>(a: A.Type, _ b: B.Type, _ c: C.Type) -> DefinitionOf {
+    let types: [Any.Type] = [
+      a, (A?).self, (A!).self,
+      b, (B?).self, (B!).self,
+      c, (C?).self, (C!).self
+    ]
+    _implementingTypes.appendContentsOf(types)
+    return self
+  }
+
+  /// - seealso: `implements(_:)`
+  public func implements<A, B, C, D>(a: A.Type, _ b: B.Type, _ c: C.Type, _ d: D.Type) -> DefinitionOf {
+    let types: [Any.Type] = [
+      a, (A?).self, (A!).self,
+      b, (B?).self, (B!).self,
+      c, (C?).self, (C!).self,
+      d, (D?).self, (D!).self
+    ]
+    _implementingTypes.appendContentsOf(types)
+    return self
+  }
+
+  private var _implementingTypes = [Any.Type]() {
+    willSet {
+      guard _implementingTypes.isEmpty else {
+        fatalError("You can not change implementing types after they were set.")
+      }
+    }
+  }
+
+  var implementingTypes: [Any.Type] {
+    return [(T?).self, (T!).self] + _implementingTypes
+  }
+  
   /// Calls `resolveDependencies` block if it was set.
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
     guard let resolvedInstance = resolvedInstance as? T else { return }
@@ -214,6 +296,7 @@ protocol _Definition: Definition {
 
   var numberOfArguments: Int { get }
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
+  var implementingTypes: [Any.Type] { get }
   
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
@@ -225,11 +308,9 @@ extension _Definition {
 }
 
 extension DefinitionOf: _Definition {
-  
   var baseFactory: Any {
     return factory
   }
-  
 }
 
 extension DefinitionOf: CustomStringConvertible {

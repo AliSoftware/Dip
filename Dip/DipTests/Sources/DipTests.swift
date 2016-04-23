@@ -26,8 +26,9 @@ import XCTest
 @testable import Dip
 
 private protocol Service: class { }
-private class ServiceImp1: Service { }
-private class ServiceImp2: Service { }
+private protocol AnotherService: class { }
+private class ServiceImp1: NSObject, Service, AnotherService { }
+private class ServiceImp2: NSObject, Service, AnotherService { }
 
 private protocol Server: class {
   weak var client: Client? { get }
@@ -44,6 +45,7 @@ class DipTests: XCTestCase {
   var allTests: [(String, () throws -> Void)] {
     return [
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
+      ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
       ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
       ("testThatItResolvesDifferentInstancesRegisteredForDifferentTags", testThatItResolvesDifferentInstancesRegisteredForDifferentTags),
       ("testThatNewRegistrationOverridesPreviousRegistration", testThatNewRegistrationOverridesPreviousRegistration),
@@ -80,6 +82,84 @@ class DipTests: XCTestCase {
     
     let anyService = try! container.resolve(Service.self)
     XCTAssertTrue(anyService is ServiceImp1)
+  }
+  
+  func testThatItResolvesInstanceByTypeForwarding() {
+    //given
+    container.register { ServiceImp1() as Service }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //when
+    let anotherService = try! container.resolve() as AnotherService
+    let object = try! container.resolve() as NSObject
+
+    //and when
+    let anyOtherService = try! container.resolve(AnotherService.self)
+    let anyObject = try! container.resolve(NSObject.self)
+
+    //then
+    XCTAssertTrue(anotherService is ServiceImp1)
+    XCTAssertTrue(object is ServiceImp1)
+
+    XCTAssertTrue(anyOtherService is ServiceImp1)
+    XCTAssertTrue(anyObject is ServiceImp1)
+  }
+  
+  func testThatItUsesTaggedDefinitionWhenResolvingInstanceByTypeForwarding() {
+    //given
+    container.register() { ServiceImp1() as Service }
+      .implements(AnotherService.self, NSObject.self)
+    
+    container.register(tag: "tag") { ServiceImp2() as Service }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //when
+    let anotherService = try! container.resolve(tag: "tag") as AnotherService
+    let object = try! container.resolve(tag: "tag") as NSObject
+    
+    //and when
+    let anyOtherService = try! container.resolve(AnotherService.self, tag: "tag")
+    let anyObject = try! container.resolve(NSObject.self, tag: "tag")
+    
+    //then
+    XCTAssertTrue(anotherService is ServiceImp2)
+    XCTAssertTrue(object is ServiceImp2)
+    
+    XCTAssertTrue(anyOtherService is ServiceImp2)
+    XCTAssertTrue(anyObject is ServiceImp2)
+  }
+  
+  func testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding() {
+    //given
+    container.register { ServiceImp1() as Service }
+      .implements(AnotherService.self, NSObject.self, NSCoder.self)
+    
+    //when
+    let anotherService = try! container.resolve(tag: "tag") as AnotherService
+    let object = try! container.resolve(tag: "tag") as NSObject
+    
+    //and when
+    let anyOtherService = try! container.resolve(AnotherService.self, tag: "tag")
+    let anyObject = try! container.resolve(NSObject.self, tag: "tag")
+    
+    //then
+    XCTAssertTrue(anotherService is ServiceImp1)
+    XCTAssertTrue(object is ServiceImp1)
+    
+    XCTAssertTrue(anyOtherService is ServiceImp1)
+    XCTAssertTrue(anyObject is ServiceImp1)
+  }
+  
+  func testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding() {
+    //given
+    container.register { ServiceImp1() as Service }
+      .implements(NSCoder.self)
+
+    //then
+    AssertThrows(expression: try container.resolve() as NSCoder)
+    
+    //but no throw with weakly typed resolve
+    AssertNoThrow(expression: try container.resolve(NSCoder.self))
   }
 
   func testThatItResolvesInstanceRegisteredWithTag() {
