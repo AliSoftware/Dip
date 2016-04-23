@@ -25,10 +25,11 @@
 extension DependencyContainer {
   
   /// Tries to resolve instance using auto-wire factories
-  func _resolveByAutoWiring(key: DefinitionKey, type: Any.Type) throws -> Any? {
+  func _resolveByAutoWiring(key: DefinitionKey) throws -> Any? {
     guard key.argumentsType == Void.self else { return nil }
     
     let tag = key.associatedTag
+    let type = key.protocolType
     let autoWiringDefinitions = self.autoWiringDefinitionsFor(type, tag: tag)
     return try _resolveEnumeratingKeys(autoWiringDefinitions) { try _resolveKey($0, tag: tag, type: type) }
   }
