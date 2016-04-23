@@ -44,7 +44,8 @@ class DefinitionTests: XCTestCase {
       ("testThatDefinitionKeysWithDifferentFactoriesAreNotEqual", testThatDefinitionKeysWithDifferentFactoriesAreNotEqual),
       ("testThatDefinitionKeysWithDifferentTagsAreNotEqual", testThatDefinitionKeysWithDifferentTagsAreNotEqual),
       ("testThatResolveDependenciesCallsResolveDependenciesBlock", testThatResolveDependenciesCallsResolveDependenciesBlock),
-      ("testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance", testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance)
+      ("testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance", testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance),
+      ("testThatItRegisteresOptionalTypesAsForwardedTypes", testThatItRegisteresOptionalTypesAsForwardedTypes)
     ]
   }
   #endif
@@ -112,5 +113,13 @@ class DefinitionTests: XCTestCase {
     //then
     XCTAssertFalse(blockCalled)
   }
+  
+  func testThatItRegisteresOptionalTypesAsForwardedTypes() {
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+    
+    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service?.self }))
+    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service!.self }))
+  }
+  
 }
 

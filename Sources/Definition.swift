@@ -134,6 +134,8 @@ public enum ComponentScope {
   
   /**
    The same scope as `Singleton`, but instance will be created when container is bootstrapped.
+   
+   - seealso: `bootstrap()`
   */
   case EagerSingleton
 }
@@ -194,6 +196,10 @@ public final class DefinitionOf<T, F>: Definition {
     self.resolveDependenciesBlock = { try block($0, $1 as! T) }
     return self
   }
+
+  var implementingTypes: [Any.Type] {
+    return [(T?).self, (T!).self]
+  }
   
   /// Calls `resolveDependencies` block if it was set.
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
@@ -209,11 +215,11 @@ public protocol Definition: class { }
 protocol _Definition: Definition {
   var scope: ComponentScope { get }
 
-  var baseFactory: Any { get }
   var weakFactory: (Any throws -> Any)! { get }
 
   var numberOfArguments: Int { get }
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
+  var implementingTypes: [Any.Type] { get }
   
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
@@ -225,11 +231,6 @@ extension _Definition {
 }
 
 extension DefinitionOf: _Definition {
-  
-  var baseFactory: Any {
-    return factory
-  }
-  
 }
 
 extension DefinitionOf: CustomStringConvertible {
@@ -259,7 +260,8 @@ class DefinitionBuilder<T, U> {
     definition.autoWiringFactory = autoWiringFactory
     definition.weakFactory = {
       guard let args = $0 as? U else {
-        fatalError("Internal inconsistency exception! Expected arguments: \(U.self); passed arguments:\($0); Definition: \(definition)")
+        let key = DefinitionKey(protocolType: T.self, argumentsType: U.self)
+        throw DipError.DefinitionNotFound(key: key)
       }
       return try factory(args)
     }
