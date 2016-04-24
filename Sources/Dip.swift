@@ -292,13 +292,24 @@ extension DependencyContainer {
   func _resolveKey<T>(key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
     return try threadSafe {
       guard let (matchingKey, definition) = try matchDefinition(key) else {
-        let error = DipError.DefinitionNotFound(key: key)
+        //if no definition found - auto-wire
         guard let resolved = try _resolveByAutoWiring(key) as? T else {
-          throw error
+          throw DipError.DefinitionNotFound(key: key)
         }
         return resolved
       }
-      return try self._resolveDefinition(definition, forKey: matchingKey, builder: builder)
+      
+      do {
+        return try self._resolveDefinition(definition, forKey: matchingKey, builder: builder)
+      }
+        //if failed to resolve type for matching key - try auto-wiring
+        //(usually happens when inferring optional type)
+      catch let DipError.DefinitionNotFound(errorKey) where errorKey.protocolType == matchingKey.protocolType {
+        guard let resolved = try _resolveByAutoWiring(key) as? T else {
+          throw DipError.DefinitionNotFound(key: key)
+        }
+        return resolved
+      }
     }
   }
   
@@ -345,8 +356,11 @@ extension DependencyContainer {
     return try typeForwardingDefinition(key)
   }
   
+  /// Searches for definition that forwards requested type
   private func typeForwardingDefinition(key: DefinitionKey) throws -> (DefinitionKey, _Definition)? {
-    let typeDefinitions = definitions.filter({ $0.1.implementingTypes.contains({ $0 == key.protocolType }) })
+    let typeDefinitions = definitions.filter({
+      $0.1.implementingTypes.contains({ $0 == key.protocolType })
+    })
     
     var tags = [key.associatedTag]
     if key.associatedTag != nil {
@@ -355,10 +369,18 @@ extension DependencyContainer {
     
     for tag in tags {
       let definitions = typeDefinitions.filter({ $0.0.associatedTag == tag })
-      switch definitions.count {
-      case 1: return definitions.first
-      case 0: continue
-      default:
+      if definitions.isEmpty {
+        continue
+      }
+      else if definitions.count == 1 {
+        let matchedKey = definitions.first!.0
+        return (
+          //we need to carry on original tag
+          DefinitionKey(protocolType: matchedKey.protocolType, argumentsType: matchedKey.argumentsType, associatedTag: key.associatedTag),
+          definitions.first!.1
+        )
+      }
+      else {
         //several definitions registered for the same tag forward to the same type
         throw DipError.AmbiguousDefinitions(type: key.protocolType, definitions: definitions.map({ $0.1 }))
       }

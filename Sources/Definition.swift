@@ -291,7 +291,6 @@ public protocol Definition: class { }
 protocol _Definition: Definition {
   var scope: ComponentScope { get }
 
-  var baseFactory: Any { get }
   var weakFactory: (Any throws -> Any)! { get }
 
   var numberOfArguments: Int { get }
@@ -308,9 +307,6 @@ extension _Definition {
 }
 
 extension DefinitionOf: _Definition {
-  var baseFactory: Any {
-    return factory
-  }
 }
 
 extension DefinitionOf: CustomStringConvertible {
@@ -340,7 +336,8 @@ class DefinitionBuilder<T, U> {
     definition.autoWiringFactory = autoWiringFactory
     definition.weakFactory = {
       guard let args = $0 as? U else {
-        fatalError("Internal inconsistency exception! Expected arguments: \(U.self); passed arguments:\($0); Definition: \(definition)")
+        let key = DefinitionKey(protocolType: T.self, argumentsType: U.self)
+        throw DipError.DefinitionNotFound(key: key)
       }
       return try factory(args)
     }
