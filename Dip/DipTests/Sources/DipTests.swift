@@ -46,7 +46,11 @@ class DipTests: XCTestCase {
     return [
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
       ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
+      ("testThatItUsesTaggedDefinitionWhenResolvingInstanceByTypeForwarding", testThatItUsesTaggedDefinitionWhenResolvingInstanceByTypeForwarding),
       ("testThatItResolvesOptionalInstance", testThatItResolvesOptionalInstance),
+      ("testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding", testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding),
+      ("testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding", testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding),
+      ("testThatItThrowsErrorIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItThrowsErrorIfSeveralDefinitionsWithTheSameTagForwardTheSameType),
       ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
       ("testThatItResolvesDifferentInstancesRegisteredForDifferentTags", testThatItResolvesDifferentInstancesRegisteredForDifferentTags),
       ("testThatNewRegistrationOverridesPreviousRegistration", testThatNewRegistrationOverridesPreviousRegistration),
@@ -110,7 +114,7 @@ class DipTests: XCTestCase {
     //given
     container.register() { ServiceImp1() as Service }
       .implements(AnotherService.self, NSObject.self)
-    
+
     container.register(tag: "tag") { ServiceImp2() as Service }
       .implements(AnotherService.self, NSObject.self)
     
@@ -161,6 +165,42 @@ class DipTests: XCTestCase {
     
     //but no throw with weakly typed resolve
     AssertNoThrow(expression: try container.resolve(NSCoder.self))
+  }
+  
+  func testThatItThrowsErrorIfSeveralDefinitionsWithTheSameTagForwardTheSameType() {
+    //given
+    container.register() { ServiceImp1() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    container.register() { ServiceImp2() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //then
+    AssertThrows(expression: try container.resolve() as AnotherService)
+    container.reset()
+    
+    //given
+    container.register(tag: "tag") { ServiceImp1() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    container.register(tag: "tag") { ServiceImp2() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //then
+    AssertThrows(expression: try container.resolve(tag: "tag") as AnotherService)
+    AssertThrows(expression: try container.resolve() as AnotherService)
+    container.reset()
+    
+    //given
+    container.register() { ServiceImp1() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    container.register(tag: "tag2") { ServiceImp2() }
+      .implements(AnotherService.self, NSObject.self)
+
+    //then
+    AssertNoThrow(expression: try container.resolve() as AnotherService)
+    AssertNoThrow(expression: try container.resolve(tag: "tag2") as AnotherService)
   }
   
   func testThatItResolvesOptionalInstance() {
