@@ -38,7 +38,7 @@ private class AutoWiredClientImp: AutoWiredClient {
   var service1: Service!
   var service2: Service!
   
-  init(service1: Service, service2: ServiceImp2) {
+  init(service1: Service?, service2: ServiceImp2) {
     self.service1 = service1
     self.service2 = service2
   }
@@ -87,6 +87,30 @@ class AutoWiringTests: XCTestCase {
     //then
     let service1 = client.service1
     XCTAssertTrue(service1 is ServiceImp1)
+    let service2 = client.service2
+    XCTAssertTrue(service2 is ServiceImp2)
+    
+    //when
+    let anyClient = try! container.resolve(AutoWiredClient.self)
+    
+    //then
+    XCTAssertTrue(anyClient is AutoWiredClientImp)
+  }
+  
+  func testThatItUsesTagToResolveDependenciesWithAutoWiring() {
+    //given
+    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(tag: "tag", .ObjectGraph) { ServiceImp2() as Service }
+    container.register(.ObjectGraph) { ServiceImp2() }
+    
+    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+    
+    //when
+    let client = try! container.resolve(tag: "tag") as AutoWiredClient
+    
+    //then
+    let service1 = client.service1
+    XCTAssertTrue(service1 is ServiceImp2)
     let service2 = client.service2
     XCTAssertTrue(service2 is ServiceImp2)
     
@@ -255,7 +279,7 @@ class AutoWiringTests: XCTestCase {
     XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
   }
   
-  func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTagged() {
+  func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag() {
     
     //given
     container.register(.ObjectGraph) { ServiceImp1() as Service }

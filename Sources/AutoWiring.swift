@@ -25,22 +25,21 @@
 extension DependencyContainer {
   
   /// Tries to resolve instance using auto-wire factories
-  func _resolveByAutoWiring(key: DefinitionKey, type: Any.Type) throws -> Any? {
+  func _resolveByAutoWiring(key: DefinitionKey) throws -> Any? {
     guard key.argumentsType == Void.self else { return nil }
     
     let tag = key.associatedTag
+    let type = key.protocolType
     let autoWiringDefinitions = self.autoWiringDefinitionsFor(type, tag: tag)
     return try _resolveEnumeratingKeys(autoWiringDefinitions) { try _resolveKey($0, tag: tag, type: type) }
   }
 
   private func autoWiringDefinitionsFor(type: Any.Type, tag: DependencyContainer.Tag?) -> [(DefinitionKey, _Definition)] {
-    var definitions = self.definitions
-      .map({ ($0.0, $0.1) })
+    var definitions = self.definitions.map({ ($0.0, $0.1) })
     
     //filter definitions
-    definitions =  definitions
-      .filter({ $0.1.supportsAutoWiring() })
-      .filter({ $0.0.protocolType == type })
+    definitions = definitions.filter({ $0.1.supportsAutoWiring() })
+      .filter({ $0.0.protocolType == type || $0.1.implementingTypes.contains({ $0 == type }) })
       .filter({ $0.0.associatedTag == tag || $0.0.associatedTag == nil })
     
     //order definitions
@@ -77,9 +76,9 @@ extension DependencyContainer {
   private func _resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any? {
     let key = DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: tag)
     
-    return try _resolveKey(key, builder: { definition throws -> Any in
+    return try _resolveKey(key, builder: { definition in
       try definition.autoWiringFactory!(self, tag)
-    })
+    }) as Any
   }
   
 }

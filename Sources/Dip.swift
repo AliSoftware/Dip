@@ -40,8 +40,8 @@ public final class DependencyContainer {
   }
   
   var definitions = [DefinitionKey : _Definition]()
-  let resolvedInstances = ResolvedInstances()
-  let lock = RecursiveLock()
+  private let resolvedInstances = ResolvedInstances()
+  private let lock = RecursiveLock()
   
   private(set) var bootstrapped = false
   private var bootstrapQueue: [() throws -> ()] = []
@@ -122,38 +122,6 @@ extension DependencyContainer {
   }
   
   /**
-   Register generic factory associated with an optional tag.
-   
-   - parameters:
-      - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
-      - scope: The scope to use for instance created by the factory.
-      - factory: The factory to register.
-   
-   - returns: A registered definition.
-   
-   - note: You _should not_ call this method directly, instead call any of other `register` methods.
-   You _should_ use this method only to register dependency with more runtime arguments
-   than _Dip_ supports (currently it's up to six) like in the following example:
-   
-   ```swift
-   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
-     return registerFactory(tag: tag, scope: scope, factory: factory)
-   }
-   ```
-   
-   Though before you do so you should probably review your design and try to reduce number of depnedencies.
-   */
-  @available(*, deprecated=4.3.0, message="Use registerFactory(tag:scope:factory:numberOfArguments:autoWiringFactory:) instead.")
-  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T) -> DefinitionOf<T, U throws -> T> {
-    let definition = DefinitionBuilder<T, U> {
-      $0.scope = scope
-      $0.factory = factory
-    }.build()
-    register(definition, forTag: tag)
-    return definition
-  }
-
-  /**
    Register generic factory and auto-wiring factory and associate it with an optional tag.
    
    - parameters:
@@ -208,6 +176,7 @@ extension DependencyContainer {
     }
   }
   
+  //Actually register definition
   func register(definition: _Definition, forKey key: DefinitionKey) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
@@ -250,6 +219,25 @@ extension DependencyContainer {
   }
   
   /**
+   Resolve a an instance of provided type. Weakly-typed alternative of `resolve(tag:)`
+   
+   - warning: This method does not make any type checks, so there is no guaranty that
+              resulting instance is actually an instance of requrested type.
+              That can happen if you register forwarded type that is not implemented by resolved instance.
+   
+   **Example**:
+   ```swift
+   let service = try! container.resolve(Service.self) as! Service
+   let service = try! container.resolve(Service.self, tag: "service") as! Service
+   ```
+   
+   - seealso: `resolve(tag:)`, `register(tag:_:factory:)`, `implements(_:)`
+   */
+  public func resolve(type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
+    return try self.resolve(type, tag: tag) { factory in try factory(())}
+  }
+
+  /**
    Resolve an instance of type `T` using generic builder closure that accepts generic factory and returns created instance.
    
    - parameters:
@@ -274,48 +262,69 @@ extension DependencyContainer {
    Though before you do so you should probably review your design and try to reduce the number of dependencies.
    */
   public func resolve<T, U>(tag tag: DependencyTagConvertible? = nil, builder: (U throws -> T) throws -> T) throws -> T {
-    let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
-
-    do {
-      //first we try to find defintion that exactly matches parameters
-      return try _resolveKey(key, builder: { definition throws -> T in
-        typealias F = U throws -> T
-        guard let factory = definition.baseFactory as? F else {
+    let resolved = try resolve(T.self, tag: tag, builder: { (factory: (U throws -> Any)) in
+      try builder({
+        guard let resolved = try factory($0) as? T else {
+          let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
           throw DipError.DefinitionNotFound(key: key)
         }
-        return try builder(factory)
+        return resolved
       })
-    }
-    catch {
-      guard let resolved = try _autoWireOrRethrow(key, type: T.self, error: error) as? T else {
-        throw error
-      }
-      return resolved
-    }
+    })
+    
+    return resolved as! T
+  }
+  
+  /**
+   Resolve an instance of provided type using builder closure. Weakly-typed alternative of `resolve(tag:builder:)`
+   
+   - seealso: `resolve(tag:builder:)`
+  */
+  public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) throws -> Any {
+    let key = DefinitionKey(protocolType: type, argumentsType: U.self, associatedTag: tag?.dependencyTag)
+    
+    return try _resolveKey(key, builder: { definition throws -> Any in
+      try builder(definition.weakFactory)
+    })
   }
   
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
   func _resolveKey<T>(key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
     return try threadSafe {
-      let nilTagKey = key.associatedTag.map { _ in
-        DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: nil)
+      guard let (matchingKey, definition) = try matchDefinition(key) else {
+        //if no definition found - auto-wire
+        guard let resolved = try _resolveByAutoWiring(key) as? T else {
+          throw DipError.DefinitionNotFound(key: key)
+        }
+        return resolved
       }
-
-      guard let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) else {
-        throw DipError.DefinitionNotFound(key: key)
+      
+      do {
+        return try self._resolveDefinition(definition, forKey: matchingKey, builder: builder)
       }
-      return try self._resolveDefinition(definition, usingKey: key, builder: builder)
+        //if failed to resolve type for matching key - try auto-wiring
+        //(usually happens when inferring optional type)
+      catch let DipError.DefinitionNotFound(errorKey) where errorKey.protocolType == matchingKey.protocolType {
+        guard let resolved = try _resolveByAutoWiring(key) as? T else {
+          throw DipError.DefinitionNotFound(key: key)
+        }
+        return resolved
+      }
     }
   }
   
   /// Actually resolve dependency.
-  private func _resolveDefinition<T>(definition: _Definition, usingKey key: DefinitionKey, builder: _Definition throws -> T) rethrows -> T {
+  private func _resolveDefinition<T>(definition: _Definition, forKey key: DefinitionKey, builder: _Definition throws -> T) rethrows -> T {
     return try resolvedInstances.resolve {
       if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
         return previouslyResolved
       }
       else {
-        let resolvedInstance = try builder(definition)
+        var resolvedInstance = try builder(definition)
+        
+        if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
+          resolvedInstance = unboxed
+        }
         
         //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
         //when it returns instance that we try to resolve here can be already resolved
@@ -334,99 +343,50 @@ extension DependencyContainer {
     }
   }
   
-  ///Pool to hold instances, created during call to `resolve()`.
-  ///Before `resolve()` returns pool is drained.
-  class ResolvedInstances {
-    var resolvedInstances = [DefinitionKey: Any]()
-    var singletons = [DefinitionKey: Any]()
-    var resolvableInstances = [Resolvable]()
-
-    func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey, inScope scope: ComponentScope) {
-      switch scope {
-      case .Singleton, .EagerSingleton: singletons[key] = instance
-      case .ObjectGraph: resolvedInstances[key] = instance
-      case .Prototype: break
-      }
-      
-      if let resolvable = instance as? Resolvable {
-        resolvableInstances.append(resolvable)
-      }
+  /// Searches for definition that matches provided key
+  private func matchDefinition(key: DefinitionKey) throws -> (DefinitionKey, _Definition)? {
+    let nilTagKey = key.associatedTag.map { _ in
+      DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: nil)
     }
     
-    func previouslyResolvedInstance<T>(forKey key: DefinitionKey, inScope scope: ComponentScope) -> T? {
-      switch scope {
-      case .Singleton, .EagerSingleton: return singletons[key] as? T
-      case .ObjectGraph: return resolvedInstances[key] as? T
-      case .Prototype: return nil
-      }
+    if let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) {
+      return (key, definition)
     }
     
-    private var depth: Int = 0
-    
-    func resolve<T>(@noescape block: () throws ->T) rethrows -> T {
-      depth = depth + 1
-      
-      defer {
-        depth = depth - 1
-        if depth == 0 {
-          // We call didResolveDependencies only at this point
-          // because this is a point when dependencies graph is complete.
-          for resolvedInstance in resolvableInstances.reverse() {
-            resolvedInstance.didResolveDependencies()
-          }
-          resolvedInstances.removeAll()
-          resolvableInstances.removeAll()
-        }
-      }
-      
-      let resolved = try block()
-      return resolved
-    }
+    return try typeForwardingDefinition(key)
   }
   
-}
-
-//MARK: - Auto-wiring
-
-extension DependencyContainer {
-  
-  private func _autoWireOrRethrow(key: DefinitionKey, type: Any.Type, error: ErrorType) throws -> Any? {
-    switch error {
-    case let DipError.DefinitionNotFound(errorKey) where key == errorKey:
-      //if no definition found for key that we were trying to resolve - try atuo-wiring
-      return try threadSafe {
-        guard let resolved = try _resolveByAutoWiring(key, type: type) else {
-          throw error
-        }
-        return resolved
-      }
-    default:
-      throw error
-    }
-  }
-
-}
-
-//MARK: - Weakly typed resolve
-
-extension DependencyContainer {
-  
-  public func resolve(type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
-    return try self.resolve(type, tag: tag) { factory in try factory(())}
-  }
-  
-  public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) throws -> Any {
-    let key = DefinitionKey(protocolType: type, argumentsType: U.self, associatedTag: tag?.dependencyTag)
+  /// Searches for definition that forwards requested type
+  private func typeForwardingDefinition(key: DefinitionKey) throws -> (DefinitionKey, _Definition)? {
+    let typeDefinitions = definitions.filter({
+      $0.1.implementingTypes.contains({ $0 == key.protocolType })
+    })
     
-    do {
-      //first we try to find defintion that exactly matches parameters
-      return try _resolveKey(key, builder: { definition throws -> Any in
-        try builder(definition.weakFactory)
-      })
+    var tags = [key.associatedTag]
+    if key.associatedTag != nil {
+      tags.append(nil)
     }
-    catch {
-      return try _autoWireOrRethrow(key, type: type, error: error)
+    
+    for tag in tags {
+      let definitions = typeDefinitions.filter({ $0.0.associatedTag == tag })
+      if definitions.isEmpty {
+        continue
+      }
+      else if definitions.count == 1 {
+        let matchedKey = definitions.first!.0
+        return (
+          //we need to carry on original tag
+          DefinitionKey(protocolType: matchedKey.protocolType, argumentsType: matchedKey.argumentsType, associatedTag: key.associatedTag),
+          definitions.first!.1
+        )
+      }
+      else {
+        //several definitions registered for the same tag forward to the same type
+        throw DipError.AmbiguousDefinitions(type: key.protocolType, definitions: definitions.map({ $0.1 }))
+      }
     }
+    
+    return nil
   }
   
 }
@@ -447,7 +407,7 @@ extension DependencyContainer {
     remove(definitionForKey: key)
   }
   
-  func remove(definitionForKey key: DefinitionKey) {
+  private func remove(definitionForKey key: DefinitionKey) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {
@@ -467,6 +427,56 @@ extension DependencyContainer {
     }
   }
 
+}
+
+///Pool to hold instances, created during call to `resolve()`.
+///Before `resolve()` returns pool is drained.
+private class ResolvedInstances {
+  var resolvedInstances = [DefinitionKey: Any]()
+  var singletons = [DefinitionKey: Any]()
+  var resolvableInstances = [Resolvable]()
+  
+  func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey, inScope scope: ComponentScope) {
+    switch scope {
+    case .Singleton, .EagerSingleton: singletons[key] = instance
+    case .ObjectGraph: resolvedInstances[key] = instance
+    case .Prototype: break
+    }
+    
+    if let resolvable = instance as? Resolvable {
+      resolvableInstances.append(resolvable)
+    }
+  }
+  
+  func previouslyResolvedInstance<T>(forKey key: DefinitionKey, inScope scope: ComponentScope) -> T? {
+    switch scope {
+    case .Singleton, .EagerSingleton: return singletons[key] as? T
+    case .ObjectGraph: return resolvedInstances[key] as? T
+    case .Prototype: return nil
+    }
+  }
+  
+  private var depth: Int = 0
+  
+  func resolve<T>(@noescape block: () throws ->T) rethrows -> T {
+    depth = depth + 1
+    
+    defer {
+      depth = depth - 1
+      if depth == 0 {
+        // We call didResolveDependencies only at this point
+        // because this is a point when dependencies graph is complete.
+        for resolvedInstance in resolvableInstances.reverse() {
+          resolvedInstance.didResolveDependencies()
+        }
+        resolvedInstances.removeAll()
+        resolvableInstances.removeAll()
+      }
+    }
+    
+    let resolved = try block()
+    return resolved
+  }
 }
 
 extension DependencyContainer: CustomStringConvertible {
@@ -603,5 +613,42 @@ public enum DipError: ErrorType, CustomStringConvertible {
       return "Ambiguous definitions for \(type):\n" +
       definitions.map({ "\($0)" }).joinWithSeparator(";\n")
     }
+  }
+}
+
+///Internal protocol used to unwrap optional values.
+protocol BoxType {
+  var unboxed: Any? { get }
+}
+
+extension Optional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .Some(value): return value
+    default: return nil
+    }
+  }
+}
+
+extension ImplicitlyUnwrappedOptional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .Some(value): return value
+    default: return nil
+    }
+  }
+}
+
+//MARK: - Deprecated methods
+
+extension DependencyContainer {
+  @available(*, deprecated=4.3.0, message="Use registerFactory(tag:scope:factory:numberOfArguments:autoWiringFactory:) instead.")
+  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T) -> DefinitionOf<T, U throws -> T> {
+    let definition = DefinitionBuilder<T, U> {
+      $0.scope = scope
+      $0.factory = factory
+      }.build()
+    register(definition, forTag: tag)
+    return definition
   }
 }

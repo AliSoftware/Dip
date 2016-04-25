@@ -26,8 +26,9 @@ import XCTest
 @testable import Dip
 
 private protocol Service: class { }
-private class ServiceImp1: Service { }
-private class ServiceImp2: Service { }
+private protocol AnotherService: class { }
+private class ServiceImp1: NSObject, Service, AnotherService { }
+private class ServiceImp2: NSObject, Service, AnotherService { }
 
 private protocol Server: class {
   weak var client: Client? { get }
@@ -44,6 +45,12 @@ class DipTests: XCTestCase {
   var allTests: [(String, () throws -> Void)] {
     return [
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
+      ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
+      ("testThatItUsesTaggedDefinitionWhenResolvingInstanceByTypeForwarding", testThatItUsesTaggedDefinitionWhenResolvingInstanceByTypeForwarding),
+      ("testThatItResolvesOptionalInstance", testThatItResolvesOptionalInstance),
+      ("testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding", testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding),
+      ("testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding", testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding),
+      ("testThatItThrowsErrorIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItThrowsErrorIfSeveralDefinitionsWithTheSameTagForwardTheSameType),
       ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
       ("testThatItResolvesDifferentInstancesRegisteredForDifferentTags", testThatItResolvesDifferentInstancesRegisteredForDifferentTags),
       ("testThatNewRegistrationOverridesPreviousRegistration", testThatNewRegistrationOverridesPreviousRegistration),
@@ -81,6 +88,182 @@ class DipTests: XCTestCase {
     let anyService = try! container.resolve(Service.self)
     XCTAssertTrue(anyService is ServiceImp1)
   }
+  
+  func testThatItResolvesInstanceByTypeForwarding() {
+    //given
+    container.register { ServiceImp1() as Service }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //when
+    let anotherService = try! container.resolve() as AnotherService
+    let object = try! container.resolve() as NSObject
+
+    //and when
+    let anyOtherService = try! container.resolve(AnotherService.self)
+    let anyObject = try! container.resolve(NSObject.self)
+
+    //then
+    XCTAssertTrue(anotherService is ServiceImp1)
+    XCTAssertTrue(object is ServiceImp1)
+
+    XCTAssertTrue(anyOtherService is ServiceImp1)
+    XCTAssertTrue(anyObject is ServiceImp1)
+  }
+  
+  func testThatItUsesTaggedDefinitionWhenResolvingInstanceByTypeForwarding() {
+    //given
+    container.register() { ServiceImp1() as Service }
+      .implements(AnotherService.self, NSObject.self)
+
+    container.register(tag: "tag") { ServiceImp2() as Service }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //when
+    let anotherService = try! container.resolve(tag: "tag") as AnotherService
+    let object = try! container.resolve(tag: "tag") as NSObject
+    
+    //and when
+    let anyOtherService = try! container.resolve(AnotherService.self, tag: "tag")
+    let anyObject = try! container.resolve(NSObject.self, tag: "tag")
+    
+    //then
+    XCTAssertTrue(anotherService is ServiceImp2)
+    XCTAssertTrue(object is ServiceImp2)
+    
+    XCTAssertTrue(anyOtherService is ServiceImp2)
+    XCTAssertTrue(anyObject is ServiceImp2)
+  }
+  
+  func testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding() {
+    //given
+    container.register { ServiceImp1() as Service }
+      .implements(AnotherService.self, NSObject.self, NSCoder.self)
+    
+    //when
+    let anotherService = try! container.resolve(tag: "tag") as AnotherService
+    let object = try! container.resolve(tag: "tag") as NSObject
+    
+    //and when
+    let anyOtherService = try! container.resolve(AnotherService.self, tag: "tag")
+    let anyObject = try! container.resolve(NSObject.self, tag: "tag")
+    
+    //then
+    XCTAssertTrue(anotherService is ServiceImp1)
+    XCTAssertTrue(object is ServiceImp1)
+    
+    XCTAssertTrue(anyOtherService is ServiceImp1)
+    XCTAssertTrue(anyObject is ServiceImp1)
+  }
+  
+  func testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding() {
+    //given
+    container.register { ServiceImp1() as Service }
+      .implements(NSCoder.self)
+
+    //then
+    AssertThrows(expression: try container.resolve() as NSCoder)
+    
+    //but no throw with weakly typed resolve
+    AssertNoThrow(expression: try container.resolve(NSCoder.self))
+  }
+  
+  func testThatItThrowsErrorIfSeveralDefinitionsWithTheSameTagForwardTheSameType() {
+    //given
+    container.register() { ServiceImp1() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    container.register() { ServiceImp2() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //then
+    AssertThrows(expression: try container.resolve() as AnotherService)
+    container.reset()
+    
+    //given
+    container.register(tag: "tag") { ServiceImp1() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    container.register(tag: "tag") { ServiceImp2() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    //then
+    AssertThrows(expression: try container.resolve(tag: "tag") as AnotherService)
+    AssertThrows(expression: try container.resolve() as AnotherService)
+    container.reset()
+    
+    //given
+    container.register() { ServiceImp1() }
+      .implements(AnotherService.self, NSObject.self)
+    
+    container.register(tag: "tag2") { ServiceImp2() }
+      .implements(AnotherService.self, NSObject.self)
+
+    //then
+    AssertNoThrow(expression: try container.resolve() as AnotherService)
+    AssertNoThrow(expression: try container.resolve(tag: "tag2") as AnotherService)
+  }
+  
+  func testThatItResolvesOptionalInstance() {
+    //given
+    var resolveDependenciesCalled = false
+    container.register { ServiceImp1() as Service }
+      .resolveDependencies { _ in
+        resolveDependenciesCalled = true
+    }
+    
+    //when
+    let serviceInstance = try! container.resolve() as Service?
+    
+    //then
+    XCTAssertTrue(serviceInstance is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+
+    //when
+    resolveDependenciesCalled = false
+    let implServiceInstance = try! container.resolve() as Service!
+    
+    //then
+    XCTAssertTrue(implServiceInstance is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+
+    //when
+    resolveDependenciesCalled = false
+    let anyService = try! container.resolve((Service?).self)
+
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+
+    //when
+    resolveDependenciesCalled = false
+    let implAnyService = try! container.resolve((Service!).self)
+    
+    //then
+    XCTAssertTrue(implAnyService is ServiceImp1)
+    XCTAssertTrue(resolveDependenciesCalled)
+    
+    let anyObject = try! container.resolve((Service?).self)
+    XCTAssertTrue(anyObject is ServiceImp1)
+    
+    var otherService: Service!
+    var impOtherService: Service!
+    var anyOtherService: Any!
+    var anyImpOtherService: Any!
+    
+    container.register(.ObjectGraph) { ServiceImp1() as Service }
+      .resolveDependencies { container, service in
+        otherService = try! container.resolve() as Service
+        impOtherService = try! container.resolve() as Service!
+        anyOtherService = try! container.resolve((Service?).self)
+        anyImpOtherService = try! container.resolve((Service!).self)
+    }
+    
+    let service = try! container.resolve((Service?).self)
+    XCTAssertTrue(otherService as! ServiceImp1 === service as! ServiceImp1)
+    XCTAssertTrue(impOtherService as! ServiceImp1 === service as! ServiceImp1)
+    XCTAssertTrue(anyOtherService as! ServiceImp1 === service as! ServiceImp1)
+    XCTAssertTrue(anyImpOtherService as! ServiceImp1 === service as! ServiceImp1)
+  }
 
   func testThatItResolvesInstanceRegisteredWithTag() {
     //given
@@ -91,6 +274,12 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(serviceInstance is ServiceImp1)
+
+    //and when
+    let anyService = try! container.resolve(Service.self, tag: "service")
+    
+    //then
+    XCTAssertTrue(anyService is ServiceImp1)
   }
   
   func testThatItResolvesDifferentInstancesRegisteredForDifferentTags() {
@@ -105,6 +294,14 @@ class DipTests: XCTestCase {
     //then
     XCTAssertTrue(service1Instance is ServiceImp1)
     XCTAssertTrue(service2Instance is ServiceImp2)
+    
+    //when
+    let anyService1 = try! container.resolve(Service.self, tag: "service1")
+    let anyService2 = try! container.resolve(Service.self, tag: "service2")
+    
+    //then
+    XCTAssertTrue(anyService1 is ServiceImp1)
+    XCTAssertTrue(anyService2 is ServiceImp2)
   }
   
   func testThatNewRegistrationOverridesPreviousRegistration() {
@@ -133,6 +330,13 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
+    resolveDependenciesCalled = false
+    
+    //and when
+    try! container.resolve(Service.self)
+    
+    //then
+    XCTAssertTrue(resolveDependenciesCalled)
   }
   
   func testThatItThrowsErrorIfCanNotFindDefinitionForType() {
@@ -149,6 +353,17 @@ class DipTests: XCTestCase {
 
       return true
     }
+
+    //and when
+    AssertThrows(expression: try container.resolve(Service.self)) { error in
+      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      
+      //then
+      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: nil)
+      XCTAssertEqual(key, expectedKey)
+      
+      return true
+    }
   }
   
   func testThatItThrowsErrorIfCanNotFindDefinitionForTag() {
@@ -157,6 +372,17 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve(tag: "other tag") as Service) { error in
+      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      
+      //then
+      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: "other tag")
+      XCTAssertEqual(key, expectedKey)
+      
+      return true
+    }
+
+    //and when
+    AssertThrows(expression: try container.resolve(Service.self, tag: "other tag")) { error in
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
@@ -181,6 +407,17 @@ class DipTests: XCTestCase {
 
       return true
     }
+
+    //and when
+    AssertThrows(expression: try container.resolve(Service.self, withArguments: "some string")) { error in
+      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      
+      //then
+      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: String.self, associatedTag: nil)
+      XCTAssertEqual(key, expectedKey)
+      
+      return true
+    }
   }
   
   func testThatItThrowsErrorIfConstructorThrows() {
@@ -191,6 +428,14 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
+      switch error {
+      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      default: return false
+      }
+    }
+    
+    //and when
+    AssertThrows(expression: try container.resolve(Service.self)) { error in
       switch error {
       case let DipError.DefinitionNotFound(key) where key == failedKey: return true
       default: return false
@@ -210,6 +455,14 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
+      switch error {
+      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      default: return false
+      }
+    }
+    
+    //and when
+    AssertThrows(expression: try container.resolve(Service.self)) { error in
       switch error {
       case let DipError.DefinitionNotFound(key) where key == failedKey: return true
       default: return false

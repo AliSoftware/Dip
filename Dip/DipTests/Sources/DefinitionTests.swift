@@ -112,5 +112,18 @@ class DefinitionTests: XCTestCase {
     //then
     XCTAssertFalse(blockCalled)
   }
+  
+  func testThatItRegisteresOptionalTypesAsForwardedTypes() {
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+      .implements(NSObject.self)
+    
+    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service?.self }))
+    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service!.self }))
+    
+    XCTAssertTrue(def.implementingTypes.contains({ $0 == NSObject.self }))
+    XCTAssertTrue(def.implementingTypes.contains({ $0 == NSObject?.self }))
+    XCTAssertTrue(def.implementingTypes.contains({ $0 == NSObject!.self }))
+  }
+  
 }
 
