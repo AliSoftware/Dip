@@ -100,6 +100,7 @@ public protocol AutoInjectedPropertyBox: class {
 */
 public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
   
+  ///The type of wrapped property.
   public static var wrappedType: Any.Type {
     return T.self
   }
@@ -129,6 +130,17 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
   public func resolve(container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(container)
     value = resolved
+  }
+  
+  /// Returns a new wrapper with provided value.
+  public func setValue(value: T?) -> Injected {
+    guard (required && value != nil) || !required else {
+      fatalError("Can not set required property to nil.")
+    }
+    
+    let injected = Injected(required: required, tag: tag, didInject: didInject)
+    injected.value = value
+    return injected
   }
   
 }
@@ -169,6 +181,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
   //so we just rely on user reading documentation and passing AnyObject in runtime
   //also we will throw fatal error if type can not be casted to AnyObject during resolution.
 
+  ///The type of wrapped property.
   public static var wrappedType: Any.Type {
     return T.self
   }
@@ -207,6 +220,21 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
     _value = resolved as? AnyObject
   }
   
+  /// Returns a new wrapper with provided value.
+  public func setValue(value: T?) -> InjectedWeak {
+    let _value = value as? AnyObject
+    if value != nil && _value == nil {
+      fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
+    }
+    guard (required && _value != nil) || !required else {
+      fatalError("Can not set required property to nil.")
+    }
+
+    let injected = InjectedWeak(required: required, tag: tag, didInject: didInject)
+    injected._value = _value
+    return injected
+  }
+
 }
 
 private class _InjectedPropertyBox<T> {
