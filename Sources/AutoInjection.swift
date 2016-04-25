@@ -27,15 +27,15 @@ extension DependencyContainer {
   /**
    Resolves properties of passed object wrapped with `Injected<T>` or `InjectedWeak<T>`
    */
-  func autoInjectProperties(instance: Any) throws {
-    try Mirror(reflecting: instance).children.forEach(_resolveChild)
+  func autoInjectProperties(instance: Any, tag: DependencyContainer.Tag?) throws {
+    try Mirror(reflecting: instance).children.forEach({ try _resolveChild($0, tag: tag) })
   }
   
-  private func _resolveChild(child: Mirror.Child) throws {
+  private func _resolveChild(child: Mirror.Child, tag: DependencyContainer.Tag?) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
     do {
-      try injectedPropertyBox.resolve(self)
+      try injectedPropertyBox.resolve(self, tag: tag)
     }
     catch {
       throw DipError.AutoInjectionFailed(label: child.label, type: injectedPropertyBox.dynamicType.wrappedType, underlyingError: error)
@@ -76,9 +76,18 @@ public protocol AutoInjectedPropertyBox: class {
    
    - parameter container: A container to be used to resolve an instance
    
-  - note: This method is not intended to be called manually, `DependencyContainer` will call it by itself.
+   - note: This method is not intended to be called manually, `DependencyContainer` will call it by itself.
    */
+  func resolve(container: DependencyContainer, tag: DependencyContainer.Tag?) throws
+  
+  @available(*, deprecated=4.5.0, message="Use resolve(_:tag:)")
   func resolve(container: DependencyContainer) throws
+}
+
+extension AutoInjectedPropertyBox {
+  func resolve(container: DependencyContainer, tag: DependencyContainer.Tag?) throws {
+    return try resolve(container)
+  }
 }
 
 /**
@@ -131,9 +140,13 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
     self.value = value
     super.init(required: required, tag: tag, didInject: didInject)
   }
-  
+
   public func resolve(container: DependencyContainer) throws {
-    let resolved: T? = try super.resolve(container)
+    return try resolve(container, tag: nil)
+  }
+
+  public func resolve(container: DependencyContainer, tag: DependencyContainer.Tag?) throws {
+    let resolved: T? = try super.resolve(container, tag: tag)
     value = resolved
   }
   
@@ -221,7 +234,11 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
   }
 
   public func resolve(container: DependencyContainer) throws {
-    let resolved: T? = try super.resolve(container)
+    return try resolve(container, tag: nil)
+  }
+
+  public func resolve(container: DependencyContainer, tag: DependencyContainer.Tag?) throws {
+    let resolved: T? = try super.resolve(container, tag: tag)
     if required && !(resolved is AnyObject) {
       fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
     }
@@ -255,13 +272,13 @@ private class _InjectedPropertyBox<T> {
     self.didInject = didInject
   }
 
-  private func resolve(container: DependencyContainer) throws -> T? {
+  private func resolve(container: DependencyContainer, tag: DependencyContainer.Tag?) throws -> T? {
     let resolved: T?
     if required {
-      resolved = try container.resolve(tag: tag) as T
+      resolved = try container.resolve(tag: self.tag ?? tag) as T
     }
     else {
-      resolved = try? container.resolve(tag: tag) as T
+      resolved = try? container.resolve(tag: self.tag ?? tag) as T
     }
     return resolved
   }

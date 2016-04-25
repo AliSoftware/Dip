@@ -327,7 +327,7 @@ extension DependencyContainer {
         resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
         
         try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
-        try autoInjectProperties(resolvedInstance)
+        try autoInjectProperties(resolvedInstance, tag: key.associatedTag)
         
         return resolvedInstance
       }
