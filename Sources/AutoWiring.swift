@@ -75,7 +75,7 @@ extension DependencyContainer {
   }
   
   private func _resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any? {
-    let key = DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: tag)
+    let key = DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: tag ?? context.tag)
     
     return try _resolveKey(key, builder: { definition throws -> Any in
       try definition.autoWiringFactory!(self, tag)

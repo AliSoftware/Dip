@@ -63,6 +63,7 @@ private class ClientImp: Client {
   var _optionalProperty = Injected<AnyObject>(required: false)
   
   var taggedServer = Injected<Server>(tag: "tagged")
+  var nilTaggedServer = Injected<Server>(tag: nil)
 }
 
 private class Obj1 {
@@ -103,7 +104,9 @@ class AutoInjectionTests: XCTestCase {
       ("testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies", testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies),
       ("testThatItCallsDidInjectOnAutoInjectedProperty", testThatItCallsDidInjectOnAutoInjectedProperty),
       ("testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected", testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected),
-      ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties)
+      ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties),
+      ("testThatItPassesTagToAutoInjectedProperty", testThatItPassesTagToAutoInjectedProperty),
+      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag)
     ]
   }
 
@@ -293,6 +296,52 @@ class AutoInjectionTests: XCTestCase {
     
     //server and tagged server should be resolved as different instances
     XCTAssertTrue(server !== taggedServer)
+    XCTAssertNotNil(server)
+    XCTAssertNotNil(taggedServer)
+  }
+  
+  func testThatItPassesTagToAutoInjectedProperty() {
+    //given
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(tag: "tagged", .ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
+    //when
+    let client = try! container.resolve(tag: "tagged") as Client
+    
+    //then
+    let taggedServer = (client as! ClientImp).taggedServer.value!
+    let server = client.server!
+    
+    //server and tagged server should be resolved as the same instance
+    XCTAssertTrue(server === taggedServer)
+  }
+  
+  func testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag() {
+    //given
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(tag: "tagged", .ObjectGraph) { ServerImp() as Server }
+
+    container.register(.ObjectGraph) { ClientImp() as Client }
+      .resolveDependencies { (container, client) -> () in
+        client.anotherServer = try! container.resolve() as Server
+    }
+
+    //when
+    let client = try! container.resolve(tag: "otherTag") as Client
+    
+    //then
+    let taggedServer = (client as! ClientImp).taggedServer.value!
+    let nilTaggedServer = (client as! ClientImp).nilTaggedServer.value!
+    let server = client.server!
+    
+    //server and tagged server should be resolved as different instances
+    XCTAssertTrue(server !== taggedServer)
+    XCTAssertTrue((client.anotherServer as! ServerImp) === nilTaggedServer)
+    
+    XCTAssertNotNil(server)
+    XCTAssertNotNil(taggedServer)
+    XCTAssertNotNil(nilTaggedServer)
   }
   
 }
