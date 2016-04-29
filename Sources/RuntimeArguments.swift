@@ -89,7 +89,7 @@ extension DependencyContainer {
   
   /// - seealso: `register(tag:scope:factory:)`
   public func register<T, A, B, C>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B, C) throws -> T) -> DefinitionOf<T, (A, B, C) throws -> T> {
-    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 3)  { container, tag in try factory(container.resolve(tag: tag), container.resolve(), container.resolve(tag: tag)) }
+    return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 3)  { container, tag in try factory(container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`

@@ -34,11 +34,13 @@ extension DependencyContainer {
   private func _resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
-    do {
-      try injectedPropertyBox.resolve(self)
-    }
-    catch {
-      throw DipError.AutoInjectionFailed(label: child.label, type: injectedPropertyBox.dynamicType.wrappedType, underlyingError: error)
+    try inContext(context.tag, injectedInProperty: child.label, resolvingType: injectedPropertyBox.dynamicType.wrappedType) {
+      do {
+        try injectedPropertyBox.resolve(self)
+      }
+      catch {
+        throw DipError.AutoInjectionFailed(label: child.label, type: injectedPropertyBox.dynamicType.wrappedType, underlyingError: error)
+      }
     }
   }
   
@@ -76,7 +78,7 @@ public protocol AutoInjectedPropertyBox: class {
    
    - parameter container: A container to be used to resolve an instance
    
-  - note: This method is not intended to be called manually, `DependencyContainer` will call it by itself.
+   - note: This method is not intended to be called manually, `DependencyContainer` will call it by itself.
    */
   func resolve(container: DependencyContainer) throws
 }
@@ -123,15 +125,19 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
       - didInject: block that will be called when concrete instance is injected in this property. 
                    Similar to `didSet` property observer. Default value does nothing.
   */
-  public override convenience init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
-    self.init(value: nil, required: required, tag: tag, didInject: didInject)
+  public convenience init(required: Bool = true, didInject: T -> () = { _ in }) {
+    self.init(value: nil, required: required, tag: nil, overrideTag: false, didInject: didInject)
   }
-  
-  private init(value: T?, required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> ()) {
+
+  public convenience init(required: Bool = true, tag: DependencyTagConvertible?, didInject: T -> () = { _ in }) {
+    self.init(value: nil, required: required, tag: tag, overrideTag: true, didInject: didInject)
+  }
+
+  private init(value: T?, required: Bool = true, tag: DependencyTagConvertible?, overrideTag: Bool, didInject: T -> ()) {
     self.value = value
-    super.init(required: required, tag: tag, didInject: didInject)
+    super.init(required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
   }
-  
+
   public func resolve(container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(container)
     value = resolved
@@ -143,7 +149,7 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
       fatalError("Can not set required property to nil.")
     }
     
-    return Injected(value: value, required: required, tag: tag, didInject: didInject)
+    return Injected(value: value, required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
   }
   
 }
@@ -211,13 +217,17 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
       - didInject: block that will be called when concrete instance is injected in this property.
                    Similar to `didSet` property observer. Default value does nothing.
    */
-  public override convenience init(required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> () = { _ in }) {
-    self.init(value: nil, required: required, tag: tag, didInject: didInject)
+  public convenience init(required: Bool = true, didInject: T -> () = { _ in }) {
+    self.init(value: nil, required: required, tag: nil, overrideTag: false, didInject: didInject)
   }
 
-  private init(value: T?, required: Bool = true, tag: DependencyTagConvertible? = nil, didInject: T -> ()) {
+  public convenience init(required: Bool = true, tag: DependencyTagConvertible?, didInject: T -> () = { _ in }) {
+    self.init(value: nil, required: required, tag: tag, overrideTag: true, didInject: didInject)
+  }
+
+  private init(value: T?, required: Bool = true, tag: DependencyTagConvertible?, overrideTag: Bool, didInject: T -> ()) {
     self._value = value as? AnyObject
-    super.init(required: required, tag: tag, didInject: didInject)
+    super.init(required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
   }
 
   public func resolve(container: DependencyContainer) throws {
@@ -238,7 +248,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
       fatalError("Can not set required property to nil.")
     }
 
-    return InjectedWeak(value: value, required: required, tag: tag, didInject: didInject)
+    return InjectedWeak(value: value, required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
   }
 
 }
@@ -248,15 +258,18 @@ private class _InjectedPropertyBox<T> {
   let required: Bool
   let didInject: T -> ()
   let tag: DependencyContainer.Tag?
+  let overrideTag: Bool
 
-  init(required: Bool = true, tag: DependencyTagConvertible?, didInject: T -> () = { _ in }) {
+  init(required: Bool = true, tag: DependencyTagConvertible?, overrideTag: Bool, didInject: T -> () = { _ in }) {
     self.required = required
     self.tag = tag?.dependencyTag
+    self.overrideTag = overrideTag
     self.didInject = didInject
   }
 
   private func resolve(container: DependencyContainer) throws -> T? {
     let resolved: T?
+    let tag = overrideTag ? self.tag : container.context.tag
     if required {
       resolved = try container.resolve(tag: tag) as T
     }
