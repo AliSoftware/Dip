@@ -39,7 +39,7 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
   }
   
   public var description: String {
-    return "type: \(protocolType), arguemnts: \(argumentsType), tag: \(associatedTag.desc)"
+    return "type: \(protocolType), arguments: \(argumentsType), tag: \(associatedTag.desc)"
   }
   
 }

@@ -144,7 +144,9 @@ class AutoWiringTests: XCTestCase {
     //when
     AssertThrows(expression: try container.resolve() as AutoWiredClient) { error -> Bool in
       switch error {
-      case DipError.AmbiguousDefinitions: return true
+      case let DipError.AutoWiringFailed(_, error):
+        if case DipError.AmbiguousDefinitions = error { return true }
+        else { return false }
       default: return false
       }
     }
