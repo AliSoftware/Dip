@@ -39,7 +39,7 @@ private class AutoWiredClientImp: AutoWiredClient {
   var service1: Service!
   var service2: Service!
   
-  init(service1: Service, service2: ServiceImp2) {
+  init(service1: Service?, service2: ServiceImp2) {
     self.service1 = service1
     self.service2 = service2
   }
@@ -61,14 +61,15 @@ class AutoWiringTests: XCTestCase {
       ("testThatItDoesNotTryToUseAutoWiringWhenCallingResolveWithArguments", testThatItDoesNotTryToUseAutoWiringWhenCallingResolveWithArguments),
       ("testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency", testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency),
       ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain),
-      ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTagged", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTagged),
+      ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag),
       ("testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithNoTag", testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithNoTag),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Argument),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Argument),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Argument),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Argument),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Argument)
+      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Argument),
+      ("testThatItCanAutoWireOptional", testThatItCanAutoWireOptional)
     ]
   }
 
@@ -262,7 +263,7 @@ class AutoWiringTests: XCTestCase {
     XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
   }
   
-  func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTagged() {
+  func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag() {
     
     //given
     container.register(.ObjectGraph) { ServiceImp1() as Service }
@@ -407,5 +408,29 @@ class AutoWiringTests: XCTestCase {
     let _ = try! container.resolve(tag: "tag") as ServiceImp3
   }
 
+  func testThatItCanAutoWireOptional() {
+    //given
+    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+    
+    var resolved: AutoWiredClient?
+    //when
+    AssertNoThrow(expression: resolved = try container.resolve() as AutoWiredClient?)
+    XCTAssertNotNil(resolved)
+    
+    //when
+    AssertNoThrow(expression: resolved = try container.resolve() as AutoWiredClient!)
+    XCTAssertNotNil(resolved)
+
+    //when
+    AssertNoThrow(expression: resolved = try container.resolve(tag: "tag") as AutoWiredClient?)
+    XCTAssertNotNil(resolved)
+    
+    //when
+    AssertNoThrow(expression: resolved = try container.resolve(tag: "tag") as AutoWiredClient!)
+    XCTAssertNotNil(resolved)
+  }
+  
 }
 
