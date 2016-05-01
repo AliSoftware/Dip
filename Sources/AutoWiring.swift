@@ -33,7 +33,13 @@ extension DependencyContainer {
     let tag = key.associatedTag
     let type = key.protocolType
     let autoWiringDefinitions = self.autoWiringDefinitionsFor(type, tag: tag)
-    let resolved = try _resolveEnumeratingKeys(autoWiringDefinitions) { try _resolveKey($0, tag: tag, type: type) }
+    let resolved: Any?
+    do {
+      resolved = try _resolveEnumeratingKeys(autoWiringDefinitions) { try _resolveKey($0, tag: tag, type: type) }
+    }
+    catch {
+      throw DipError.AutoWiringFailed(type: type, underlyingError: error)
+    }
     if let resolved = resolved as? T  {
       return resolved
     }

@@ -702,12 +702,22 @@ public enum DipError: ErrorType, CustomStringConvertible {
       - underlyingError: The error that caused auto-injection to fail
   */
   case AutoInjectionFailed(label: String?, type: Any.Type, underlyingError: ErrorType)
-
+  
   /**
-   Thrown by `resolve(tag:)` if found ambigous definitions registered for resolved type
+   Thrown by `resolve(tag:)` if failed to auto-wire a type.
    
    - parameters:
-      - type: The type that failed to be resolved
+      - type: The type that failed to be resolved by auto-wiring
+      - underlyingError: The error that cause auto-wiring to fail
+  */
+  case AutoWiringFailed(type: Any.Type, underlyingError: ErrorType)
+
+  /**
+   Thrown when auto-wiring type if several definitions with the same number of runtime arguments
+   are registered for that type.
+   
+   - parameters:
+      - type: The type that failed to be resolved by auto-wiring
       - definitions: Ambiguous definitions
   */
   case AmbiguousDefinitions(type: Any.Type, definitions: [Definition])
@@ -718,6 +728,8 @@ public enum DipError: ErrorType, CustomStringConvertible {
       return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
       return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
+    case let .AutoWiringFailed(type, error):
+      return "Failed to auto-wire type \"\(type)\". \(error)"
     case let .AmbiguousDefinitions(type, definitions):
       return "Ambiguous definitions for \(type):\n" +
       definitions.map({ "\($0)" }).joinWithSeparator(";\n")
