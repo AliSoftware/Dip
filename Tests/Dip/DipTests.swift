@@ -357,6 +357,7 @@ class DipTests: XCTestCase {
       }
     }
     
+    //given
     container.register { ResolvableService() as Service }
       .resolveDependencies { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
@@ -365,24 +366,33 @@ class DipTests: XCTestCase {
 
     container.register(tag: "graph", .ObjectGraph) { ResolvableService() as Service }
       .resolveDependencies { _, service in
-        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
+        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
     }
 
     container.register(tag: "singleton", .Singleton) { ResolvableService() as Service }
       .resolveDependencies { _, service in
-        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
+        XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
     }
 
+    //when
     let service = try! container.resolve() as Service
+    
+    //then
     XCTAssertTrue((service as! ResolvableService).didResolveDependenciesCalled)
 
+    //and when
     let graphService = try! container.resolve(tag: "graph") as Service
+    
+    //then
     XCTAssertTrue((graphService as! ResolvableService).didResolveDependenciesCalled)
     
+    //and when
     let singletonService = try! container.resolve(tag: "singleton") as Service
     let _ = try! container.resolve(tag: "singleton") as Service
+    
+    //then
     XCTAssertTrue((singletonService as! ResolvableService).didResolveDependenciesCalled)
   }
   
@@ -396,19 +406,22 @@ class DipTests: XCTestCase {
       }
     }
     
+    //given
     var resolveDependenciesCalled = false
     var service2: Service!
     container.register { ResolvableService() as Service }
       .resolveDependencies { _, service in
         if !resolveDependenciesCalled {
           resolveDependenciesCalled = true
-          service2 = try! self.container.resolve() as Service
+          service2 = try self.container.resolve() as Service
         }
         return
     }
 
+    //when
     let service1 = try! container.resolve() as Service
     
+    //then
     XCTAssertTrue(ResolvableService.resolved.first === service2)
     XCTAssertTrue(ResolvableService.resolved.last === service1)
   }
@@ -458,6 +471,7 @@ class DipTests: XCTestCase {
       
     }
 
+    //given
     container.register(.ObjectGraph) { try ResolvableServer(client: self.container.resolve()) as Server }
       .resolveDependencies { (container: DependencyContainer, server: Server) in
         let server = server as! ResolvableServer
@@ -471,11 +485,13 @@ class DipTests: XCTestCase {
         client.secondServer = try container.resolve() as Server
     }
 
+    //when
     let client = (try! container.resolve() as Client) as! ResolvableClient
     let server = client.server as! ResolvableServer
     let secondServer = client.secondServer as! ResolvableServer
     let secondClient = server.secondClient as! ResolvableClient
     
+    //then
     XCTAssertTrue(client === server.client)
     XCTAssertTrue(client === server.secondClient)
     XCTAssertTrue(client === secondServer.client)
@@ -485,6 +501,91 @@ class DipTests: XCTestCase {
     
     XCTAssertTrue(client.didResolveDependenciesCalled)
     XCTAssertTrue(server.didResolveDependenciesCalled)
+  }
+  
+  func testThatItValidatesConfiguration() {
+    //given
+    var createdService1 = false
+    var createdService2 = false
+    var createdService3 = false
+    
+    container.register { ServiceImp1() as Service }
+      .resolveDependencies { _ in
+        createdService1 = true
+    }
+    
+    container.register(tag: "tag") { ServiceImp2() as Service }
+      .resolveDependencies { _ in
+        createdService2 = true
+    }
+    
+    container.register() { (s: Service) in ServiceImp1() }
+      .resolveDependencies { _ in
+        createdService3 = true
+    }
+    
+    //then
+    AssertNoThrow(expression: try container.validate())
+    XCTAssertTrue(createdService1)
+    XCTAssertTrue(createdService2)
+    XCTAssertTrue(createdService3)
+  }
+  
+  func testThatItPicksRuntimeArgumentsWhenValidatingConfiguration() {
+    //given
+    let expectedIntArgument = 1
+    let expectedStringArgument = "a"
+    container.register { (a: Int) -> Service in
+      XCTAssertEqual(a, expectedIntArgument)
+      return ServiceImp1() as Service
+    }
+    
+    container.register { (a: Int, b: String) -> Service in
+      XCTAssertEqual(a, expectedIntArgument)
+      XCTAssertEqual(b, expectedStringArgument)
+      return ServiceImp1() as Service
+    }
+    
+    //then
+    AssertNoThrow(expression:
+      try container.validate(
+        "1",
+        expectedIntArgument,
+        "x",
+        (expectedStringArgument, expectedIntArgument),
+        (expectedIntArgument, expectedStringArgument)
+      )
+    )
+  }
+  
+  func testThatItFailsValidationIfNoMatchingArgumentsFound() {
+    //given
+    container.register { (a: Int) -> Service in ServiceImp1() as Service }
+    
+    //then
+    AssertThrows(expression: try container.validate("1"))
+  }
+  
+  func testThatItFailsValidationOnlyForDipErrors() {
+    //given
+    container.register { () -> Service in
+      throw NSError(domain: "", code: 0, userInfo: nil)
+    }
+    
+    //then
+    AssertNoThrow(expression: try container.validate())
+    
+    //given
+    let key = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: nil)
+    container.register { () -> Service in
+      throw DipError.DefinitionNotFound(key: key)
+    }
+    
+    //then
+    AssertThrows(expression: try container.validate()) { error in
+      if case let DipError.DefinitionNotFound(_key) = error where _key == key { return true }
+      else { return false }
+    }
   }
   
 }

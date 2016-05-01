@@ -538,6 +538,48 @@ extension DependencyContainer {
 
 }
 
+extension DependencyContainer {
+  
+  /**
+   Validates container configuration trying to resolve each registered definition one by one.
+   If definition fails to be resolved without arguments will search provided arguments array
+   for arguments matched by type and try to resolve this definition using these arguments.
+   If there are no matching arguments will rethrow original error.
+   
+   - parameter arguments: set of arguments to use to resolve registered definitions.
+                          Use a tuple for registered factories that accept several runtime arguments.
+  */
+  public func validate(arguments: Any...) throws {
+    validateNextDefinition: for (key, _) in definitions {
+      do {
+        try self.resolve(key.protocolType, tag: key.associatedTag)
+      }
+      catch let error as DipError {
+        for argumentsSet in arguments where argumentsSet.dynamicType == key.argumentsType {
+          do {
+            try inContext(key.associatedTag, resolvingType: key.protocolType) {
+              try _resolveKey(key, builder: { definition throws -> Any in
+                try definition.weakFactory(argumentsSet)
+              })
+            }
+            continue validateNextDefinition
+          }
+          catch let error as DipError {
+            throw error
+          }
+            //ignore other errors
+          catch { print(error) }
+        }
+        
+        //no matched arguments provided - rethrow original error
+        throw error
+      }
+        //ignore other errors
+      catch { print(error) }
+    }
+  }
+}
+
 ///Pool to hold instances, created during call to `resolve()`.
 ///Before `resolve()` returns pool is drained.
 private class ResolvedInstances {
