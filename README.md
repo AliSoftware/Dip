@@ -134,7 +134,7 @@ class ViewController {
 
 ## Installation
 
-Since version 4.3.1 Dip is built with Swift 2.2. The lates version built with Swift 2.1 is 4.3.0.
+Since version 4.3.1 Dip is built with Swift 2.2. The latest version built with Swift 2.1 is 4.3.0.
 
 Dip is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
