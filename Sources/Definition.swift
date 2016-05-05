@@ -86,7 +86,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register(scope: .ObjectGraph) { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service
@@ -116,7 +116,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.Singleton) { ServiceImp() as Service }
+   container.register(scope: .Singleton) { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service
@@ -202,7 +202,7 @@ public final class DefinitionOf<T, F>: Definition {
   }
   
   /// Calls `resolveDependencies` block if it was set.
-  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
+  func resolveDependencies(of resolvedInstance: Any, container: DependencyContainer) throws {
     guard let resolvedInstance = resolvedInstance as? T else { return }
     try self.resolveDependenciesBlock?(container, resolvedInstance)
   }
@@ -221,7 +221,7 @@ protocol _Definition: Definition {
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
   var implementingTypes: [Any.Type] { get }
   
-  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
+  func resolveDependencies(of resolvedInstance: Any, container: DependencyContainer) throws
 }
 
 extension _Definition {

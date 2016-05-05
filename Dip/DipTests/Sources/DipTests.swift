@@ -363,13 +363,13 @@ class DipTests: XCTestCase {
         return
     }
 
-    container.register(tag: "graph", .ObjectGraph) { ResolvableService() as Service }
+    container.register(tag: "graph", scope: .ObjectGraph) { ResolvableService() as Service }
       .resolveDependencies { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
         return
     }
 
-    container.register(tag: "singleton", .Singleton) { ResolvableService() as Service }
+    container.register(tag: "singleton", scope: .Singleton) { ResolvableService() as Service }
       .resolveDependencies { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
         return
@@ -458,13 +458,13 @@ class DipTests: XCTestCase {
       
     }
 
-    container.register(.ObjectGraph) { try ResolvableServer(client: self.container.resolve()) as Server }
+    container.register(scope: .ObjectGraph) { try ResolvableServer(client: self.container.resolve()) as Server }
       .resolveDependencies { (container: DependencyContainer, server: Server) in
         let server = server as! ResolvableServer
         server.secondClient = try container.resolve() as Client
     }
     
-    container.register(.ObjectGraph) { ResolvableClient() as Client }
+    container.register(scope: .ObjectGraph) { ResolvableClient() as Client }
       .resolveDependencies { (container: DependencyContainer, client: Client) in
         let client = client as! ResolvableClient
         client.server = try container.resolve() as Server

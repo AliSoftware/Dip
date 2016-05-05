@@ -213,16 +213,16 @@ extension DependencyContainer {
    ```swift
    container.register { ServiceImp() as Service }
    container.register(tag: "service") { ServiceImp() as Service }
-   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register(scope: .ObjectGraph) { ServiceImp() as Service }
    container.register { ClientImp(service: try! container.resolve() as Service) as Client }
    ```
    */
-  public func register<T>(tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
+  public func register<T>(tag: DependencyTagConvertible? = nil, scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
     let definition = DefinitionBuilder<T, ()> {
       $0.scope = scope
       $0.factory = factory
     }.build()
-    register(definition: definition, forTag: tag)
+    register(definition: definition, tag: tag)
     return definition
   }
   
@@ -259,7 +259,7 @@ extension DependencyContainer {
       $0.numberOfArguments = numberOfArguments
       $0.autoWiringFactory = autoWiringFactory
     }.build()
-    register(definition: definition, forTag: tag)
+    register(definition: definition, tag: tag)
     return definition
   }
 
@@ -272,9 +272,9 @@ extension DependencyContainer {
       - definition: The definition to register in the container.
    
    */
-  public func register<T, U>(definition: DefinitionOf<T, U throws -> T>, forTag tag: DependencyTagConvertible? = nil) {
+  public func register<T, U>(definition: DefinitionOf<T, U throws -> T>, tag: DependencyTagConvertible? = nil) {
     let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
-    register(definition: definition, forKey: key)
+    register(definition: definition, key: key)
 
     if case .EagerSingleton = definition.scope {
       bootstrapQueue.append({ let _ = try self.resolve(tag: tag) as T })
@@ -282,7 +282,7 @@ extension DependencyContainer {
   }
   
   /// Actually register definition
-  func register(definition: _Definition, forKey key: DefinitionKey) {
+  func register(definition: _Definition, key: DefinitionKey) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {
@@ -445,7 +445,7 @@ extension DependencyContainer {
       
       resolvedInstances.storeResolvedInstance(instance: resolvedInstance, forKey: key, inScope: definition.scope)
       
-      try definition.resolveDependenciesOf(resolvedInstance: resolvedInstance, withContainer: self)
+      try definition.resolveDependencies(of: resolvedInstance, container: self)
       try autoInjectProperties(instance: resolvedInstance)
       
       return resolvedInstance
@@ -769,7 +769,7 @@ extension DependencyContainer {
       $0.scope = scope
       $0.factory = factory
       }.build()
-    register(definition: definition, forTag: tag)
+    register(definition: definition, tag: tag)
     return definition
   }
 }

@@ -138,7 +138,7 @@ class ThreadSafetyTests: XCTestCase {
   #endif
   
   func testSingletonThreadSafety() {
-    container.register(.Singleton) { ServerImp() as Server }
+    container.register(scope: .Singleton) { ServerImp() as Server }
     
     for _ in 0..<100 {
       #if os(Linux)
@@ -186,11 +186,11 @@ class ThreadSafetyTests: XCTestCase {
   
   
   func testCircularReferenceThreadSafety() {
-    container.register(.ObjectGraph) {
+    container.register(scope: .ObjectGraph) {
       ClientImp(server: try container.resolve()) as Client
     }
     
-    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(scope: .ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { container, server in
         server.client = resolveClientSync()
     }
