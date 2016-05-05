@@ -67,12 +67,13 @@ import Glibc
 private var lock: pthread_spinlock_t = 0
 
 private let resolveClientSync: () -> Client? = {
-  var clientPointer: UnsafeMutablePointer<Void> = nil
+  var clientPointer: UnsafeMutablePointer<Void>? = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
   clientPointer = dispatch_sync { _ in
     let resolved = try! container.resolve() as Client
-    return UnsafeMutablePointer(Unmanaged.passUnretained(resolved as! ClientImp).toOpaque())
+    let unmanaged = Unmanaged.passUnretained(resolved as! ClientImp)
+    return UnsafeMutablePointer<Void>(OpaquePointer(bitPattern: Unmanaged.passUnretained(resolved as! ClientImp)))
   }
-  return Unmanaged<ClientImp>.fromOpaque(COpaquePointer(clientPointer)).takeUnretainedValue()
+  return Unmanaged<ClientImp>.fromOpaque(OpaquePointer(clientPointer!)).takeUnretainedValue()
 }
   
 #else
@@ -106,7 +107,7 @@ let resolveClientAsync = {
 class ThreadSafetyTests: XCTestCase {
   
   #if os(Linux)
-  public required init(name: String, testClosure: XCTestCase throws -> Void) {
+  required init(name: String, testClosure: XCTestCase throws -> Void) {
     super.init(name: name, testClosure: testClosure)
     pthread_spin_init(&lock, 0)
   }

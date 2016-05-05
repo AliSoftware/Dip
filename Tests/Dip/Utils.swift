@@ -71,10 +71,10 @@ func dispatch_async(_ block: TMain) {
 
 func dispatch_sync(_ block: TMain) -> UnsafeMutablePointer<Void> {
   var pid: pthread_t = 0
-  var result = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
+  var result: UnsafeMutablePointer<Void>? = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
   pthread_create(&pid, nil, block, nil)
   pthread_join(pid, &result)
-  return result
+  return result!
 }
 
 extension pthread_spinlock_t {
