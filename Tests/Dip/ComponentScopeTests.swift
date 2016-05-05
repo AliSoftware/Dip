@@ -48,7 +48,7 @@ class ComponentScopeTests: XCTestCase {
   let container = DependencyContainer()
   
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, ComponentScopeTests -> () throws -> Void)] {
     return [
       ("testThatPrototypeIsDefaultScope", testThatPrototypeIsDefaultScope),
       ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),

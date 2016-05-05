@@ -37,7 +37,7 @@ class DefinitionTests: XCTestCase {
   let tag2 = DependencyContainer.Tag.String("tag2")
   
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, DefinitionTests -> () throws -> Void)] {
     return [
       ("testThatDefinitionKeyIsEqualBy_Type_Factory_Tag", testThatDefinitionKeyIsEqualBy_Type_Factory_Tag),
       ("testThatDefinitionKeysWithDifferentTypesAreNotEqual", testThatDefinitionKeysWithDifferentTypesAreNotEqual),
