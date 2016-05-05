@@ -49,7 +49,7 @@ private class ServerImp: Server, Hashable {
   init() {}
   
   var hashValue: Int {
-    return unsafeAddressOf(self).hashValue
+    return unsafeAddress(of: self).hashValue
   }
 }
 
@@ -147,7 +147,7 @@ class ThreadSafetyTests: XCTestCase {
         return nil
       })
       #else
-      queue.addOperationWithBlock(resolveServerAsync)
+      queue.addOperation(resolveServerAsync)
       #endif
     }
     
@@ -171,7 +171,7 @@ class ThreadSafetyTests: XCTestCase {
         return nil
       })
       #else
-      queue.addOperationWithBlock(resolveServerAsync)
+      queue.addOperation(resolveServerAsync)
       #endif
     }
     
@@ -202,7 +202,7 @@ class ThreadSafetyTests: XCTestCase {
         return nil
       })
       #else
-      queue.addOperationWithBlock(resolveClientAsync)
+      queue.addOperation(resolveClientAsync)
       #endif
     }
     

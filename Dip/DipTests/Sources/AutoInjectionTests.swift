@@ -137,8 +137,8 @@ class AutoInjectionTests: XCTestCase {
     
     let newServer = ServerImp()
     let newClient = ClientImp()
-    client._server = client._server.setValue(newServer)
-    server._client = server._client.setValue(newClient)
+    client._server = client._server.setValue(value: newServer)
+    server._client = server._client.setValue(value: newClient)
     
     XCTAssertTrue(client.server === newServer)
     XCTAssertTrue(server.client === newClient)

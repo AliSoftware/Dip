@@ -249,7 +249,7 @@ class DefinitionBuilder<T, U> {
   var numberOfArguments: Int = 0
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
   
-  init(@noescape configure: (DefinitionBuilder -> ())) {
+  init(configure: @noescape DefinitionBuilder -> ()) {
     configure(self)
   }
   

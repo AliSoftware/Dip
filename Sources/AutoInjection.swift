@@ -34,9 +34,9 @@ extension DependencyContainer {
   private func _resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
-    try inContext(context.tag, injectedInProperty: child.label, resolvingType: injectedPropertyBox.dynamicType.wrappedType) {
+    try inContext(tag: context.tag, injectedInProperty: child.label, resolvingType: injectedPropertyBox.dynamicType.wrappedType) {
       do {
-        try injectedPropertyBox.resolve(self)
+        try injectedPropertyBox.resolve(container: self)
       }
       catch {
         throw DipError.AutoInjectionFailed(label: child.label, type: injectedPropertyBox.dynamicType.wrappedType, underlyingError: error)
@@ -139,7 +139,7 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
   }
 
   public func resolve(container: DependencyContainer) throws {
-    let resolved: T? = try super.resolve(container)
+    let resolved: T? = try super.resolve(container: container)
     value = resolved
   }
   
@@ -231,7 +231,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
   }
 
   public func resolve(container: DependencyContainer) throws {
-    let resolved: T? = try super.resolve(container)
+    let resolved: T? = try super.resolve(container: container)
     if required && !(resolved is AnyObject) {
       fatalError("\(T.self) can not be casted to AnyObject. InjectedWeak wrapper should be used to wrap only classes.")
     }

@@ -99,7 +99,7 @@ class AutoWiringTests: XCTestCase {
     XCTAssertTrue(service2 is ServiceImp2)
     
     //when
-    let anyClient = try! container.resolve(AutoWiredClient.self)
+    let anyClient = try! container.resolve(type: AutoWiredClient.self)
     
     //then
     XCTAssertTrue(anyClient is AutoWiredClientImp)

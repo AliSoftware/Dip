@@ -92,7 +92,7 @@ class DefinitionTests: XCTestCase {
     }
     
     //when
-    try! def.resolveDependenciesOf(ServiceImp(), withContainer: DependencyContainer())
+    try! def.resolveDependenciesOf(resolvedInstance: ServiceImp(), withContainer: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -108,7 +108,7 @@ class DefinitionTests: XCTestCase {
     }
     
     //when
-    try! def.resolveDependenciesOf(String(), withContainer: DependencyContainer())
+    try! def.resolveDependenciesOf(resolvedInstance: String(), withContainer: DependencyContainer())
     
     //then
     XCTAssertFalse(blockCalled)

@@ -109,8 +109,8 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 === service2)
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsNotReusedAcrossContainers() {
@@ -118,7 +118,7 @@ class ComponentScopeTests: XCTestCase {
       //given
       let def = container.register(.Singleton) { ServiceImp1() as Service }
       let secondContainer = DependencyContainer()
-      secondContainer.register(def, forTag: nil)
+      secondContainer.register(definition: def, forTag: nil)
       
       //when
       let service1 = try! container.resolve() as Service
@@ -128,8 +128,8 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 !== service2, "Singleton instances should not be reused across containers")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsRemoved() {
@@ -139,16 +139,16 @@ class ComponentScopeTests: XCTestCase {
       let service1 = try! container.resolve() as Service
       
       //when
-      container.remove(def, forTag: nil)
-      container.register(def, forTag: nil)
+      container.remove(definition: def, forTag: nil)
+      container.register(definition: def, forTag: nil)
       
       //then
       let service2 = try! container.resolve() as Service
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsOverridden() {
@@ -158,15 +158,15 @@ class ComponentScopeTests: XCTestCase {
       let service1 = try! container.resolve() as Service
       
       //when
-      container.register(def, forTag: nil)
+      container.register(definition: def, forTag: nil)
       
       //then
       let service2 = try! container.resolve() as Service
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is overridden")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenContainerIsReset() {
@@ -177,15 +177,15 @@ class ComponentScopeTests: XCTestCase {
       
       //when
       container.reset()
-      container.register(def, forTag: nil)
+      container.register(definition: def, forTag: nil)
       
       //then
       let service2 = try! container.resolve() as Service
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when container is reset")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatItReusesInstanceInObjectGraphScopeDuringResolve() {
@@ -286,8 +286,8 @@ class ComponentScopeTests: XCTestCase {
       .resolveDependencies { container, service in
         otherService = try! container.resolve() as Service?
         impOtherService = try! container.resolve() as Service!
-        anyOtherService = try! container.resolve((Service?).self)
-        anyImpOtherService = try! container.resolve((Service!).self)
+        anyOtherService = try! container.resolve(type: (Service?).self)
+        anyImpOtherService = try! container.resolve(type: (Service!).self)
     }
     
     let service = try! container.resolve() as Service
