@@ -21,7 +21,7 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
     }
     
     func fetchIDs(completion: [Int] -> Void) {
-        ws.request("starships") { response in
+        ws.request(path: "starships") { response in
             do {
                 let dict = try response.json() as NSDictionary
                 guard let results = dict["results"] as? [NSDictionary] else { throw SWAPIError.InvalidJSON }
@@ -39,7 +39,7 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
     }
     
     func fetch(id: Int, completion: Starship? -> Void) {
-        ws.request("starships/\(id)") { response in
+        ws.request(path: "starships/\(id)") { response in
             do {
                 let json = try response.json() as NSDictionary
                 guard

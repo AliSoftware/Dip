@@ -16,11 +16,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     private let container = DependencyContainer()
     
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject : AnyObject]? = [:]) -> Bool {
         // Override point for customization after application launch.
         
         //This is a composition root where container is configured and all dependencies are resolved
-        configureContainer(container)
+        configure(container: container)
         
         let personProvider = try! container.resolve() as PersonProviderAPI
         let starshipProvider = try! container.resolve() as StarshipProviderAPI

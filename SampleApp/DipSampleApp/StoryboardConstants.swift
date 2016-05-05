@@ -21,7 +21,7 @@ extension StoryboardScene where Self.RawValue == String {
     }
 
     func viewController() -> UIViewController {
-        return Self.storyboard().instantiateViewControllerWithIdentifier(self.rawValue)
+        return Self.storyboard().instantiateViewController(withIdentifier: self.rawValue)
     }
     static func viewController(identifier: Self) -> UIViewController {
         return identifier.viewController()

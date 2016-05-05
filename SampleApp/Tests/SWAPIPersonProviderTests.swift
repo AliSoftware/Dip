@@ -40,7 +40,7 @@ class SWAPIPersonProviderTests: XCTestCase {
         wsDependencies.register(scope: .Singleton) { mock as NetworkLayer }
         
         let provider = SWAPIPersonProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(1) { person in
+        provider.fetch(id: 1) { person in
             XCTAssertNotNil(person)
             XCTAssertEqual(person?.name, "John Doe")
             XCTAssertEqual(person?.mass, 72)
@@ -60,7 +60,7 @@ class SWAPIPersonProviderTests: XCTestCase {
         wsDependencies.register(scope: .Singleton) { mock as NetworkLayer }
         
         let provider = SWAPIPersonProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(12) { person in
+        provider.fetch(id: 12) { person in
             XCTAssertNil(person)
         }
     }

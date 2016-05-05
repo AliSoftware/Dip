@@ -14,27 +14,27 @@ struct URLSessionNetworkLayer : NetworkLayer {
     let session: NSURLSession
     let responseQueue: dispatch_queue_t
     
-    init?(baseURL: String, session: NSURLSession = .sharedSession(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
+    init?(baseURL: String, session: NSURLSession = NSURLSession.shared(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
         guard let url = NSURL(string: baseURL) else { return nil }
         self.init(baseURL: url, session: session)
     }
     
-    init(baseURL: NSURL, session: NSURLSession = .sharedSession(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
+    init(baseURL: NSURL, session: NSURLSession = .shared(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
         self.baseURL = baseURL
         self.session = session
         self.responseQueue = responseQueue
     }
     
     func request(path: String, completion: NetworkResponse -> Void) {
-        let url = self.baseURL.URLByAppendingPathComponent(path)
-        let task = session.dataTaskWithURL(url) { data, response, error in
+        let url = self.baseURL.appendingPathComponent(path)
+        let task = session.dataTask(with: url) { data, response, error in
             if let data = data, let response = response as? NSHTTPURLResponse {
                 dispatch_async(self.responseQueue) {
                     completion(NetworkResponse.Success(data, response))
                 }
             }
             else {
-                let err = error ?? NSError(domain: NSURLErrorDomain, code: NSURLError.Unknown.rawValue, userInfo: nil)
+                let err = error ?? NSError(domain: NSURLErrorDomain, code: NSURLError.unknown.rawValue, userInfo: nil)
                 dispatch_async(self.responseQueue) {
                     completion(NetworkResponse.Error(err))
                 }

@@ -24,14 +24,14 @@ extension BaseCell where Self : UITableViewCell {
     
     static func register(tableView: UITableView) {
         if let cellNib = self.nib {
-            tableView.registerNib(cellNib, forCellReuseIdentifier: identifier)
+            tableView.register(cellNib, forCellReuseIdentifier: identifier)
         } else {
-            tableView.registerClass(Self.self as AnyClass, forCellReuseIdentifier: identifier)
+            tableView.register(Self.self as AnyClass, forCellReuseIdentifier: identifier)
         }
     }
     
     static func dequeueFromTableView(tableView: UITableView, forIndexPath indexPath: NSIndexPath) -> Self {
-        return tableView.dequeueReusableCellWithIdentifier(identifier, forIndexPath: indexPath) as! Self
+        return tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! Self
     }
 }
 

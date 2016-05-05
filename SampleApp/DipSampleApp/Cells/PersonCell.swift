@@ -18,20 +18,20 @@ final class PersonCell : UITableViewCell, FillableCell {
     
     let heightFormatter: NSLengthFormatter = {
         let f = NSLengthFormatter()
-        f.forPersonHeightUse = true
+        f.isForPersonHeightUse = true
         return f
         }()
     let massFormatter: NSMassFormatter = {
         let f = NSMassFormatter()
-        f.forPersonMassUse = true
+        f.isForPersonMassUse = true
         return f
     }()
     
-    func fillWithObject(person: Person) {
+    func fillWithObject(object person: Person) {
         nameLabel.text = person.name
         genderImageView.image = person.gender.flatMap { UIImage(named: $0.rawValue) }
-        heightLabel.text = heightFormatter.stringFromValue(Double(person.height), unit: .Centimeter)
-        massLabel.text = massFormatter.stringFromValue(Double(person.mass), unit: .Kilogram)
+        heightLabel.text = heightFormatter.string(fromValue: Double(person.height), unit: .centimeter)
+        massLabel.text = massFormatter.string(fromValue: Double(person.mass), unit: .kilogram)
         hairLabel.text = person.hairColor
         eyesLabel.text = person.eyeColor
     }

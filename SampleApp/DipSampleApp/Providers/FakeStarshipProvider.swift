@@ -18,7 +18,7 @@ struct DummyStarshipProvider : StarshipProviderAPI {
     }
     
     func fetch(id: Int, completion: Starship? -> Void) {
-        completion(dummyStarship(id))
+        completion(dummyStarship(idx: id))
     }
     
     private func dummyStarship(idx: Int) -> Starship {
@@ -67,15 +67,15 @@ class FakeStarshipProvider: StarshipProviderAPI {
     }
     
     func fetchIDs(completion: [Int] -> Void) {
-        hardCodedProvider.fetchIDs(completion)
+        hardCodedProvider.fetchIDs(completion: completion)
     }
     
     func fetch(id: Int, completion: Starship? -> Void) {
         if id == 0 {
-            dummyProvider.fetch(id, completion: completion)
+            dummyProvider.fetch(id: id, completion: completion)
         }
         else {
-            hardCodedProvider.fetch(id, completion: completion)
+            hardCodedProvider.fetch(id: id, completion: completion)
         }
     }
     

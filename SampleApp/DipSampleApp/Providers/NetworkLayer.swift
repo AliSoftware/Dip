@@ -23,7 +23,7 @@ enum NetworkResponse {
     
     func json<T>() throws -> T {
         let (data, _) = try self.unwrap()
-        let obj = try NSJSONSerialization.JSONObjectWithData(data, options: [])
+        let obj = try NSJSONSerialization.jsonObject(with: data, options: [])
         guard let json = obj as? T else {
             throw SWAPIError.InvalidJSON
         }

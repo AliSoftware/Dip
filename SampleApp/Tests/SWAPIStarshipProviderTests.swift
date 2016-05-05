@@ -41,7 +41,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
         wsDependencies.register(scope: .Singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(1) { starship in
+        provider.fetch(id: 1) { starship in
             XCTAssertNotNil(starship)
             XCTAssertEqual(starship?.name, "Falcon")
             XCTAssertEqual(starship?.model, "Fighter")
@@ -60,7 +60,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
         wsDependencies.register(scope: .Singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(12) { starship in
+        provider.fetch(id: 12) { starship in
             XCTAssertNil(starship)
         }
     }

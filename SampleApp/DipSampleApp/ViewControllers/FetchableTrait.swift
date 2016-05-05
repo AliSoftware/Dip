@@ -27,7 +27,7 @@ extension FetchableTrait {
         objects?.removeAll()
         fetchProgress = (0,objectIDs.count)
         for objectID in objectIDs {
-            fetchOne(objectID) { (object: ObjectType?) in
+            fetchOne(id: objectID) { (object: ObjectType?) in
                 // Exit if we failed to retrive an object for this ID, or if the request
                 // should be ignored because a new batch request has been started since
                 guard let object = object where batch == self.batchRequestID else { return }
@@ -46,7 +46,7 @@ extension FetchableTrait {
         fetchProgress = (0, nil)
         fetchIDs() { objectIDs in
             guard batch == self.batchRequestID else { return }
-            self.loadObjects(objectIDs)
+            self.loadObjects(objectIDs: objectIDs)
         }
     }
     
@@ -63,8 +63,8 @@ extension FetchableTrait {
         }
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
         label.text = text
-        label.textColor = .grayColor()
-        label.font = .systemFontOfSize(12)
+        label.textColor = .gray()
+        label.font = UIFont.systemFont(ofSize: 12)
         label.sizeToFit()
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: label)
     }

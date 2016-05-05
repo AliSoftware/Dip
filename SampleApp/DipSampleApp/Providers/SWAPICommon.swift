@@ -9,7 +9,7 @@
 import Foundation
 import Dip
 
-enum SWAPIError: ErrorType {
+enum SWAPIError: ErrorProtocol {
     case InvalidJSON
 }
 
