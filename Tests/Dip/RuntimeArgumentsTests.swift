@@ -52,7 +52,7 @@ class RuntimeArgumentsTests: XCTestCase {
   let container = DependencyContainer()
  
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, RuntimeArgumentsTests -> () throws -> Void)] {
     return [
       ("testThatItResolvesInstanceWithOneArgument", testThatItResolvesInstanceWithOneArgument),
       ("testThatItResolvesInstanceWithTwoArguments", testThatItResolvesInstanceWithTwoArguments),
@@ -68,7 +68,7 @@ class RuntimeArgumentsTests: XCTestCase {
     ]
   }
 
-  func setUp() {
+  override func setUp() {
     container.reset()
   }
   #else
@@ -92,7 +92,7 @@ class RuntimeArgumentsTests: XCTestCase {
     XCTAssertTrue(service is ServiceImp1)
     
     //when
-    let anyService = try! container.resolve(Service.self, withArguments: arg1)
+    let anyService = try! container.resolve(type: Service.self, withArguments: arg1)
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)
@@ -114,7 +114,7 @@ class RuntimeArgumentsTests: XCTestCase {
     XCTAssertTrue(service is ServiceImp1)
 
     //when
-    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2)
+    let anyService = try! container.resolve(type: Service.self, withArguments: arg1, arg2)
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)
@@ -136,7 +136,7 @@ class RuntimeArgumentsTests: XCTestCase {
     XCTAssertTrue(service is ServiceImp1)
     
     //when
-    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3)
+    let anyService = try! container.resolve(type: Service.self, withArguments: arg1, arg2, arg3)
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)
@@ -159,7 +159,7 @@ class RuntimeArgumentsTests: XCTestCase {
     XCTAssertTrue(service is ServiceImp1)
     
     //when
-    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3, arg4)
+    let anyService = try! container.resolve(type: Service.self, withArguments: arg1, arg2, arg3, arg4)
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)
@@ -183,7 +183,7 @@ class RuntimeArgumentsTests: XCTestCase {
     XCTAssertTrue(service is ServiceImp1)
     
     //when
-    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3, arg4, arg5)
+    let anyService = try! container.resolve(type: Service.self, withArguments: arg1, arg2, arg3, arg4, arg5)
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)
@@ -208,7 +208,7 @@ class RuntimeArgumentsTests: XCTestCase {
     XCTAssertTrue(service is ServiceImp1)
     
     //when
-    let anyService = try! container.resolve(Service.self, withArguments: arg1, arg2, arg3, arg4, arg5, arg6)
+    let anyService = try! container.resolve(type: Service.self, withArguments: arg1, arg2, arg3, arg4, arg5, arg6)
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)

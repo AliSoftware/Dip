@@ -41,7 +41,7 @@ class DipTests: XCTestCase {
   let container = DependencyContainer()
 
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, DipTests -> () throws -> Void)] {
     return [
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
       ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
@@ -59,7 +59,7 @@ class DipTests: XCTestCase {
     ]
   }
 
-  func setUp() {
+  override func setUp() {
     container.reset()
   }
   #else
@@ -79,19 +79,19 @@ class DipTests: XCTestCase {
     XCTAssertTrue(serviceInstance is ServiceImp1)
     
     //and when
-    let anyService = try! container.resolve(Service.self)
+    let anyService = try! container.resolve(type: Service.self)
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)
 
     //and when
-    let optService = try! container.resolve((Service?).self)
+    let optService = try! container.resolve(type: (Service?).self)
     
     //then
     XCTAssertTrue(optService is ServiceImp1)
     
     //and when
-    let impService = try! container.resolve((Service!).self)
+    let impService = try! container.resolve(type: (Service!).self)
     
     //then
     XCTAssertTrue(impService is ServiceImp1)
@@ -108,19 +108,19 @@ class DipTests: XCTestCase {
     XCTAssertTrue(serviceInstance is ServiceImp1)
 
     //and when
-    let anyService = try! container.resolve(Service.self, tag: "service")
+    let anyService = try! container.resolve(type: Service.self, tag: "service")
     
     //then
     XCTAssertTrue(anyService is ServiceImp1)
     
     //and when
-    let optService = try! container.resolve((Service?).self, tag: "service")
+    let optService = try! container.resolve(type: (Service?).self, tag: "service")
     
     //then
     XCTAssertTrue(optService is ServiceImp1)
     
     //and when
-    let impService = try! container.resolve((Service!).self, tag: "service")
+    let impService = try! container.resolve(type: (Service!).self, tag: "service")
     
     //then
     XCTAssertTrue(impService is ServiceImp1)
@@ -140,24 +140,24 @@ class DipTests: XCTestCase {
     XCTAssertTrue(service2Instance is ServiceImp2)
     
     //and when
-    let anyService1 = try! container.resolve(Service.self, tag: "service1")
-    let anyService2 = try! container.resolve(Service.self, tag: "service2")
+    let anyService1 = try! container.resolve(type: Service.self, tag: "service1")
+    let anyService2 = try! container.resolve(type: Service.self, tag: "service2")
     
     //then
     XCTAssertTrue(anyService1 is ServiceImp1)
     XCTAssertTrue(anyService2 is ServiceImp2)
 
     //and when
-    let optService1 = try! container.resolve((Service?).self, tag: "service1")
-    let optService2 = try! container.resolve((Service?).self, tag: "service2")
+    let optService1 = try! container.resolve(type: (Service?).self, tag: "service1")
+    let optService2 = try! container.resolve(type: (Service?).self, tag: "service2")
     
     //then
     XCTAssertTrue(optService1 is ServiceImp1)
     XCTAssertTrue(optService2 is ServiceImp2)
   
     //and when
-    let impService1 = try! container.resolve((Service!).self, tag: "service1")
-    let impService2 = try! container.resolve((Service!).self, tag: "service2")
+    let impService1 = try! container.resolve(type: (Service!).self, tag: "service1")
+    let impService2 = try! container.resolve(type: (Service!).self, tag: "service2")
     
     //then
     XCTAssertTrue(impService1 is ServiceImp1)
@@ -193,7 +193,7 @@ class DipTests: XCTestCase {
     resolveDependenciesCalled = false
     
     //and when
-    try! container.resolve(Service.self)
+    try! container.resolve(type: Service.self)
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
@@ -201,7 +201,7 @@ class DipTests: XCTestCase {
     resolveDependenciesCalled = false
     
     //and when
-    try! container.resolve((Service?).self)
+    try! container.resolve(type: (Service?).self)
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
@@ -209,7 +209,7 @@ class DipTests: XCTestCase {
     resolveDependenciesCalled = false
     
     //and when
-    try! container.resolve((Service!).self)
+    try! container.resolve(type: (Service!).self)
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
@@ -231,7 +231,7 @@ class DipTests: XCTestCase {
     }
 
     //and when
-    AssertThrows(expression: try container.resolve(Service.self)) { error in
+    AssertThrows(expression: try container.resolve(type: Service.self)) { error in
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
@@ -258,7 +258,7 @@ class DipTests: XCTestCase {
     }
 
     //and when
-    AssertThrows(expression: try container.resolve(Service.self, tag: "other tag")) { error in
+    AssertThrows(expression: try container.resolve(type: Service.self, tag: "other tag")) { error in
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
@@ -285,7 +285,7 @@ class DipTests: XCTestCase {
     }
 
     //and when
-    AssertThrows(expression: try container.resolve(Service.self, withArguments: "some string")) { error in
+    AssertThrows(expression: try container.resolve(type: Service.self, withArguments: "some string")) { error in
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
@@ -311,7 +311,7 @@ class DipTests: XCTestCase {
     }
     
     //and when
-    AssertThrows(expression: try container.resolve(Service.self)) { error in
+    AssertThrows(expression: try container.resolve(type: Service.self)) { error in
       switch error {
       case let DipError.DefinitionNotFound(key) where key == failedKey: return true
       default: return false
@@ -338,7 +338,7 @@ class DipTests: XCTestCase {
     }
     
     //and when
-    AssertThrows(expression: try container.resolve(Service.self)) { error in
+    AssertThrows(expression: try container.resolve(type: Service.self)) { error in
       switch error {
       case let DipError.DefinitionNotFound(key) where key == failedKey: return true
       default: return false
@@ -363,13 +363,13 @@ class DipTests: XCTestCase {
         return
     }
 
-    container.register(tag: "graph", .ObjectGraph) { ResolvableService() as Service }
+    container.register(tag: "graph", scope: .ObjectGraph) { ResolvableService() as Service }
       .resolveDependencies { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
         return
     }
 
-    container.register(tag: "singleton", .Singleton) { ResolvableService() as Service }
+    container.register(tag: "singleton", scope: .Singleton) { ResolvableService() as Service }
       .resolveDependencies { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled)
         return
@@ -458,13 +458,13 @@ class DipTests: XCTestCase {
       
     }
 
-    container.register(.ObjectGraph) { try ResolvableServer(client: self.container.resolve()) as Server }
+    container.register(scope: .ObjectGraph) { try ResolvableServer(client: self.container.resolve()) as Server }
       .resolveDependencies { (container: DependencyContainer, server: Server) in
         let server = server as! ResolvableServer
         server.secondClient = try container.resolve() as Client
     }
     
-    container.register(.ObjectGraph) { ResolvableClient() as Client }
+    container.register(scope: .ObjectGraph) { ResolvableClient() as Client }
       .resolveDependencies { (container: DependencyContainer, client: Client) in
         let client = client as! ResolvableClient
         client.server = try container.resolve() as Server

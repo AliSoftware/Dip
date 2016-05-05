@@ -104,19 +104,19 @@
 		0919F4CA1C16417000DC3B10 /* Dip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Dip.swift; path = ../../Sources/Dip.swift; sourceTree = "<group>"; };
 		0919F4CB1C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RuntimeArguments.swift; path = ../../Sources/RuntimeArguments.swift; sourceTree = "<group>"; };
-		0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ComponentScopeTests.swift; path = Sources/ComponentScopeTests.swift; sourceTree = "<group>"; };
-		0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DefinitionTests.swift; path = Sources/DefinitionTests.swift; sourceTree = "<group>"; };
-		0919F4D01C16417000DC3B10 /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DipTests.swift; path = Sources/DipTests.swift; sourceTree = "<group>"; };
+		0919F4CE1C16417000DC3B10 /* ComponentScopeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ComponentScopeTests.swift; path = ../../Tests/Dip/ComponentScopeTests.swift; sourceTree = "<group>"; };
+		0919F4CF1C16417000DC3B10 /* DefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DefinitionTests.swift; path = ../../Tests/Dip/DefinitionTests.swift; sourceTree = "<group>"; };
+		0919F4D01C16417000DC3B10 /* DipTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = DipTests.swift; path = ../../Tests/Dip/DipTests.swift; sourceTree = "<group>"; };
 		0919F4D11C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RuntimeArgumentsTests.swift; path = Sources/RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
+		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RuntimeArgumentsTests.swift; path = ../../Tests/Dip/RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
 		0982AF0B1C5183A000B62463 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = ../../Sources/Utils.swift; sourceTree = "<group>"; };
 		09873F551C1E0237000C02F6 /* AutoInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjection.swift; path = ../../Sources/AutoInjection.swift; sourceTree = "<group>"; };
-		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjectionTests.swift; path = Sources/AutoInjectionTests.swift; sourceTree = "<group>"; };
-		09B035FB1C5D2AD6001EA5B7 /* AutoWiringTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoWiringTests.swift; path = Sources/AutoWiringTests.swift; sourceTree = "<group>"; };
+		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjectionTests.swift; path = ../../Tests/Dip/AutoInjectionTests.swift; sourceTree = "<group>"; };
+		09B035FB1C5D2AD6001EA5B7 /* AutoWiringTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoWiringTests.swift; path = ../../Tests/Dip/AutoWiringTests.swift; sourceTree = "<group>"; };
 		09B035FF1C5D2B83001EA5B7 /* AutoWiring.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoWiring.swift; path = ../../Sources/AutoWiring.swift; sourceTree = "<group>"; };
-		09C20EBF1C8B3BC3009A082B /* ThreadSafetyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ThreadSafetyTests.swift; path = Sources/ThreadSafetyTests.swift; sourceTree = "<group>"; };
-		09D598321C6F9EC100F24D49 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = Sources/Utils.swift; sourceTree = "<group>"; };
-		64EC9B501CD0CB4000FF6A4C /* ContextTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContextTests.swift; path = Sources/ContextTests.swift; sourceTree = "<group>"; };
+		09C20EBF1C8B3BC3009A082B /* ThreadSafetyTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ThreadSafetyTests.swift; path = ../../Tests/Dip/ThreadSafetyTests.swift; sourceTree = "<group>"; };
+		09D598321C6F9EC100F24D49 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = ../../Tests/Dip/Utils.swift; sourceTree = "<group>"; };
+		64EC9B501CD0CB4000FF6A4C /* ContextTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ContextTests.swift; path = ../../Tests/Dip/ContextTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */

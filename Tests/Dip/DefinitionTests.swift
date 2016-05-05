@@ -37,7 +37,7 @@ class DefinitionTests: XCTestCase {
   let tag2 = DependencyContainer.Tag.String("tag2")
   
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, DefinitionTests -> () throws -> Void)] {
     return [
       ("testThatDefinitionKeyIsEqualBy_Type_Factory_Tag", testThatDefinitionKeyIsEqualBy_Type_Factory_Tag),
       ("testThatDefinitionKeysWithDifferentTypesAreNotEqual", testThatDefinitionKeysWithDifferentTypesAreNotEqual),
@@ -92,7 +92,7 @@ class DefinitionTests: XCTestCase {
     }
     
     //when
-    try! def.resolveDependenciesOf(ServiceImp(), withContainer: DependencyContainer())
+    try! def.resolveDependencies(of: ServiceImp(), container: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -108,7 +108,7 @@ class DefinitionTests: XCTestCase {
     }
     
     //when
-    try! def.resolveDependenciesOf(String(), withContainer: DependencyContainer())
+    try! def.resolveDependencies(of: String(), container: DependencyContainer())
     
     //then
     XCTAssertFalse(blockCalled)
