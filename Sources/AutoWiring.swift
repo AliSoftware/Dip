@@ -97,9 +97,9 @@ extension DependencyContainer {
   
 }
 
-extension CollectionType {
+extension CollectionType where Self.Index: Comparable {
   subscript(safe index: Index) -> Generator.Element? {
-    guard indices.contains(index) else { return nil }
+    guard indices ~= index else { return nil }
     return self[index]
   }
   subscript(next index: Index) -> Generator.Element? {
