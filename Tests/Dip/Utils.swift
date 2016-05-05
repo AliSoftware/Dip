@@ -25,19 +25,19 @@
 import XCTest
 
 
-func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T) {
-  AssertThrows(file, line: line, expression: expression, "")
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, expression: @autoclosure() throws -> T) {
+  AssertThrows(file: file, line: line, expression: expression, "")
 }
 
-func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, _ message: String) {
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, expression: @autoclosure() throws -> T, _ message: String) {
   AssertThrows(expression: expression, checkError: { _ in true }, message)
 }
 
-func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, checkError: ErrorType -> Bool) {
-  AssertThrows(file, line: line, expression: expression, checkError: checkError, "")
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, expression: @autoclosure() throws -> T, checkError: ErrorProtocol -> Bool) {
+  AssertThrows(file: file, line: line, expression: expression, checkError: checkError, "")
 }
 
-func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, checkError: ErrorType -> Bool, _ message: String) {
+func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, expression: @autoclosure() throws -> T, checkError: ErrorProtocol -> Bool, _ message: String) {
   do {
     try expression()
     XCTFail(message, file: file, line: line)
@@ -47,11 +47,11 @@ func AssertThrows<T>(file: StaticString = #file, line: UInt = #line, @autoclosur
   }
 }
 
-func AssertNoThrow<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T) {
-  AssertNoThrow(file, line: line, expression: expression, "")
+func AssertNoThrow<T>(file: StaticString = #file, line: UInt = #line, expression: @autoclosure() throws -> T) {
+  AssertNoThrow(file: file, line: line, expression: expression, "")
 }
 
-func AssertNoThrow<T>(file: StaticString = #file, line: UInt = #line, @autoclosure expression: () throws -> T, _ message: String) {
+func AssertNoThrow<T>(file: StaticString = #file, line: UInt = #line, expression: @autoclosure() throws -> T, _ message: String) {
   do {
     try expression()
   }
@@ -62,19 +62,19 @@ func AssertNoThrow<T>(file: StaticString = #file, line: UInt = #line, @autoclosu
 
 #if os(Linux)
 import Glibc
-typealias TMain = @convention(c) (UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void>
+typealias TMain = @convention(c) (UnsafeMutablePointer<Void>!) -> UnsafeMutablePointer<Void>!
 
-func dispatch_async(block: TMain) {
+func dispatch_async(_ block: TMain) {
   var pid: pthread_t = 0
   pthread_create(&pid, nil, block, nil)
 }
 
-func dispatch_sync(block: TMain) -> UnsafeMutablePointer<Void> {
+func dispatch_sync(_ block: TMain) -> UnsafeMutablePointer<Void> {
   var pid: pthread_t = 0
-  var result: UnsafeMutablePointer<Void> = nil
+  var result: UnsafeMutablePointer<Void>? = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
   pthread_create(&pid, nil, block, nil)
   pthread_join(pid, &result)
-  return result
+  return result!
 }
 
 extension pthread_spinlock_t {

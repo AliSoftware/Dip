@@ -32,10 +32,10 @@ extension DependencyContainer {
     
     let tag = key.associatedTag
     let type = key.protocolType
-    let autoWiringDefinitions = self.autoWiringDefinitionsFor(type, tag: tag)
+    let autoWiringDefinitions = self.autoWiringDefinitionsFor(type: type, tag: tag)
     let resolved: Any?
     do {
-      resolved = try _resolveEnumeratingKeys(autoWiringDefinitions) { try _resolveKey($0, tag: tag, type: type) }
+      resolved = try _resolveEnumeratingKeys(definitions: autoWiringDefinitions) { try _resolveKey(key: $0, tag: tag, type: type) }
     }
     catch {
       throw DipError.AutoWiringFailed(type: type, underlyingError: error)
@@ -58,7 +58,7 @@ extension DependencyContainer {
     
     //order definitions
     definitions = definitions
-      .sort({ $0.1.numberOfArguments > $1.1.numberOfArguments })
+      .sorted(isOrderedBefore: { $0.1.numberOfArguments > $1.1.numberOfArguments })
 
     definitions =
       //first will try to use tagged definitions
@@ -70,8 +70,8 @@ extension DependencyContainer {
   }
   
   /// Tries definitions one by one until one of them succeeds, otherwise returns nil
-  private func _resolveEnumeratingKeys(definitions: [(DefinitionKey, _Definition)], @noescape block: (DefinitionKey) throws -> Any?) throws -> Any? {
-    for (index, definition) in definitions.enumerate() {
+  private func _resolveEnumeratingKeys(definitions: [(DefinitionKey, _Definition)], block: @noescape(DefinitionKey) throws -> Any?) throws -> Any? {
+    for (index, definition) in definitions.enumerated() {
       //If the next definition matches current definition then they are ambigous
       if case definition? = definitions[next: index] {
           throw DipError.AmbiguousDefinitions(
@@ -90,21 +90,11 @@ extension DependencyContainer {
   private func _resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any {
     let key = DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: tag ?? context.tag)
     
-    return try _resolveKey(key, builder: { definition in
+    return try _resolveKey(key: key, builder: { definition in
       try definition.autoWiringFactory!(self, tag)
     })
   }
   
-}
-
-extension CollectionType {
-  subscript(safe index: Index) -> Generator.Element? {
-    guard indices.contains(index) else { return nil }
-    return self[index]
-  }
-  subscript(next index: Index) -> Generator.Element? {
-    return self[safe: index.advancedBy(1)]
-  }
 }
 
 /// Definitions are matched if they are registered for the same tag and thier factories accept the same number of runtime arguments.

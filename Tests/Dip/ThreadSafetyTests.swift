@@ -49,7 +49,7 @@ private class ServerImp: Server, Hashable {
   init() {}
   
   var hashValue: Int {
-    return unsafeAddressOf(self).hashValue
+    return unsafeAddress(of: self).hashValue
   }
 }
 
@@ -67,12 +67,13 @@ import Glibc
 private var lock: pthread_spinlock_t = 0
 
 private let resolveClientSync: () -> Client? = {
-  var clientPointer: UnsafeMutablePointer<Void> = nil
+  var clientPointer: UnsafeMutablePointer<Void>? = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
   clientPointer = dispatch_sync { _ in
     let resolved = try! container.resolve() as Client
-    return UnsafeMutablePointer(Unmanaged.passUnretained(resolved as! ClientImp).toOpaque())
+    let unmanaged = Unmanaged.passUnretained(resolved as! ClientImp)
+    return UnsafeMutablePointer<Void>(OpaquePointer(bitPattern: Unmanaged.passUnretained(resolved as! ClientImp)))
   }
-  return Unmanaged<ClientImp>.fromOpaque(COpaquePointer(clientPointer)).takeUnretainedValue()
+  return Unmanaged<ClientImp>.fromOpaque(OpaquePointer(clientPointer!)).takeUnretainedValue()
 }
   
 #else
@@ -106,11 +107,12 @@ let resolveClientAsync = {
 class ThreadSafetyTests: XCTestCase {
   
   #if os(Linux)
-  init() {
+  required init(name: String, testClosure: XCTestCase throws -> Void) {
+    super.init(name: name, testClosure: testClosure)
     pthread_spin_init(&lock, 0)
   }
   
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, ThreadSafetyTests -> () throws -> Void)] {
     return [
       ("testSingletonThreadSafety", testSingletonThreadSafety),
       ("testFactoryThreadSafety", testFactoryThreadSafety),
@@ -118,11 +120,11 @@ class ThreadSafetyTests: XCTestCase {
     ]
   }
   
-  func setUp() {
+  override func setUp() {
     container = DependencyContainer()
   }
   
-  func tearDown() {
+  override class func tearDown() {
     resolvedServers.removeAll()
     resolvedClients.removeAll()
   }
@@ -138,7 +140,7 @@ class ThreadSafetyTests: XCTestCase {
   #endif
   
   func testSingletonThreadSafety() {
-    container.register(.Singleton) { ServerImp() as Server }
+    container.register(scope: .Singleton) { ServerImp() as Server }
     
     for _ in 0..<100 {
       #if os(Linux)
@@ -147,7 +149,7 @@ class ThreadSafetyTests: XCTestCase {
         return nil
       })
       #else
-      queue.addOperationWithBlock(resolveServerAsync)
+      queue.addOperation(resolveServerAsync)
       #endif
     }
     
@@ -171,7 +173,7 @@ class ThreadSafetyTests: XCTestCase {
         return nil
       })
       #else
-      queue.addOperationWithBlock(resolveServerAsync)
+      queue.addOperation(resolveServerAsync)
       #endif
     }
     
@@ -186,11 +188,11 @@ class ThreadSafetyTests: XCTestCase {
   
   
   func testCircularReferenceThreadSafety() {
-    container.register(.ObjectGraph) {
+    container.register(scope: .ObjectGraph) {
       ClientImp(server: try container.resolve()) as Client
     }
     
-    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(scope: .ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { container, server in
         server.client = resolveClientSync()
     }
@@ -202,7 +204,7 @@ class ThreadSafetyTests: XCTestCase {
         return nil
       })
       #else
-      queue.addOperationWithBlock(resolveClientAsync)
+      queue.addOperation(resolveClientAsync)
       #endif
     }
     

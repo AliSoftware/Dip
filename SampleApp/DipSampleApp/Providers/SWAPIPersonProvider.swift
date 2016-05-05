@@ -21,7 +21,7 @@ struct SWAPIPersonProvider : PersonProviderAPI {
     }
     
     func fetchIDs(completion: [Int] -> Void) {
-        ws.request("people") { response in
+        ws.request(path: "people") { response in
             do {
                 let dict = try response.json() as NSDictionary
                 guard let results = dict["results"] as? [NSDictionary] else { throw SWAPIError.InvalidJSON }
@@ -39,7 +39,7 @@ struct SWAPIPersonProvider : PersonProviderAPI {
     }
     
     func fetch(id: Int, completion: Person? -> Void) {
-        ws.request("people/\(id)") { response in
+        ws.request(path: "people/\(id)") { response in
             do {
                 let json = try response.json() as NSDictionary
                 guard

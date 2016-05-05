@@ -48,7 +48,7 @@ class ComponentScopeTests: XCTestCase {
   let container = DependencyContainer()
   
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, ComponentScopeTests -> () throws -> Void)] {
     return [
       ("testThatPrototypeIsDefaultScope", testThatPrototypeIsDefaultScope),
       ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),
@@ -65,7 +65,7 @@ class ComponentScopeTests: XCTestCase {
     ]
   }
   
-  func setUp() {
+  override func setUp() {
     container.reset()
   }
   #else
@@ -80,7 +80,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatScopeCanBeChanged() {
-    let def = container.register(.Singleton) { ServiceImp1() as Service }
+    let def = container.register(scope: .Singleton) { ServiceImp1() as Service }
     XCTAssertEqual(def.scope, ComponentScope.Singleton)
   }
   
@@ -99,7 +99,7 @@ class ComponentScopeTests: XCTestCase {
   func testThatItReusesInstanceForSingletonScope() {
     func test(scope: ComponentScope) {
       //given
-      container.register(scope) { ServiceImp1() as Service }
+      container.register(scope: scope) { ServiceImp1() as Service }
       
       //when
       let service1 = try! container.resolve() as Service
@@ -109,16 +109,16 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 === service2)
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsNotReusedAcrossContainers() {
     func test(scope: ComponentScope) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope: .Singleton) { ServiceImp1() as Service }
       let secondContainer = DependencyContainer()
-      secondContainer.register(def, forTag: nil)
+      secondContainer.register(definition: def, tag: nil)
       
       //when
       let service1 = try! container.resolve() as Service
@@ -128,71 +128,71 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 !== service2, "Singleton instances should not be reused across containers")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsRemoved() {
     func test(scope: ComponentScope) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope: .Singleton) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
       
       //when
-      container.remove(def, forTag: nil)
-      container.register(def, forTag: nil)
+      container.remove(definition: def, forTag: nil)
+      container.register(definition: def, tag: nil)
       
       //then
       let service2 = try! container.resolve() as Service
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsOverridden() {
     func test(scope: ComponentScope) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope: .Singleton) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
       
       //when
-      container.register(def, forTag: nil)
+      container.register(definition: def, tag: nil)
       
       //then
       let service2 = try! container.resolve() as Service
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is overridden")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenContainerIsReset() {
     func test(scope: ComponentScope) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope: .Singleton) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
       
       //when
       container.reset()
-      container.register(def, forTag: nil)
+      container.register(definition: def, tag: nil)
       
       //then
       let service2 = try! container.resolve() as Service
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when container is reset")
     }
     
-    test(.Singleton)
-    test(.EagerSingleton)
+    test(scope: .Singleton)
+    test(scope: .EagerSingleton)
   }
   
   func testThatItReusesInstanceInObjectGraphScopeDuringResolve() {
     //given
-    container.register(.ObjectGraph) { Client(server: try self.container.resolve()) as Client }
+    container.register(scope: .ObjectGraph) { Client(server: try self.container.resolve()) as Client }
     
-    container.register(.ObjectGraph) { Server() as Server }
+    container.register(scope: .ObjectGraph) { Server() as Server }
       .resolveDependencies { container, server in
         server.client = try container.resolve() as Client
     }
@@ -207,8 +207,8 @@ class ComponentScopeTests: XCTestCase {
   
   func testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve() {
     //given
-    container.register(.ObjectGraph) { Client(server: try self.container.resolve()) as Client }
-    container.register(.ObjectGraph) { Server() as Server }
+    container.register(scope: .ObjectGraph) { Client(server: try self.container.resolve()) as Client }
+    container.register(scope: .ObjectGraph) { Server() as Server }
       .resolveDependencies { container, server in
         server.client = try container.resolve() as Client
     }
@@ -228,7 +228,7 @@ class ComponentScopeTests: XCTestCase {
   func testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag() {
     //given
     var service2: Service?
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(scope: .ObjectGraph) { ServiceImp1() as Service }
       .resolveDependencies { (c, _) in
         service2 = try c.resolve(tag: "service") as Service
         
@@ -238,7 +238,7 @@ class ComponentScopeTests: XCTestCase {
         //we don't want every next resolve of service reuse it
         XCTAssertTrue(service2 is ServiceImp2)
     }
-    container.register(tag: "service", .ObjectGraph) { ServiceImp2() as Service}
+    container.register(tag: "service", scope: .ObjectGraph) { ServiceImp2() as Service}
     
     //when
     let service1 = try! container.resolve(tag: "tag") as Service
@@ -251,16 +251,16 @@ class ComponentScopeTests: XCTestCase {
     //given
     var eagerSingletonResolved = false
     
-    container.register(tag: "eager", .EagerSingleton) { ServiceImp1() as Service }
+    container.register(tag: "eager", scope: .EagerSingleton) { ServiceImp1() as Service }
       .resolveDependencies { container, service in eagerSingletonResolved = true }
     
-    container.register(tag: "singleton", .Singleton) { ServiceImp1() as Service }
+    container.register(tag: "singleton", scope: .Singleton) { ServiceImp1() as Service }
       .resolveDependencies { container, service in XCTFail() }
 
-    container.register(tag: "prototype", .Prototype) { ServiceImp1() as Service }
+    container.register(tag: "prototype", scope: .Prototype) { ServiceImp1() as Service }
       .resolveDependencies { container, service in XCTFail() }
 
-    container.register(tag: "graph", .ObjectGraph) { ServiceImp1() as Service }
+    container.register(tag: "graph", scope: .ObjectGraph) { ServiceImp1() as Service }
       .resolveDependencies { container, service in XCTFail() }
     
     //when
@@ -282,12 +282,12 @@ class ComponentScopeTests: XCTestCase {
     var anyOtherService: Any!
     var anyImpOtherService: Any!
     
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(scope: .ObjectGraph) { ServiceImp1() as Service }
       .resolveDependencies { container, service in
         otherService = try! container.resolve() as Service?
         impOtherService = try! container.resolve() as Service!
-        anyOtherService = try! container.resolve((Service?).self)
-        anyImpOtherService = try! container.resolve((Service!).self)
+        anyOtherService = try! container.resolve(type: (Service?).self)
+        anyImpOtherService = try! container.resolve(type: (Service!).self)
     }
     
     let service = try! container.resolve() as Service

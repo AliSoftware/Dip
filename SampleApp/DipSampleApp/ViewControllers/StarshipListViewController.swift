@@ -17,19 +17,19 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var personProvider: PersonProviderAPI!
     
     func fetchIDs(completion: [Int] -> Void) {
-        starshipProvider.fetchIDs(completion)
+        starshipProvider.fetchIDs(completion: completion)
     }
-    func fetchOne(shipID:Int, completion: Starship? -> Void) {
-        starshipProvider.fetch(shipID, completion: completion)
+    func fetchOne(id shipID:Int, completion: Starship? -> Void) {
+        starshipProvider.fetch(id: shipID, completion: completion)
     }
     
     var fetchProgress: (current: Int, total: Int?) = (0, nil) {
         didSet {
-            displayProgressInNavBar(self.navigationItem)
+            displayProgressInNavBar(navigationItem: self.navigationItem)
         }
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
         guard
             let id = segue.identifier, segueID = UIStoryboard.Segue.Main(rawValue: id)
             where segueID == .PilotsSegue,
@@ -41,19 +41,19 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
         }
         
         destVC.personProvider = personProvider
-        destVC.loadObjects(starship.pilotIDs)
+        destVC.loadObjects(objectIDs: starship.pilotIDs)
     }
 }
 
 extension StarshipListViewController {
-    override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return objects?.count ?? 0
     }
     
-    override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: NSIndexPath) -> UITableViewCell {
         guard let object = self.objects?[indexPath.row] else { fatalError() }
-        let cell = StarshipCell.dequeueFromTableView(tableView, forIndexPath: indexPath)
-        cell.fillWithObject(object)
+        let cell = StarshipCell.dequeueFromTableView(tableView: tableView, forIndexPath: indexPath)
+        cell.fillWithObject(object: object)
         return cell
     }
 }

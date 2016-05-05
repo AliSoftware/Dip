@@ -16,7 +16,7 @@ struct DummyPilotProvider : PersonProviderAPI {
     }
     
     func fetch(id: Int, completion: Person? -> Void) {
-        completion(dummyPerson(id))
+        completion(dummyPerson(idx: id))
     }
     
     private func dummyPerson(idx: Int) -> Person {
@@ -40,7 +40,7 @@ class PlistPersonProvider : PersonProviderAPI {
     
     init(plist basename: String) {
         guard
-            let path = NSBundle.mainBundle().pathForResource(basename, ofType: "plist"),
+            let path = NSBundle.main().pathForResource(basename, ofType: "plist"),
             let list = NSArray(contentsOfFile: path),
             peopleDict = list as? [[String:AnyObject]]
             else {
@@ -99,15 +99,15 @@ class FakePersonsProvider: PersonProviderAPI {
     }
     
     func fetchIDs(completion: [Int] -> Void) {
-        dummyProvider.fetchIDs(completion)
+        dummyProvider.fetchIDs(completion: completion)
     }
     
     func fetch(id: Int, completion: Person? -> Void) {
         if let plistProvider = plistProvider where id == 0 {
-            plistProvider.fetch(id, completion: completion)
+            plistProvider.fetch(id: id, completion: completion)
         }
         else {
-            dummyProvider.fetch(id, completion: completion)
+            dummyProvider.fetch(id: id, completion: completion)
         }
     }
 

@@ -42,7 +42,7 @@ extension DependencyContainer {
   
   - seealso: `registerFactory(tag:scope:factory:)`
   */
-  public func register<T, A>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A) throws -> T) -> DefinitionOf<T, (A) throws -> T> {
+  public func register<T, A>(tag: DependencyTagConvertible? = nil, scope: ComponentScope = .Prototype, factory: (A) throws -> T) -> DefinitionOf<T, (A) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 1) { container, tag in try factory(container.resolve(tag: tag)) }
   }
   
@@ -70,98 +70,98 @@ extension DependencyContainer {
 
    - seealso: `register(tag:_:factory:)`, `resolve(tag:builder:)`
    */
-  public func resolve<T, A>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A) throws -> T {
+  public func resolve<T, A>(tag: DependencyTagConvertible? = nil, withArguments arg1: A) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1) }
   }
 
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory(arg1) }
+    return try resolve(type: type, tag: tag) { factory in try factory(arg1) }
   }
 
   // MARK: 2 Runtime Arguments
   
   /// - seealso: `register(tag:scope:factory:)`
-  public func register<T, A, B>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B) throws -> T) -> DefinitionOf<T, (A, B) throws -> T> {
+  public func register<T, A, B>(tag: DependencyTagConvertible? = nil, scope: ComponentScope = .Prototype, factory: (A, B) throws -> T) -> DefinitionOf<T, (A, B) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 2) { container, tag in try factory(container.resolve(tag: tag), container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B) throws -> T {
+  public func resolve<T, A, B>(tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2) }
   }
   
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A, B>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2)) }
+    return try resolve(type: type, tag: tag) { factory in try factory((arg1, arg2)) }
   }
 
   // MARK: 3 Runtime Arguments
   
   /// - seealso: `register(tag:scope:factory:)`
-  public func register<T, A, B, C>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B, C) throws -> T) -> DefinitionOf<T, (A, B, C) throws -> T> {
+  public func register<T, A, B, C>(tag: DependencyTagConvertible? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C) throws -> T) -> DefinitionOf<T, (A, B, C) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 3)  { container, tag in try factory(container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C) throws -> T {
+  public func resolve<T, A, B, C>(tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3) }
   }
   
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A, B, C>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3)) }
+    return try resolve(type: type, tag: tag) { factory in try factory((arg1, arg2, arg3)) }
   }
   
   // MARK: 4 Runtime Arguments
   
   /// - seealso: `register(tag:scope:factory:)`
-  public func register<T, A, B, C, D>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B, C, D) throws -> T) -> DefinitionOf<T, (A, B, C, D) throws -> T> {
+  public func register<T, A, B, C, D>(tag: DependencyTagConvertible? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, D) throws -> T) -> DefinitionOf<T, (A, B, C, D) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 4) { container, tag in try factory(container.resolve(tag: tag),  container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C, D>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> T {
+  public func resolve<T, A, B, C, D>(tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4) }
   }
 
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A, B, C, D>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4)) }
+    return try resolve(type: type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4)) }
   }
 
   // MARK: 5 Runtime Arguments
   
   /// - seealso: `register(tag:scope:factory:)`
-  public func register<T, A, B, C, D, E>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B, C, D, E) throws -> T) -> DefinitionOf<T, (A, B, C, D, E) throws -> T> {
+  public func register<T, A, B, C, D, E>(tag: DependencyTagConvertible? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, D, E) throws -> T) -> DefinitionOf<T, (A, B, C, D, E) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 5) { container, tag in try factory(container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C, D, E>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> T {
+  public func resolve<T, A, B, C, D, E>(tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5) }
   }
 
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A, B, C, D, E>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5)) }
+    return try resolve(type: type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5)) }
   }
 
   // MARK: 6 Runtime Arguments
   
   /// - seealso: `register(tag:scope:factory:)`
-  public func register<T, A, B, C, D, E, F>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B, C, D, E, F) throws -> T) -> DefinitionOf<T, (A, B, C, D, E, F) throws -> T> {
+  public func register<T, A, B, C, D, E, F>(tag: DependencyTagConvertible? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, D, E, F) throws -> T) -> DefinitionOf<T, (A, B, C, D, E, F) throws -> T> {
     return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 6) { container, tag in try factory(container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag)) }
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C, D, E, F>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> T {
+  public func resolve<T, A, B, C, D, E, F>(tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5, arg6) }
   }
 
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A, B, C, D, E, F>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5, arg6)) }
+    return try resolve(type: type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5, arg6)) }
   }
 
 }

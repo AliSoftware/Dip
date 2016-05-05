@@ -43,11 +43,11 @@ It's very important that _at least one_ of them uses property injection, because
 Now you can register those classes in container:
 */
 
-container.register(.ObjectGraph) {
+container.register(scope: .ObjectGraph) {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
+container.register(scope: .ObjectGraph) { NetworkClientImp() as NetworkClient }
     .resolveDependencies { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }
@@ -95,7 +95,7 @@ container.register(.Prototype) {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
+container.register(scope: .ObjectGraph) { NetworkClientImp() as NetworkClient }
     .resolveDependencies { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }

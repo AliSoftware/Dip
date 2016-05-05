@@ -18,19 +18,19 @@ struct NetworkMock : NetworkLayer {
     
     init(json: AnyObject) {
         do {
-            fakeData = try NSJSONSerialization.dataWithJSONObject(json, options: [])
+            fakeData = try NSJSONSerialization.data(withJSONObject: json, options: [])
         } catch {
             fakeData = nil
         }
     }
     
     func request(path: String, completion: NetworkResponse -> Void) {
-        let fakeURL = NSURL(string: "stub://")!.URLByAppendingPathComponent(path)
+        let fakeURL = NSURL(string: "stub://")!.appendingPathComponent(path)
         if let data = fakeData {
-            let response = NSHTTPURLResponse(URL: fakeURL, statusCode: 200, HTTPVersion: "1.1", headerFields:nil)!
+            let response = NSHTTPURLResponse(url: fakeURL, statusCode: 200, httpVersion: "1.1", headerFields:nil)!
             completion(.Success(data, response))
         } else {
-            let response = NSHTTPURLResponse(URL: fakeURL, statusCode: 204, HTTPVersion: "1.1", headerFields:nil)!
+            let response = NSHTTPURLResponse(url: fakeURL, statusCode: 204, httpVersion: "1.1", headerFields:nil)!
             completion(.Success(NSData(), response))
         }
     }

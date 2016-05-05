@@ -127,11 +127,11 @@ class ServerClientImp: ServerClient {
 The standard way to register such components in `DependencyContainer` will lead to such code:
 */
 
-container.register(.ObjectGraph) {
+container.register(scope: .ObjectGraph) {
     ServerClientImp(server: try container.resolve()) as ServerClient
 }
 
-container.register(.ObjectGraph) { ServerImp() as Server }
+container.register(scope: .ObjectGraph) { ServerImp() as Server }
     .resolveDependencies { (container: DependencyContainer, server: Server) in
         (server as! ServerImp).client = try container.resolve() as ServerClient
 }
@@ -153,8 +153,8 @@ class InjectedClientImp: ServerClient {
     var server: Server? { get { return injectedServer.value } }
 }
 
-container.register(.ObjectGraph) { InjectedServerImp() as Server }
-container.register(.ObjectGraph) { InjectedClientImp() as ServerClient }
+container.register(scope: .ObjectGraph) { InjectedServerImp() as Server }
+container.register(scope: .ObjectGraph) { InjectedClientImp() as ServerClient }
 
 let injectedClient = try! container.resolve() as ServerClient
 injectedClient.server
