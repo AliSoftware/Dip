@@ -51,7 +51,7 @@ class AutoWiringTests: XCTestCase {
   let container = DependencyContainer()
 
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, AutoWiringTests -> () throws -> Void)] {
     return [
       ("testThatItCanResolveWithAutoWiring", testThatItCanResolveWithAutoWiring),
       ("testThatItUsesAutoWireFactoryWithMostNumberOfArguments", testThatItUsesAutoWireFactoryWithMostNumberOfArguments),
@@ -64,11 +64,11 @@ class AutoWiringTests: XCTestCase {
       ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag),
       ("testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithNoTag", testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithNoTag),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Argument),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Argument),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Argument),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Argument),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Argument),
+      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Arguments),
+      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Arguments),
+      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Arguments),
+      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Arguments),
+      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Arguments),
       ("testThatItCanAutoWireOptional", testThatItCanAutoWireOptional)
     ]
   }

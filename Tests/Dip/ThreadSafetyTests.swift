@@ -106,11 +106,11 @@ let resolveClientAsync = {
 class ThreadSafetyTests: XCTestCase {
   
   #if os(Linux)
-  init() {
+  required init(name: String, testClosure: XCTestCase throws -> Void) {
     pthread_spin_init(&lock, 0)
   }
   
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, ThreadSafetyTests -> () throws -> Void)] {
     return [
       ("testSingletonThreadSafety", testSingletonThreadSafety),
       ("testFactoryThreadSafety", testFactoryThreadSafety),

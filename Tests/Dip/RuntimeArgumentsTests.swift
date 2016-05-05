@@ -52,7 +52,7 @@ class RuntimeArgumentsTests: XCTestCase {
   let container = DependencyContainer()
  
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, RuntimeArgumentsTests -> () throws -> Void)] {
     return [
       ("testThatItResolvesInstanceWithOneArgument", testThatItResolvesInstanceWithOneArgument),
       ("testThatItResolvesInstanceWithTwoArguments", testThatItResolvesInstanceWithTwoArguments),
