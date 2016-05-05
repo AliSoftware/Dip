@@ -110,7 +110,7 @@ class ThreadSafetyTests: XCTestCase {
     pthread_spin_init(&lock, 0)
   }
   
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, ThreadSafetyTests -> () throws -> Void)] {
     return [
       ("testSingletonThreadSafety", testSingletonThreadSafety),
       ("testFactoryThreadSafety", testFactoryThreadSafety),
@@ -118,11 +118,11 @@ class ThreadSafetyTests: XCTestCase {
     ]
   }
   
-  func setUp() {
+  override class func setUp() {
     container = DependencyContainer()
   }
   
-  func tearDown() {
+  override class func tearDown() {
     resolvedServers.removeAll()
     resolvedClients.removeAll()
   }

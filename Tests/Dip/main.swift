@@ -1,12 +1,12 @@
 import XCTest
 
 XCTMain([
-  DipTests(), 
-  DefinitionTests(), 
-  RuntimeArgumentsTests(), 
-  ComponentScopeTests(),
-  AutoInjectionTests(),
-  ThreadSafetyTests(),
-  AutoWiringTests(),
-  ContextTests()
+  testCase(DipTests.allTests),
+  testCase(DefinitionTests.allTests),
+  testCase(RuntimeArgumentsTests.allTests),
+  testCase(ComponentScopeTests.allTests),
+  testCase(AutoInjectionTests.allTests),
+  testCase(ThreadSafetyTests.allTests),
+  testCase(AutoWiringTests.allTests),
+  testCase(ContextTests.allTests)
 ])

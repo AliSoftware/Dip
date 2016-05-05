@@ -40,7 +40,7 @@ class ContextTests: XCTestCase {
   let container = DependencyContainer()
   
   #if os(Linux)
-  var allTests: [(String, () throws -> Void)] {
+  static var allTests: [(String, ContextTests -> () throws -> Void)] {
     return [
       ("testThatContextStoresCurrentlyResolvedType", testThatContextStoresCurrentlyResolvedType),
       ("testThatContextStoresInjectedInType", testThatContextStoresInjectedInType),
@@ -52,7 +52,7 @@ class ContextTests: XCTestCase {
     ]
   }
   
-  func setUp() {
+  override class func setUp() {
     container.reset()
     container.register { ServiceImp2() }
   }
