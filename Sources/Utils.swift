@@ -41,6 +41,17 @@ extension Optional {
   }
 }
 
+extension Collection where Self.Index: Comparable {
+  subscript(safe index: Index) -> Generator.Element? {
+    guard index >= startIndex && index < endIndex else { return nil }
+    return self[index]
+  }
+
+  subscript(next index: Index) -> Generator.Element? {
+    return self[safe: self.index(after: index)]
+  }
+}
+
 #if os(Linux)
   import Glibc
   class RecursiveLock {

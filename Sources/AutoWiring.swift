@@ -97,18 +97,6 @@ extension DependencyContainer {
   
 }
 
-extension Collection where Self.Index: Comparable {
-  subscript(safe index: Index) -> Generator.Element? {
-    guard index >= startIndex && index < endIndex else { return nil }
-    return self[index]
-  }
-}
-extension Collection where Self.Indices.Index == Index {
-  subscript(next index: Self.Indices.Index) -> Generator.Element? {
-    return self[safe: indices.index(after: index)]
-  }
-}
-
 /// Definitions are matched if they are registered for the same tag and thier factories accept the same number of runtime arguments.
 private func ~=(lhs: (DefinitionKey, _Definition), rhs: (DefinitionKey, _Definition)) -> Bool {
   return
