@@ -290,6 +290,42 @@ extension DependencyContainer {
       resolvedInstances.singletons[key] = nil
     }
   }
+  
+  public func register<T, U, F>(definition: DefinitionOf<T, U throws -> T>, forType: F.Type, tag: DependencyTagConvertible? = nil) {
+    let forwardDefinition = DefinitionBuilder<F, U> {
+      $0.scope = definition.scope
+
+      let factory = definition.factory
+      $0.factory = { [unowned self] in
+        guard let resolved = try factory($0) as? F else {
+          let key = DefinitionKey(protocolType: self.context.resolvingType, argumentsType: U.self, associatedTag: self.context.tag)
+          throw DipError.DefinitionNotFound(key: key)
+        }
+        return resolved
+      }
+      $0.numberOfArguments = definition.numberOfArguments
+      
+      if let autoWiringFactory = definition.autoWiringFactory {
+        $0.autoWiringFactory = { [unowned self] in
+          guard let resolved = try autoWiringFactory($0, $1) as? F else {
+            let key = DefinitionKey(protocolType: self.context.resolvingType, argumentsType: U.self, associatedTag: self.context.tag)
+            throw DipError.DefinitionNotFound(key: key)
+          }
+          return resolved
+        }
+      }
+    }.build()
+    
+    if let resolveDependencies = definition.resolveDependenciesBlock {
+      forwardDefinition.resolveDependencies { (container, resolved) in
+        try resolveDependencies(container, resolved)
+      }
+    }
+    
+    register(forwardDefinition, forTag: tag)
+    definition.implementingTypes = definition.implementingTypes + [F.self]
+    forwardDefinition.implementingTypes = forwardDefinition.implementingTypes + [T.self]
+  }
 
 }
 
@@ -414,42 +450,46 @@ extension DependencyContainer {
   
   /// Actually resolve dependency.
   private func _resolveDefinition<T>(definition: _Definition, forKey key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
-    if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
-      return previouslyResolved
-    }
-    else {
-      var resolvedInstance = try builder(definition)
-      
-      /*
-       Strongly-typed `resolve(tag:builder:)` calls weakly-typed `resolve(_:tag:builder:)`,
-       so `T` will be `Any` at runtime, erasing type information when this method returns.
-       When we try to cast result of `Any` to generic type T Swift fails to cast it.
-       The same happens in the following code snippet:
-       
-       let optService: Service? = ServiceImp()
-       let anyService: Any = optService
-       let service: Service = anyService as! Service
-       
-       As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
-       */
-      if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
-        resolvedInstance = unboxed
-      }
-      
-      //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
-      //when it returns instance that we try to resolve here can be already resolved
-      //so we return it, throwing away instance created by previous call to builder
+    
+    //first search for already resolved instance for this type or any of forwarding types
+    let keys = [key] + definition.implementingTypes.map({ DefinitionKey(protocolType: $0, argumentsType: key.argumentsType, associatedTag: key.associatedTag) })
+    for key in keys {
       if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
         return previouslyResolved
       }
-      
-      resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
-      
-      try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
-      try autoInjectProperties(resolvedInstance)
-      
-      return resolvedInstance
     }
+    
+    var resolvedInstance = try builder(definition)
+    
+    /*
+     Strongly-typed `resolve(tag:builder:)` calls weakly-typed `resolve(_:tag:builder:)`,
+     so `T` will be `Any` at runtime, erasing type information when this method returns.
+     When we try to cast result of `Any` to generic type T Swift fails to cast it.
+     The same happens in the following code snippet:
+     
+     let optService: Service? = ServiceImp()
+     let anyService: Any = optService
+     let service: Service = anyService as! Service
+     
+     As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
+     */
+    if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
+      resolvedInstance = unboxed
+    }
+    
+    //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
+    //when it returns instance that we try to resolve here can be already resolved
+    //so we return it, throwing away instance created by previous call to builder
+    if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
+      return previouslyResolved
+    }
+    
+    resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
+    
+    try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
+    try autoInjectProperties(resolvedInstance)
+    
+    return resolvedInstance
   }
   
   /// Searches for definition that matches provided key
@@ -458,11 +498,16 @@ extension DependencyContainer {
       DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: nil)
     }
     
-    if let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) {
-      return (key, definition)
+    let typeDefinitions = definitions.filter({ $0.0.protocolType ==  key.protocolType })
+    if typeDefinitions.isEmpty {
+      return try typeForwardingDefinition(key)
     }
-    
-    return try typeForwardingDefinition(key)
+    else {
+      if let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) {
+        return (key, definition)
+      }
+      return nil
+    }
   }
   
   /// Searches for definition that forwards requested type
@@ -482,12 +527,10 @@ extension DependencyContainer {
         continue
       }
       else if definitions.count == 1 {
-        let matchedKey = definitions.first!.0
-        return (
-          //we need to carry on original tag
-          DefinitionKey(protocolType: matchedKey.protocolType, argumentsType: matchedKey.argumentsType, associatedTag: key.associatedTag),
-          definitions.first!.1
-        )
+        //we need to carry on original tag
+        var match: (key: DefinitionKey, definition: _Definition) = definitions.first!
+        match.key = DefinitionKey(protocolType: match.key.protocolType, argumentsType: match.key.argumentsType, associatedTag: key.associatedTag)
+        return match
       }
       else {
         //several definitions registered for the same tag forward to the same type

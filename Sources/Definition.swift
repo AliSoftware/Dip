@@ -154,7 +154,7 @@ public final class DefinitionOf<T, F>: Definition {
   let scope: ComponentScope
   
   private(set) var weakFactory: (Any throws -> Any)!
-  private var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
+  private(set) var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
   
   //Auto-wiring helpers
   
@@ -196,17 +196,14 @@ public final class DefinitionOf<T, F>: Definition {
     self.resolveDependenciesBlock = { try block($0, $1 as! T) }
     return self
   }
-
-  var implementingTypes: [Any.Type] {
-    return [(T?).self, (T!).self]
-  }
+  
+  var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
   
   /// Calls `resolveDependencies` block if it was set.
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
     guard let resolvedInstance = resolvedInstance as? T else { return }
     try self.resolveDependenciesBlock?(container, resolvedInstance)
   }
-  
 }
 
 ///Dummy protocol to store definitions for different types in collection
@@ -219,7 +216,7 @@ protocol _Definition: Definition {
 
   var numberOfArguments: Int { get }
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
-  var implementingTypes: [Any.Type] { get }
+  var implementingTypes: [Any.Type] { get set }
   
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
@@ -230,8 +227,7 @@ extension _Definition {
   }
 }
 
-extension DefinitionOf: _Definition {
-}
+extension DefinitionOf: _Definition { }
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {
