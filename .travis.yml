@@ -31,7 +31,7 @@ matrix:
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - export SWIFT_RELEASE_VERSION=2.2.1
-	- export SWIFT_RELEASE_NAME="${SWIFT_RELEASE_VERSION}-RELEASE"
+        - export SWIFT_RELEASE_NAME="${SWIFT_RELEASE_VERSION}-RELEASE"
         - wget https://swift.org/builds/swift-$SWIFT_RELEASE_VERSION-release/ubuntu1404/swift-$SWIFT_RELEASE_VERSION_NAME/swift-$SWIFT_RELEASE_VERSION_NAME-ubuntu14.04.tar.gz 
         - tar xzf swift-$SWIFT_RELEASE_VERSION_NAME-ubuntu14.04.tar.gz
         - git clone --depth 1 https://github.com/apple/swift-package-manager -b $SWIFT_VERSION
