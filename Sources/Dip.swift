@@ -155,7 +155,7 @@ extension DependencyContainer {
   /// Pushes new context created with provided values and calls block. When block returns previous context is restored.
   /// For `nil` values (except tag) new context will use values from the current context.
   /// Will releas resolved instances and call `Resolvable` callbacks when popped to initial context.
-  func inContext<T>(tag: Tag?, injectedInProperty: String? = nil, resolvingType: Any.Type? = nil, @noescape block: () throws -> T) throws -> T {
+  func inContext<T>(tag: Tag?, resolvingType: Any.Type? = nil, injectedInProperty: String? = nil, @noescape block: () throws -> T) throws -> T {
     return try threadSafe {
       let currentContext = self.context
       
@@ -214,7 +214,7 @@ extension DependencyContainer {
    container.register { ServiceImp() as Service }
    container.register(tag: "service") { ServiceImp() as Service }
    container.register(.ObjectGraph) { ServiceImp() as Service }
-   container.register { ClientImp(service: try! container.resolve() as Service) as Client }
+   container.register { try ClientImp(service: container.resolve() as Service) as Client }
    ```
    */
   public func register<T>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
@@ -245,7 +245,7 @@ extension DependencyContainer {
    ```swift
    public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
      return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: ...) { container, tag in
-        try factory(try container.resolve(tag: tag), ...)
+        try factory(container.resolve(tag: tag), ...)
       }
    }
    ```

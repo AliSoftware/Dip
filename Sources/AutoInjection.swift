@@ -34,7 +34,11 @@ extension DependencyContainer {
   private func _resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
-    try inContext(context.tag, injectedInProperty: child.label, resolvingType: injectedPropertyBox.dynamicType.wrappedType) {
+    try inContext(
+      context.tag,
+      resolvingType: injectedPropertyBox.dynamicType.wrappedType,
+      injectedInProperty: child.label)
+    {
       do {
         try injectedPropertyBox.resolve(self)
       }

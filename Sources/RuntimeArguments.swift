@@ -125,7 +125,7 @@ extension DependencyContainer {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4) }
   }
 
-  ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
+  /// - seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A, B, C, D>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4)) }
   }
@@ -159,7 +159,7 @@ extension DependencyContainer {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5, arg6) }
   }
 
-  ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
+  /// - seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
   public func resolve<A, B, C, D, E, F>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5, arg6)) }
   }

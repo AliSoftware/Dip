@@ -240,6 +240,7 @@ extension DefinitionOf: CustomStringConvertible {
 }
 
 /// Internal class used to build definition
+/// Need this builder as alternative to changing to DefinitionOf<T, U> where U - type of arguments
 class DefinitionBuilder<T, U> {
   typealias F = U throws -> T
   

@@ -60,7 +60,7 @@ import Dip
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // Create the container
-    private let container = DependencyContainer() { container in
+    private let container = DependencyContainer { container in
     
         // Register some factory. ServiceImp here implements protocol Service
         container.register { ServiceImp() as Service }
@@ -94,16 +94,16 @@ import DipUI
 extension DependencyContainer {
 
 	static func configure() -> DependencyContainer {
-		return DependencyContainer() { container in 
+		return DependencyContainer { container in 
 			container.register(tag: "ViewController") { ViewController() }
-			  .resolveDependencies() { container, controller in
+			  .resolveDependencies { container, controller in
 				  controller.animationsFactory = try container.resolve() as AnimatonsFactory
 			}
     
-			container.register() { AuthFormBehaviourImp(apiClient: $0) as AuthFormBehaviour }
-			container.register() { [unowned container] container as AnimationsFactory }
-			container.register() { view in ShakeAnimationImp(view: view) as ShakeAnimation }
-			container.register() { APIClient(baseURL: NSURL(string: "http://localhost:2368")!) as ApiClient }
+			container.register { AuthFormBehaviourImp(apiClient: $0) as AuthFormBehaviour }
+			container.register { container as AnimationsFactory }
+			container.register { view in ShakeAnimationImp(view: view) as ShakeAnimation }
+			container.register { APIClient(baseURL: NSURL(string: "http://localhost:2368")!) as ApiClient }
 		}
 	}
 
