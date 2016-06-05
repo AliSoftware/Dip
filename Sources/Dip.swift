@@ -291,42 +291,6 @@ extension DependencyContainer {
     }
   }
   
-  public func register<T, U, F>(definition: DefinitionOf<T, U throws -> T>, forType: F.Type, tag: DependencyTagConvertible? = nil) {
-    let forwardDefinition = DefinitionBuilder<F, U> {
-      $0.scope = definition.scope
-
-      let factory = definition.factory
-      $0.factory = { [unowned self] in
-        guard let resolved = try factory($0) as? F else {
-          let key = DefinitionKey(protocolType: self.context.resolvingType, argumentsType: U.self, associatedTag: self.context.tag)
-          throw DipError.DefinitionNotFound(key: key)
-        }
-        return resolved
-      }
-      $0.numberOfArguments = definition.numberOfArguments
-      
-      if let autoWiringFactory = definition.autoWiringFactory {
-        $0.autoWiringFactory = { [unowned self] in
-          guard let resolved = try autoWiringFactory($0, $1) as? F else {
-            let key = DefinitionKey(protocolType: self.context.resolvingType, argumentsType: U.self, associatedTag: self.context.tag)
-            throw DipError.DefinitionNotFound(key: key)
-          }
-          return resolved
-        }
-      }
-    }.build()
-    
-    if let resolveDependencies = definition.resolveDependenciesBlock {
-      forwardDefinition.resolveDependencies { (container, resolved) in
-        try resolveDependencies(container, resolved)
-      }
-    }
-    
-    register(forwardDefinition, forTag: tag)
-    definition.implementingTypes = definition.implementingTypes + [F.self]
-    forwardDefinition.implementingTypes = forwardDefinition.implementingTypes + [T.self]
-  }
-
 }
 
 // MARK: - Resolve dependencies
@@ -433,18 +397,18 @@ extension DependencyContainer {
   
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
   func _resolveKey<T>(key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
-    guard let (matchingKey, definition) = try matchDefinition(key) else {
+    guard let matching = definition(matching: key) else {
       //if no definition found - auto-wire
-      return try _resolveByAutoWiring(key)
+      return try _autowire(key)
     }
     
     do {
-      return try self._resolveDefinition(definition, forKey: matchingKey, builder: builder)
+      return try _resolveDefinition(matching.definition, forKey: matching.key, builder: builder)
     }
       //if failed to resolve type for matching key - try auto-wiring
       //(usually happens when inferring optional type)
-    catch let DipError.DefinitionNotFound(errorKey) where errorKey.protocolType == matchingKey.protocolType {
-      return try _resolveByAutoWiring(key)
+    catch let DipError.DefinitionNotFound(errorKey) where errorKey.protocolType == matching.key.protocolType {
+      return try _autowire(key)
     }
   }
   
@@ -452,11 +416,8 @@ extension DependencyContainer {
   private func _resolveDefinition<T>(definition: _Definition, forKey key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
     
     //first search for already resolved instance for this type or any of forwarding types
-    let keys = [key] + definition.implementingTypes.map({ DefinitionKey(protocolType: $0, argumentsType: key.argumentsType, associatedTag: key.associatedTag) })
-    for key in keys {
-      if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
-        return previouslyResolved
-      }
+    if let previouslyResolved: T = previouslyResolved(definition, key: key) {
+      return previouslyResolved
     }
     
     var resolvedInstance = try builder(definition)
@@ -480,7 +441,7 @@ extension DependencyContainer {
     //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
     //when it returns instance that we try to resolve here can be already resolved
     //so we return it, throwing away instance created by previous call to builder
-    if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
+    if let previouslyResolved: T = previouslyResolved(definition, key: key) {
       return previouslyResolved
     }
     
@@ -492,52 +453,28 @@ extension DependencyContainer {
     return resolvedInstance
   }
   
-  /// Searches for definition that matches provided key
-  private func matchDefinition(key: DefinitionKey) throws -> (DefinitionKey, _Definition)? {
-    let nilTagKey = key.associatedTag.map { _ in
-      DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: nil)
-    }
-    
-    let typeDefinitions = definitions.filter({ $0.0.protocolType ==  key.protocolType })
-    if typeDefinitions.isEmpty {
-      return try typeForwardingDefinition(key)
-    }
-    else {
-      if let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) {
-        return (key, definition)
+  private func previouslyResolved<T>(definition: _Definition, key: DefinitionKey) -> T? {
+    let keys = definition.implementingTypes.map({
+      DefinitionKey(protocolType: $0, argumentsType: key.argumentsType, associatedTag: key.associatedTag)
+    })
+    for key in [key] + keys {
+      if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
+        return previouslyResolved
       }
-      return nil
     }
+    return nil
   }
   
-  /// Searches for definition that forwards requested type
-  private func typeForwardingDefinition(key: DefinitionKey) throws -> (DefinitionKey, _Definition)? {
-    let typeDefinitions = definitions.filter({
-      $0.1.implementingTypes.contains({ $0 == key.protocolType })
-    })
-    
-    var tags = [key.associatedTag]
-    if key.associatedTag != nil {
-      tags.append(nil)
+  /// Searches for definition that matches provided key
+  private func definition(matching key: DefinitionKey) -> KeyDefinitionPair? {
+    let typeDefinitions = definitions.filter({ $0.0.protocolType ==  key.protocolType })
+    guard !typeDefinitions.isEmpty else {
+      return typeForwardingDefinition(key.protocolType, tag: key.associatedTag)
     }
     
-    for tag in tags {
-      let definitions = typeDefinitions.filter({ $0.0.associatedTag == tag })
-      if definitions.isEmpty {
-        continue
-      }
-      else if definitions.count == 1 {
-        //we need to carry on original tag
-        var match: (key: DefinitionKey, definition: _Definition) = definitions.first!
-        match.key = DefinitionKey(protocolType: match.key.protocolType, argumentsType: match.key.argumentsType, associatedTag: key.associatedTag)
-        return match
-      }
-      else {
-        //several definitions registered for the same tag forward to the same type
-        throw DipError.AmbiguousDefinitions(type: key.protocolType, definitions: definitions.map({ $0.1 }))
-      }
+    if let definition = (self.definitions[key] ?? self.definitions[key.tagged(nil)]) {
+      return (key, definition)
     }
-    
     return nil
   }
   
@@ -595,9 +532,7 @@ extension DependencyContainer {
   public func validate(arguments: Any...) throws {
     validateNextDefinition: for (key, _) in definitions {
       do {
-        try self.resolve(key.protocolType, tag: key.associatedTag)
-      }
-      catch let error as DipError {
+        //try to resolve key using provided arguments
         for argumentsSet in arguments where argumentsSet.dynamicType == key.argumentsType {
           do {
             try inContext(key.associatedTag, resolvingType: key.protocolType) {
@@ -614,11 +549,16 @@ extension DependencyContainer {
           catch { print(error) }
         }
         
-        //no matched arguments provided - rethrow original error
-        throw error
+        //try to resolve key using auto-wiring
+        do {
+          try self.resolve(key.protocolType, tag: key.associatedTag)
+        }
+        catch let error as DipError {
+          throw error
+        }
+          //ignore other errors
+        catch { print(error) }
       }
-        //ignore other errors
-      catch { print(error) }
     }
   }
 }

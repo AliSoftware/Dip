@@ -508,27 +508,35 @@ class DipTests: XCTestCase {
     var createdService1 = false
     var createdService2 = false
     var createdService3 = false
+    var createdService = false
     
-    container.register { ServiceImp1() as Service }
-      .resolveDependencies { _ in
-        createdService1 = true
+    let service = container.register { ServiceImp1() }
+      .resolveDependencies { container, _ in
+        if container.context.resolvingType == ServiceImp1.self {
+          createdService1 = true
+        }
+        if container.context.resolvingType == Service.self {
+          createdService = true
+        }
     }
+    container.register(service, type: Service.self)
     
     container.register(tag: "tag") { ServiceImp2() as Service }
       .resolveDependencies { _ in
         createdService2 = true
     }
     
-    container.register() { (s: Service) in ServiceImp1() }
+    container.register() { (arg: String) in ServiceImp1() }
       .resolveDependencies { _ in
         createdService3 = true
     }
     
     //then
-    AssertNoThrow(expression: try container.validate())
+    AssertNoThrow(expression: try container.validate("arg"))
     XCTAssertTrue(createdService1)
     XCTAssertTrue(createdService2)
     XCTAssertTrue(createdService3)
+    XCTAssertTrue(createdService)
   }
   
   func testThatItPicksRuntimeArgumentsWhenValidatingConfiguration() {

@@ -41,6 +41,10 @@
 		095A51CF1CEA1664006B957C /* TypeForwardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095A51CE1CEA1664006B957C /* TypeForwardingTests.swift */; };
 		095A51D01CEA1664006B957C /* TypeForwardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095A51CE1CEA1664006B957C /* TypeForwardingTests.swift */; };
 		095A51D11CEA1664006B957C /* TypeForwardingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095A51CE1CEA1664006B957C /* TypeForwardingTests.swift */; };
+		095F829C1D043B41008CD706 /* TypeForwarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F829B1D043B41008CD706 /* TypeForwarding.swift */; };
+		095F829D1D043BAA008CD706 /* TypeForwarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F829B1D043B41008CD706 /* TypeForwarding.swift */; };
+		095F829E1D043BAA008CD706 /* TypeForwarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F829B1D043B41008CD706 /* TypeForwarding.swift */; };
+		095F829F1D043BAB008CD706 /* TypeForwarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F829B1D043B41008CD706 /* TypeForwarding.swift */; };
 		0982AF0C1C5183A000B62463 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF0B1C5183A000B62463 /* Utils.swift */; };
 		0982AF0D1C5183A000B62463 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF0B1C5183A000B62463 /* Utils.swift */; };
 		0982AF0E1C5183A000B62463 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0982AF0B1C5183A000B62463 /* Utils.swift */; };
@@ -113,6 +117,7 @@
 		0919F4D11C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RuntimeArgumentsTests.swift; path = ../../Tests/Dip/RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
 		095A51CE1CEA1664006B957C /* TypeForwardingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeForwardingTests.swift; sourceTree = "<group>"; };
+		095F829B1D043B41008CD706 /* TypeForwarding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeForwarding.swift; sourceTree = "<group>"; };
 		0982AF0B1C5183A000B62463 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = ../../Sources/Utils.swift; sourceTree = "<group>"; };
 		09873F551C1E0237000C02F6 /* AutoInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjection.swift; path = ../../Sources/AutoInjection.swift; sourceTree = "<group>"; };
 		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjectionTests.swift; path = ../../Tests/Dip/AutoInjectionTests.swift; sourceTree = "<group>"; };
@@ -188,6 +193,7 @@
 				0919F4CC1C16417000DC3B10 /* RuntimeArguments.swift */,
 				09873F551C1E0237000C02F6 /* AutoInjection.swift */,
 				09B035FF1C5D2B83001EA5B7 /* AutoWiring.swift */,
+				095F829B1D043B41008CD706 /* TypeForwarding.swift */,
 				0982AF0B1C5183A000B62463 /* Utils.swift */,
 				0919F4CB1C16417000DC3B10 /* Info.plist */,
 			);
@@ -518,6 +524,7 @@
 				0919F4D51C16417B00DC3B10 /* Definition.swift in Sources */,
 				09B036001C5D2B83001EA5B7 /* AutoWiring.swift in Sources */,
 				0919F4D41C16417B00DC3B10 /* Dip.swift in Sources */,
+				095F829C1D043B41008CD706 /* TypeForwarding.swift in Sources */,
 				09873F561C1E0237000C02F6 /* AutoInjection.swift in Sources */,
 				0919F4D61C16417B00DC3B10 /* RuntimeArguments.swift in Sources */,
 			);
@@ -548,6 +555,7 @@
 				0919F4D91C16417C00DC3B10 /* Definition.swift in Sources */,
 				09B036011C5D2B83001EA5B7 /* AutoWiring.swift in Sources */,
 				0919F4D81C16417C00DC3B10 /* Dip.swift in Sources */,
+				095F829D1D043BAA008CD706 /* TypeForwarding.swift in Sources */,
 				09873F7A1C1E0252000C02F6 /* AutoInjection.swift in Sources */,
 				0919F4DA1C16417C00DC3B10 /* RuntimeArguments.swift in Sources */,
 			);
@@ -578,6 +586,7 @@
 				0919F4DD1C16417D00DC3B10 /* Definition.swift in Sources */,
 				09B036021C5D2B83001EA5B7 /* AutoWiring.swift in Sources */,
 				0919F4DC1C16417D00DC3B10 /* Dip.swift in Sources */,
+				095F829E1D043BAA008CD706 /* TypeForwarding.swift in Sources */,
 				09873F7B1C1E0253000C02F6 /* AutoInjection.swift in Sources */,
 				0919F4DE1C16417D00DC3B10 /* RuntimeArguments.swift in Sources */,
 			);
@@ -608,6 +617,7 @@
 				0919F4E11C16417E00DC3B10 /* Definition.swift in Sources */,
 				09B036031C5D2B83001EA5B7 /* AutoWiring.swift in Sources */,
 				0919F4E01C16417E00DC3B10 /* Dip.swift in Sources */,
+				095F829F1D043BAB008CD706 /* TypeForwarding.swift in Sources */,
 				09873F7C1C1E0254000C02F6 /* AutoInjection.swift in Sources */,
 				0919F4E21C16417E00DC3B10 /* RuntimeArguments.swift in Sources */,
 			);

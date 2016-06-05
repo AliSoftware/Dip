@@ -26,7 +26,7 @@
 public struct DefinitionKey : Hashable, CustomStringConvertible {
   public let protocolType: Any.Type
   public let argumentsType: Any.Type
-  public let associatedTag: DependencyContainer.Tag?
+  public private(set) var associatedTag: DependencyContainer.Tag?
   
   init(protocolType: Any.Type, argumentsType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
     self.protocolType = protocolType
@@ -40,6 +40,12 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
   
   public var description: String {
     return "type: \(protocolType), arguments: \(argumentsType), tag: \(associatedTag.desc)"
+  }
+  
+  func tagged(tag: DependencyContainer.Tag?) -> DefinitionKey {
+    var tagged = self
+    tagged.associatedTag = tag
+    return tagged
   }
   
 }
@@ -140,6 +146,9 @@ public enum ComponentScope {
   case EagerSingleton
 }
 
+///Dummy protocol to store definitions for different types in collection
+public protocol Definition: class { }
+
 /**
  `DefinitionOf<T, F>` describes how instances of type `T` should be created when this type is resolved by the `DependencyContainer`.
  
@@ -150,22 +159,18 @@ public enum ComponentScope {
 */
 public final class DefinitionOf<T, F>: Definition {
   
-  let factory: F
-  let scope: ComponentScope
-  
-  private(set) var weakFactory: (Any throws -> Any)!
-  private(set) var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
-  
-  //Auto-wiring helpers
-  
-  private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
-  private(set) var numberOfArguments: Int = 0
-  
   init(scope: ComponentScope, factory: F) {
     self.factory = factory
     self.scope = scope
   }
+  
+  //MARK: - _Definition
 
+  let factory: F
+  let scope: ComponentScope
+  private(set) var weakFactory: (Any throws -> Any)!
+  private(set) var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
+  
   /**
    Set the block that will be used to resolve dependencies of the instance.
    This block will be called before `resolve(tag:)` returns. It can be set only once.
@@ -181,59 +186,111 @@ public final class DefinitionOf<T, F>: Definition {
    
    ```swift
    container.register { ClientImp(service: try container.resolve() as Service) as Client }
-
+   
    container.register { ServiceImp() as Service }
      .resolveDependencies { container, service in
        service.client = try container.resolve() as Client
-   }
+     }
    ```
    
    */
   public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
-    guard resolveDependenciesBlock == nil else {
-      fatalError("You can not change resolveDependencies block after it was set.")
+    let oldBlock = self.resolveDependenciesBlock
+    self.resolveDependenciesBlock = {
+      try oldBlock?($0, $1 as! T)
+      try block($0, $1 as! T)
     }
-    self.resolveDependenciesBlock = { try block($0, $1 as! T) }
     return self
   }
-  
-  var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
   
   /// Calls `resolveDependencies` block if it was set.
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
     guard let resolvedInstance = resolvedInstance as? T else { return }
-    try self.resolveDependenciesBlock?(container, resolvedInstance)
+    if let resolveDependenciesBlock = self.resolveDependenciesBlock {
+      try resolveDependenciesBlock(container, resolvedInstance)
+    }
   }
+  
+  //MARK: - AutoWiringDefinition
+  
+  private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
+  private(set) var numberOfArguments: Int?
+  
+  //MARK: - TypeForwardingDefinition
+  
+  /// Types that can be resolved using this definition.
+  private(set) var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
+  
+  /// Return `true` if type can be resolved using this definition
+  func doesImplements(type: Any.Type) -> Bool {
+    return implementingTypes.contains({ $0 == type })
+  }
+  
+  //MARK: - _TypeForwardingDefinition
+
+  /// Adds type as being able to be resolved using this definition
+  private func implements(type: Any.Type) {
+    implements([type])
+  }
+  
+  /// Adds types as being able to be resolved using this definition
+  private func implements(types: [Any.Type]) {
+    implementingTypes.appendContentsOf(types.filter({ !doesImplements($0) }))
+  }
+
+  /// Definition to which resolution will be forwarded to
+  private weak var forwardsToDefinition: _TypeForwardingDefinition? {
+    didSet {
+      if let forwardsToDefinition = forwardsToDefinition {
+        implements(forwardsToDefinition.type)
+        implements(forwardsToDefinition.implementingTypes)
+        
+        for definition in [forwardsToDefinition] + forwardsToDefinition.forwardsFromDefinitions {
+          definition.implements(type)
+          definition.implements(implementingTypes)
+        }
+        forwardsToDefinition.forwardsFromDefinitions.append(self)
+        resolveDependencies({ try forwardsToDefinition.resolveDependenciesOf($1, withContainer: $0) })
+      }
+    }
+  }
+  
+  /// Definitions that will forward resolution to this definition
+  private var forwardsFromDefinitions: [_TypeForwardingDefinition] = []
+  
 }
 
-///Dummy protocol to store definitions for different types in collection
-public protocol Definition: class { }
+//MARK: - _Definition
 
-protocol _Definition: Definition {
+protocol _Definition: Definition, AutoWiringDefinition, TypeForwardingDefinition {
+  var type: Any.Type { get }
   var scope: ComponentScope { get }
-
   var weakFactory: (Any throws -> Any)! { get }
-
-  var numberOfArguments: Int { get }
-  var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
-  var implementingTypes: [Any.Type] { get set }
-  
   func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
 }
 
-extension _Definition {
-  func supportsAutoWiring() -> Bool {
-    return autoWiringFactory != nil && numberOfArguments > 0
-  }
+//MARK: - Type Forwarding
+
+private protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definition {
+  weak var forwardsToDefinition: _TypeForwardingDefinition? { get set }
+  var forwardsFromDefinitions: [_TypeForwardingDefinition] { get set }
+  func implements(type: Any.Type)
+  func implements(type: [Any.Type])
 }
 
-extension DefinitionOf: _Definition { }
+extension DefinitionOf: _TypeForwardingDefinition {
+  var type: Any.Type {
+    return T.self
+  }
+}
 
 extension DefinitionOf: CustomStringConvertible {
   public var description: String {
     return "type: \(T.self), factory: \(F.self), scope: \(scope)"
   }
 }
+
+//MARK: - Definition Builder
 
 /// Internal class used to build definition
 /// Need this builder as alternative to changing to DefinitionOf<T, U> where U - type of arguments
@@ -243,8 +300,10 @@ class DefinitionBuilder<T, U> {
   var scope: ComponentScope!
   var factory: F!
   
-  var numberOfArguments: Int = 0
+  var numberOfArguments: Int?
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
+  
+  var forwardsDefinition: _Definition?
   
   init(@noescape configure: (DefinitionBuilder -> ())) {
     configure(self)
@@ -262,6 +321,7 @@ class DefinitionBuilder<T, U> {
       }
       return try factory(args)
     }
+    definition.forwardsToDefinition = forwardsDefinition as? _TypeForwardingDefinition
     return definition
   }
 }
