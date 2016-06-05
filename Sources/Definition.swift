@@ -173,14 +173,17 @@ public final class DefinitionOf<T, F>: Definition {
   
   /**
    Set the block that will be used to resolve dependencies of the instance.
-   This block will be called before `resolve(tag:)` returns. It can be set only once.
+   This block will be called before `resolve(tag:)` returns.
    
    - parameter block: The block to use to resolve dependencies of the instance.
    
    - returns: modified definition
    
    - note: To resolve circular dependencies at least one of them should use this block
-   to resolve its dependencies. Otherwise the application will enter an infinite loop and crash.
+           to resolve its dependencies. Otherwise the application will enter an infinite loop and crash.
+   
+   - note: You can call this method several times on the same definition. 
+           Container will call all provided blocks in the same order.
    
    **Example**
    

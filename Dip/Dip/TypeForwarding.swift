@@ -33,12 +33,14 @@ extension DependencyContainer {
    Registers definition for passed type.
    
    If instance created by definition factory does not implement registered type
-   DipError.DefinitionNotFound will be thrown when trying to resolve that type.
+   container will throw `DipError.DefinitionNotFound` error when trying to resolve that type.
    
    - parameters:
-   - definition: Definition to register
-   - type: Type to register definition for
-   - tag: Optional tag to associate definition with. Default is `nil`.
+      - definition: Definition to register
+      - type: Type to register definition for
+      - tag: Optional tag to associate definition with. Default is `nil`.
+   
+   - returns: New definition for passed type.
    */
   public func register<T, U, F>(definition: DefinitionOf<T, U throws -> T>, type: F.Type, tag: DependencyTagConvertible? = nil) -> DefinitionOf<F, U throws -> F> {
     let key = DefinitionKey(protocolType: F.self, argumentsType: U.self)
