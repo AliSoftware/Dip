@@ -117,7 +117,7 @@
 		0919F4D11C16417000DC3B10 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0919F4D21C16417000DC3B10 /* RuntimeArgumentsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RuntimeArgumentsTests.swift; path = ../../Tests/Dip/RuntimeArgumentsTests.swift; sourceTree = "<group>"; };
 		095A51CE1CEA1664006B957C /* TypeForwardingTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeForwardingTests.swift; sourceTree = "<group>"; };
-		095F829B1D043B41008CD706 /* TypeForwarding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TypeForwarding.swift; sourceTree = "<group>"; };
+		095F829B1D043B41008CD706 /* TypeForwarding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TypeForwarding.swift; path = ../../Sources/TypeForwarding.swift; sourceTree = "<group>"; };
 		0982AF0B1C5183A000B62463 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = ../../Sources/Utils.swift; sourceTree = "<group>"; };
 		09873F551C1E0237000C02F6 /* AutoInjection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjection.swift; path = ../../Sources/AutoInjection.swift; sourceTree = "<group>"; };
 		09873F751C1E0249000C02F6 /* AutoInjectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AutoInjectionTests.swift; path = ../../Tests/Dip/AutoInjectionTests.swift; sourceTree = "<group>"; };
