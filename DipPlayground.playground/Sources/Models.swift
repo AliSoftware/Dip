@@ -74,5 +74,37 @@ public class DataProviderImp: DataProvider {
     public init() {}
 }
 
+public protocol ListInteractorOutput: class {}
+public protocol ListModuleInterface: class {}
+public protocol ListInteractorInput: class {}
+public class ListPresenter: NSObject {
+    public var listInteractor : ListInteractorInput?
+    public var listWireframe : ListWireframe?
+    public override init() {}
+}
+public class ListInteractor: NSObject {
+    public var output : ListInteractorOutput?
+    public override init() {}
+}
 
+public class ListWireframe : NSObject {
+    public let addWireframe: AddWireframe
+    public let listPresenter: ListPresenter
+    public init(addWireFrame: AddWireframe, listPresenter: ListPresenter) {
+        self.addWireframe = addWireFrame
+        self.listPresenter = listPresenter
+    }
+}
 
+public protocol AddModuleDelegate: class {}
+public protocol AddModuleInterface: class {}
+public class AddWireframe: NSObject {
+    let addPresenter : AddPresenter
+    public init(addPresenter: AddPresenter) {
+        self.addPresenter = addPresenter
+    }
+}
+public class AddPresenter: NSObject {
+    public var addModuleDelegate : AddModuleDelegate?
+    public override init() {}
+}
