@@ -290,7 +290,7 @@ extension DependencyContainer {
       resolvedInstances.singletons[key] = nil
     }
   }
-
+  
 }
 
 // MARK: - Resolve dependencies
@@ -397,104 +397,84 @@ extension DependencyContainer {
   
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
   func _resolveKey<T>(key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
-    guard let (matchingKey, definition) = try matchDefinition(key) else {
+    guard let matching = definition(matching: key) else {
       //if no definition found - auto-wire
-      return try _resolveByAutoWiring(key)
+      return try _autowire(key)
     }
     
     do {
-      return try self._resolveDefinition(definition, forKey: matchingKey, builder: builder)
+      return try _resolveDefinition(matching.definition, forKey: matching.key, builder: builder)
     }
       //if failed to resolve type for matching key - try auto-wiring
       //(usually happens when inferring optional type)
-    catch let DipError.DefinitionNotFound(errorKey) where errorKey.protocolType == matchingKey.protocolType {
-      return try _resolveByAutoWiring(key)
+    catch let DipError.DefinitionNotFound(errorKey) where errorKey.protocolType == matching.key.protocolType {
+      return try _autowire(key)
     }
   }
   
   /// Actually resolve dependency.
   private func _resolveDefinition<T>(definition: _Definition, forKey key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
-    if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
+    
+    //first search for already resolved instance for this type or any of forwarding types
+    if let previouslyResolved: T = previouslyResolved(definition, key: key) {
       return previouslyResolved
     }
-    else {
-      var resolvedInstance = try builder(definition)
-      
-      /*
-       Strongly-typed `resolve(tag:builder:)` calls weakly-typed `resolve(_:tag:builder:)`,
-       so `T` will be `Any` at runtime, erasing type information when this method returns.
-       When we try to cast result of `Any` to generic type T Swift fails to cast it.
-       The same happens in the following code snippet:
-       
-       let optService: Service? = ServiceImp()
-       let anyService: Any = optService
-       let service: Service = anyService as! Service
-       
-       As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
-       */
-      if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
-        resolvedInstance = unboxed
-      }
-      
-      //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
-      //when it returns instance that we try to resolve here can be already resolved
-      //so we return it, throwing away instance created by previous call to builder
+    
+    var resolvedInstance = try builder(definition)
+    
+    /*
+     Strongly-typed `resolve(tag:builder:)` calls weakly-typed `resolve(_:tag:builder:)`,
+     so `T` will be `Any` at runtime, erasing type information when this method returns.
+     When we try to cast result of `Any` to generic type T Swift fails to cast it.
+     The same happens in the following code snippet:
+     
+     let optService: Service? = ServiceImp()
+     let anyService: Any = optService
+     let service: Service = anyService as! Service
+     
+     As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
+     */
+    if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
+      resolvedInstance = unboxed
+    }
+    
+    //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
+    //when it returns instance that we try to resolve here can be already resolved
+    //so we return it, throwing away instance created by previous call to builder
+    if let previouslyResolved: T = previouslyResolved(definition, key: key) {
+      return previouslyResolved
+    }
+    
+    resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
+    
+    try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
+    try autoInjectProperties(resolvedInstance)
+    
+    return resolvedInstance
+  }
+  
+  private func previouslyResolved<T>(definition: _Definition, key: DefinitionKey) -> T? {
+    let keys = definition.implementingTypes.map({
+      DefinitionKey(protocolType: $0, argumentsType: key.argumentsType, associatedTag: key.associatedTag)
+    })
+    for key in [key] + keys {
       if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
         return previouslyResolved
       }
-      
-      resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
-      
-      try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
-      try autoInjectProperties(resolvedInstance)
-      
-      return resolvedInstance
     }
+    return nil
   }
   
   /// Searches for definition that matches provided key
-  private func matchDefinition(key: DefinitionKey) throws -> (DefinitionKey, _Definition)? {
-    let nilTagKey = key.associatedTag.map { _ in
-      DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: nil)
+  private func definition(matching key: DefinitionKey) -> KeyDefinitionPair? {
+    let typeDefinitions = definitions.filter({ $0.0.protocolType ==  key.protocolType })
+    guard !typeDefinitions.isEmpty else {
+      return typeForwardingDefinition(key.protocolType, tag: key.associatedTag)
     }
     
-    if let definition = (self.definitions[key] ?? self.definitions[nilTagKey]) {
+    if let definition = (self.definitions[key] ?? self.definitions[key.tagged(nil)]) {
       return (key, definition)
     }
-    
-    return try typeForwardingDefinition(key)
-  }
-  
-  /// Searches for definition that forwards requested type
-  private func typeForwardingDefinition(key: DefinitionKey) throws -> (DefinitionKey, _Definition)? {
-    let typeDefinitions = definitions.filter({
-      $0.1.implementingTypes.contains({ $0 == key.protocolType })
-    })
-    
-    var tags = [key.associatedTag]
-    if key.associatedTag != nil {
-      tags.append(nil)
-    }
-    
-    for tag in tags {
-      let definitions = typeDefinitions.filter({ $0.0.associatedTag == tag })
-      if definitions.isEmpty {
-        continue
-      }
-      else if definitions.count == 1 {
-        let matchedKey = definitions.first!.0
-        return (
-          //we need to carry on original tag
-          DefinitionKey(protocolType: matchedKey.protocolType, argumentsType: matchedKey.argumentsType, associatedTag: key.associatedTag),
-          definitions.first!.1
-        )
-      }
-      else {
-        //several definitions registered for the same tag forward to the same type
-        throw DipError.AmbiguousDefinitions(type: key.protocolType, definitions: definitions.map({ $0.1 }))
-      }
-    }
-    
     return nil
   }
   
@@ -552,9 +532,7 @@ extension DependencyContainer {
   public func validate(arguments: Any...) throws {
     validateNextDefinition: for (key, _) in definitions {
       do {
-        try self.resolve(key.protocolType, tag: key.associatedTag)
-      }
-      catch let error as DipError {
+        //try to resolve key using provided arguments
         for argumentsSet in arguments where argumentsSet.dynamicType == key.argumentsType {
           do {
             try inContext(key.associatedTag, resolvingType: key.protocolType) {
@@ -571,11 +549,16 @@ extension DependencyContainer {
           catch { print(error) }
         }
         
-        //no matched arguments provided - rethrow original error
-        throw error
+        //try to resolve key using auto-wiring
+        do {
+          try self.resolve(key.protocolType, tag: key.associatedTag)
+        }
+        catch let error as DipError {
+          throw error
+        }
+          //ignore other errors
+        catch { print(error) }
       }
-        //ignore other errors
-      catch { print(error) }
     }
   }
 }
