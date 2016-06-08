@@ -571,7 +571,8 @@ class DipTests: XCTestCase {
     container.register { (a: Int) -> Service in ServiceImp1() as Service }
     
     //then
-    AssertThrows(expression: try container.validate("1"))
+    AssertThrows(expression: try container.validate()) { error in error is DipError }
+    AssertThrows(expression: try container.validate("1")) { error in error is DipError }
   }
   
   func testThatItFailsValidationOnlyForDipErrors() {

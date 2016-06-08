@@ -24,7 +24,7 @@ It's aimed to be as simple as possible yet provide rich functionality usual for 
 
 ## Documentation & Usage Examples
 
-Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.4.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
+Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.5.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
 
@@ -46,10 +46,12 @@ File an issue if you have any question.
 - **[Runtime arguments](wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
 - **[Circular dependencies](wiki/circular-dependencies)**. Dip can resolve circular dependencies;
 - **[Auto-wiring](wiki/auto-wiring)** & **[Auto-injection](wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
-- **[Storyboards integration](wiki/storyboards-integration)**. You can easily use Dip along with storyboards without ever referencing it in your view controller's code;
+- **[Type forwarding](wiki/Type-forwarding)**. You can register the same factory to resolve different types.
+- **[Storyboards integration](wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
+- **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.
 - **Easy configuration**. No complex container hierarchy, no unneeded functionality;
 - **Thread safety**. Registering and resolving components is thread safe;
-- **Helpful error messages**. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
+- **Helpful error messages and configuration validation**. You can validate your container configuration. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
 
 ## Basic usage
 
@@ -155,20 +157,21 @@ If you use [Swift Package Manager](https://swift.org/package-manager/) add Dip a
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.4.0")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.5.0")
   ]
 )
 ```
 
 ## Running tests
 
-On OSX you can run tests from Xcode. On Linux you need to have Swift Package Manager installed and use it to build test executable:
+On OSX you can run tests from Xcode. On Linux you need to have Swift Package Manager installed and use it to build and run tests:
 
 ```
-cd Dip/DipTests
-swift build
-./.build/debug/DipTests
+cd Dip
+swift build && swift test
 ```
+
+> Note: Swift Package Manager is destributed with Swift development snapshots only, so it builds packages using Swift 3. To build Dip you will need to build it with Swift 2.2, for that you need to set [`$SWIFT_EXEC`](https://github.com/apple/swift-package-manager#choosing-swift-version) environment variable.
 
 ## Credits
 
