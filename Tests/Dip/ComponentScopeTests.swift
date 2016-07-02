@@ -60,7 +60,8 @@ class ComponentScopeTests: XCTestCase {
       ("testThatSingletonIsReleasedWhenContainerIsReset", testThatSingletonIsReleasedWhenContainerIsReset),
       ("testThatItReusesInstanceInObjectGraphScopeDuringResolve", testThatItReusesInstanceInObjectGraphScopeDuringResolve),
       ("testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve", testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve),
-      ("testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag),
+      ("testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTagWhenResolvingForAnotherTag),
+      ("testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag", testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag),
       ("testThatItReusesResolvedInstanceWhenResolvingOptional", testThatItReusesResolvedInstanceWhenResolvingOptional)
     ]
   }
@@ -225,17 +226,15 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertFalse(client === anotherClient)
   }
 
-  func testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag() {
+  func testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTagWhenResolvingForAnotherTag() {
     //given
     var service2: Service?
     container.register(.ObjectGraph) { ServiceImp1() as Service }
       .resolveDependencies { (c, _) in
+        //when service1 is resolved using this definition due to fallback to nil tag
         service2 = try c.resolve(tag: "service") as Service
         
-        //then
-        
-        //when service1 is resolved using this definition due to fallback to nil tag
-        //we don't want every next resolve of service reuse it
+        //then we don't want every next resolve of service for other tags to reuse it
         XCTAssertTrue(service2 is ServiceImp2)
     }
     container.register(tag: "service", .ObjectGraph) { ServiceImp2() as Service}
@@ -243,6 +242,28 @@ class ComponentScopeTests: XCTestCase {
     //when
     let service1 = try! container.resolve(tag: "tag") as Service
 
+    //then
+    XCTAssertTrue(service1 is ServiceImp1)
+  }
+  
+  func testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag() {
+    //given
+    var service2: Service?
+    container.register(.ObjectGraph) { ServiceImp1() as Service }
+      .resolveDependencies { (c, service1) in
+        guard service2 == nil else { return }
+        
+        //when service1 is resolved using this definition due to fallback to nil tag
+        //and service is resolved again with another (existing) tag
+        service2 = try c.resolve(tag: "tag") as Service
+        
+        //than we don't want every next resolve of service to reuse it
+        XCTAssertTrue(service1 as! ServiceImp1 === service1)
+    }
+    
+    //when
+    let service1 = try! container.resolve(tag: "tag") as Service
+    
     //then
     XCTAssertTrue(service1 is ServiceImp1)
   }

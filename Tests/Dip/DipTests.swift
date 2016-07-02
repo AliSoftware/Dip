@@ -36,6 +36,15 @@ private protocol Client: class {
   var server: Server? { get }
 }
 
+class ResolvableService: Service, Resolvable {
+  var didResolveDependenciesCalled = false
+  
+  func didResolveDependencies() {
+    XCTAssertFalse(didResolveDependenciesCalled, "didResolveDependencies should be called only once per instance")
+    didResolveDependenciesCalled = true
+  }
+}
+
 class DipTests: XCTestCase {
 
   let container = DependencyContainer()
@@ -55,7 +64,8 @@ class DipTests: XCTestCase {
       ("testThatItThrowsErrorIfFailsToResolveDependency", testThatItThrowsErrorIfFailsToResolveDependency),
       ("testThatItCallsDidResolveDependenciesOnResolvableIntance", testThatItCallsDidResolveDependenciesOnResolvableIntance),
       ("testThatItCallsDidResolveDependenciesInReverseOrder", testThatItCallsDidResolveDependenciesInReverseOrder),
-      ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies)
+      ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies),
+      ("testContainerCollaborators", testContainerCollaborators)
     ]
   }
 
@@ -347,16 +357,6 @@ class DipTests: XCTestCase {
   }
 
   func testThatItCallsDidResolveDependenciesOnResolvableIntance() {
-    
-    class ResolvableService: Service, Resolvable {
-      var didResolveDependenciesCalled = false
-      
-      func didResolveDependencies() {
-        XCTAssertFalse(didResolveDependenciesCalled, "didResolveDependencies should be called only once per instance")
-        didResolveDependenciesCalled = true
-      }
-    }
-    
     //given
     container.register { ResolvableService() as Service }
       .resolveDependencies { _, service in
@@ -595,6 +595,24 @@ class DipTests: XCTestCase {
       if case let DipError.DefinitionNotFound(_key) = error where _key == key { return true }
       else { return false }
     }
+  }
+  
+  func testContainerCollaborators() {
+    var collaborator: DependencyContainer? = DependencyContainer()
+    collaborator!.register { ResolvableService() as Service }
+
+    container.collaborate(with: collaborator!)
+    XCTAssertFalse(container._collaborators.isEmpty)
+    
+    AssertNoThrow(expression: try container.resolve() as Service)
+    AssertNoThrow(expression: try container.resolve(Service.self))
+    
+    collaborator!.collaborate(with: collaborator!)
+    XCTAssertTrue(collaborator!._collaborators.isEmpty, "Container should not collaborate with itself")
+    
+    weak var weakCollaborator = collaborator
+    collaborator = nil
+    XCTAssertNil(weakCollaborator)
   }
   
 }

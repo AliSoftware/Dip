@@ -45,7 +45,7 @@ extension DependencyContainer {
     let type = key.protocolType
     let resolved: Any?
     do {
-      let definitions = autoWiringDefinitions(forType: type, tag: tag)
+      let definitions = autoWiringDefinitions(type, tag: tag)
       resolved = try _resolve(enumerating: definitions) { try _resolveKey($0, tag: tag, type: type) }
     }
     catch {
@@ -60,7 +60,7 @@ extension DependencyContainer {
     }
   }
 
-  private func autoWiringDefinitions(forType type: Any.Type, tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+  private func autoWiringDefinitions(type: Any.Type, tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
     //filter definitions
@@ -69,7 +69,7 @@ extension DependencyContainer {
       .sort({ $0.definition.numberOfArguments > $1.definition.numberOfArguments })
     
     definitions = filter(definitions, type: type, tag: tag)
-    definitions = order(definitions, byTag: tag)
+    definitions = order(definitions, tag: tag)
 
     return definitions
   }
@@ -127,7 +127,7 @@ func filter(definitions: [KeyDefinitionPair], type: Any.Type, tag: DependencyCon
     .filter({ $0.key.associatedTag == tag || $0.key.associatedTag == nil })
 }
 
-func order(definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+func order(definitions: [KeyDefinitionPair], tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
   return
     //first will try to use tagged definitions
     definitions.filter({ $0.key.associatedTag == tag }) +
