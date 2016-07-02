@@ -28,7 +28,9 @@ Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.5.0/) and come
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
 
-You can find bunch of usage examples in a [wiki](wiki).
+You can find bunch of usage examples in a [wiki](wiki). 
+
+If your are using [VIPER](https://www.objc.io/issues/13-architecture/viper/) architecture - [here](https://github.com/ilyapuchka/VIPER-SWIFT) is VIPER demo app that uses Dip instead of manual dependency injection.
 
 There are also several blog posts that describe how to use Dip and some of its implementation details:
 
