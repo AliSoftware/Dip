@@ -186,7 +186,13 @@ extension DependencyContainer {
         self.context.depth = currentContext.depth + 1
       }
       
-      return try block()
+      do {
+        return try block()
+      }
+      catch {
+        print(error)
+        throw error
+      }
     }
   }
 
@@ -475,6 +481,7 @@ extension DependencyContainer {
     if let definition = (self.definitions[key] ?? self.definitions[key.tagged(nil)]) {
       return (key, definition)
     }
+
     return nil
   }
   
@@ -750,16 +757,17 @@ public enum DipError: ErrorType, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
-      return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
+      return "[DIP] No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
-      return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
+      return "[DIP] Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
     case let .AutoWiringFailed(type, error):
-      return "Failed to auto-wire type \"\(type)\". \(error)"
+      return "[DIP] Failed to auto-wire type \"\(type)\". \(error)"
     case let .AmbiguousDefinitions(type, definitions):
-      return "Ambiguous definitions for \(type):\n" +
+      return "[DIP] Ambiguous definitions for \(type):\n" +
       definitions.map({ "\($0)" }).joinWithSeparator(";\n")
     }
   }
+  
 }
 
 ///Internal protocol used to unwrap optional values.

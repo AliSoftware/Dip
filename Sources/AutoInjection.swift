@@ -39,12 +39,7 @@ extension DependencyContainer {
       resolvingType: injectedPropertyBox.dynamicType.wrappedType,
       injectedInProperty: child.label)
     {
-      do {
         try injectedPropertyBox.resolve(self)
-      }
-      catch {
-        throw DipError.AutoInjectionFailed(label: child.label, type: injectedPropertyBox.dynamicType.wrappedType, underlyingError: error)
-      }
     }
   }
   
@@ -272,15 +267,21 @@ private class _InjectedPropertyBox<T> {
   }
 
   private func resolve(container: DependencyContainer) throws -> T? {
-    let resolved: T?
     let tag = overrideTag ? self.tag : container.context.tag
-    if required {
-      resolved = try container.resolve(tag: tag) as T
+    do {
+      return try container.resolve(tag: tag) as T
     }
-    else {
-      resolved = try? container.resolve(tag: tag) as T
+    catch {
+      let error = DipError.AutoInjectionFailed(label: container.context.injectedInProperty, type: container.context.resolvingType, underlyingError: error)
+      
+      if required {
+        throw error
+      }
+      else {
+        print(error)
+        return nil
+      }
     }
-    return resolved
   }
   
 }
