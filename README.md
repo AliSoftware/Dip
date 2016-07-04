@@ -28,7 +28,7 @@ Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.5.0/) and come
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
 
-You can find bunch of usage examples in a [wiki](wiki). 
+You can find bunch of usage examples in a [wiki](../../wiki). 
 
 If your are using [VIPER](https://www.objc.io/issues/13-architecture/viper/) architecture - [here](https://github.com/ilyapuchka/VIPER-SWIFT) is VIPER demo app that uses Dip instead of manual dependency injection.
 
@@ -43,13 +43,13 @@ File an issue if you have any question.
 
 ## Features
 
-- **[Scopes](wiki/scopes)**. Dip supports 4 different scopes (or life cycle strategies): _Prototype_, _ObjectGraph_, _Singleton_, _EagerSingleton_;
-- **[Named definitions](wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
-- **[Runtime arguments](wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
-- **[Circular dependencies](wiki/circular-dependencies)**. Dip can resolve circular dependencies;
-- **[Auto-wiring](wiki/auto-wiring)** & **[Auto-injection](wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
-- **[Type forwarding](wiki/Type-forwarding)**. You can register the same factory to resolve different types.
-- **[Storyboards integration](wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
+- **[Scopes](../../wiki/scopes)**. Dip supports 4 different scopes (or life cycle strategies): _Prototype_, _ObjectGraph_, _Singleton_, _EagerSingleton_;
+- **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
+- **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
+- **[Circular dependencies](../../wiki/circular-dependencies)**. Dip can resolve circular dependencies;
+- **[Auto-wiring](../../wiki/auto-wiring)** & **[Auto-injection](../../wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
+- **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types.
+- **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
 - **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.
 - **Easy configuration**. No complex container hierarchy, no unneeded functionality;
 - **Thread safety**. Registering and resolving components is thread safe;
