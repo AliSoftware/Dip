@@ -37,6 +37,10 @@ extension DependencyContainer {
   
   /// Tries to resolve instance using auto-wire factories
   func _autowire<T>(key: DefinitionKey) throws -> T {
+    let shouldLogErrors = context.logErrors
+    defer { context.logErrors = shouldLogErrors }
+    context.logErrors = false
+    
     guard key.argumentsType == Void.self else {
       throw DipError.DefinitionNotFound(key: key)
     }

@@ -39,7 +39,7 @@ public final class DependencyContainer {
     case Int(IntegerLiteralType)
   }
   
-  private(set) public var context: Context!
+  internal(set) public var context: Context!
   var definitions = [DefinitionKey : _Definition]()
   private var resolvedInstances = ResolvedInstances()
   private let lock = RecursiveLock()
@@ -153,6 +153,8 @@ extension DependencyContainer {
     /// Currently resolving type.
     private(set) public var resolvingType: Any.Type
     
+    var logErrors: Bool = true
+    
     init(tag: Tag?, injectedInType: Any.Type?, injectedInProperty: String?, resolvingType: Any.Type) {
       self.tag = tag
       self.injectedInType = injectedInType
@@ -164,7 +166,7 @@ extension DependencyContainer {
   /// Pushes new context created with provided values and calls block. When block returns previous context is restored.
   /// For `nil` values (except tag) new context will use values from the current context.
   /// Will releas resolved instances and call `Resolvable` callbacks when popped to initial context.
-  func inContext<T>(tag: Tag?, resolvingType: Any.Type? = nil, injectedInProperty: String? = nil, @noescape block: () throws -> T) throws -> T {
+  func inContext<T>(tag: Tag?, resolvingType: Any.Type? = nil, injectedInProperty: String? = nil, logErrors: Bool = true, @noescape block: () throws -> T) throws -> T {
     return try threadSafe {
       let currentContext = self.context
       
@@ -200,12 +202,13 @@ extension DependencyContainer {
           resolvingType: resolvingType ?? T.self
         )
       }
+      context.logErrors = logErrors
       
       do {
         return try block()
       }
       catch {
-        print(error)
+        if context.logErrors { print(error) }
         throw error
       }
     }
@@ -546,8 +549,8 @@ extension DependencyContainer {
           collaborator.resolvedInstances = resolvedInstances
         }
         
-        let resolved = try collaborator.inContext(key.associatedTag) {
-          try collaborator._resolveKey(key, builder: builder)
+        let resolved = try collaborator.inContext(key.associatedTag, logErrors: false) {
+          try collaborator.resolveKey(key, builder: builder)
         }
 
         return resolved
