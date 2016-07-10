@@ -41,8 +41,7 @@ public final class DependencyContainer {
   
   private(set) public var context: Context!
   var definitions = [DefinitionKey : _Definition]()
-  private let resolvedInstances = ResolvedInstances()
-  private var resolvableInstancesPool: ResolvableInstancesPool
+  private var resolvedInstances = ResolvedInstances()
   private let lock = RecursiveLock()
   
   private(set) var bootstrapped = false
@@ -70,7 +69,7 @@ public final class DependencyContainer {
    - returns: A new DependencyContainer.
    */
   public init(@noescape configBlock: (DependencyContainer->()) = { _ in }) {
-    resolvableInstancesPool = resolvedInstances
+    resolvedInstances.container = self
     configBlock(self)
   }
   
@@ -90,14 +89,6 @@ public final class DependencyContainer {
     }
   }
 
-  public func collaborate(with containers: DependencyContainer...) {
-    collaborate(with: containers)
-  }
-
-  public func collaborate(with containers: [DependencyContainer]) {
-    _collaborators += containers
-  }
-  
   private func threadSafe<T>(@noescape closure: () throws -> T) rethrows -> T {
     lock.lock()
     defer {
@@ -180,14 +171,16 @@ extension DependencyContainer {
       defer {
         self.context = currentContext
         
-        if self.context == nil && resolvableInstancesPool === self.resolvedInstances {
+        //clean instances pool if it is owned not by other container
+        if context == nil && resolvedInstances.container === self {
+          resolvedInstances.resolvedInstances.removeAll()
+          
           // We call didResolveDependencies only at this point
           // because this is a point when dependencies graph is complete.
-          for resolvedInstance in resolvableInstancesPool.resolvableInstances.reverse() {
+          for resolvedInstance in resolvedInstances.resolvableInstances.reverse() {
             resolvedInstance.didResolveDependencies()
           }
-          self.resolvedInstances.resolvedInstances.removeAll()
-          self.resolvedInstances.resolvableInstances.removeAll()
+          resolvedInstances.resolvableInstances.removeAll()
         }
       }
       
@@ -475,7 +468,7 @@ extension DependencyContainer {
     resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
 
     if let resolvable = resolvedInstance as? Resolvable {
-      resolvableInstancesPool.resolvableInstances.append(resolvable)
+      resolvedInstances.resolvableInstances.append(resolvable)
     }
 
     try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
@@ -510,6 +503,28 @@ extension DependencyContainer {
     return nil
   }
   
+}
+
+//MARK: - Collaborating containers
+
+extension DependencyContainer {
+  
+  /**
+   Adds collaborating containers as weak references. Circular references are allowed.
+   References to the container itself are ignored.
+   */
+  public func collaborate(with containers: DependencyContainer...) {
+    collaborate(with: containers)
+  }
+  
+  /**
+   Adds collaborating containers as weak references. Circular references are allowed.
+   References to the container itself are ignored.
+   */
+  public func collaborate(with containers: [DependencyContainer]) {
+    _collaborators += containers
+  }
+  
   /// Tries to resolve key using collaborating containers
   private func _resolveWithCollaborators<T>(key: DefinitionKey, builder: _Definition throws -> T) -> T? {
     for collaborator in _collaborators {
@@ -522,18 +537,19 @@ extension DependencyContainer {
           context.resolvingType == key.protocolType &&
           context.tag == key.associatedTag { continue }
 
-        //We pass current context pool or current container resolved instances pool
-        //to later collect all resolved instances and call Resolvable callbacks in a correct order
-        collaborator.resolvableInstancesPool = resolvableInstancesPool
+        //We pass current container's instances pool
+        //so that it is cleaned and resolvable collbacks are called not when collaborator's context ends
+        //but when current container context ends
+        let resolvedInstances = collaborator.resolvedInstances
+        collaborator.resolvedInstances = self.resolvedInstances
+        defer {
+          collaborator.resolvedInstances = resolvedInstances
+        }
         
         let resolved = try collaborator.inContext(key.associatedTag) {
           try collaborator._resolveKey(key, builder: builder)
         }
 
-        if resolvableInstancesPool !== self.resolvedInstances {
-          resolvableInstancesPool.resolvableInstances.appendContentsOf(resolvableInstancesPool.resolvableInstances)
-        }
-        
         return resolved
       }
       catch {
@@ -628,14 +644,10 @@ extension DependencyContainer {
   }
 }
 
-///Pool to store resolved instances that conform to `Resolvable` protocol
-protocol ResolvableInstancesPool: class {
-  var resolvableInstances: [Resolvable] { get set }
-}
-
 ///Pool to hold instances, created during call to `resolve()`.
 ///Before `resolve()` returns pool is drained.
-private class ResolvedInstances: ResolvableInstancesPool {
+private class ResolvedInstances {
+  weak var container: DependencyContainer?
   var resolvedInstances = [DefinitionKey: Any]()
   var singletons = [DefinitionKey: Any]()
   var resolvableInstances = [Resolvable]()

@@ -597,22 +597,78 @@ class DipTests: XCTestCase {
     }
   }
   
-  func testContainerCollaborators() {
-    var collaborator: DependencyContainer? = DependencyContainer()
-    collaborator!.register { ResolvableService() as Service }
+}
 
-    container.collaborate(with: collaborator!)
-    XCTAssertFalse(container._collaborators.isEmpty)
+extension DipTests {
+
+  func testThatItCanResolveUsingContainersCollaboration() {
+    //given
+    let collaborator = DependencyContainer()
+    collaborator.register { ResolvableService() as Service }
+
+    //when
+    container.collaborate(with: collaborator)
     
+    //then
     AssertNoThrow(expression: try container.resolve() as Service)
     AssertNoThrow(expression: try container.resolve(Service.self))
+  }
+  
+  func testThatCollaboratingWithSelfIsIgnored() {
+    let collaborator = DependencyContainer()
+    collaborator.collaborate(with: collaborator)
+    XCTAssertTrue(collaborator._collaborators.isEmpty, "Container should not collaborate with itself")
     
-    collaborator!.collaborate(with: collaborator!)
-    XCTAssertTrue(collaborator!._collaborators.isEmpty, "Container should not collaborate with itself")
-    
+  }
+  
+  func testThatCollaboratingContainersAreWeakReferences() {
+    //given
+    var collaborator: DependencyContainer? = DependencyContainer()
     weak var weakCollaborator = collaborator
+    
+    //when
+    container.collaborate(with: collaborator!)
     collaborator = nil
+    
+    //then
     XCTAssertNil(weakCollaborator)
+  }
+  
+  func testThatCollaboratingContainersReuseInstances() {
+    //given
+    class ServerImp: Server {
+      weak var client: Client?
+      init(client: Client) { self.client = client }
+    }
+    class ClientImp: Client {
+      var server: Server?
+      var anotherServer: Server?
+      init() {}
+    }
+    
+    let serverContainer = DependencyContainer() { container in
+      container.register(.ObjectGraph) { ServerImp(client: $0) as Server }
+    }
+    let clientContainer = DependencyContainer() { container in
+      container.register(.ObjectGraph) { ClientImp() as Client }
+        .resolveDependencies { container, client in
+          let client = client as! ClientImp
+          client.server = try container.resolve() as Server
+          client.anotherServer = try container.resolve() as Server
+      }
+    }
+
+    //when
+    serverContainer.collaborate(with: clientContainer)
+    clientContainer.collaborate(with: serverContainer)
+    let client = try? clientContainer.resolve() as Client
+    
+    //then
+    XCTAssertNotNil(client)
+    XCTAssertTrue(client === client?.server?.client)
+    XCTAssertTrue(client === (client as? ClientImp)?.anotherServer?.client)
+    XCTAssertTrue(client?.server === (client as? ClientImp)?.anotherServer
+    )
   }
   
 }
