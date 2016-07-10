@@ -36,7 +36,7 @@ extension AutoWiringDefinition {
 extension DependencyContainer {
   
   /// Tries to resolve instance using auto-wire factories
-  func _autowire<T>(key: DefinitionKey) throws -> T {
+  func autowire<T>(key: DefinitionKey) throws -> T {
     let shouldLogErrors = context.logErrors
     defer { context.logErrors = shouldLogErrors }
     context.logErrors = false
@@ -50,7 +50,7 @@ extension DependencyContainer {
     let resolved: Any?
     do {
       let definitions = autoWiringDefinitions(type, tag: tag)
-      resolved = try _resolve(enumerating: definitions) { try _resolveKey($0, tag: tag, type: type) }
+      resolved = try resolve(enumerating: definitions) { try resolveKey($0, tag: tag, type: type) }
     }
     catch {
       throw DipError.AutoWiringFailed(type: type, underlyingError: error)
@@ -79,7 +79,7 @@ extension DependencyContainer {
   }
   
   /// Enumerates definitions one by one until one of them succeeds, otherwise returns nil
-  private func _resolve(enumerating keyDefinitionPairs: [KeyDefinitionPair], @noescape block: (DefinitionKey) throws -> Any?) throws -> Any? {
+  private func resolve(enumerating keyDefinitionPairs: [KeyDefinitionPair], @noescape block: (DefinitionKey) throws -> Any?) throws -> Any? {
     for (index, keyDefinitionPair) in keyDefinitionPairs.enumerate() {
       //If the next definition matches current definition then they are ambigous
       if let nextPair = keyDefinitionPairs[next: index], case keyDefinitionPair = nextPair {
@@ -96,11 +96,12 @@ extension DependencyContainer {
     return nil
   }
   
-  private func _resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any {
+  private func resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any {
     let key = key.tagged(tag ?? context.tag)
-    return try _resolveKey(key, builder: { definition in
+    let resolved: Any = try resolveKey(key, builder: { definition in
       try definition.autoWiringFactory!(self, tag)
     })
+    return resolved
   }
   
 }

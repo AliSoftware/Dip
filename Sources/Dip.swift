@@ -171,7 +171,7 @@ extension DependencyContainer {
       let currentContext = self.context
       
       defer {
-        self.context = currentContext
+        context = currentContext
         
         //clean instances pool if it is owned not by other container
         if context == nil && resolvedInstances.container === self {
@@ -187,7 +187,7 @@ extension DependencyContainer {
       }
       
       if currentContext ==  nil {
-        self.context = Context(
+        context = Context(
           tag: tag,
           injectedInType: nil,
           injectedInProperty: nil,
@@ -195,7 +195,7 @@ extension DependencyContainer {
         )
       }
       else {
-        self.context = Context(
+        context = Context(
           tag: tag,
           injectedInType: currentContext.injectedInType ?? currentContext.resolvingType,
           injectedInProperty: injectedInProperty ?? currentContext.injectedInProperty,
@@ -413,16 +413,16 @@ extension DependencyContainer {
     let key = DefinitionKey(protocolType: type, argumentsType: U.self, associatedTag: tag?.dependencyTag)
     
     return try inContext(tag?.dependencyTag, resolvingType: type) {
-      try _resolveKey(key, builder: { definition throws -> Any in
+      try resolveKey(key, builder: { definition throws -> Any in
         try builder(definition.weakFactory)
       })
     }
   }
   
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
-  func _resolveKey<T>(key: DefinitionKey, builder: (_Definition throws -> T)) throws -> T {
-    guard let matching = definition(matching: key) else {
-      return try _resolveWithCollaborators(key, builder: builder) ?? _autowire(key)
+  func resolveKey<T>(key: DefinitionKey, builder: (_Definition throws -> T)) throws -> T {
+    guard let matching = self.definition(matching: key) else {
+      return try resolveWithCollaborators(key, builder: builder) ?? autowire(key)
     }
     
     let (key, definition) = matching
@@ -518,7 +518,7 @@ extension DependencyContainer {
   }
   
   /// Tries to resolve key using collaborating containers
-  private func _resolveWithCollaborators<T>(key: DefinitionKey, builder: _Definition throws -> T) -> T? {
+  private func resolveWithCollaborators<T>(key: DefinitionKey, builder: _Definition throws -> T) -> T? {
     for collaborator in _collaborators {
       do {
         //if container is already in a context resolving this type 
@@ -609,7 +609,7 @@ extension DependencyContainer {
         for argumentsSet in arguments where argumentsSet.dynamicType == key.argumentsType {
           do {
             try inContext(key.associatedTag, resolvingType: key.protocolType) {
-              try _resolveKey(key, builder: { definition throws -> Any in
+              try resolveKey(key, builder: { definition throws -> Any in
                 try definition.weakFactory(argumentsSet)
               })
             }
