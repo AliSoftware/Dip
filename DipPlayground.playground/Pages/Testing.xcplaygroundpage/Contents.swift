@@ -1,4 +1,4 @@
-//: [Previous: Shared Instances](@previous)
+//: [Previous: Containers Collaboration](@previous)
 
 //import XCTest
 import Dip
