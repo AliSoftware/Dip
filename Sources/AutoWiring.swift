@@ -125,10 +125,15 @@ private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
   return true
 }
 
-func filter(definitions: [KeyDefinitionPair], type: Any.Type, tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
-  return definitions
+func filter(definitions: [KeyDefinitionPair], type: Any.Type, tag: DependencyContainer.Tag?, argumentsType: Any.Type? = nil) -> [KeyDefinitionPair] {
+  let definitions =  definitions
     .filter({ $0.key.protocolType == type || $0.definition.doesImplements(type) })
     .filter({ $0.key.associatedTag == tag || $0.key.associatedTag == nil })
+  
+  if let argumentsType = argumentsType {
+    return definitions.filter({ $0.key.argumentsType == argumentsType })
+  }
+  return definitions
 }
 
 func order(definitions: [KeyDefinitionPair], tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {

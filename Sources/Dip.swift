@@ -425,18 +425,7 @@ extension DependencyContainer {
       return try _resolveWithCollaborators(key, builder: builder) ?? _autowire(key)
     }
     
-    do {
-      return try _resolveDefinition(matching.definition, key: matching.key, builder: builder)
-    }
-      //if failed to resolve type for matching key - try auto-wiring
-      //(usually happens when inferring optional type)
-    catch let DipError.DefinitionNotFound(errorKey) where errorKey.protocolType == matching.key.protocolType {
-      return try _autowire(key)
-    }
-  }
-  
-  /// Actually resolve dependency.
-  private func _resolveDefinition<T>(definition: _Definition, key: DefinitionKey, builder: _Definition throws -> T) throws -> T {
+    let (key, definition) = matching
     
     //first search for already resolved instance for this type or any of forwarding types
     if let previouslyResolved: T = previouslyResolved(definition, key: key) {
@@ -496,7 +485,7 @@ extension DependencyContainer {
   private func definition(matching key: DefinitionKey) -> KeyDefinitionPair? {
     let typeDefinitions = definitions.filter({ $0.0.protocolType ==  key.protocolType })
     guard !typeDefinitions.isEmpty else {
-      return typeForwardingDefinition(key.protocolType, tag: key.associatedTag)
+      return typeForwardingDefinition(key)
     }
     
     if let definition = (self.definitions[key] ?? self.definitions[key.tagged(nil)]) {

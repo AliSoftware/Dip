@@ -317,13 +317,7 @@ class DefinitionBuilder<T, U> {
     let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
     definition.numberOfArguments = numberOfArguments
     definition.autoWiringFactory = autoWiringFactory
-    definition.weakFactory = {
-      guard let args = $0 as? U else {
-        let key = DefinitionKey(protocolType: T.self, argumentsType: U.self)
-        throw DipError.DefinitionNotFound(key: key)
-      }
-      return try factory(args)
-    }
+    definition.weakFactory = { try factory($0 as! U) }
     definition.forwardsToDefinition = forwardsDefinition as? _TypeForwardingDefinition
     return definition
   }
