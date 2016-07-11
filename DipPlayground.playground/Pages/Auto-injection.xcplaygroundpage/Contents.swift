@@ -1,4 +1,4 @@
-//: [Previous: Shared Instances](@previous)
+//: [Previous: Auto-wiring](@previous)
 
 import UIKit
 import Dip

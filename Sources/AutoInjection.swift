@@ -28,10 +28,10 @@ extension DependencyContainer {
    Resolves properties of passed object wrapped with `Injected<T>` or `InjectedWeak<T>`
    */
   func autoInjectProperties(instance: Any) throws {
-    try Mirror(reflecting: instance).children.forEach(_resolveChild)
+    try Mirror(reflecting: instance).children.forEach(resolveChild)
   }
   
-  private func _resolveChild(child: Mirror.Child) throws {
+  private func resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
     try inContext(

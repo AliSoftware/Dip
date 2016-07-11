@@ -74,14 +74,14 @@ extension DependencyContainer {
   }
   
   /// Searches for definition that forwards requested type
-  func typeForwardingDefinition(type: Any.Type, tag: DependencyContainer.Tag?) -> KeyDefinitionPair? {
+  func typeForwardingDefinition(key: DefinitionKey) -> KeyDefinitionPair? {
     var forwardingDefinitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    forwardingDefinitions = filter(forwardingDefinitions, type: type, tag: tag)
-    forwardingDefinitions = order(forwardingDefinitions, byTag: tag)
+    forwardingDefinitions = filter(forwardingDefinitions, type: key.protocolType, tag: key.associatedTag, argumentsType: key.argumentsType)
+    forwardingDefinitions = order(forwardingDefinitions, tag: key.associatedTag)
 
     //we need to carry on original tag
-    return forwardingDefinitions.first.map({ ($0.key.tagged(tag), $0.definition) })
+    return forwardingDefinitions.first.map({ ($0.key.tagged(key.associatedTag), $0.definition) })
   }
   
 }

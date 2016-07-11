@@ -22,6 +22,13 @@
 // THE SOFTWARE.
 //
 
+class WeakBox<T: AnyObject> {
+  weak var value: T?
+  init(value: T) {
+    self.value = value
+  }
+}
+
 extension Dictionary {
   subscript(key: Key?) -> Value? {
     get {
