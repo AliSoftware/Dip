@@ -62,7 +62,9 @@ class ComponentScopeTests: XCTestCase {
       ("testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve", testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve),
       ("testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTagWhenResolvingForAnotherTag),
       ("testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag", testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag),
-      ("testThatItReusesResolvedInstanceWhenResolvingOptional", testThatItReusesResolvedInstanceWhenResolvingOptional)
+      ("testThatItReusesResolvedInstanceWhenResolvingOptional", testThatItReusesResolvedInstanceWhenResolvingOptional),
+      ("testThatItHoldsWeakReferenceToWeakSingletonInstance",
+          testThatItHoldsWeakReferenceToWeakSingletonInstance)
     ]
   }
   
@@ -318,5 +320,20 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertTrue(anyImpOtherService as! ServiceImp1 === service as! ServiceImp1)
   }
   
+  func testThatItHoldsWeakReferenceToWeakSingletonInstance() {
+    //given
+    container.register(.WeakSingleton) { ServiceImp1() as Service }
+    var strongSingleton: Service? = try! container.resolve() as Service
+    weak var weakSingleton = try! container.resolve() as Service
+    
+    //then
+    XCTAssertTrue(weakSingleton === strongSingleton)
+    
+    //when
+    strongSingleton = nil
+    
+    //then
+    XCTAssertNil(weakSingleton)
+  }
 }
 

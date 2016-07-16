@@ -634,7 +634,7 @@ extension DipTests {
     XCTAssertNil(weakCollaborator)
   }
   
-  func testThatCollaboratingContainersReuseInstances() {
+  func testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer() {
     //given
     class ServerImp: Server {
       weak var client: Client?
@@ -661,14 +661,21 @@ extension DipTests {
     //when
     serverContainer.collaborate(with: clientContainer)
     clientContainer.collaborate(with: serverContainer)
-    let client = try? clientContainer.resolve() as Client
+    var client = try? clientContainer.resolve() as Client
     
     //then
     XCTAssertNotNil(client)
     XCTAssertTrue(client === client?.server?.client)
     XCTAssertTrue(client === (client as? ClientImp)?.anotherServer?.client)
-    XCTAssertTrue(client?.server === (client as? ClientImp)?.anotherServer
-    )
+    XCTAssertTrue(client?.server === (client as? ClientImp)?.anotherServer)
+    
+    client = try? serverContainer.resolve() as Client
+    
+    //then
+    XCTAssertNotNil(client)
+    XCTAssertTrue(client === client?.server?.client)
+    XCTAssertTrue(client === (client as? ClientImp)?.anotherServer?.client)
+    XCTAssertTrue(client?.server === (client as? ClientImp)?.anotherServer)
   }
   
 }
