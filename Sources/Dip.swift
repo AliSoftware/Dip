@@ -198,6 +198,10 @@ extension DependencyContainer {
         //clean instances pool if it is owned not by other container
         if context == nil {
           resolvedInstances.resolvedInstances.removeAll()
+          for (key, instance) in resolvedInstances.weakSingletons {
+            if resolvedInstances.weakSingletons[key] is WeakBoxType { continue }
+            resolvedInstances.weakSingletons[key] = WeakBox(value: instance)
+          }
           
           // We call didResolveDependencies only at this point
           // because this is a point when dependencies graph is complete.
@@ -449,6 +453,7 @@ extension DependencyContainer {
      let anyService: Any = optService
      let service: Service = anyService as! Service
      
+     That happens because when Optional is casted to Any Swift can not implicitly unwrap it with as operator.
      As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
      */
     if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
@@ -650,12 +655,14 @@ extension DependencyContainer {
 private class ResolvedInstances {
   var resolvedInstances = [DefinitionKey: Any]()
   var singletons = [DefinitionKey: Any]()
+  var weakSingletons = [DefinitionKey: Any]()
   var resolvableInstances = [Resolvable]()
   
   subscript(forKey key: DefinitionKey, inScope scope: ComponentScope) -> Any? {
     get {
       switch scope {
       case .Singleton, .EagerSingleton: return singletons[key]
+      case .WeakSingleton: return (weakSingletons[key] as? WeakBoxType)?.unboxed ?? weakSingletons[key]
       case .ObjectGraph: return resolvedInstances[key]
       case .Prototype: return nil
       }
@@ -663,6 +670,7 @@ private class ResolvedInstances {
     set {
       switch scope {
       case .Singleton, .EagerSingleton: singletons[key] = newValue
+      case .WeakSingleton: weakSingletons[key] = newValue
       case .ObjectGraph: resolvedInstances[key] = newValue
       case .Prototype: break
       }
@@ -819,29 +827,6 @@ public enum DipError: ErrorType, CustomStringConvertible {
     }
   }
   
-}
-
-///Internal protocol used to unwrap optional values.
-private protocol BoxType {
-  var unboxed: Any? { get }
-}
-
-extension Optional: BoxType {
-  private var unboxed: Any? {
-    switch self {
-    case let .Some(value): return value
-    default: return nil
-    }
-  }
-}
-
-extension ImplicitlyUnwrappedOptional: BoxType {
-  private var unboxed: Any? {
-    switch self {
-    case let .Some(value): return value
-    default: return nil
-    }
-  }
 }
 
 //MARK: - Deprecated methods

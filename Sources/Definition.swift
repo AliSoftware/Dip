@@ -111,7 +111,7 @@ public enum ComponentScope {
   /**
    Resolved instance will be retained by the container and always reused.
    Do not mix this life cycle with _singleton pattern_.
-   Instance will be not shared between different containers.
+   Instance will be not shared between different containers unless they collaborate.
    
    - warning: Make sure this component is thread safe or accessed always from the same thread.
    
@@ -139,11 +139,18 @@ public enum ComponentScope {
   case Singleton
   
   /**
-   The same scope as `Singleton`, but instance will be created when container is bootstrapped.
+   The same scope as a `Singleton`, but instance will be created when container is bootstrapped.
    
    - seealso: `bootstrap()`
   */
   case EagerSingleton
+  
+  /**
+   The same scope as a `Singleton`, but container stores week reference to the resolved instance.
+   While a strong reference to the resolved instance exists resolve will return the same instance.
+   After the resolved instance is deallocated next resolve will produce a new instance.
+  */
+  case WeakSingleton
 }
 
 ///Dummy protocol to store definitions for different types in collection

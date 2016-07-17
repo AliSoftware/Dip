@@ -34,10 +34,44 @@ func log(logLevel: LogLevel, _ message: Any) {
   print(message)
 }
 
-class WeakBox<T: AnyObject> {
-  weak var value: T?
+///Internal protocol used to unwrap optional values.
+protocol BoxType {
+  var unboxed: Any? { get }
+}
+
+extension Optional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .Some(value): return value
+    default: return nil
+    }
+  }
+}
+
+extension ImplicitlyUnwrappedOptional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .Some(value): return value
+    default: return nil
+    }
+  }
+}
+
+protocol WeakBoxType {
+  var unboxed: AnyObject? { get }
+}
+
+class WeakBox<T>: WeakBoxType {
+  weak var unboxed: AnyObject?
+  var value: T? {
+    return unboxed as? T
+  }
+
   init(value: T) {
-    self.value = value
+    guard let value = value as? AnyObject else {
+      fatalError("Can not store weak reference to not a class instance (\(T.self))")
+    }
+    self.unboxed = value
   }
 }
 

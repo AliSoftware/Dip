@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol Service {}
+public protocol Service: class {}
 
 public class ServiceImp1: Service {
   public init() {}
