@@ -171,15 +171,15 @@ extension DependencyContainer {
     }
     
     public var description: String {
-      let resolvingDescription = "resolving type \(key.protocolType) with arguments \(key.argumentsType) tagged with \(key.associatedTag.desc)"
+      let resolvingDescription = "Resolving type \(key.protocolType) with arguments \(key.argumentsType) tagged with \(key.associatedTag.desc)"
       if injectedInProperty != nil {
-        return "Auto-injecting property \(injectedInProperty.desc) of \(injectedInType.desc) \(resolvingDescription)"
+        return "\(resolvingDescription) while auto-injecting property \(injectedInProperty.desc) of \(injectedInType.desc)"
       }
       else if injectedInType != nil {
-        return "Injecting in type \(injectedInType.desc) \(resolvingDescription)"
+        return "\(resolvingDescription) while injecting in type \(injectedInType.desc)"
       }
       else {
-        return String(resolvingDescription.characters.prefix(1)).capitalizedString + String(resolvingDescription.characters.dropFirst())
+        return resolvingDescription
       }
     }
     
