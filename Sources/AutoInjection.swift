@@ -35,7 +35,7 @@ extension DependencyContainer {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
     let contextKey = DefinitionKey(protocolType: injectedPropertyBox.dynamicType.wrappedType, argumentsType: Void.self, associatedTag: context.tag)
-    try inContext(contextKey, injectedInProperty: child.label) {
+    try inContext(contextKey, injectedInProperty: child.label, logErrors: false) {
         try injectedPropertyBox.resolve(self)
     }
   }
@@ -277,7 +277,7 @@ private class _InjectedPropertyBox<T> {
         throw error
       }
       else {
-        print(error)
+        log(.Errors, error)
         return nil
       }
     }
