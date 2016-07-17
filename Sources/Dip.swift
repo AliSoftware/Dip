@@ -69,7 +69,6 @@ public final class DependencyContainer {
    - returns: A new DependencyContainer.
    */
   public init(@noescape configBlock: (DependencyContainer->()) = { _ in }) {
-    resolvedInstances.container = self
     configBlock(self)
   }
   
@@ -179,7 +178,7 @@ extension DependencyContainer {
         context = currentContext
         
         //clean instances pool if it is owned not by other container
-        if context == nil && resolvedInstances.container === self {
+        if context == nil {
           resolvedInstances.resolvedInstances.removeAll()
           
           // We call didResolveDependencies only at this point
@@ -523,13 +522,15 @@ extension DependencyContainer {
           context.resolvingType == key.protocolType &&
           context.tag == key.associatedTag { continue }
 
-        //We pass current container's instances pool
-        //so that it is cleaned and resolvable collbacks are called not when collaborator's context ends
-        //but when current container context ends
+        //Pass current container's instances pool to collect instances resolved by collaborator
         let resolvedInstances = collaborator.resolvedInstances
         collaborator.resolvedInstances = self.resolvedInstances
+        //Set collaborator context to preserve current container context
+        let context = collaborator.context
+        collaborator.context = self.context
         defer {
           collaborator.resolvedInstances = resolvedInstances
+          collaborator.context = context
         }
         
         let resolved = try collaborator.inContext(key, injectedInProperty: self.context.injectedInProperty, injectedInType: self.context.injectedInType, logErrors: false) {
@@ -633,7 +634,6 @@ extension DependencyContainer {
 ///Pool to hold instances, created during call to `resolve()`.
 ///Before `resolve()` returns pool is drained.
 private class ResolvedInstances {
-  weak var container: DependencyContainer?
   var resolvedInstances = [DefinitionKey: Any]()
   var singletons = [DefinitionKey: Any]()
   var resolvableInstances = [Resolvable]()
