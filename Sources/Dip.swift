@@ -457,7 +457,7 @@ extension DependencyContainer {
       return previouslyResolved
     }
 
-    resolvedInstances.storeResolvedInstance(resolvedInstance, forKey: key, inScope: definition.scope)
+    resolvedInstances[forKey: key, inScope: definition.scope] = resolvedInstance
 
     if let resolvable = resolvedInstance as? Resolvable {
       resolvedInstances.resolvableInstances.append(resolvable)
@@ -474,7 +474,7 @@ extension DependencyContainer {
       DefinitionKey(protocolType: $0, argumentsType: key.argumentsType, associatedTag: key.associatedTag)
     })
     for key in [key] + keys {
-      if let previouslyResolved: T = resolvedInstances.previouslyResolvedInstance(forKey: key, inScope: definition.scope) {
+      if let previouslyResolved = resolvedInstances[forKey: key, inScope: definition.scope] as? T {
         return previouslyResolved
       }
     }
@@ -644,19 +644,20 @@ private class ResolvedInstances {
   var singletons = [DefinitionKey: Any]()
   var resolvableInstances = [Resolvable]()
   
-  func storeResolvedInstance<T>(instance: T, forKey key: DefinitionKey, inScope scope: ComponentScope) {
-    switch scope {
-    case .Singleton, .EagerSingleton: singletons[key] = instance
-    case .ObjectGraph: resolvedInstances[key] = instance
-    case .Prototype: break
+  subscript(forKey key: DefinitionKey, inScope scope: ComponentScope) -> Any? {
+    get {
+      switch scope {
+      case .Singleton, .EagerSingleton: return singletons[key]
+      case .ObjectGraph: return resolvedInstances[key]
+      case .Prototype: return nil
+      }
     }
-  }
-  
-  func previouslyResolvedInstance<T>(forKey key: DefinitionKey, inScope scope: ComponentScope) -> T? {
-    switch scope {
-    case .Singleton, .EagerSingleton: return singletons[key] as? T
-    case .ObjectGraph: return resolvedInstances[key] as? T
-    case .Prototype: return nil
+    set {
+      switch scope {
+      case .Singleton, .EagerSingleton: singletons[key] = newValue
+      case .ObjectGraph: resolvedInstances[key] = newValue
+      case .Prototype: break
+      }
     }
   }
   
