@@ -449,6 +449,7 @@ extension DependencyContainer {
      let anyService: Any = optService
      let service: Service = anyService as! Service
      
+     That happens because when Optional is casted to Any Swift can not implicitly unwrap it with as operator.
      As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
      */
     if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
