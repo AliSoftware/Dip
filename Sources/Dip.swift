@@ -137,7 +137,7 @@ extension DependencyContainer {
    
    ```
    */
-  public struct Context {
+  public struct Context: CustomStringConvertible, CustomDebugStringConvertible {
     
     internal(set) public var key: DefinitionKey
     
@@ -165,12 +165,30 @@ extension DependencyContainer {
       self.injectedInType = injectedInType
       self.injectedInProperty = injectedInProperty
     }
+    
+    public var debugDescription: String {
+      return "Context(key: \(key), injectedInType: \(injectedInType.desc), injectedInProperty: \(injectedInProperty.desc) logErrors: \(logErrors))"
+    }
+    
+    public var description: String {
+      let resolvingDescription = "resolving type \(key.protocolType) with arguments \(key.argumentsType) tagged with \(key.associatedTag.desc)"
+      if injectedInProperty != nil {
+        return "Auto-injecting property \(injectedInProperty.desc) of \(injectedInType.desc) \(resolvingDescription)"
+      }
+      else if injectedInType != nil {
+        return "Injecting in type \(injectedInType.desc) \(resolvingDescription)"
+      }
+      else {
+        return String(resolvingDescription.characters.prefix(1)).capitalizedString + String(resolvingDescription.characters.dropFirst())
+      }
+    }
+    
   }
 
   /// Pushes new context created with provided values and calls block. When block returns previous context is restored.
   /// For `nil` values (except tag) new context will use values from the current context.
   /// Will releas resolved instances and call `Resolvable` callbacks when popped to initial context.
-  func inContext<T>(key: DefinitionKey, injectedInProperty: String? = nil, injectedInType: Any.Type? = nil, logErrors: Bool = true, @noescape block: () throws -> T) rethrows -> T {
+  func inContext<T>(key: DefinitionKey, injectedInProperty: String? = nil, injectedInType: Any.Type? = nil, logErrors: Bool! = nil, @noescape block: () throws -> T) rethrows -> T {
     return try threadSafe {
       let currentContext = self.context
       
@@ -195,13 +213,13 @@ extension DependencyContainer {
         injectedInType: injectedInType ?? currentContext?.resolvingType,
         injectedInProperty: injectedInProperty
       )
-      context.logErrors = logErrors
+      context.logErrors = logErrors ?? currentContext?.logErrors ?? true
       
       do {
         return try block()
       }
       catch {
-        if context.logErrors { print(error) }
+        if context.logErrors { log(.Errors, error) }
         throw error
       }
     }
@@ -414,9 +432,11 @@ extension DependencyContainer {
     
     //first search for already resolved instance for this type or any of forwarding types
     if let previouslyResolved: T = previouslyResolved(definition, key: key) {
+      log(.Verbose, "Reusing previously resolved instance \(previouslyResolved)")
       return previouslyResolved
     }
     
+    log(.Verbose, context)
     var resolvedInstance = try builder(definition)
     
     /*
@@ -439,6 +459,7 @@ extension DependencyContainer {
     //when it returns instance that we try to resolve here can be already resolved
     //so we return it, throwing away instance created by previous call to builder
     if let previouslyResolved: T = previouslyResolved(definition, key: key) {
+      log(.Verbose, "Reusing previously resolved instance \(previouslyResolved)")
       return previouslyResolved
     }
 
@@ -451,6 +472,7 @@ extension DependencyContainer {
     try autoInjectProperties(resolvedInstance)
     try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
     
+    log(.Verbose, "Resolved type \(key.protocolType) with \(resolvedInstance)")
     return resolvedInstance
   }
   
@@ -606,7 +628,7 @@ extension DependencyContainer {
             throw error
           }
             //ignore other errors
-          catch { print(error) }
+          catch { log(.Errors, error) }
         }
         
         //try to resolve key using auto-wiring
@@ -617,7 +639,7 @@ extension DependencyContainer {
           throw error
         }
           //ignore other errors
-        catch { print(error) }
+        catch { log(.Errors, error) }
       }
     }
   }
@@ -786,13 +808,13 @@ public enum DipError: ErrorType, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
-      return "[DIP] No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
+      return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
     case let .AutoInjectionFailed(label, type, error):
-      return "[DIP] Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
+      return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
     case let .AutoWiringFailed(type, error):
-      return "[DIP] Failed to auto-wire type \"\(type)\". \(error)"
+      return "Failed to auto-wire type \"\(type)\". \(error)"
     case let .AmbiguousDefinitions(type, definitions):
-      return "[DIP] Ambiguous definitions for \(type):\n" +
+      return "Ambiguous definitions for \(type):\n" +
       definitions.map({ "\($0)" }).joinWithSeparator(";\n")
     }
   }

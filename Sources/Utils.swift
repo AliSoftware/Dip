@@ -22,6 +22,18 @@
 // THE SOFTWARE.
 //
 
+public enum LogLevel {
+  case Verbose
+  case Errors
+  case None
+}
+public var logLevel: LogLevel = .Errors
+
+func log(logLevel: LogLevel, _ message: Any) {
+  guard case logLevel = Dip.logLevel else { return }
+  print(message)
+}
+
 class WeakBox<T: AnyObject> {
   weak var value: T?
   init(value: T) {
