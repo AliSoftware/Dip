@@ -34,11 +34,8 @@ extension DependencyContainer {
   private func resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
-    try inContext(
-      context.tag,
-      resolvingType: injectedPropertyBox.dynamicType.wrappedType,
-      injectedInProperty: child.label)
-    {
+    let contextKey = DefinitionKey(protocolType: injectedPropertyBox.dynamicType.wrappedType, argumentsType: Void.self, associatedTag: context.tag)
+    try inContext(contextKey, injectedInProperty: child.label) {
         try injectedPropertyBox.resolve(self)
     }
   }
@@ -269,7 +266,9 @@ private class _InjectedPropertyBox<T> {
   private func resolve(container: DependencyContainer) throws -> T? {
     let tag = overrideTag ? self.tag : container.context.tag
     do {
-      return try container.resolve(tag: tag) as T
+      container.context.key = container.context.key.tagged(tag)
+      let key = DefinitionKey(protocolType: T.self, argumentsType: Void.self, associatedTag: tag?.dependencyTag)
+      return try resolve(container, key: key, builder: { factory in try factory() }) as? T
     }
     catch {
       let error = DipError.AutoInjectionFailed(label: container.context.injectedInProperty, type: container.context.resolvingType, underlyingError: error)
@@ -282,6 +281,12 @@ private class _InjectedPropertyBox<T> {
         return nil
       }
     }
+  }
+  
+  private func resolve<U>(container: DependencyContainer, key: DefinitionKey, builder: (U throws -> Any) throws -> Any) throws -> Any {
+    return try container.resolveKey(key, builder: { definition throws -> Any in
+      try builder(definition.weakFactory)
+    })
   }
   
 }
