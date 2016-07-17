@@ -463,8 +463,8 @@ extension DependencyContainer {
       resolvedInstances.resolvableInstances.append(resolvable)
     }
 
-    try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
     try autoInjectProperties(resolvedInstance)
+    try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
     
     return resolvedInstance
   }
