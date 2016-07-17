@@ -170,7 +170,7 @@ extension DependencyContainer {
   /// Pushes new context created with provided values and calls block. When block returns previous context is restored.
   /// For `nil` values (except tag) new context will use values from the current context.
   /// Will releas resolved instances and call `Resolvable` callbacks when popped to initial context.
-  func inContext<T>(key: DefinitionKey, injectedInProperty: String? = nil, injectedInType: Any.Type? = nil, logErrors: Bool = true, @noescape block: () throws -> T) throws -> T {
+  func inContext<T>(key: DefinitionKey, injectedInProperty: String? = nil, injectedInType: Any.Type? = nil, logErrors: Bool = true, @noescape block: () throws -> T) rethrows -> T {
     return try threadSafe {
       let currentContext = self.context
       
@@ -337,7 +337,7 @@ extension DependencyContainer {
    
    */
   public func resolve<T>(tag tag: DependencyTagConvertible? = nil) throws -> T {
-    return try resolve(tag: tag) { (factory: () throws -> T) in try factory() }
+    return try resolve(tag: tag) { factory in try factory() }
   }
   
   /**
@@ -356,7 +356,7 @@ extension DependencyContainer {
    - seealso: `resolve(tag:)`, `register(tag:_:factory:)`
    */
   public func resolve(type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory(())}
+    return try resolve(type, tag: tag) { factory in try factory() }
   }
 
   /**
@@ -383,18 +383,10 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce the number of dependencies.
    */
-  public func resolve<T, U>(tag tag: DependencyTagConvertible? = nil, builder: (U throws -> T) throws -> T) throws -> T {
-    let resolved = try resolve(T.self, tag: tag, builder: { (factory: (U throws -> Any)) in
-      try builder({
-        guard let resolved = try factory($0) as? T else {
-          let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
-          throw DipError.DefinitionNotFound(key: key)
-        }
-        return resolved
-      })
-    })
-    
-    return resolved as! T
+  public func resolve<T, U>(tag tag: DependencyTagConvertible? = nil, builder: (U throws -> T) throws -> T) rethrows -> T {
+    return try resolve(T.self, tag: tag, builder: { factory in
+      try builder({ try factory($0) as! T })
+    }) as! T
   }
   
   /**
@@ -402,11 +394,11 @@ extension DependencyContainer {
    
    - seealso: `resolve(tag:builder:)`
   */
-  public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) throws -> Any {
+  public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) rethrows -> Any {
     let key = DefinitionKey(protocolType: type, argumentsType: U.self, associatedTag: tag?.dependencyTag)
     
     return try inContext(key) {
-      try resolveKey(key, builder: { definition throws -> Any in
+      try resolveKey(key, builder: { definition in
         try builder(definition.weakFactory)
       })
     }

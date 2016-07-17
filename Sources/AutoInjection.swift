@@ -266,15 +266,9 @@ private class _InjectedPropertyBox<T> {
   private func resolve(container: DependencyContainer) throws -> T? {
     let tag = overrideTag ? self.tag : container.context.tag
     do {
-      let key = DefinitionKey(protocolType: T.self, argumentsType: Void.self, associatedTag: tag)
       container.context.key = container.context.key.tagged(tag)
-      return try container.resolveKey(key, builder: { (definition) -> T in
-        guard let resolved = try definition.weakFactory(()) as? T else {
-          let key = DefinitionKey(protocolType: T.self, argumentsType: Void.self, associatedTag: tag?.dependencyTag)
-          throw DipError.DefinitionNotFound(key: key)
-        }
-        return resolved
-      })
+      let key = DefinitionKey(protocolType: T.self, argumentsType: Void.self, associatedTag: tag?.dependencyTag)
+      return try resolve(container, key: key, builder: { factory in try factory() }) as? T
     }
     catch {
       let error = DipError.AutoInjectionFailed(label: container.context.injectedInProperty, type: container.context.resolvingType, underlyingError: error)
@@ -287,6 +281,12 @@ private class _InjectedPropertyBox<T> {
         return nil
       }
     }
+  }
+  
+  private func resolve<U>(container: DependencyContainer, key: DefinitionKey, builder: (U throws -> Any) throws -> Any) throws -> Any {
+    return try container.resolveKey(key, builder: { definition throws -> Any in
+      try builder(definition.weakFactory)
+    })
   }
   
 }
