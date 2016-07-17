@@ -62,7 +62,7 @@ class AutoWiringTests: XCTestCase {
       ("testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency", testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency),
       ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain),
       ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag),
-      ("testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithNoTag", testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithNoTag),
+      ("testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithAnotherTag", testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithAnotherTag),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Arguments),
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Arguments),
@@ -265,6 +265,31 @@ class AutoWiringTests: XCTestCase {
     XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
   }
   
+  func testThatItReusesInstancesResolvedWithoutAutoWiringWhenUsingAutoWiringAgain() {
+    
+    //given
+    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(.ObjectGraph) { ServiceImp2() }
+    
+    var anotherInstance: AutoWiredClient?
+    
+    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+      .resolveDependencies { container, _ in
+        if anotherInstance == nil {
+          anotherInstance = try! container.resolve() as AutoWiredClient
+        }
+    }
+    
+    //when
+    let service1 = try! container.resolve() as Service?
+    let service2 = try! container.resolve() as ServiceImp2
+    let resolved = try! container.resolve(withArguments: service1, service2) as AutoWiredClient
+    
+    //then
+    //when doing another auto-wiring during resolve we should reuse instance
+    XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
+  }
+
   func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag() {
     
     //given

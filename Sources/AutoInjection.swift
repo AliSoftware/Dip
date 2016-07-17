@@ -28,23 +28,15 @@ extension DependencyContainer {
    Resolves properties of passed object wrapped with `Injected<T>` or `InjectedWeak<T>`
    */
   func autoInjectProperties(instance: Any) throws {
-    try Mirror(reflecting: instance).children.forEach(_resolveChild)
+    try Mirror(reflecting: instance).children.forEach(resolveChild)
   }
   
-  private func _resolveChild(child: Mirror.Child) throws {
+  private func resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
-    try inContext(
-      context.tag,
-      resolvingType: injectedPropertyBox.dynamicType.wrappedType,
-      injectedInProperty: child.label)
-    {
-      do {
+    let contextKey = DefinitionKey(protocolType: injectedPropertyBox.dynamicType.wrappedType, argumentsType: Void.self, associatedTag: context.tag)
+    try inContext(contextKey, injectedInProperty: child.label, logErrors: false) {
         try injectedPropertyBox.resolve(self)
-      }
-      catch {
-        throw DipError.AutoInjectionFailed(label: child.label, type: injectedPropertyBox.dynamicType.wrappedType, underlyingError: error)
-      }
     }
   }
   
@@ -272,15 +264,29 @@ private class _InjectedPropertyBox<T> {
   }
 
   private func resolve(container: DependencyContainer) throws -> T? {
-    let resolved: T?
     let tag = overrideTag ? self.tag : container.context.tag
-    if required {
-      resolved = try container.resolve(tag: tag) as T
+    do {
+      container.context.key = container.context.key.tagged(tag)
+      let key = DefinitionKey(protocolType: T.self, argumentsType: Void.self, associatedTag: tag?.dependencyTag)
+      return try resolve(container, key: key, builder: { factory in try factory() }) as? T
     }
-    else {
-      resolved = try? container.resolve(tag: tag) as T
+    catch {
+      let error = DipError.AutoInjectionFailed(label: container.context.injectedInProperty, type: container.context.resolvingType, underlyingError: error)
+      
+      if required {
+        throw error
+      }
+      else {
+        log(.Errors, error)
+        return nil
+      }
     }
-    return resolved
+  }
+  
+  private func resolve<U>(container: DependencyContainer, key: DefinitionKey, builder: (U throws -> Any) throws -> Any) throws -> Any {
+    return try container.resolveKey(key, builder: { definition throws -> Any in
+      try builder(definition.weakFactory)
+    })
   }
   
 }

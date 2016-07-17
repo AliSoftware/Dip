@@ -344,5 +344,18 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertNotNil(nilTaggedServer)
   }
   
+  func testThatItAutoInjectsPropertyWithCollaboratingContainer() {
+    let collaborator = DependencyContainer()
+    collaborator.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
+    container.collaborate(with: collaborator)
+    collaborator.collaborate(with: container)
+    
+    let client = try! container.resolve() as Client
+    let server = client.server
+    XCTAssertTrue(client === server?.client)
+  }
+  
 }
 

@@ -106,4 +106,4 @@ container.register(listInteractorDefinition, type: ListInteractorInput.self)
 }
 addPresenter = try! container.resolve() as AddPresenter
 
-//: [Next: Testing](@next)
+//: [Next: Containers Collaboration](@next)
