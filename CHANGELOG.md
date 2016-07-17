@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 4.6.0
+
+* Containers collaboration. Break your definitions in modules and link them together.  
+  [#95](https://github.com/AliSoftware/Dip/pull/95), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added WeakSingleton scope.  
+  [#96](https://github.com/AliSoftware/Dip/pull/96), [@ilyapuchka](https://github.com/ilyapuchka)
+* Properties Auto-injection now is performed before calling `resolveDependencies` block  
+  [#97](https://github.com/AliSoftware/Dip/pull/97), [@ilyapuchka](https://github.com/ilyapuchka)
+* Fixed updating container's context when resolving properties with auto-injection.  
+  [#98](https://github.com/AliSoftware/Dip/pull/98), [@ilyapuchka](https://github.com/ilyapuchka) 
+* Improved logging.  
+  [#94](https://github.com/AliSoftware/Dip/pull/94), [#99](https://github.com/AliSoftware/Dip/pull/99), [@ilyapuchka](https://github.com/ilyapuchka)
+* Fixed warning about using only extensions api.  
+  [#92](https://github.com/AliSoftware/Dip/pull/92), [@mwoollard](https://github.com/mwoollard)
+
 ## 4.5.0
 
 * Added weakly-typed API to resolve components when exact type is unknown during compile time.  
