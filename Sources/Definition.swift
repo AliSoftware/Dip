@@ -74,7 +74,7 @@ public enum ComponentScope {
    
    ```
    */
-  case Prototype
+  case prototype
   
   /**
    Instance resolved with the same definition will be reused until topmost `resolve(tag:)` method returns.
@@ -100,7 +100,7 @@ public enum ComponentScope {
    consumer1.service1 !== consumer2.service1 //true
    ```
    */
-  case ObjectGraph
+  case objectGraph
 
   /**
    Resolved instance will be retained by the container and always reused.
@@ -130,14 +130,14 @@ public enum ComponentScope {
    consumer1.service1 === consumer2.service1 //true
    ```
    */
-  case Singleton
+  case singleton
   
   /**
    The same scope as `Singleton`, but instance will be created when container is bootstrapped.
    
    - seealso: `bootstrap()`
   */
-  case EagerSingleton
+  case eagerSingleton
 }
 
 /**
@@ -153,7 +153,7 @@ public final class DefinitionOf<T, F>: Definition {
   let factory: F
   let scope: ComponentScope
   
-  private(set) var weakFactory: (Any throws -> Any)!
+  private(set) var weakFactory: ((Any) throws -> Any)!
   private var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
   
   //Auto-wiring helpers
@@ -189,7 +189,7 @@ public final class DefinitionOf<T, F>: Definition {
    ```
    
    */
-  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+  public func resolveDependencies(_ block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
     guard resolveDependenciesBlock == nil else {
       fatalError("You can not change resolveDependencies block after it was set.")
     }
@@ -215,7 +215,7 @@ public protocol Definition: class { }
 protocol _Definition: Definition {
   var scope: ComponentScope { get }
 
-  var weakFactory: (Any throws -> Any)! { get }
+  var weakFactory: ((Any) throws -> Any)! { get }
 
   var numberOfArguments: Int { get }
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
@@ -241,7 +241,7 @@ extension DefinitionOf: CustomStringConvertible {
 
 /// Internal class used to build definition
 class DefinitionBuilder<T, U> {
-  typealias F = U throws -> T
+  typealias F = (U) throws -> T
   
   var scope: ComponentScope!
   var factory: F!
@@ -249,21 +249,21 @@ class DefinitionBuilder<T, U> {
   var numberOfArguments: Int = 0
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
   
-  init(configure: @noescape DefinitionBuilder -> ()) {
+  init(configure: @noescape (DefinitionBuilder) -> ()) {
     configure(self)
   }
   
   func build() -> DefinitionOf<T, F> {
     let factory = self.factory
-    let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
+    let definition = DefinitionOf<T, F>(scope: scope, factory: factory!)
     definition.numberOfArguments = numberOfArguments
     definition.autoWiringFactory = autoWiringFactory
     definition.weakFactory = {
       guard let args = $0 as? U else {
         let key = DefinitionKey(protocolType: T.self, argumentsType: U.self)
-        throw DipError.DefinitionNotFound(key: key)
+        throw DipError.definitionNotFound(key: key)
       }
-      return try factory(args)
+      return try factory!(args)
     }
     return definition
   }

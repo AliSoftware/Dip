@@ -25,30 +25,30 @@
 extension DependencyContainer {
   
   /// Tries to resolve instance using auto-wire factories
-  func _resolveByAutoWiring<T>(key: DefinitionKey) throws -> T {
+  func _resolveByAutoWiring<T>(_ key: DefinitionKey) throws -> T {
     guard key.argumentsType == Void.self else {
-      throw DipError.DefinitionNotFound(key: key)
+      throw DipError.definitionNotFound(key: key)
     }
     
     let tag = key.associatedTag
     let type = key.protocolType
-    let autoWiringDefinitions = self.autoWiringDefinitionsFor(type: type, tag: tag)
+    let autoWiringDefinitions = self.autoWiringDefinitionsFor(type, tag: tag)
     let resolved: Any?
     do {
-      resolved = try _resolveEnumeratingKeys(definitions: autoWiringDefinitions) { try _resolveKey(key: $0, tag: tag, type: type) }
+      resolved = try _resolveEnumeratingKeys(autoWiringDefinitions) { try _resolveKey($0, tag: tag, type: type) }
     }
     catch {
-      throw DipError.AutoWiringFailed(type: type, underlyingError: error)
+      throw DipError.autoWiringFailed(type: type, underlyingError: error)
     }
     if let resolved = resolved as? T  {
       return resolved
     }
     else {
-      throw DipError.DefinitionNotFound(key: key)
+      throw DipError.definitionNotFound(key: key)
     }
   }
 
-  private func autoWiringDefinitionsFor(type: Any.Type, tag: DependencyContainer.Tag?) -> [(DefinitionKey, _Definition)] {
+  private func autoWiringDefinitionsFor(_ type: Any.Type, tag: DependencyContainer.Tag?) -> [(DefinitionKey, _Definition)] {
     var definitions = self.definitions.map({ ($0.0, $0.1) })
     
     //filter definitions
@@ -70,11 +70,11 @@ extension DependencyContainer {
   }
   
   /// Tries definitions one by one until one of them succeeds, otherwise returns nil
-  private func _resolveEnumeratingKeys(definitions: [(DefinitionKey, _Definition)], block: @noescape(DefinitionKey) throws -> Any?) throws -> Any? {
+  private func _resolveEnumeratingKeys(_ definitions: [(DefinitionKey, _Definition)], block: @noescape (DefinitionKey) throws -> Any?) throws -> Any? {
     for (index, definition) in definitions.enumerated() {
       //If the next definition matches current definition then they are ambigous
       if case definition? = definitions[next: index] {
-          throw DipError.AmbiguousDefinitions(
+          throw DipError.ambiguousDefinitions(
             type: definition.0.protocolType,
             definitions: [definition.1, definitions[next: index]!.1]
         )
@@ -87,10 +87,10 @@ extension DependencyContainer {
     return nil
   }
   
-  private func _resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any {
+  private func _resolveKey(_ key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any {
     let key = DefinitionKey(protocolType: key.protocolType, argumentsType: key.argumentsType, associatedTag: tag ?? context.tag)
     
-    return try _resolveKey(key: key, builder: { definition in
+    return try _resolveKey(key, builder: { definition in
       try definition.autoWiringFactory!(self, tag)
     })
   }
