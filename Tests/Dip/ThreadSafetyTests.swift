@@ -77,12 +77,12 @@ private let resolveClientSync: () -> Client? = {
 }
   
 #else
-let queue = NSOperationQueue()
-let lock = NSRecursiveLock()
+let queue = OperationQueue()
+let lock = RecursiveLock()
   
 private let resolveClientSync: () -> Client? = {
   var client: Client?
-  dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+  DispatchQueue.global(attributes: DispatchQueue.GlobalAttributes.qosDefault).sync {
     client = try! container.resolve() as Client
   }
   return client
@@ -140,7 +140,7 @@ class ThreadSafetyTests: XCTestCase {
   #endif
   
   func testSingletonThreadSafety() {
-    container.register(scope: .Singleton) { ServerImp() as Server }
+    container.register(scope: .singleton) { ServerImp() as Server }
     
     for _ in 0..<100 {
       #if os(Linux)
@@ -188,11 +188,11 @@ class ThreadSafetyTests: XCTestCase {
   
   
   func testCircularReferenceThreadSafety() {
-    container.register(scope: .ObjectGraph) {
+    container.register(scope: .objectGraph) {
       ClientImp(server: try container.resolve()) as Client
     }
     
-    container.register(scope: .ObjectGraph) { ServerImp() as Server }
+    container.register(scope: .objectGraph) { ServerImp() as Server }
       .resolveDependencies { container, server in
         server.client = resolveClientSync()
     }

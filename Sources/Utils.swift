@@ -91,5 +91,5 @@ extension Collection where Self.Index: Comparable {
   
 #else
   import Foundation
-  typealias RecursiveLock = NSRecursiveLock
+  typealias RecursiveLock = Foundation.RecursiveLock
 #endif

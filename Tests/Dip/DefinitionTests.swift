@@ -33,8 +33,8 @@ class DefinitionTests: XCTestCase {
   private typealias F1 = () -> Service
   private typealias F2 = (String) -> Service
   
-  let tag1 = DependencyContainer.Tag.String("tag1")
-  let tag2 = DependencyContainer.Tag.String("tag2")
+  let tag1 = DependencyContainer.Tag.string("tag1")
+  let tag2 = DependencyContainer.Tag.string("tag2")
   
   #if os(Linux)
   static var allTests: [(String, DefinitionTests -> () throws -> Void)] {
@@ -86,7 +86,7 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+    let def = DefinitionOf<Service, () -> Service>(scope: .prototype) { ServiceImp() as Service }
       .resolveDependencies { container, service in
         blockCalled = true
     }
@@ -102,7 +102,7 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+    let def = DefinitionOf<Service, () -> Service>(scope: .prototype) { ServiceImp() as Service }
       .resolveDependencies { container, service in
         blockCalled = true
     }
@@ -115,7 +115,7 @@ class DefinitionTests: XCTestCase {
   }
   
   func testThatItRegisteresOptionalTypesAsForwardedTypes() {
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+    let def = DefinitionOf<Service, () -> Service>(scope: .prototype) { ServiceImp() as Service }
     
     XCTAssertTrue(def.implementingTypes.contains({ $0 == Service?.self }))
     XCTAssertTrue(def.implementingTypes.contains({ $0 == Service!.self }))
