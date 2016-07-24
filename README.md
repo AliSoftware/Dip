@@ -24,11 +24,13 @@ It's aimed to be as simple as possible yet provide rich functionality usual for 
 
 ## Documentation & Usage Examples
 
-Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.4.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
+Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.6.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
 
-You can find bunch of usage examples in a [wiki](wiki).
+You can find bunch of usage examples in a [wiki](../../wiki). 
+
+If your are using [VIPER](https://www.objc.io/issues/13-architecture/viper/) architecture - [here](https://github.com/ilyapuchka/VIPER-SWIFT) is VIPER demo app that uses Dip instead of manual dependency injection.
 
 There are also several blog posts that describe how to use Dip and some of its implementation details:
 
@@ -41,15 +43,17 @@ File an issue if you have any question.
 
 ## Features
 
-- **[Scopes](wiki/scopes)**. Dip supports 4 different scopes (or life cycle strategies): _Prototype_, _ObjectGraph_, _Singleton_, _EagerSingleton_;
-- **[Named definitions](wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
-- **[Runtime arguments](wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
-- **[Circular dependencies](wiki/circular-dependencies)**. Dip can resolve circular dependencies;
-- **[Auto-wiring](wiki/auto-wiring)** & **[Auto-injection](wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
-- **[Storyboards integration](wiki/storyboards-integration)**. You can easily use Dip along with storyboards without ever referencing it in your view controller's code;
-- **Easy configuration**. No complex container hierarchy, no unneeded functionality;
+- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Prototype_, _ObjectGraph_, _Singleton_, _EagerSingleton_;
+- **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
+- **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
+- **[Circular dependencies](../../wiki/circular-dependencies)**. Dip can resolve circular dependencies;
+- **[Auto-wiring](../../wiki/auto-wiring)** & **[Auto-injection](../../wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
+- **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types.
+- **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
+- **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.
+- **[Easy configuration](../../wiki/configuration)**. No complex container hierarchy, no unneeded functionality;
 - **Thread safety**. Registering and resolving components is thread safe;
-- **Helpful error messages**. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
+- **Helpful error messages and configuration validation**. You can validate your container configuration. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
 
 ## Basic usage
 
@@ -60,7 +64,7 @@ import Dip
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // Create the container
-    private let container = DependencyContainer() { container in
+    private let container = DependencyContainer { container in
     
         // Register some factory. ServiceImp here implements protocol Service
         container.register { ServiceImp() as Service }
@@ -94,16 +98,16 @@ import DipUI
 extension DependencyContainer {
 
 	static func configure() -> DependencyContainer {
-		return DependencyContainer() { container in 
+		return DependencyContainer { container in 
 			container.register(tag: "ViewController") { ViewController() }
-			  .resolveDependencies() { container, controller in
+			  .resolveDependencies { container, controller in
 				  controller.animationsFactory = try container.resolve() as AnimatonsFactory
 			}
     
-			container.register() { AuthFormBehaviourImp(apiClient: $0) as AuthFormBehaviour }
-			container.register() { [unowned container] container as AnimationsFactory }
-			container.register() { view in ShakeAnimationImp(view: view) as ShakeAnimation }
-			container.register() { APIClient(baseURL: NSURL(string: "http://localhost:2368")!) as ApiClient }
+			container.register { AuthFormBehaviourImp(apiClient: $0) as AuthFormBehaviour }
+			container.register { container as AnimationsFactory }
+			container.register { view in ShakeAnimationImp(view: view) as ShakeAnimation }
+			container.register { APIClient(baseURL: NSURL(string: "http://localhost:2368")!) as ApiClient }
 		}
 	}
 
@@ -155,20 +159,21 @@ If you use [Swift Package Manager](https://swift.org/package-manager/) add Dip a
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.4.0")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.6.0")
   ]
 )
 ```
 
 ## Running tests
 
-On OSX you can run tests from Xcode. On Linux you need to have Swift Package Manager installed and use it to build test executable:
+On OSX you can run tests from Xcode. On Linux you need to have Swift Package Manager installed and use it to build and run tests:
 
 ```
-cd Dip/DipTests
-swift build
-./.build/debug/DipTests
+cd Dip
+swift build && swift test
 ```
+
+> Note: Swift Package Manager is destributed with Swift development snapshots only, so it builds packages using Swift 3. To build Dip you will need to build it with Swift 2.2, for that you need to set [`$SWIFT_EXEC`](https://github.com/apple/swift-package-manager#choosing-swift-version) environment variable.
 
 ## Credits
 

@@ -20,7 +20,11 @@ struct SWAPIPersonProvider : PersonProviderAPI {
         self.ws = webService
     }
     
+<<<<<<< HEAD
+    func fetchIDs(completion: [Int] -> Void) {
+=======
     func fetchIDs(completion: ([Int]) -> Void) {
+>>>>>>> feature/swift3
         ws.request(path: "people") { response in
             do {
                 let dict = try response.json() as NSDictionary
@@ -38,7 +42,11 @@ struct SWAPIPersonProvider : PersonProviderAPI {
         }
     }
     
+<<<<<<< HEAD
+    func fetch(id: Int, completion: Person? -> Void) {
+=======
     func fetch(id: Int, completion: (Person?) -> Void) {
+>>>>>>> feature/swift3
         ws.request(path: "people/\(id)") { response in
             do {
                 let json = try response.json() as NSDictionary

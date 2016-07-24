@@ -1,4 +1,4 @@
-//: [Previous: Shared Instances](@previous)
+//: [Previous: Auto-wiring](@previous)
 
 import UIKit
 import Dip
@@ -210,4 +210,4 @@ In such scenario when view controller is created by storyboard you will need to 
 So as you can see there are certain advantages and disadvatages of using auto-injection. It makes your definitions simpler, especially if there are circular dependencies involved or the number of dependencies is high, removing boilerplate calls to `resolve` method in `resolveDependencies` block of your definitions. But it requires additional properties and some boilerplate code in your implementations, makes your implementatios tightly coupled with Dip. You can avoid tight coupoling by using your own boxing classes instead of `Injected<T>` and `InjectedWeak<T>` (see `AutoInjectedPropertyBox`).
 */
 
-//: [Next: Testing](@next)
+//: [Next: Type Forwarding](@next)

@@ -120,8 +120,8 @@ class AutoInjectionTests: XCTestCase {
   #endif
 
   func testThatItResolvesAutoInjectedDependencies() {
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
     
     let client = try! container.resolve() as Client
     let server = client.server
@@ -129,8 +129,8 @@ class AutoInjectionTests: XCTestCase {
   }
   
   func testThatItCanSetInjectedProperty() {
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
     
     let client = (try! container.resolve() as Client) as! ClientImp
     let server = client.server as! ServerImp
@@ -145,15 +145,15 @@ class AutoInjectionTests: XCTestCase {
   }
   
   func testThatItThrowsErrorIfFailsToAutoInjectDependency() {
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ClientImp() as Client }
     
     AssertThrows(expression: try container.resolve() as Client)
   }
 
   func testThatItResolvesAutoInjectedSingletons() {
     //given
-    container.register(scope: .singleton) { ServerImp() as Server }
-    container.register(scope: .singleton) { ClientImp() as Client }
+    container.register(.Singleton) { ServerImp() as Server }
+    container.register(.Singleton) { ClientImp() as Client }
     
     //when
     let sharedClient = try! container.resolve() as Client
@@ -172,33 +172,33 @@ class AutoInjectionTests: XCTestCase {
     var serverBlockWasCalled = false
     
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { (container, server) -> () in
         serverBlockWasCalled = true
     }
 
     var clientBlockWasCalled = false
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ClientImp() as Client }
       .resolveDependencies { (container, client) -> () in
         clientBlockWasCalled = true
     }
 
     //when
-    try! container.resolve() as Client
+    let _ = try! container.resolve() as Client
     XCTAssertTrue(serverBlockWasCalled)
     
-    try! container.resolve() as Server
+    let _ = try! container.resolve() as Server
     XCTAssertTrue(clientBlockWasCalled)
   }
   
   func testThatItReusesResolvedAutoInjectedInstances() {
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { (container, server) -> () in
         server.anotherClient = try! container.resolve() as Client
     }
 
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ClientImp() as Client }
       .resolveDependencies { (container, client) -> () in
         client.anotherServer = try! container.resolve() as Server
     }
@@ -221,9 +221,9 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection() {
     //given
-    container.register(scope: .objectGraph) { Obj1() }
-    container.register(scope: .objectGraph) { Obj2() }
-    container.register(scope: .objectGraph) { Obj3(obj: try self.container.resolve()) }
+    container.register(.ObjectGraph) { Obj1() }
+    container.register(.ObjectGraph) { Obj2() }
+    container.register(.ObjectGraph) { Obj3(obj: try self.container.resolve()) }
     
     //when
     let obj2 = try! container.resolve() as Obj2
@@ -238,8 +238,8 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies() {
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
 
     //when
     var client: Client? = try! container.resolve() as Client
@@ -262,11 +262,11 @@ class AutoInjectionTests: XCTestCase {
     AutoInjectionTests.serverDidInjectCalled = false
     
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
     
     //when
-    try! container.resolve() as Client
+    let _ = try! container.resolve() as Client
     
     //then
     XCTAssertTrue(AutoInjectionTests.clientDidInjectCalled)
@@ -275,17 +275,17 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected() {
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
 
     AssertNoThrow(expression: try container.resolve() as Client, "Container should not throw error if failed to resolve optional auto-injected properties.")
   }
   
   func testThatItResolvesTaggedAutoInjectedProperties() {
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register("tagged", scope: .objectGraph) { ServerImp() as Server }
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(tag: "tagged", .ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
     
     //when
     let client = try! container.resolve() as Client
@@ -302,12 +302,12 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItPassesTagToAutoInjectedProperty() {
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register("tagged", scope: .objectGraph) { ServerImp() as Server }
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(tag: "tagged", .ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
     
     //when
-    let client = try! container.resolve("tagged") as Client
+    let client = try! container.resolve(tag: "tagged") as Client
     
     //then
     let taggedServer = (client as! ClientImp).taggedServer.value!
@@ -319,16 +319,16 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag() {
     //given
-    container.register(scope: .objectGraph) { ServerImp() as Server }
-    container.register("tagged", scope: .objectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(tag: "tagged", .ObjectGraph) { ServerImp() as Server }
 
-    container.register(scope: .objectGraph) { ClientImp() as Client }
+    container.register(.ObjectGraph) { ClientImp() as Client }
       .resolveDependencies { (container, client) -> () in
         client.anotherServer = try! container.resolve() as Server
     }
 
     //when
-    let client = try! container.resolve("otherTag") as Client
+    let client = try! container.resolve(tag: "otherTag") as Client
     
     //then
     let taggedServer = (client as! ClientImp).taggedServer.value!
@@ -342,6 +342,19 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertNotNil(server)
     XCTAssertNotNil(taggedServer)
     XCTAssertNotNil(nilTaggedServer)
+  }
+  
+  func testThatItAutoInjectsPropertyWithCollaboratingContainer() {
+    let collaborator = DependencyContainer()
+    collaborator.register(.ObjectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ClientImp() as Client }
+    
+    container.collaborate(with: collaborator)
+    collaborator.collaborate(with: container)
+    
+    let client = try! container.resolve() as Client
+    let server = client.server
+    XCTAssertTrue(client === server?.client)
   }
   
 }

@@ -22,6 +22,59 @@
 // THE SOFTWARE.
 //
 
+public enum LogLevel {
+  case Verbose
+  case Errors
+  case None
+}
+public var logLevel: LogLevel = .Errors
+
+func log(_ logLevel: LogLevel, _ message: Any) {
+  guard case logLevel = Dip.logLevel else { return }
+  print(message)
+}
+
+///Internal protocol used to unwrap optional values.
+protocol BoxType {
+  var unboxed: Any? { get }
+}
+
+extension Optional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .some(value): return value
+    default: return nil
+    }
+  }
+}
+
+extension ImplicitlyUnwrappedOptional: BoxType {
+  var unboxed: Any? {
+    switch self {
+    case let .some(value): return value
+    default: return nil
+    }
+  }
+}
+
+protocol WeakBoxType {
+  var unboxed: AnyObject? { get }
+}
+
+class WeakBox<T>: WeakBoxType {
+  weak var unboxed: AnyObject?
+  var value: T? {
+    return unboxed as? T
+  }
+
+  init(value: T) {
+    guard let value = value as? AnyObject else {
+      fatalError("Can not store weak reference to not a class instance (\(T.self))")
+    }
+    self.unboxed = value
+  }
+}
+
 extension Dictionary {
   subscript(key: Key?) -> Value? {
     get {
@@ -41,20 +94,19 @@ extension Optional {
   }
 }
 
-extension Collection where Self.Index: Comparable {
+extension Collection where Index: Comparable, Self.Indices.Index == Index {
   subscript(safe index: Index) -> Generator.Element? {
-    guard index >= startIndex && index < endIndex else { return nil }
+    guard indices.startIndex..<indices.endIndex ~= index else { return nil }
     return self[index]
   }
-
   subscript(next index: Index) -> Generator.Element? {
-    return self[safe: self.index(after: index)]
+    return self[safe: indices.index(after: index)]
   }
 }
 
 #if os(Linux)
   import Glibc
-  class RecursiveLock {
+  class RecursiveLockType {
     private var _lock = _initializeRecursiveMutex()
     
     func lock() {
@@ -91,5 +143,5 @@ extension Collection where Self.Index: Comparable {
   
 #else
   import Foundation
-  typealias RecursiveLock = Foundation.RecursiveLock
+  typealias RecursiveLockType = RecursiveLock
 #endif

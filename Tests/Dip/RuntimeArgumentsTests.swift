@@ -276,20 +276,27 @@ class RuntimeArgumentsTests: XCTestCase {
   
   func testThatDifferentFactoriesRegisteredIfArgumentIsOptional() {
     //given
-    let name1 = "1", name2 = "2", name3 = "3"
+    let name1 = "1", name2 = "2"//, name3 = "3"
     container.register { (port: Int, url: String) in ServiceImp(name: name1, baseURL: url, port: port) as Service }
     container.register { (port: Int, url: String?) in ServiceImp(name: name2, baseURL: url!, port: port) as Service }
-    container.register { (port: Int, url: String!) in ServiceImp(name: name3, baseURL: url, port: port) as Service }
     
     //when
     let service1 = try! container.resolve(withArguments: 80, "http://example.com") as Service
     let service2 = try! container.resolve(withArguments: 80, "http://example.com" as String?) as Service
-    let service3 = try! container.resolve(withArguments: 80, "http://example.com" as String!) as Service
     
     //then
     XCTAssertEqual(service1.name, name1)
     XCTAssertEqual(service2.name, name2)
-    XCTAssertEqual(service3.name, name3)
+    
+    //Due to incomplete implementation of SE-0054 (bug: https://bugs.swift.org/browse/SR-2143)
+    //registering definition with T? and T! arguments types will produce two different definitions
+    //but when argement of T! will be passed to `resolve` method it will be transformed to T?
+    //and wrong definition will be used
+    //When fixed using T? and T! should not register two different definitions
+    
+//    container.register { (port: Int, url: String!) in ServiceImp(name: name3, baseURL: url, port: port) as Service }
+//    let service3 = try! container.resolve(withArguments: "http://example.com" as String!) as Service
+//    XCTAssertEqual(service3.name, name3)
   }
   
 }

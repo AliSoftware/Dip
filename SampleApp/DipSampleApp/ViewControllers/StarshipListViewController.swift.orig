@@ -16,10 +16,17 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var starshipProvider: StarshipProviderAPI!
     var personProvider: PersonProviderAPI!
     
+<<<<<<< HEAD
+    func fetchIDs(completion: [Int] -> Void) {
+        starshipProvider.fetchIDs(completion: completion)
+    }
+    func fetchOne(id shipID:Int, completion: Starship? -> Void) {
+=======
     func fetchIDs(completion: ([Int]) -> Void) {
         starshipProvider.fetchIDs(completion: completion)
     }
     func fetchOne(id shipID:Int, completion: (Starship?) -> Void) {
+>>>>>>> feature/swift3
         starshipProvider.fetch(id: shipID, completion: completion)
     }
     
@@ -50,9 +57,15 @@ extension StarshipListViewController {
         return objects?.count ?? 0
     }
     
+<<<<<<< HEAD
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: NSIndexPath) -> UITableViewCell {
+        guard let object = self.objects?[indexPath.row] else { fatalError() }
+        let cell = StarshipCell.dequeueFromTableView(tableView: tableView, forIndexPath: indexPath)
+=======
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let object = self.objects?[indexPath.row] else { fatalError() }
         let cell = StarshipCell.dequeueFromTableView(tableView, forIndexPath: indexPath)
+>>>>>>> feature/swift3
         cell.fillWithObject(object: object)
         return cell
     }

@@ -14,8 +14,8 @@ protocol FetchableTrait: class {
     var batchRequestID: Int { get set }
     var tableView: UITableView! { get }
     
-    func fetchIDs(completion: [Int] -> Void)
-    func fetchOne(id: Int, completion: ObjectType? -> Void)
+    func fetchIDs(completion: ([Int]) -> Void)
+    func fetchOne(id: Int, completion: (ObjectType?) -> Void)
     var fetchProgress: (current: Int, total: Int?) { get set }
 }
 

@@ -33,8 +33,8 @@ class DefinitionTests: XCTestCase {
   private typealias F1 = () -> Service
   private typealias F2 = (String) -> Service
   
-  let tag1 = DependencyContainer.Tag.string("tag1")
-  let tag2 = DependencyContainer.Tag.string("tag2")
+  let tag1 = DependencyContainer.Tag.String("tag1")
+  let tag2 = DependencyContainer.Tag.String("tag2")
   
   #if os(Linux)
   static var allTests: [(String, DefinitionTests -> () throws -> Void)] {
@@ -86,13 +86,13 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .prototype) { ServiceImp() as Service }
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
       .resolveDependencies { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveDependencies(of: ServiceImp(), container: DependencyContainer())
+    try! def.resolveDependenciesOf(ServiceImp(), withContainer: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -102,20 +102,20 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .prototype) { ServiceImp() as Service }
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
       .resolveDependencies { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveDependencies(of: String(), container: DependencyContainer())
+    try! def.resolveDependenciesOf(String(), withContainer: DependencyContainer())
     
     //then
     XCTAssertFalse(blockCalled)
   }
   
   func testThatItRegisteresOptionalTypesAsForwardedTypes() {
-    let def = DefinitionOf<Service, () -> Service>(scope: .prototype) { ServiceImp() as Service }
+    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
     
     XCTAssertTrue(def.implementingTypes.contains({ $0 == Service?.self }))
     XCTAssertTrue(def.implementingTypes.contains({ $0 == Service!.self }))

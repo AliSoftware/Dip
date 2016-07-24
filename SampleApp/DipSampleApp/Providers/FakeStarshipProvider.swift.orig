@@ -17,7 +17,11 @@ struct DummyStarshipProvider : StarshipProviderAPI {
         completion(Array(0..<nbShips))
     }
     
+<<<<<<< HEAD
+    func fetch(id: Int, completion: Starship? -> Void) {
+=======
     func fetch(id: Int, completion: (Starship?) -> Void) {
+>>>>>>> feature/swift3
         completion(dummyStarship(idx: id))
     }
     
@@ -66,7 +70,11 @@ class FakeStarshipProvider: StarshipProviderAPI {
         self.hardCodedProvider = hardCodedProvider
     }
     
+<<<<<<< HEAD
+    func fetchIDs(completion: [Int] -> Void) {
+=======
     func fetchIDs(completion: ([Int]) -> Void) {
+>>>>>>> feature/swift3
         hardCodedProvider.fetchIDs(completion: completion)
     }
     

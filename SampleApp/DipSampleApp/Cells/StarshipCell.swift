@@ -15,7 +15,7 @@ final class StarshipCell : UITableViewCell, FillableCell {
     @IBOutlet weak var crewLabel: UILabel!
     @IBOutlet weak var passengersLabel: UILabel!
     
-    let numberFormatter = NSNumberFormatter()
+    let numberFormatter = NumberFormatter()
     
     func fillWithObject(object starship: Starship) {
         nameLabel.text = starship.name

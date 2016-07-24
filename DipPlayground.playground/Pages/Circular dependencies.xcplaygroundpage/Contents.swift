@@ -1,6 +1,7 @@
 //: [Previous: Scopes](@previous)
 
 import Dip
+import Foundation
 
 let container = DependencyContainer()
 
@@ -25,7 +26,7 @@ class NetworkClientImp: NetworkClient {
     init() {}
 }
 
-class Interactor: NetworkClientDelegate {
+class Interactor: NSObject, NetworkClientDelegate {
     let networkClient: NetworkClient
     init(networkClient: NetworkClient) {
         self.networkClient = networkClient
@@ -43,11 +44,11 @@ It's very important that _at least one_ of them uses property injection, because
 Now you can register those classes in container:
 */
 
-container.register(scope: .ObjectGraph) {
+container.register(.ObjectGraph) {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(scope: .ObjectGraph) { NetworkClientImp() as NetworkClient }
+container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
     .resolveDependencies { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }
@@ -95,7 +96,7 @@ container.register(.Prototype) {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(scope: .ObjectGraph) { NetworkClientImp() as NetworkClient }
+container.register(.ObjectGraph) { NetworkClientImp() as NetworkClient }
     .resolveDependencies { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }

@@ -1,5 +1,38 @@
 # CHANGELOG
 
+## 4.6.0
+
+* Containers collaboration. Break your definitions in modules and link them together.  
+  [#95](https://github.com/AliSoftware/Dip/pull/95), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added WeakSingleton scope.  
+  [#96](https://github.com/AliSoftware/Dip/pull/96), [@ilyapuchka](https://github.com/ilyapuchka)
+* Properties Auto-injection now is performed before calling `resolveDependencies` block  
+  [#97](https://github.com/AliSoftware/Dip/pull/97), [@ilyapuchka](https://github.com/ilyapuchka)
+* Fixed updating container's context when resolving properties with auto-injection.  
+  [#98](https://github.com/AliSoftware/Dip/pull/98), [@ilyapuchka](https://github.com/ilyapuchka) 
+* Improved logging.  
+  [#94](https://github.com/AliSoftware/Dip/pull/94), [#99](https://github.com/AliSoftware/Dip/pull/99), [@ilyapuchka](https://github.com/ilyapuchka)
+* Fixed warning about using only extensions api.  
+  [#92](https://github.com/AliSoftware/Dip/pull/92), [@mwoollard](https://github.com/mwoollard)
+
+## 4.5.0
+
+* Added weakly-typed API to resolve components when exact type is unknown during compile time.  
+  [#79](https://github.com/AliSoftware/Dip/pull/79), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added type forwarding feature. You can register the same factory to resolve different types.  
+  [#89](https://github.com/AliSoftware/Dip/pull/89), [@ilyapuchka](https://github.com/ilyapuchka) 
+* Container now can resolve optional types :tada:  
+  [#84](https://github.com/AliSoftware/Dip/pull/84), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added container context that provides contextual information during graph resolution process.  
+  [#83](https://github.com/AliSoftware/Dip/pull/83), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added method to validate container configuration.  
+  [#87](https://github.com/AliSoftware/Dip/pull/87), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added method to manually set value wrapped by auto-injection wrappers.  
+  [#81](https://github.com/AliSoftware/Dip/pull/81), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added separate error type for failures during auto-wiring.  
+  [#85](https://github.com/AliSoftware/Dip/pull/85), [@ilyapuchka](https://github.com/ilyapuchka)
+
+
 ## 4.4.0
 
 * Added `.EagerSingleton` scope for objectes requiring early instantiation and `bootstrap()` method on `DepenencyContainer`.  
@@ -113,7 +146,7 @@
   This code: 
   
   ```swift
-  container.register("some tag") { SomeClass() as SomeProtocol }
+  container.register(tag: "some tag") { SomeClass() as SomeProtocol }
   container.resolve("some tag") as SomeProtocol
   ```
   

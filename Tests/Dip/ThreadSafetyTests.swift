@@ -67,13 +67,12 @@ import Glibc
 private var lock: pthread_spinlock_t = 0
 
 private let resolveClientSync: () -> Client? = {
-  var clientPointer: UnsafeMutablePointer<Void>? = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
+  var clientPointer: UnsafeMutablePointer<Void> = nil
   clientPointer = dispatch_sync { _ in
     let resolved = try! container.resolve() as Client
-    let unmanaged = Unmanaged.passUnretained(resolved as! ClientImp)
-    return UnsafeMutablePointer<Void>(OpaquePointer(bitPattern: Unmanaged.passUnretained(resolved as! ClientImp)))
+    return UnsafeMutablePointer(Unmanaged.passUnretained(resolved as! ClientImp).toOpaque())
   }
-  return Unmanaged<ClientImp>.fromOpaque(OpaquePointer(clientPointer!)).takeUnretainedValue()
+  return Unmanaged<ClientImp>.fromOpaque(COpaquePointer(clientPointer)).takeUnretainedValue()
 }
   
 #else
@@ -82,7 +81,7 @@ let lock = RecursiveLock()
   
 private let resolveClientSync: () -> Client? = {
   var client: Client?
-  DispatchQueue.global(attributes: DispatchQueue.GlobalAttributes.qosDefault).sync {
+  DispatchQueue.global(attributes: .qosDefault).sync() {
     client = try! container.resolve() as Client
   }
   return client
@@ -108,7 +107,6 @@ class ThreadSafetyTests: XCTestCase {
   
   #if os(Linux)
   required init(name: String, testClosure: XCTestCase throws -> Void) {
-    super.init(name: name, testClosure: testClosure)
     pthread_spin_init(&lock, 0)
   }
   
@@ -120,11 +118,11 @@ class ThreadSafetyTests: XCTestCase {
     ]
   }
   
-  override func setUp() {
+  func setUp() {
     container = DependencyContainer()
   }
   
-  override class func tearDown() {
+  func tearDown() {
     resolvedServers.removeAll()
     resolvedClients.removeAll()
   }
@@ -140,7 +138,7 @@ class ThreadSafetyTests: XCTestCase {
   #endif
   
   func testSingletonThreadSafety() {
-    container.register(scope: .singleton) { ServerImp() as Server }
+    container.register(.Singleton) { ServerImp() as Server }
     
     for _ in 0..<100 {
       #if os(Linux)
@@ -188,11 +186,11 @@ class ThreadSafetyTests: XCTestCase {
   
   
   func testCircularReferenceThreadSafety() {
-    container.register(scope: .objectGraph) {
+    container.register(.ObjectGraph) {
       ClientImp(server: try container.resolve()) as Client
     }
     
-    container.register(scope: .objectGraph) { ServerImp() as Server }
+    container.register(.ObjectGraph) { ServerImp() as Server }
       .resolveDependencies { container, server in
         server.client = resolveClientSync()
     }

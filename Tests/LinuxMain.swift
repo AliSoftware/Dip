@@ -9,5 +9,6 @@ XCTMain([
   testCase(AutoInjectionTests.allTests),
   testCase(ThreadSafetyTests.allTests),
   testCase(AutoWiringTests.allTests),
-  testCase(ContextTests.allTests)
+  testCase(ContextTests.allTests),
+  testCase(TypeForwardingTests.allTests)
 ])

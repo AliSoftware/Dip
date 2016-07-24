@@ -11,6 +11,8 @@
         <page name='Shared Instances'/>
         <page name='Auto-wiring'/>
         <page name='Auto-injection'/>
+        <page name='Type Forwarding'/>
+        <page name='Containers Collaboration'/>
         <page name='Testing'/>
     </pages>
 </playground>

@@ -106,25 +106,25 @@ class ContextTests: XCTestCase {
   func testThatContextStoresTheTagPassedToResolve() {
     container.register { () -> Service in
       XCTAssertNotNil(self.container.context.tag)
-      XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
-      let _ = try self.container.resolve("otherTag") as ServiceImp1
+      XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
+      let _ = try self.container.resolve(tag: "otherTag") as ServiceImp1
       return ServiceImp1() as Service
       }.resolveDependencies { _ in
         XCTAssertNotNil(self.container.context.tag)
-        XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
-        let _ = try self.container.resolve("otherTag") as ServiceImp1
+        XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
+        let _ = try self.container.resolve(tag: "otherTag") as ServiceImp1
     }
     
     container.register { () -> ServiceImp1 in
       XCTAssertNotNil(self.container.context.tag)
-      XCTAssertTrue(DependencyContainer.Tag.string("otherTag") ~= self.container.context.tag!)
+      XCTAssertTrue(DependencyContainer.Tag.String("otherTag") ~= self.container.context.tag!)
       return ServiceImp1()
       }.resolveDependencies { _ in
         XCTAssertNotNil(self.container.context.tag)
-        XCTAssertTrue(DependencyContainer.Tag.string("otherTag") ~= self.container.context.tag!)
+        XCTAssertTrue(DependencyContainer.Tag.String("otherTag") ~= self.container.context.tag!)
     }
     
-    let _ = try! container.resolve("tag") as Service
+    let _ = try! container.resolve(tag: "tag") as Service
   }
   
   func testThatContextStoresTheTagPassedToResolveWhenAutoInjecting() {
@@ -137,7 +137,7 @@ class ContextTests: XCTestCase {
       }
       else {
         XCTAssertNotNil(self.container.context.tag)
-        XCTAssertTrue(DependencyContainer.Tag.string("injectedTag") ~= self.container.context.tag!)
+        XCTAssertTrue(DependencyContainer.Tag.String("injectedTag") ~= self.container.context.tag!)
       }
       return ServiceImp2()
       }.resolveDependencies { _ in
@@ -146,20 +146,20 @@ class ContextTests: XCTestCase {
         }
         else {
           XCTAssertNotNil(self.container.context.tag)
-          XCTAssertTrue(DependencyContainer.Tag.string("injectedTag") ~= self.container.context.tag!)
+          XCTAssertTrue(DependencyContainer.Tag.String("injectedTag") ~= self.container.context.tag!)
         }
     }
     
-    container.register("tag") { () -> ServiceImp2 in
+    container.register(tag: "tag") { () -> ServiceImp2 in
       XCTAssertNotNil(self.container.context.tag)
-      XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
+      XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
       return ServiceImp2()
       }.resolveDependencies { _ in
         XCTAssertNotNil(self.container.context.tag)
-        XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
+        XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
     }
     
-    let _ = try! container.resolve("tag") as Service
+    let _ = try! container.resolve(tag: "tag") as Service
   }
 
   func testThatContextStoresTheTagPassedToResolveWhenAutoWiring() {
@@ -170,25 +170,25 @@ class ContextTests: XCTestCase {
     
     container.register { () -> ServiceImp1 in
       XCTAssertNotNil(self.container.context.tag)
-      XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
+      XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
       return ServiceImp1()
       }.resolveDependencies { _ in
         XCTAssertNotNil(self.container.context.tag)
-        XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
+        XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
     }
     
-    let _ = try! container.resolve("tag") as Service
+    let _ = try! container.resolve(tag: "tag") as Service
   }
 
   func testThatContextDoesNotOverrideNilTagPassedToResolve() {
     container.register { () -> Service in
       XCTAssertNotNil(self.container.context.tag)
-      XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
+      XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
       let _ = try self.container.resolve() as ServiceImp1
       return ServiceImp1() as Service
       }.resolveDependencies { _ in
         XCTAssertNotNil(self.container.context.tag)
-        XCTAssertTrue(DependencyContainer.Tag.string("tag") ~= self.container.context.tag!)
+        XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
         let _ = try self.container.resolve() as ServiceImp1
     }
     
@@ -199,7 +199,7 @@ class ContextTests: XCTestCase {
         XCTAssertNil(self.container.context.tag)
     }
     
-    let _ = try! container.resolve("tag") as Service
+    let _ = try! container.resolve(tag: "tag") as Service
   }
   
   func testThatContextStoresNameOfAutoInjectedProperty() {

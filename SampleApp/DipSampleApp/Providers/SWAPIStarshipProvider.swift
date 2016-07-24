@@ -20,7 +20,7 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
         self.ws = webService
     }
     
-    func fetchIDs(completion: [Int] -> Void) {
+    func fetchIDs(completion: ([Int]) -> Void) {
         ws.request(path: "starships") { response in
             do {
                 let dict = try response.json() as NSDictionary
@@ -38,7 +38,7 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
         }
     }
     
-    func fetch(id: Int, completion: Starship? -> Void) {
+    func fetch(id: Int, completion: (Starship?) -> Void) {
         ws.request(path: "starships/\(id)") { response in
             do {
                 let json = try response.json() as NSDictionary

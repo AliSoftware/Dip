@@ -30,7 +30,11 @@ extension BaseCell where Self : UITableViewCell {
         }
     }
     
+<<<<<<< HEAD
+    static func dequeueFromTableView(tableView: UITableView, forIndexPath indexPath: NSIndexPath) -> Self {
+=======
     static func dequeueFromTableView(_ tableView: UITableView, forIndexPath indexPath: IndexPath) -> Self {
+>>>>>>> feature/swift3
         return tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as! Self
     }
 }

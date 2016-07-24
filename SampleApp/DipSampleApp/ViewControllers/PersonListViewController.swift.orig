@@ -14,12 +14,21 @@ class PersonListViewController: UITableViewController, FetchableTrait {
     
     var personProvider: PersonProviderAPI!
     var starshipProvider: StarshipProviderAPI!
+<<<<<<< HEAD
+        
+    func fetchIDs(completion: [Int] -> Void) {
+        return personProvider.fetchIDs(completion: completion)
+    }
+    
+    func fetchOne(id personID: Int, completion: Person? -> Void) {
+=======
     
     func fetchIDs(completion: ([Int]) -> Void) {
         return personProvider.fetchIDs(completion: completion)
     }
     
     func fetchOne(id personID: Int, completion: (Person?) -> Void) {
+>>>>>>> feature/swift3
         return personProvider.fetch(id: personID, completion: completion)
     }
     
@@ -49,9 +58,15 @@ extension PersonListViewController {
         return objects?.count ?? 0
     }
     
+<<<<<<< HEAD
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: NSIndexPath) -> UITableViewCell {
+        guard let object = self.objects?[indexPath.row] else { fatalError() }
+        let cell = PersonCell.dequeueFromTableView(tableView: tableView, forIndexPath: indexPath)
+=======
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let object = self.objects?[indexPath.row] else { fatalError() }
         let cell = PersonCell.dequeueFromTableView(tableView, forIndexPath: indexPath)
+>>>>>>> feature/swift3
         cell.fillWithObject(object: object)
         return cell
     }
