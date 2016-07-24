@@ -24,6 +24,9 @@
 
 import XCTest
 
+#if os(Linux)
+  typealias NSObject = AnyObject
+#endif
 
 func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T) {
   AssertThrows(file, line: line, expression: expression, "")
@@ -62,17 +65,21 @@ func AssertNoThrow<T>(_ file: StaticString = #file, line: UInt = #line, expressi
 
 #if os(Linux)
 import Glibc
-typealias TMain = @convention(c) (UnsafeMutablePointer<Void>) -> UnsafeMutablePointer<Void>
+typealias TMain = @convention(c) (UnsafeMutablePointer<Void>?) -> UnsafeMutablePointer<Void>?
 
-func dispatch_async(block: TMain) {
+private func startThread(_ block: TMain) -> pthread_t  {
   var pid: pthread_t = 0
   pthread_create(&pid, nil, block, nil)
+  return pid
 }
 
-func dispatch_sync(block: TMain) -> UnsafeMutablePointer<Void> {
-  var pid: pthread_t = 0
-  var result: UnsafeMutablePointer<Void> = nil
-  pthread_create(&pid, nil, block, nil)
+func dispatch_async(block: TMain) -> pthread_t {
+  return startThread(block)
+}
+
+func dispatch_sync(block: TMain) -> UnsafeMutablePointer<Void>? {
+  var result: UnsafeMutablePointer<Void>? = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
+  let pid = startThread(block)
   pthread_join(pid, &result)
   return result
 }

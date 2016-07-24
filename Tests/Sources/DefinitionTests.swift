@@ -37,7 +37,7 @@ class DefinitionTests: XCTestCase {
   let tag2 = DependencyContainer.Tag.String("tag2")
   
   #if os(Linux)
-  static var allTests: [(String, DefinitionTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatDefinitionKeyIsEqualBy_Type_Factory_Tag", testThatDefinitionKeyIsEqualBy_Type_Factory_Tag),
       ("testThatDefinitionKeysWithDifferentTypesAreNotEqual", testThatDefinitionKeysWithDifferentTypesAreNotEqual),
@@ -47,7 +47,7 @@ class DefinitionTests: XCTestCase {
       ("testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance", testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance),
       ("testThatItRegisteresOptionalTypesAsForwardedTypes", testThatItRegisteresOptionalTypesAsForwardedTypes)
     ]
-  }
+  }()
   #endif
 
   func testThatDefinitionKeyIsEqualBy_Type_Factory_Tag() {

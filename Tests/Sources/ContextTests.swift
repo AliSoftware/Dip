@@ -40,7 +40,7 @@ class ContextTests: XCTestCase {
   let container = DependencyContainer()
   
   #if os(Linux)
-  static var allTests: [(String, ContextTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatContextStoresCurrentlyResolvedType", testThatContextStoresCurrentlyResolvedType),
       ("testThatContextStoresInjectedInType", testThatContextStoresInjectedInType),
@@ -50,7 +50,7 @@ class ContextTests: XCTestCase {
       ("testThatContextDoesNotOverrideNilTagPassedToResolve", testThatContextDoesNotOverrideNilTagPassedToResolve),
       ("testThatContextStoresNameOfAutoInjectedProperty", testThatContextStoresNameOfAutoInjectedProperty)
     ]
-  }
+  }()
   
   override func setUp() {
     container.reset()

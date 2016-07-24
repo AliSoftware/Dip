@@ -52,7 +52,7 @@ class RuntimeArgumentsTests: XCTestCase {
   let container = DependencyContainer()
  
   #if os(Linux)
-  static var allTests: [(String, RuntimeArgumentsTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatItResolvesInstanceWithOneArgument", testThatItResolvesInstanceWithOneArgument),
       ("testThatItResolvesInstanceWithTwoArguments", testThatItResolvesInstanceWithTwoArguments),
@@ -66,7 +66,7 @@ class RuntimeArgumentsTests: XCTestCase {
       ("testThatNewRegistrationWithSameArgumentsOverridesPreviousRegistration", testThatNewRegistrationWithSameArgumentsOverridesPreviousRegistration),
       ("testThatDifferentFactoriesRegisteredIfArgumentIsOptional", testThatDifferentFactoriesRegisteredIfArgumentIsOptional)
     ]
-  }
+  }()
 
   override func setUp() {
     container.reset()

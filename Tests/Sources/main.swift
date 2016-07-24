@@ -1,5 +1,4 @@
 import XCTest
-@testable import DipTestSuite
 
 XCTMain([
   testCase(DipTests.allTests),

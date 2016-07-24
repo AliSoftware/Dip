@@ -51,7 +51,7 @@ class AutoWiringTests: XCTestCase {
   let container = DependencyContainer()
 
   #if os(Linux)
-  static var allTests: [(String, AutoWiringTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatItCanResolveWithAutoWiring", testThatItCanResolveWithAutoWiring),
       ("testThatItUsesAutoWireFactoryWithMostNumberOfArguments", testThatItUsesAutoWireFactoryWithMostNumberOfArguments),
@@ -71,7 +71,7 @@ class AutoWiringTests: XCTestCase {
       ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Arguments),
       ("testThatItCanAutoWireOptional", testThatItCanAutoWireOptional)
     ]
-  }
+  }()
 
   override func setUp() {
     container.reset()
@@ -313,7 +313,7 @@ class AutoWiringTests: XCTestCase {
     XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
   }
   
-  func testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithNoTag() {
+  func testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithAnotherTag() {
     
     //given
     container.register(.ObjectGraph) { ServiceImp1() as Service }

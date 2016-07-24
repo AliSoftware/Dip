@@ -106,7 +106,7 @@ extension Collection where Index: Comparable, Self.Indices.Index == Index {
 
 #if os(Linux)
   import Glibc
-  class RecursiveLockType {
+  class RecursiveLock {
     private var _lock = _initializeRecursiveMutex()
     
     func lock() {
@@ -134,7 +134,7 @@ extension Collection where Index: Comparable, Self.Indices.Index == Index {
   
   extension pthread_mutex_t {
     mutating func lock() {
-      pthread_mutex_trylock(&self)
+      pthread_mutex_lock(&self)
     }
     mutating func unlock() {
       pthread_mutex_unlock(&self)
@@ -143,5 +143,4 @@ extension Collection where Index: Comparable, Self.Indices.Index == Index {
   
 #else
   import Foundation
-  typealias RecursiveLockType = RecursiveLock
 #endif

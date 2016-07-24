@@ -64,15 +64,17 @@ private var container: DependencyContainer!
 
 #if os(Linux)
 import Glibc
+  
+private var runningThreads: Int = 0
 private var lock: pthread_spinlock_t = 0
 
 private let resolveClientSync: () -> Client? = {
-  var clientPointer: UnsafeMutablePointer<Void> = nil
-  clientPointer = dispatch_sync { _ in
+  let pointer = dispatch_sync { _ in
     let resolved = try! container.resolve() as Client
-    return UnsafeMutablePointer(Unmanaged.passUnretained(resolved as! ClientImp).toOpaque())
+    return UnsafeMutablePointer<Void>(Unmanaged.passRetained(resolved as! ClientImp).toOpaque())
   }
-  return Unmanaged<ClientImp>.fromOpaque(COpaquePointer(clientPointer)).takeUnretainedValue()
+  guard let clientPointer = pointer else { return nil }
+  return Unmanaged<ClientImp>.fromOpaque(clientPointer).takeRetainedValue()
 }
   
 #else
@@ -90,9 +92,14 @@ private let resolveClientSync: () -> Client? = {
 #endif
 
 let resolveServerAsync = {
-  let service = try! container.resolve() as Server
+  let server = try! container.resolve() as Server
   lock.lock()
-  resolvedServers.insert(service as! ServerImp)
+  resolvedServers.insert(server as! ServerImp)
+
+  #if os(Linux)
+    runningThreads -= 1
+  #endif
+
   lock.unlock()
 }
 
@@ -100,34 +107,42 @@ let resolveClientAsync = {
   let client = try! container.resolve() as Client
   lock.lock()
   resolvedClients.append(client as! ClientImp)
+
+  #if os(Linux)
+    runningThreads -= 1
+  #endif
+
   lock.unlock()
 }
 
 class ThreadSafetyTests: XCTestCase {
   
   #if os(Linux)
-  required init(name: String, testClosure: XCTestCase throws -> Void) {
+  required init(name: String, testClosure: (XCTestCase) throws -> Void) {
     pthread_spin_init(&lock, 0)
+    super.init(name: name, testClosure: testClosure)
   }
   
-  static var allTests: [(String, ThreadSafetyTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testSingletonThreadSafety", testSingletonThreadSafety),
       ("testFactoryThreadSafety", testFactoryThreadSafety),
       ("testCircularReferenceThreadSafety", testCircularReferenceThreadSafety)
     ]
-  }
+  }()
   
-  func setUp() {
+  override func setUp() {
+    Dip.logLevel = .Verbose
     container = DependencyContainer()
   }
   
-  func tearDown() {
+  override func tearDown() {
     resolvedServers.removeAll()
     resolvedClients.removeAll()
   }
   #else
   override func setUp() {
+    Dip.logLevel = .Verbose
     container = DependencyContainer()
   }
   
@@ -142,17 +157,21 @@ class ThreadSafetyTests: XCTestCase {
     
     for _ in 0..<100 {
       #if os(Linux)
-      dispatch_async({ _ in
+      lock.lock()
+      runningThreads += 1
+      lock.unlock()
+        
+      dispatch_async { _ in
         resolveServerAsync()
         return nil
-      })
+      }
       #else
       queue.addOperation(resolveServerAsync)
       #endif
     }
     
     #if os(Linux)
-    sleep(1)
+    while runningThreads > 0 { sleep(1) }
     #else
     queue.waitUntilAllOperationsAreFinished()
     #endif
@@ -166,17 +185,21 @@ class ThreadSafetyTests: XCTestCase {
     
     for _ in 0..<100 {
       #if os(Linux)
-      dispatch_async({ _ in
+      lock.lock()
+      runningThreads += 1
+      lock.unlock()
+
+      dispatch_async { _ in
         resolveServerAsync()
         return nil
-      })
+      }
       #else
       queue.addOperation(resolveServerAsync)
       #endif
     }
     
     #if os(Linux)
-    sleep(1)
+    while runningThreads > 0 { sleep(1) }
     #else
     queue.waitUntilAllOperationsAreFinished()
     #endif
@@ -197,17 +220,21 @@ class ThreadSafetyTests: XCTestCase {
     
     for _ in 0..<100 {
       #if os(Linux)
-      dispatch_async({ _ in
+      lock.lock()
+      runningThreads += 1
+      lock.unlock()
+
+      dispatch_async { _ in
         resolveClientAsync()
         return nil
-      })
+      }
       #else
       queue.addOperation(resolveClientAsync)
       #endif
     }
     
     #if os(Linux)
-    sleep(1)
+    while runningThreads > 0 { sleep(1) }
     #else
     queue.waitUntilAllOperationsAreFinished()
     #endif

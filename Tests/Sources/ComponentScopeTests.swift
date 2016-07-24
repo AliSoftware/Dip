@@ -48,7 +48,7 @@ class ComponentScopeTests: XCTestCase {
   let container = DependencyContainer()
   
   #if os(Linux)
-  static var allTests: [(String, ComponentScopeTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatPrototypeIsDefaultScope", testThatPrototypeIsDefaultScope),
       ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),
@@ -66,7 +66,7 @@ class ComponentScopeTests: XCTestCase {
       ("testThatItHoldsWeakReferenceToWeakSingletonInstance",
           testThatItHoldsWeakReferenceToWeakSingletonInstance)
     ]
-  }
+  }()
   
   override func setUp() {
     container.reset()

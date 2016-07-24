@@ -50,7 +50,7 @@ class DipTests: XCTestCase {
   let container = DependencyContainer()
 
   #if os(Linux)
-  static var allTests: [(String, DipTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
       ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
@@ -65,11 +65,14 @@ class DipTests: XCTestCase {
       ("testThatItCallsDidResolveDependenciesOnResolvableIntance", testThatItCallsDidResolveDependenciesOnResolvableIntance),
       ("testThatItCallsDidResolveDependenciesInReverseOrder", testThatItCallsDidResolveDependenciesInReverseOrder),
       ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies),
-      ("testContainerCollaborators", testContainerCollaborators)
+      ("testThatItCanResolveUsingContainersCollaboration", testThatItCanResolveUsingContainersCollaboration),
+      ("testThatCollaboratingWithSelfIsIgnored", testThatCollaboratingWithSelfIsIgnored),
+      ("testThatCollaboratingContainersAreWeakReferences", testThatCollaboratingContainersAreWeakReferences),
+      ("testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer", testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer),
     ]
-  }
+  }()
 
-  func setUp() {
+  override func setUp() {
     container.reset()
   }
   #else
@@ -457,9 +460,11 @@ class DipTests: XCTestCase {
       var server: Server?
       var secondServer: Server?
       
-      override init() {
-        super.init()
-      }
+      #if os(Linux)
+      init() {}
+      #else
+      override init() { super.init() }
+      #endif
       
       var didResolveDependenciesCalled = false
       
@@ -581,8 +586,10 @@ class DipTests: XCTestCase {
   
   func testThatItFailsValidationOnlyForDipErrors() {
     //given
+    enum SomeError: ErrorProtocol { case error }
+    
     container.register { () -> Service in
-      throw NSError(domain: "", code: 0, userInfo: nil)
+      throw SomeError.error
     }
     
     //then
@@ -650,9 +657,12 @@ extension DipTests {
     class ClientImp: NSObject, Client {
       var server: Server?
       var anotherServer: Server?
-      override init() {
-        super.init()
-      }
+
+      #if os(Linux)
+      init() {}
+      #else
+      override init() { super.init() }
+      #endif
     }
     
     let serverContainer = DependencyContainer() { container in

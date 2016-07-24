@@ -92,7 +92,7 @@ class AutoInjectionTests: XCTestCase {
   let container = DependencyContainer()
   
   #if os(Linux)
-  static var allTests: [(String, AutoInjectionTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
       ("testThatItCanSetInjectedProperty", testThatItCanSetInjectedProperty),
@@ -106,9 +106,10 @@ class AutoInjectionTests: XCTestCase {
       ("testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected", testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected),
       ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties),
       ("testThatItPassesTagToAutoInjectedProperty", testThatItPassesTagToAutoInjectedProperty),
-      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag)
+      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag),
+      ("testThatItAutoInjectsPropertyWithCollaboratingContainer", testThatItAutoInjectsPropertyWithCollaboratingContainer)
     ]
-  }
+  }()
 
   override func setUp() {
     container.reset()

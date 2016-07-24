@@ -42,7 +42,7 @@ public final class DependencyContainer {
   internal(set) public var context: Context!
   var definitions = [DefinitionKey : _Definition]()
   private var resolvedInstances = ResolvedInstances()
-  private let lock = RecursiveLockType()
+  private let lock = RecursiveLock()
   
   private(set) var bootstrapped = false
   private var bootstrapQueue: [() throws -> ()] = []
