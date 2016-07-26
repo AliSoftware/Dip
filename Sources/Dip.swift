@@ -40,7 +40,7 @@ public final class DependencyContainer {
   }
   
   internal(set) public var context: Context!
-  var definitions = [DefinitionKey : _Definition]()
+  var definitions = [DefinitionKey: _Definition]()
   private var resolvedInstances = ResolvedInstances()
   private let lock = RecursiveLock()
   
@@ -328,6 +328,7 @@ extension DependencyContainer {
     threadSafe {
       let key = DefinitionKey(type: T.self, typeOfArguments: U.self, tag: tag?.dependencyTag)
       
+      definition.container = self
       definitions[key] = definition
       resolvedInstances.singletons[key] = nil
       resolvedInstances.weakSingletons[key] = nil
@@ -599,6 +600,7 @@ extension DependencyContainer {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {
+      definitions[key]?.container = nil
       definitions[key] = nil
       resolvedInstances.singletons[key] = nil
       resolvedInstances.weakSingletons[key] = nil
@@ -610,6 +612,7 @@ extension DependencyContainer {
    */
   public func reset() {
     threadSafe {
+      definitions.forEach { $0.1.container = nil }
       definitions.removeAll()
       resolvedInstances.singletons.removeAll()
       resolvedInstances.weakSingletons.removeAll()

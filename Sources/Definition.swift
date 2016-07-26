@@ -191,6 +191,8 @@ public final class Definition<T, U>: DefinitionType {
   
   //MARK: - _Definition
 
+  weak var container: DependencyContainer?
+  
   let factory: F
   let scope: ComponentScope
   private(set) var weakFactory: (Any throws -> Any)!
@@ -265,7 +267,7 @@ public final class Definition<T, U>: DefinitionType {
   private func implements(types: [Any.Type]) {
     implementingTypes.appendContentsOf(types.filter({ !doesImplements($0) }))
   }
-
+  
   /// Definition to which resolution will be forwarded to
   private weak var forwardsToDefinition: _TypeForwardingDefinition? {
     didSet {
@@ -295,6 +297,7 @@ protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefini
   var scope: ComponentScope { get }
   var weakFactory: (Any throws -> Any)! { get }
   func resolveProperties(instance instance: Any, container: DependencyContainer) throws
+  var container: DependencyContainer? { get set }
 }
 
 //MARK: - Type Forwarding

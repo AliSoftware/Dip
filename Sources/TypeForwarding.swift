@@ -27,6 +27,54 @@ protocol TypeForwardingDefinition: DefinitionType {
   func doesImplements(type: Any.Type) -> Bool
 }
 
+extension Definition {
+  
+  public func implements<F>(type: F.Type, tag: DependencyTagConvertible? = nil, resolvingProperties: (DependencyContainer, F) throws -> () = { _ in }) -> Definition {
+    let container = self.container!
+    let key = DefinitionKey(type: F.self, typeOfArguments: U.self)
+    
+    let forwardDefinition = DefinitionBuilder<F, U> {
+      $0.scope = scope
+      
+      $0.factory = { [factory] in
+        guard let resolved = try factory($0) as? F else {
+          throw DipError.DefinitionNotFound(key: key.tagged(container.context.tag))
+        }
+        return resolved
+      }
+      
+      $0.numberOfArguments = numberOfArguments
+      $0.autoWiringFactory = autoWiringFactory.map({ autoWiringFactory in
+        {
+          guard let resolved = try autoWiringFactory($0, $1) as? F else {
+            throw DipError.DefinitionNotFound(key: key.tagged(container.context.tag))
+          }
+          return resolved
+        }
+      })
+      
+      $0.forwardsDefinition = self
+      }.build()
+      .resolvingProperties(resolvingProperties)
+    
+    container.register(forwardDefinition, forTag: tag)
+    return self
+  }
+
+  public func implements<A, B>(a: A.Type, _ b: B.Type) -> Definition {
+    return implements(a).implements(b)
+  }
+
+  public func implements<A, B, C>(a: A.Type, _ b: B.Type, _ c: C.Type) -> Definition {
+    return implements(a).implements(b).implements(c)
+  }
+
+  public func implements<A, B, C, D>(a: A.Type, _ b: B.Type, c: C.Type, d: D.Type) -> Definition {
+    return implements(a).implements(b).implements(c).implements(d)
+  }
+
+}
+
 extension DependencyContainer {
   
   /**
@@ -42,6 +90,7 @@ extension DependencyContainer {
    
    - returns: New definition for passed type.
    */
+  @available(*, deprecated=5.0.0, message="Use implements(_:tag:resolvingProperties:) method of Definition instead.")
   public func register<T, U, F>(definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
     let key = DefinitionKey(type: F.self, typeOfArguments: U.self)
     
