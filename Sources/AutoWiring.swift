@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 
-protocol AutoWiringDefinition: Definition {
+protocol AutoWiringDefinition: DefinitionType {
   var numberOfArguments: Int? { get }
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
 }

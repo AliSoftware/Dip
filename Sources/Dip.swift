@@ -267,7 +267,7 @@ extension DependencyContainer {
    container.register { try ClientImp(service: container.resolve() as Service) as Client }
    ```
    */
-  public func register<T>(scope: ComponentScope = .Shared, tag: DependencyTagConvertible? = nil, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
+  public func register<T>(scope: ComponentScope = .Shared, tag: DependencyTagConvertible? = nil, factory: () throws -> T) -> Definition<T, ()> {
     let definition = DefinitionBuilder<T, ()> {
       $0.scope = scope
       $0.factory = factory
@@ -293,7 +293,7 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Shared, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
+   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Shared, factory: (A, B, C, ...) throws -> T) -> Definition<T, (A, B, C, ...)> {
      return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: ...) { container, tag in
         try factory(container.resolve(tag: tag), ...)
       }
@@ -302,7 +302,7 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
-  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T, numberOfArguments: Int, autoWiringFactory: (DependencyContainer, Tag?) throws -> T) -> DefinitionOf<T, U throws -> T> {
+  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T, numberOfArguments: Int, autoWiringFactory: (DependencyContainer, Tag?) throws -> T) -> Definition<T, U> {
     let definition = DefinitionBuilder<T, U> {
       $0.scope = scope
       $0.factory = factory
@@ -322,7 +322,7 @@ extension DependencyContainer {
       - definition: The definition to register in the container.
    
    */
-  public func register<T, U>(definition: DefinitionOf<T, U throws -> T>, forTag tag: DependencyTagConvertible? = nil) {
+  public func register<T, U>(definition: Definition<T, U>, forTag tag: DependencyTagConvertible? = nil) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {
@@ -590,7 +590,7 @@ extension DependencyContainer {
       - tag: The tag used to register definition.
       - definition: The definition to remove
    */
-  public func remove<T, U>(definition: DefinitionOf<T, U>, forTag tag: DependencyTagConvertible? = nil) {
+  public func remove<T, U>(definition: Definition<T, U>, forTag tag: DependencyTagConvertible? = nil) {
     let key = DefinitionKey(type: T.self, typeOfArguments: U.self, tag: tag?.dependencyTag)
     remove(definitionForKey: key)
   }
@@ -837,7 +837,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
       - type: The type that failed to be resolved by auto-wiring
       - definitions: Ambiguous definitions
   */
-  case AmbiguousDefinitions(type: Any.Type, definitions: [Definition])
+  case AmbiguousDefinitions(type: Any.Type, definitions: [DefinitionType])
   
   public var description: String {
     switch self {
@@ -859,7 +859,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
 
 extension DependencyContainer {
   @available(*, deprecated=4.3.0, message="Use registerFactory(tag:scope:factory:numberOfArguments:autoWiringFactory:) instead.")
-  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T) -> DefinitionOf<T, U throws -> T> {
+  public func registerFactory<T, U>(tag tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: U throws -> T) -> Definition<T, U> {
     let definition = DefinitionBuilder<T, U> {
       $0.scope = scope
       $0.factory = factory

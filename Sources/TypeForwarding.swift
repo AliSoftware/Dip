@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 
-protocol TypeForwardingDefinition: Definition {
+protocol TypeForwardingDefinition: DefinitionType {
   var implementingTypes: [Any.Type] { get }
   func doesImplements(type: Any.Type) -> Bool
 }
@@ -42,7 +42,7 @@ extension DependencyContainer {
    
    - returns: New definition for passed type.
    */
-  public func register<T, U, F>(definition: DefinitionOf<T, U throws -> T>, type: F.Type, tag: DependencyTagConvertible? = nil) -> DefinitionOf<F, U throws -> F> {
+  public func register<T, U, F>(definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
     let key = DefinitionKey(type: F.self, typeOfArguments: U.self)
     
     let forwardDefinition = DefinitionBuilder<F, U> {
