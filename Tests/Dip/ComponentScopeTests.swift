@@ -343,9 +343,8 @@ class ComponentScopeTests: XCTestCase {
   
   func testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer() {
     func test(scope: ComponentScope, line: UInt = #line) {
-      let container1 = DependencyContainer() { container in
-        container.register(scope) { ServiceImp1() as Service }
-      }
+      let container1 = DependencyContainer()
+      container1.register(scope) { ServiceImp1() as Service }
       
       let container2 = DependencyContainer()
       container1.collaborate(with: container2)
