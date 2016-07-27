@@ -80,6 +80,9 @@ public enum ComponentScope {
    
    ```
    */
+  case Unique
+  
+  @available(*, deprecated=4.6.1, message="Prototype scope is renamed to Unique")
   case Prototype
   
   /**
@@ -92,7 +95,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register(.Shared) { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service
@@ -106,6 +109,9 @@ public enum ComponentScope {
    consumer1.service1 !== consumer2.service1 //true
    ```
    */
+  case Shared
+  
+  @available(*, deprecated=4.6.1, message="ObjectGraph scope is renamed to Shared")
   case ObjectGraph
 
   /**

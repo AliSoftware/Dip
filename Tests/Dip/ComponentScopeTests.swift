@@ -50,18 +50,18 @@ class ComponentScopeTests: XCTestCase {
   #if os(Linux)
   static var allTests: [(String, ComponentScopeTests -> () throws -> Void)] {
     return [
-      ("testThatPrototypeIsDefaultScope", testThatPrototypeIsDefaultScope),
+      ("testThatUniqueIsDefaultScope", testThatUniqueIsDefaultScope),
       ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),
-      ("testThatItResolvesTypeAsNewInstanceForPrototypeScope", testThatItResolvesTypeAsNewInstanceForPrototypeScope),
+      ("testThatItResolvesTypeAsNewInstanceForUniqueScope", testThatItResolvesTypeAsNewInstanceForUniqueScope),
       ("testThatItReusesInstanceForSingletonScope", testThatItReusesInstanceForSingletonScope),
       ("testThatSingletonIsNotReusedAcrossContainers", testThatSingletonIsNotReusedAcrossContainers),
       ("testThatSingletonIsReleasedWhenDefinitionIsRemoved", testThatSingletonIsReleasedWhenDefinitionIsRemoved),
       ("testThatSingletonIsReleasedWhenDefinitionIsOverridden", testThatSingletonIsReleasedWhenDefinitionIsOverridden),
       ("testThatSingletonIsReleasedWhenContainerIsReset", testThatSingletonIsReleasedWhenContainerIsReset),
-      ("testThatItReusesInstanceInObjectGraphScopeDuringResolve", testThatItReusesInstanceInObjectGraphScopeDuringResolve),
-      ("testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve", testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve),
-      ("testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTagWhenResolvingForAnotherTag),
-      ("testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag", testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag),
+      ("testThatItReusesInstanceInSharedScopeDuringResolve", testThatItReusesInstanceInSharedScopeDuringResolve),
+      ("testThatItDoesNotReuseInstanceInSharedScopeInNextResolve", testThatItDoesNotReuseInstanceInSharedScopeInNextResolve),
+      ("testThatItDoesNotReuseInstanceInSharedScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInSharedScopeResolvedForNilTagWhenResolvingForAnotherTag),
+      ("testThatItReusesInstanceInSharedScopeResolvedForNilTag", testThatItReusesInstanceInSharedScopeResolvedForNilTag),
       ("testThatItReusesResolvedInstanceWhenResolvingOptional", testThatItReusesResolvedInstanceWhenResolvingOptional),
       ("testThatItHoldsWeakReferenceToWeakSingletonInstance",
           testThatItHoldsWeakReferenceToWeakSingletonInstance)
@@ -77,9 +77,9 @@ class ComponentScopeTests: XCTestCase {
   }
   #endif
   
-  func testThatPrototypeIsDefaultScope() {
+  func testThatUniqueIsDefaultScope() {
     let def = container.register { ServiceImp1() as Service }
-    XCTAssertEqual(def.scope, ComponentScope.Prototype)
+    XCTAssertEqual(def.scope, ComponentScope.Unique)
   }
   
   func testThatScopeCanBeChanged() {
@@ -87,7 +87,7 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertEqual(def.scope, ComponentScope.Singleton)
   }
   
-  func testThatItResolvesTypeAsNewInstanceForPrototypeScope() {
+  func testThatItResolvesTypeAsNewInstanceForUniqueScope() {
     //given
     container.register { ServiceImp1() as Service }
     
@@ -196,11 +196,11 @@ class ComponentScopeTests: XCTestCase {
     test(.EagerSingleton)
   }
   
-  func testThatItReusesInstanceInObjectGraphScopeDuringResolve() {
+  func testThatItReusesInstanceInSharedScopeDuringResolve() {
     //given
-    container.register(.ObjectGraph) { Client(server: try self.container.resolve()) as Client }
+    container.register(.Shared) { Client(server: try self.container.resolve()) as Client }
     
-    container.register(.ObjectGraph) { Server() as Server }
+    container.register(.Shared) { Server() as Server }
       .resolveDependencies { container, server in
         server.client = try container.resolve() as Client
     }
@@ -213,10 +213,10 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertTrue(server.client === client)
   }
   
-  func testThatItDoesNotReuseInstanceInObjectGraphScopeInNextResolve() {
+  func testThatItDoesNotReuseInstanceInSharedScopeInNextResolve() {
     //given
-    container.register(.ObjectGraph) { Client(server: try self.container.resolve()) as Client }
-    container.register(.ObjectGraph) { Server() as Server }
+    container.register(.Shared) { Client(server: try self.container.resolve()) as Client }
+    container.register(.Shared) { Server() as Server }
       .resolveDependencies { container, server in
         server.client = try container.resolve() as Client
     }
@@ -233,10 +233,10 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertFalse(client === anotherClient)
   }
 
-  func testThatItDoesNotReuseInstanceInObjectGraphScopeResolvedForNilTagWhenResolvingForAnotherTag() {
+  func testThatItDoesNotReuseInstanceInSharedScopeResolvedForNilTagWhenResolvingForAnotherTag() {
     //given
     var service2: Service?
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
       .resolveDependencies { (c, _) in
         //when service1 is resolved using this definition due to fallback to nil tag
         service2 = try c.resolve(tag: "service") as Service
@@ -244,7 +244,7 @@ class ComponentScopeTests: XCTestCase {
         //then we don't want every next resolve of service for other tags to reuse it
         XCTAssertTrue(service2 is ServiceImp2)
     }
-    container.register(tag: "service", .ObjectGraph) { ServiceImp2() as Service}
+    container.register(tag: "service", .Shared) { ServiceImp2() as Service}
     
     //when
     let service1 = try! container.resolve(tag: "tag") as Service
@@ -253,10 +253,10 @@ class ComponentScopeTests: XCTestCase {
     XCTAssertTrue(service1 is ServiceImp1)
   }
   
-  func testThatItReusesInstanceInObjectGraphScopeResolvedForNilTag() {
+  func testThatItReusesInstanceInSharedScopeResolvedForNilTag() {
     //given
     var service2: Service?
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
       .resolveDependencies { (c, service1) in
         guard service2 == nil else { return }
         
@@ -285,10 +285,10 @@ class ComponentScopeTests: XCTestCase {
     container.register(tag: "singleton", .Singleton) { ServiceImp1() as Service }
       .resolveDependencies { container, service in XCTFail() }
 
-    container.register(tag: "prototype", .Prototype) { ServiceImp1() as Service }
+    container.register(tag: "prototype", .Unique) { ServiceImp1() as Service }
       .resolveDependencies { container, service in XCTFail() }
 
-    container.register(tag: "graph", .ObjectGraph) { ServiceImp1() as Service }
+    container.register(tag: "graph", .Shared) { ServiceImp1() as Service }
       .resolveDependencies { container, service in XCTFail() }
     
     //when
@@ -310,7 +310,7 @@ class ComponentScopeTests: XCTestCase {
     var anyOtherService: Any!
     var anyImpOtherService: Any!
     
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
       .resolveDependencies { container, service in
         otherService = try! container.resolve() as Service?
         impOtherService = try! container.resolve() as Service!

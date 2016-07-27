@@ -390,7 +390,7 @@ class DipTests: XCTestCase {
         return
     }
 
-    container.register(tag: "graph", .ObjectGraph) { ResolvableService() as Service }
+    container.register(tag: "graph", .Shared) { ResolvableService() as Service }
       .resolveDependencies { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
@@ -498,13 +498,13 @@ class DipTests: XCTestCase {
     }
 
     //given
-    container.register(.ObjectGraph) { try ResolvableServer(client: self.container.resolve()) as Server }
+    container.register(.Shared) { try ResolvableServer(client: self.container.resolve()) as Server }
       .resolveDependencies { (container: DependencyContainer, server: Server) in
         let server = server as! ResolvableServer
         server.secondClient = try container.resolve() as Client
     }
     
-    container.register(.ObjectGraph) { ResolvableClient() as Client }
+    container.register(.Shared) { ResolvableClient() as Client }
       .resolveDependencies { (container: DependencyContainer, client: Client) in
         let client = client as! ResolvableClient
         client.server = try container.resolve() as Server
@@ -673,10 +673,10 @@ extension DipTests {
     }
     
     let serverContainer = DependencyContainer()
-    serverContainer.register(.ObjectGraph) { ServerImp(client: $0) as Server }
+    serverContainer.register(.Shared) { ServerImp(client: $0) as Server }
 
     let clientContainer = DependencyContainer()
-    clientContainer.register(.ObjectGraph) { ClientImp() as Client }
+    clientContainer.register(.Shared) { ClientImp() as Client }
       .resolveDependencies { container, client in
         let client = client as! ClientImp
         client.server = try container.resolve() as Server

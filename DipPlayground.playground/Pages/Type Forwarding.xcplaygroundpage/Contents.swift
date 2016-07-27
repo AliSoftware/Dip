@@ -27,21 +27,21 @@ extension AddPresenter: AddModuleInterface {}
  We can achieve this result by explicitly rosolving concrete types:
  */
 
-container.register(.ObjectGraph) { ListWireframe(addWireFrame: $0, listPresenter: $1) }
-container.register(.ObjectGraph) { AddWireframe(addPresenter: $0) }
+container.register(.Shared) { ListWireframe(addWireFrame: $0, listPresenter: $1) }
+container.register(.Shared) { AddWireframe(addPresenter: $0) }
 
-var listInteractorDefinition = container.register(.ObjectGraph) { ListInteractor() }
+var listInteractorDefinition = container.register(.Shared) { ListInteractor() }
     .resolveDependencies { container, interactor in
         interactor.output = try container.resolve() as ListPresenter
 }
 
-var listPresenterDefinition = container.register(.ObjectGraph) { ListPresenter() }
+var listPresenterDefinition = container.register(.Shared) { ListPresenter() }
     .resolveDependencies { container, presenter in
         presenter.listInteractor = try container.resolve() as ListInteractor
         presenter.listWireframe = try container.resolve()
 }
 
-var addPresenterDefinition = container.register(.ObjectGraph) { AddPresenter() }
+var addPresenterDefinition = container.register(.Shared) { AddPresenter() }
     .resolveDependencies { container, presenter in
         presenter.addModuleDelegate = try container.resolve() as ListPresenter
 }
@@ -54,21 +54,21 @@ var listWireframe = listPresenter.listWireframe
 listWireframe?.listPresenter === listPresenter
 
 /*:
- Alternatively we can use type-forwarding. With type-forwarding we register definition for one (source) type and also for another (forwarded) type. When container will try to resolve forwarded type it will use the same definition as for source type, and (if registered in `ObjectGraph` scope or as a singleton) will reuse the same instance. With that you don't need to resolve concrete types in definitions:
+ Alternatively we can use type-forwarding. With type-forwarding we register definition for one (source) type and also for another (forwarded) type. When container will try to resolve forwarded type it will use the same definition as for source type, and (if registered in `Shared` scope or as a singleton) will reuse the same instance. With that you don't need to resolve concrete types in definitions:
  */
 
-listInteractorDefinition = container.register(.ObjectGraph) { ListInteractor() }
+listInteractorDefinition = container.register(.Shared) { ListInteractor() }
     .resolveDependencies { container, interactor in
         interactor.output = try container.resolve()
 }
 
-listPresenterDefinition = container.register(.ObjectGraph) { ListPresenter() }
+listPresenterDefinition = container.register(.Shared) { ListPresenter() }
     .resolveDependencies { container, presenter in
         presenter.listInteractor = try container.resolve()
         presenter.listWireframe = try container.resolve()
 }
 
-addPresenterDefinition = container.register(.ObjectGraph) { AddPresenter() }
+addPresenterDefinition = container.register(.Shared) { AddPresenter() }
     .resolveDependencies { container, presenter in
         presenter.addModuleDelegate = try container.resolve()
 }

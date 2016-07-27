@@ -263,11 +263,11 @@ extension DependencyContainer {
    ```swift
    container.register { ServiceImp() as Service }
    container.register(tag: "service") { ServiceImp() as Service }
-   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register(.Shared) { ServiceImp() as Service }
    container.register { try ClientImp(service: container.resolve() as Service) as Client }
    ```
    */
-  public func register<T>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
+  public func register<T>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Unique, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
     let definition = DefinitionBuilder<T, ()> {
       $0.scope = scope
       $0.factory = factory
@@ -293,7 +293,7 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Prototype, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
+   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Unique, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
      return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: ...) { container, tag in
         try factory(container.resolve(tag: tag), ...)
       }
@@ -689,16 +689,16 @@ private class ResolvedInstances {
       switch scope {
       case .Singleton, .EagerSingleton: return singletons[key]
       case .WeakSingleton: return (weakSingletons[key] as? WeakBoxType)?.unboxed ?? weakSingletons[key]
-      case .ObjectGraph: return resolvedInstances[key]
-      case .Prototype: return nil
+      case .Shared, .ObjectGraph: return resolvedInstances[key]
+      case .Unique, .Prototype: return nil
       }
     }
     set {
       switch scope {
       case .Singleton, .EagerSingleton: singletons[key] = newValue
       case .WeakSingleton: weakSingletons[key] = newValue
-      case .ObjectGraph: resolvedInstances[key] = newValue
-      case .Prototype: break
+      case .Shared, .ObjectGraph: resolvedInstances[key] = newValue
+      case .Unique, .Prototype: break
       }
     }
   }
