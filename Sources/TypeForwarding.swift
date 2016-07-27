@@ -77,8 +77,8 @@ extension DependencyContainer {
   func typeForwardingDefinition(key: DefinitionKey) -> KeyDefinitionPair? {
     var forwardingDefinitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    forwardingDefinitions = filter(forwardingDefinitions, type: key.type, tag: key.tag, typeOfArguments: key.typeOfArguments)
-    forwardingDefinitions = order(forwardingDefinitions, tag: key.tag)
+    forwardingDefinitions = filter(forwardingDefinitions, byKeyAndTypeOfArguments: key)
+    forwardingDefinitions = order(forwardingDefinitions, byTag: key.tag)
 
     //we need to carry on original tag
     return forwardingDefinitions.first.map({ ($0.key.tagged(key.tag), $0.definition) })

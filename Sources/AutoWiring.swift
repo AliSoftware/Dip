@@ -49,8 +49,8 @@ extension DependencyContainer {
     let type = key.type
     let resolved: Any?
     do {
-      let definitions = autoWiringDefinitions(type, tag: tag)
-      resolved = try resolve(enumerating: definitions) { try resolveKey($0, tag: tag, type: type) }
+      let definitions = autoWiringDefinitions(byKey: key)
+      resolved = try resolve(enumerating: definitions, tag: tag)
     }
     catch {
       throw DipError.AutoWiringFailed(type: type, underlyingError: error)
@@ -64,7 +64,7 @@ extension DependencyContainer {
     }
   }
 
-  private func autoWiringDefinitions(type: Any.Type, tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+  private func autoWiringDefinitions(byKey key: DefinitionKey) -> [KeyDefinitionPair] {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
     //filter definitions
@@ -72,36 +72,32 @@ extension DependencyContainer {
       .filter({ $0.definition.supportsAutoWiring() })
       .sort({ $0.definition.numberOfArguments > $1.definition.numberOfArguments })
     
-    definitions = filter(definitions, type: type, tag: tag)
-    definitions = order(definitions, tag: tag)
+    definitions = filter(definitions, byKey: key)
+    definitions = order(definitions, byTag: key.tag)
 
     return definitions
   }
   
   /// Enumerates definitions one by one until one of them succeeds, otherwise returns nil
-  private func resolve(enumerating keyDefinitionPairs: [KeyDefinitionPair], @noescape block: (DefinitionKey) throws -> Any?) throws -> Any? {
-    for (index, keyDefinitionPair) in keyDefinitionPairs.enumerate() {
+  private func resolve(enumerating autoWiringDefinitions: [KeyDefinitionPair], tag: DependencyContainer.Tag?) throws -> Any? {
+    for (index, autoWiringDefinition) in autoWiringDefinitions.enumerate() {
       //If the next definition matches current definition then they are ambigous
-      if let nextPair = keyDefinitionPairs[next: index], case keyDefinitionPair = nextPair {
+      if let nextPair = autoWiringDefinitions[next: index], case autoWiringDefinition = nextPair {
           throw DipError.AmbiguousDefinitions(
-            type: keyDefinitionPair.key.type,
-            definitions: [keyDefinitionPair.definition, nextPair.definition]
+            type: autoWiringDefinition.key.type,
+            definitions: [autoWiringDefinition.definition, nextPair.definition]
         )
       }
       
-      if let resolved = try block(keyDefinitionPair.key) {
+      let key = autoWiringDefinition.key.tagged(tag ?? context.tag)
+      let resolved: Any? = try? resolveKey(key) { definition in
+        try definition.autoWiringFactory!(self, tag)
+      }
+      if let resolved = resolved {
         return resolved
       }
     }
     return nil
-  }
-  
-  private func resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any {
-    let key = key.tagged(tag ?? context.tag)
-    let resolved: Any = try resolveKey(key, builder: { definition in
-      try definition.autoWiringFactory!(self, tag)
-    })
-    return resolved
   }
   
 }
@@ -126,18 +122,18 @@ private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
   return true
 }
 
-func filter(definitions: [KeyDefinitionPair], type: Any.Type, tag: DependencyContainer.Tag?, typeOfArguments: Any.Type? = nil) -> [KeyDefinitionPair] {
-  let definitions =  definitions
-    .filter({ $0.key.type == type || $0.definition.doesImplements(type) })
-    .filter({ $0.key.tag == tag || $0.key.tag == nil })
-  
-  if let typeOfArguments = typeOfArguments {
-    return definitions.filter({ $0.key.typeOfArguments == typeOfArguments })
-  }
+func filter(definitions: [KeyDefinitionPair], byKey key: DefinitionKey) -> [KeyDefinitionPair] {
   return definitions
+    .filter({ $0.key.type == key.type || $0.definition.doesImplements(key.type) })
+    .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
 }
 
-func order(definitions: [KeyDefinitionPair], tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+func filter(definitions: [KeyDefinitionPair], byKeyAndTypeOfArguments key: DefinitionKey) -> [KeyDefinitionPair] {
+  return filter(definitions, byKey: key)
+    .filter({ $0.key.typeOfArguments == key.typeOfArguments })
+}
+
+func order(definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
   return
     //first will try to use tagged definitions
     definitions.filter({ $0.key.tag == tag }) +
