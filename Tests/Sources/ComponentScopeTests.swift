@@ -335,5 +335,30 @@ class ComponentScopeTests: XCTestCase {
     //then
     XCTAssertNil(weakSingleton)
   }
+  
+  func testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer() {
+    func test(scope: ComponentScope, line: UInt = #line) {
+      let container1 = DependencyContainer() { container in
+        container.register(scope) { ServiceImp1() as Service }
+      }
+      
+      let container2 = DependencyContainer()
+      container1.collaborate(with: container2)
+      container2.collaborate(with: container1)
+      
+      try! container1.bootstrap()
+      try! container2.bootstrap()
+      
+      let service1 = try! container1.resolve() as Service
+      let service2 = try! container2.resolve() as Service
+      
+      XCTAssertTrue(service1 === service2, line: line, "\(scope) should be reused when first resolved from another container")
+    }
+    
+    test(.Singleton)
+    test(.WeakSingleton)
+    test(.EagerSingleton)
+  }
+  
 }
 

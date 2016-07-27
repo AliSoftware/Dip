@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Develop
+
+#### Fixed
+
+* Fixed sharing singletons between collaborating containers
+  [#103](https://github.com/AliSoftware/Dip/issues/103) 
+
 ## 4.6.0
 
 * Containers collaboration. Break your definitions in modules and link them together.  

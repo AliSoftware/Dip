@@ -527,6 +527,10 @@ extension DependencyContainer {
    */
   public func collaborate(with containers: [DependencyContainer]) {
     _collaborators += containers
+    for container in containers {
+      container.resolvedInstances.singletonsBox = self.resolvedInstances.singletonsBox
+      container.resolvedInstances.weakSingletonsBox = self.resolvedInstances.weakSingletonsBox
+    }
   }
   
   /// Tries to resolve key using collaborating containers
@@ -653,11 +657,23 @@ extension DependencyContainer {
 ///Pool to hold instances, created during call to `resolve()`.
 ///Before `resolve()` returns pool is drained.
 private class ResolvedInstances {
+  
   var resolvedInstances = [DefinitionKey: Any]()
-  var singletons = [DefinitionKey: Any]()
-  var weakSingletons = [DefinitionKey: Any]()
   var resolvableInstances = [Resolvable]()
   
+  //singletons are stored using reference type wrapper to be able to share them between containers
+  private var singletonsBox = Box<[DefinitionKey: Any]>([:])
+  var singletons: [DefinitionKey: Any] {
+    get { return singletonsBox.unboxed }
+    set { singletonsBox.unboxed = newValue }
+  }
+  
+  private var weakSingletonsBox = Box<[DefinitionKey: Any]>([:])
+  var weakSingletons: [DefinitionKey: Any] {
+    get { return weakSingletonsBox.unboxed }
+    set { weakSingletonsBox.unboxed = newValue }
+  }
+
   subscript(forKey key: DefinitionKey, inScope scope: ComponentScope) -> Any? {
     get {
       switch scope {
