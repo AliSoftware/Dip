@@ -57,6 +57,13 @@ extension ImplicitlyUnwrappedOptional: BoxType {
   }
 }
 
+class Box<T> {
+  var unboxed: T
+  init(_ value: T) {
+    self.unboxed = value
+  }
+}
+
 protocol WeakBoxType {
   var unboxed: AnyObject? { get }
 }
@@ -67,7 +74,7 @@ class WeakBox<T>: WeakBoxType {
     return unboxed as? T
   }
 
-  init(value: T) {
+  init(_ value: T) {
     guard let value = value as? AnyObject else {
       fatalError("Can not store weak reference to not a class instance (\(T.self))")
     }
