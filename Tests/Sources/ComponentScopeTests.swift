@@ -100,7 +100,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatItReusesInstanceForSingletonScope() {
-    func test(_ scope: ComponentScope) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
       container.register(scope) { ServiceImp1() as Service }
       
@@ -109,17 +109,18 @@ class ComponentScopeTests: XCTestCase {
       let service2 = try! container.resolve() as Service
       
       //then
-      XCTAssertTrue(service1 === service2)
+      XCTAssertTrue(service1 === service2, line: line)
     }
     
     test(.Singleton)
+    test(.WeakSingleton)
     test(.EagerSingleton)
   }
   
   func testThatSingletonIsNotReusedAcrossContainers() {
-    func test(_ scope: ComponentScope) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope) { ServiceImp1() as Service }
       let secondContainer = DependencyContainer()
       secondContainer.register(def, forTag: nil)
       
@@ -128,17 +129,18 @@ class ComponentScopeTests: XCTestCase {
       let service2 = try! secondContainer.resolve() as Service
       
       //then
-      XCTAssertTrue(service1 !== service2, "Singleton instances should not be reused across containers")
+      XCTAssertTrue(service1 !== service2, "Singleton instances should not be reused across containers", line: line)
     }
     
     test(.Singleton)
+    test(.WeakSingleton)
     test(.EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsRemoved() {
-    func test(_ scope: ComponentScope) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
       
       //when
@@ -147,17 +149,18 @@ class ComponentScopeTests: XCTestCase {
       
       //then
       let service2 = try! container.resolve() as Service
-      XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container")
+      XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container", line: line)
     }
     
     test(.Singleton)
+    test(.WeakSingleton)
     test(.EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsOverridden() {
-    func test(_ scope: ComponentScope) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
       
       //when
@@ -165,17 +168,18 @@ class ComponentScopeTests: XCTestCase {
       
       //then
       let service2 = try! container.resolve() as Service
-      XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is overridden")
+      XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is overridden", line: line)
     }
     
     test(.Singleton)
+    test(.WeakSingleton)
     test(.EagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenContainerIsReset() {
-    func test(_ scope: ComponentScope) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
-      let def = container.register(.Singleton) { ServiceImp1() as Service }
+      let def = container.register(scope) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
       
       //when
@@ -184,10 +188,11 @@ class ComponentScopeTests: XCTestCase {
       
       //then
       let service2 = try! container.resolve() as Service
-      XCTAssertTrue(service1 !== service2, "Singleton instances should be released when container is reset")
+      XCTAssertTrue(service1 !== service2, "Singleton instances should be released when container is reset", line: line)
     }
     
     test(.Singleton)
+    test(.WeakSingleton)
     test(.EagerSingleton)
   }
   

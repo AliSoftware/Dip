@@ -200,7 +200,7 @@ extension DependencyContainer {
           resolvedInstances.resolvedInstances.removeAll()
           for (key, instance) in resolvedInstances.weakSingletons {
             if resolvedInstances.weakSingletons[key] is WeakBoxType { continue }
-            resolvedInstances.weakSingletons[key] = WeakBox(value: instance)
+            resolvedInstances.weakSingletons[key] = WeakBox(instance)
           }
           
           // We call didResolveDependencies only at this point
@@ -312,21 +312,18 @@ extension DependencyContainer {
    
    */
   public func register<T, U>(_ definition: DefinitionOf<T, (U) throws -> T>, forTag tag: DependencyTagConvertible? = nil) {
-    let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
-    register(definition, forKey: key)
-
-    if case .EagerSingleton = definition.scope {
-      bootstrapQueue.append({ let _ = try self.resolve(tag: tag) as T })
-    }
-  }
-  
-  /// Actually register definition
-  func register(_ definition: _Definition, forKey key: DefinitionKey) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {
+      let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
+      
       definitions[key] = definition
       resolvedInstances.singletons[key] = nil
+      resolvedInstances.weakSingletons[key] = nil
+      
+      if case .EagerSingleton = definition.scope {
+        bootstrapQueue.append({ let _ = try self.resolve(tag: tag) as T })
+      }
     }
   }
   
@@ -593,6 +590,7 @@ extension DependencyContainer {
     threadSafe {
       definitions[key] = nil
       resolvedInstances.singletons[key] = nil
+      resolvedInstances.weakSingletons[key] = nil
     }
   }
 
@@ -603,6 +601,7 @@ extension DependencyContainer {
     threadSafe {
       definitions.removeAll()
       resolvedInstances.singletons.removeAll()
+      resolvedInstances.weakSingletons.removeAll()
       bootstrapped = false
     }
   }
