@@ -22,20 +22,17 @@ class EventsListWireframe {
 }
 
 
-let rootContainer = DependencyContainer() { container in
-    container.register(.Singleton) { CoreDataStore() as DataStore }
+let rootContainer = DependencyContainer()
+rootContainer.register(.Singleton) { CoreDataStore() as DataStore }
+
+let eventsListModule = DependencyContainer()
+eventsListModule.register(.ObjectGraph) { EventsListWireframe(dataStore: $0) }
+    .resolveDependencies { container, wireframe in
+        wireframe.addEventWireframe = try container.resolve()
 }
 
-let eventsListModule = DependencyContainer() { container in
-    container.register(.ObjectGraph) { EventsListWireframe(dataStore: $0) }
-        .resolveDependencies { container, wireframe in
-            wireframe.addEventWireframe = try container.resolve()
-    }
-}
-
-let addEventModule = DependencyContainer() { container in
-    container.register { AddEventWireframe() }
-}
+let addEventModule = DependencyContainer()
+addEventModule.register { AddEventWireframe() }
 
 eventsListModule.collaborate(with: addEventModule, rootContainer)
 
