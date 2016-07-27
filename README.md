@@ -1,6 +1,6 @@
 # Dip
 
-[![CI Status](http://img.shields.io/travis/AliSoftware/Dip.svg?style=flat)](https://travis-ci.org/AliSoftware/Dip.svg?branch=develop)
+[![CI Status](https://travis-ci.org/AliSoftware/Dip.svg?branch=develop)](https://travis-ci.org/AliSoftware/Dip)
 [![Version](https://img.shields.io/cocoapods/v/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
