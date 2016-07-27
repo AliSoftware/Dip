@@ -24,38 +24,49 @@
 
 ///A key used to store definitons in a container.
 public struct DefinitionKey : Hashable, CustomStringConvertible {
-  public let protocolType: Any.Type
-  public let argumentsType: Any.Type
-  public private(set) var associatedTag: DependencyContainer.Tag?
-  
-  init(protocolType: Any.Type, argumentsType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
-    self.protocolType = protocolType
-    self.argumentsType = argumentsType
-    self.associatedTag = associatedTag
+  public let type: Any.Type
+  public let typeOfArguments: Any.Type
+  public private(set) var tag: DependencyContainer.Tag?
+
+  init(type: Any.Type, typeOfArguments: Any.Type, tag: DependencyContainer.Tag? = nil) {
+    self.type = type
+    self.typeOfArguments = typeOfArguments
+    self.tag = tag
   }
   
   public var hashValue: Int {
-    return "\(protocolType)-\(argumentsType)-\(associatedTag)".hashValue
+    return "\(type)-\(typeOfArguments)-\(tag)".hashValue
   }
   
   public var description: String {
-    return "type: \(protocolType), arguments: \(argumentsType), tag: \(associatedTag.desc)"
+    return "type: \(type), arguments: \(typeOfArguments), tag: \(tag.desc)"
   }
   
   func tagged(tag: DependencyContainer.Tag?) -> DefinitionKey {
     var tagged = self
-    tagged.associatedTag = tag
+    tagged.tag = tag
     return tagged
   }
   
 }
 
-/// Check two definition keys on equality by comparing their `protocolType`, `factoryType` and `associatedTag` properties.
+//MARK: - Deprecated
+extension DefinitionKey {
+  
+  @available(*, deprecated=4.6.1, message="Property protocolType was renamed to type")
+  public var protocolType: Any.Type { return type }
+  @available(*, deprecated=4.6.1, message="Property argumentsType was renamed to typeOfArguments")
+  public var argumentsType: Any.Type { return typeOfArguments }
+  @available(*, deprecated=4.6.1, message="Property associatedTag was renamed to tag")
+  public var associatedTag: DependencyContainer.Tag? { return tag }
+}
+
+/// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
 public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
-    lhs.protocolType == rhs.protocolType &&
-      lhs.argumentsType == rhs.argumentsType &&
-      lhs.associatedTag == rhs.associatedTag
+    lhs.type == rhs.type &&
+      lhs.typeOfArguments == rhs.typeOfArguments &&
+      lhs.tag == rhs.tag
 }
 
 ///Component scope defines a strategy used by the `DependencyContainer` to manage resolved instances life cycle.

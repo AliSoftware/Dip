@@ -154,12 +154,12 @@ extension DependencyContainer {
     
     /// Currently resolving type.
     public var resolvingType: Any.Type {
-      return key.protocolType
+      return key.type
     }
 
     /// The tag used to resolve currently resolving type.
     public var tag: Tag? {
-      return key.associatedTag
+      return key.tag
     }
     
     /// The type that caused currently resolving type to be resolved.
@@ -182,7 +182,7 @@ extension DependencyContainer {
     }
     
     public var description: String {
-      let resolvingDescription = "Resolving type \(key.protocolType) with arguments \(key.argumentsType) tagged with \(key.associatedTag.desc)"
+      let resolvingDescription = "Resolving type \(key.type) with arguments \(key.typeOfArguments) tagged with \(key.tag.desc)"
       if injectedInProperty != nil {
         return "\(resolvingDescription) while auto-injecting property \(injectedInProperty.desc) of \(injectedInType.desc)"
       }
@@ -326,7 +326,7 @@ extension DependencyContainer {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {
-      let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
+      let key = DefinitionKey(type: T.self, typeOfArguments: U.self, tag: tag?.dependencyTag)
       
       definitions[key] = definition
       resolvedInstances.singletons[key] = nil
@@ -425,7 +425,7 @@ extension DependencyContainer {
    - seealso: `resolve(tag:builder:)`
   */
   public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) rethrows -> Any {
-    let key = DefinitionKey(protocolType: type, argumentsType: U.self, associatedTag: tag?.dependencyTag)
+    let key = DefinitionKey(type: type, typeOfArguments: U.self, tag: tag?.dependencyTag)
     
     return try inContext(key) {
       try resolveKey(key, builder: { definition in
@@ -485,13 +485,13 @@ extension DependencyContainer {
     try autoInjectProperties(resolvedInstance)
     try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
     
-    log(.Verbose, "Resolved type \(key.protocolType) with \(resolvedInstance)")
+    log(.Verbose, "Resolved type \(key.type) with \(resolvedInstance)")
     return resolvedInstance
   }
   
   private func previouslyResolved<T>(definition: _Definition, key: DefinitionKey) -> T? {
     let keys = definition.implementingTypes.map({
-      DefinitionKey(protocolType: $0, argumentsType: key.argumentsType, associatedTag: key.associatedTag)
+      DefinitionKey(type: $0, typeOfArguments: key.typeOfArguments, tag: key.tag)
     })
     for key in [key] + keys {
       if let previouslyResolved = resolvedInstances[forKey: key, inScope: definition.scope] as? T {
@@ -503,7 +503,7 @@ extension DependencyContainer {
   
   /// Searches for definition that matches provided key
   private func definition(matching key: DefinitionKey) -> KeyDefinitionPair? {
-    let typeDefinitions = definitions.filter({ $0.0.protocolType ==  key.protocolType })
+    let typeDefinitions = definitions.filter({ $0.0.type ==  key.type })
     guard !typeDefinitions.isEmpty else {
       return typeForwardingDefinition(key)
     }
@@ -550,8 +550,8 @@ extension DependencyContainer {
         //so there is probably a cercular reference between containers.
         //To break it skip this container
         if let context = collaborator.context where
-          context.resolvingType == key.protocolType &&
-          context.tag == key.associatedTag { continue }
+          context.resolvingType == key.type &&
+          context.tag == key.tag { continue }
 
         //Pass current container's instances pool to collect instances resolved by collaborator
         let resolvedInstances = collaborator.resolvedInstances
@@ -591,7 +591,7 @@ extension DependencyContainer {
       - definition: The definition to remove
    */
   public func remove<T, U>(definition: DefinitionOf<T, U>, forTag tag: DependencyTagConvertible? = nil) {
-    let key = DefinitionKey(protocolType: T.self, argumentsType: U.self, associatedTag: tag?.dependencyTag)
+    let key = DefinitionKey(type: T.self, typeOfArguments: U.self, tag: tag?.dependencyTag)
     remove(definitionForKey: key)
   }
   
@@ -634,7 +634,7 @@ extension DependencyContainer {
     validateNextDefinition: for (key, _) in definitions {
       do {
         //try to resolve key using provided arguments
-        for argumentsSet in arguments where argumentsSet.dynamicType == key.argumentsType {
+        for argumentsSet in arguments where argumentsSet.dynamicType == key.typeOfArguments {
           do {
             try inContext(key) {
               try resolveKey(key, builder: { definition throws -> Any in
@@ -652,7 +652,7 @@ extension DependencyContainer {
         
         //try to resolve key using auto-wiring
         do {
-          try self.resolve(key.protocolType, tag: key.associatedTag)
+          try self.resolve(key.type, tag: key.tag)
         }
         catch let error as DipError {
           throw error
@@ -842,7 +842,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
-      return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.protocolType)."
+      return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.type)."
     case let .AutoInjectionFailed(label, type, error):
       return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
     case let .AutoWiringFailed(type, error):

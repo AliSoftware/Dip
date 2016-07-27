@@ -260,7 +260,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: nil)
+      let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
 
       return true
@@ -271,7 +271,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: nil)
+      let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
       
       return true
@@ -287,7 +287,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: "other tag")
+      let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: "other tag")
       XCTAssertEqual(key, expectedKey)
       
       return true
@@ -298,7 +298,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: "other tag")
+      let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: "other tag")
       XCTAssertEqual(key, expectedKey)
       
       return true
@@ -314,7 +314,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: String.self, associatedTag: nil)
+      let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: String.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
 
       return true
@@ -325,7 +325,7 @@ class DipTests: XCTestCase {
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
-      let expectedKey = DefinitionKey(protocolType: Service.self, argumentsType: String.self, associatedTag: nil)
+      let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: String.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
       
       return true
@@ -334,7 +334,7 @@ class DipTests: XCTestCase {
   
   func testThatItThrowsErrorIfConstructorThrows() {
     //given
-    let failedKey = DefinitionKey(protocolType: Any.self, argumentsType: Any.self)
+    let failedKey = DefinitionKey(type: Any.self, typeOfArguments: Any.self)
     let expectedError = DipError.DefinitionNotFound(key: failedKey)
     container.register { () throws -> Service in throw expectedError }
     
@@ -357,7 +357,7 @@ class DipTests: XCTestCase {
   
   func testThatItThrowsErrorIfFailsToResolveDependency() {
     //given
-    let failedKey = DefinitionKey(protocolType: Any.self, argumentsType: Any.self)
+    let failedKey = DefinitionKey(type: Any.self, typeOfArguments: Any.self)
     let expectedError = DipError.DefinitionNotFound(key: failedKey)
     container.register { ServiceImp1() as Service }
       .resolveDependencies { container, service in
@@ -611,7 +611,7 @@ class DipTests: XCTestCase {
     AssertNoThrow(expression: try container.validate())
     
     //given
-    let key = DefinitionKey(protocolType: Service.self, argumentsType: Void.self, associatedTag: nil)
+    let key = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
     container.register { () -> Service in
       throw DipError.DefinitionNotFound(key: key)
     }

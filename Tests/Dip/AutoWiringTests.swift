@@ -224,7 +224,7 @@ class AutoWiringTests: XCTestCase {
         resolved.service2 = try container.resolve() as ServiceImp2
         
         //simulate that something goes wrong on the way
-        throw DipError.DefinitionNotFound(key: DefinitionKey(protocolType: ServiceImp1.self, argumentsType: Any.self))
+        throw DipError.DefinitionNotFound(key: DefinitionKey(type: ServiceImp1.self, typeOfArguments: Any.self))
     }
     
     container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
