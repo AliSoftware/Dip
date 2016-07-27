@@ -57,6 +57,13 @@ extension ImplicitlyUnwrappedOptional: BoxType {
   }
 }
 
+class Box<T> {
+  var unboxed: T
+  init(_ value: T) {
+    self.unboxed = value
+  }
+}
+
 protocol WeakBoxType {
   var unboxed: AnyObject? { get }
 }
