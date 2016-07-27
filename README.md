@@ -43,7 +43,7 @@ File an issue if you have any question.
 
 ## Features
 
-- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Prototype_, _ObjectGraph_, _Singleton_, _EagerSingleton_;
+- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Prototype_, _ObjectGraph_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
 - **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
 - **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
 - **[Circular dependencies](../../wiki/circular-dependencies)**. Dip can resolve circular dependencies;
