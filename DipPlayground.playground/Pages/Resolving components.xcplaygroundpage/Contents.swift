@@ -1,9 +1,8 @@
 //: [Previous: Registering Components](@previous)
 
 import Dip
-let container = DependencyContainer { container in
-    container.register { ServiceImp1() as Service }
-}
+let container = DependencyContainer()
+container.register { ServiceImp1() as Service }
 
 /*:
 

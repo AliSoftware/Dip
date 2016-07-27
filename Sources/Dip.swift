@@ -64,7 +64,18 @@ public final class DependencyContainer {
    
    - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
            It is only present for convenience to have a cleaner syntax when declaring and initializing
-           your `DependencyContainer` instances.
+           your `DependencyContainer` instances. 
+   
+   - warning: If you use `configBlock` you need to make sure you don't create retain cycles. For example
+              there will be a retain cycle between container and its definition if you reference container
+              inside definition's factory. You can avoid that by using unowned reference to container:
+   
+   ```swift
+   let container = DependencyContainer() { container in
+     unowned let container = container
+     //register definitions
+   }
+   ```
    
    - returns: A new DependencyContainer.
    */

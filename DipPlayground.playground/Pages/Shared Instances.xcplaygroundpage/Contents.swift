@@ -90,7 +90,7 @@ class MyViewController: UIViewController {
 }
 
 //inject with constructor
-let viewController = MyViewController(apiClient: ApiClient())
+var viewController = MyViewController(apiClient: ApiClient())
 //or with property
 viewController.apiClient = ApiClient()
 
@@ -98,14 +98,13 @@ viewController.apiClient = ApiClient()
 With Dip this code can look like this:
 */
 
-let container = DependencyContainer { container in
-    container.register { ApiClient() as ApiClientProtocol }
-}
+let container = DependencyContainer()
+container.register { ApiClient() as ApiClientProtocol }
 
 //inject with constructor
-let dipViewController = MyViewController(apiClient: container.resolve())
+viewController = try MyViewController(apiClient: container.resolve())
 //or with property
-dipViewController.apiClient = container.resolve()
+viewController.apiClient = try container.resolve()
 
 /*:
 Of cource `DependencyContainer` should not be a singleton too. There is just no need for that because you never should call `DependencyContainer` from inside of your components. That will make it a [service locator antipatter]((http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/)). You may only call `DependencyContainer` from the _Composition root_ - the place where all the components are configured and wired together.

@@ -52,6 +52,7 @@ class DipTests: XCTestCase {
   #if os(Linux)
   static var allTests = {
     return [
+      ("testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle", testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle),
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
       ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
       ("testThatItResolvesDifferentInstancesRegisteredForDifferentTags", testThatItResolvesDifferentInstancesRegisteredForDifferentTags),
@@ -80,6 +81,31 @@ class DipTests: XCTestCase {
     container.reset()
   }
   #endif
+  
+  func testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle() {
+    var container: DependencyContainer! = DependencyContainer() { container in
+      //compiler crashes if you try to capture container in capture list
+      //so instead we capture it in a variable
+      unowned let container = container
+      
+      container.register { ServiceImp1() }
+      container.register { (_: ServiceImp1)->Service in
+        //referencing container in factory
+        let _ = container
+        return ServiceImp1() as Service
+        }.resolveDependencies() { container, _ in
+          //when container is passed as argument there will be no retain cycle
+          let _ = container
+      }
+    }
+    
+    let _ = try! container.resolve() as Service
+
+    weak var weakContainer = container
+    container = nil
+    
+    XCTAssertNil(weakContainer)
+  }
 
   func testThatItResolvesInstanceRegisteredWithoutTag() {
     //given
@@ -665,16 +691,15 @@ extension DipTests {
       #endif
     }
     
-    let serverContainer = DependencyContainer() { container in
-      container.register(.ObjectGraph) { ServerImp(client: $0) as Server }
-    }
-    let clientContainer = DependencyContainer() { container in
-      container.register(.ObjectGraph) { ClientImp() as Client }
-        .resolveDependencies { container, client in
-          let client = client as! ClientImp
-          client.server = try container.resolve() as Server
-          client.anotherServer = try container.resolve() as Server
-      }
+    let serverContainer = DependencyContainer()
+    serverContainer.register(.ObjectGraph) { ServerImp(client: $0) as Server }
+
+    let clientContainer = DependencyContainer()
+    clientContainer.register(.ObjectGraph) { ClientImp() as Client }
+      .resolveDependencies { container, client in
+        let client = client as! ClientImp
+        client.server = try container.resolve() as Server
+        client.anotherServer = try container.resolve() as Server
     }
 
     //when
