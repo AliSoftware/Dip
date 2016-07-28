@@ -310,7 +310,7 @@ class DipTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     
     //when
-    AssertThrows(expression: try container.resolve(withArguments: "some string") as Service) { error in
+    AssertThrows(expression: try container.resolve(arguments: "some string") as Service) { error in
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then
@@ -321,7 +321,7 @@ class DipTests: XCTestCase {
     }
 
     //and when
-    AssertThrows(expression: try container.resolve(Service.self, withArguments: "some string")) { error in
+    AssertThrows(expression: try container.resolve(Service.self, arguments: "some string")) { error in
       guard case let DipError.DefinitionNotFound(key) = error else { return false }
       
       //then

@@ -60,7 +60,7 @@ func configureContainer(dip: DependencyContainer) {
         //Here we use constructor injection, but instead of providing dependencies manually container resolves them for us
         dip.register() {
             FakeStarshipProvider(
-                dummyProvider: try dip.resolve(tag: DependencyTags.Dummy, withArguments: "Main Pilot"),
+                dummyProvider: try dip.resolve(tag: DependencyTags.Dummy, arguments: "Main Pilot"),
                 hardCodedProvider: try dip.resolve(tag: DependencyTags.Hardcoded)) as StarshipProviderAPI
         }
         

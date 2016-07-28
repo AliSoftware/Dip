@@ -70,12 +70,12 @@ extension DependencyContainer {
 
    - seealso: `register(tag:_:factory:)`, `resolve(tag:builder:)`
    */
-  public func resolve<T, A>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A) throws -> T {
+  public func resolve<T, A>(tag tag: DependencyTagConvertible? = nil, arguments arg1: A) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1) }
   }
 
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
-  public func resolve<A>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A) throws -> Any {
+  public func resolve<A>(type: Any.Type, tag: DependencyTagConvertible? = nil, arguments arg1: A) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory(arg1) }
   }
 
@@ -87,15 +87,15 @@ extension DependencyContainer {
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B) throws -> T {
+  public func resolve<T, A, B>(tag tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2) }
   }
   
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
-  public func resolve<A, B>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B) throws -> Any {
+  public func resolve<A, B>(type: Any.Type, tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory((arg1, arg2)) }
   }
-
+  
   // MARK: 3 Runtime Arguments
   
   /// - seealso: `register(tag:scope:factory:)`
@@ -104,15 +104,15 @@ extension DependencyContainer {
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C) throws -> T {
+  public func resolve<T, A, B, C>(tag tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3) }
   }
   
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
-  public func resolve<A, B, C>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C) throws -> Any {
+  public func resolve<A, B, C>(type: Any.Type, tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3)) }
   }
-  
+
   // MARK: 4 Runtime Arguments
   
   /// - seealso: `register(tag:scope:factory:)`
@@ -121,12 +121,12 @@ extension DependencyContainer {
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C, D>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> T {
+  public func resolve<T, A, B, C, D>(tag tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4) }
   }
 
   /// - seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
-  public func resolve<A, B, C, D>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> Any {
+  public func resolve<A, B, C, D>(type: Any.Type, tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4)) }
   }
 
@@ -138,12 +138,12 @@ extension DependencyContainer {
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C, D, E>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> T {
+  public func resolve<T, A, B, C, D, E>(tag tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5) }
   }
 
   ///- seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
-  public func resolve<A, B, C, D, E>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> Any {
+  public func resolve<A, B, C, D, E>(type: Any.Type, tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5)) }
   }
 
@@ -155,14 +155,80 @@ extension DependencyContainer {
   }
   
   /// - seealso: `resolve(tag:withArguments:)`
-  public func resolve<T, A, B, C, D, E, F>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> T {
+  public func resolve<T, A, B, C, D, E, F>(tag tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> T {
     return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5, arg6) }
   }
 
   /// - seealso: `resolve(_:tag:)`, `resolve(tag:withArguments:)`
-  public func resolve<A, B, C, D, E, F>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> Any {
+  public func resolve<A, B, C, D, E, F>(type: Any.Type, tag: DependencyTagConvertible? = nil, arguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5, arg6)) }
   }
 
+}
+
+//MARK - Deprecated methods
+
+extension DependencyContainer {
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(tag:arguments:) instead")
+  public func resolve<T, A>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A) throws -> T {
+    return try resolve(tag: tag) { factory in try factory(arg1) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(_:tag:arguments:) instead")
+  public func resolve<A>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A) throws -> Any {
+    return try resolve(type, tag: tag) { factory in try factory(arg1) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(tag:arguments:_:) instead")
+  public func resolve<T, A, B>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B) throws -> T {
+    return try resolve(tag: tag) { factory in try factory(arg1, arg2) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(_:tag:arguments:_:) instead")
+  public func resolve<A, B>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B) throws -> Any {
+    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2)) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(tag:arguments:_:_:) instead")
+  public func resolve<T, A, B, C>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C) throws -> T {
+    return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(_:tag:arguments:_:_:) instead")
+  public func resolve<A, B, C>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C) throws -> Any {
+    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3)) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(tag:arguments:_:_:_:) instead")
+  public func resolve<T, A, B, C, D>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> T {
+    return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(_:tag:arguments:_:_:_:) instead")
+  public func resolve<A, B, C, D>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D) throws -> Any {
+    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4)) }
+  }
+
+  @available(*, deprecated=4.6.1, message="Use resolve(tag:arguments:_:_:_:_:) instead")
+  public func resolve<T, A, B, C, D, E>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> T {
+    return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(_: tag:arguments:_:_:_:_:) instead")
+  public func resolve<A, B, C, D, E>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E) throws -> Any {
+    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5)) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(tag:arguments:_:_:_:_:_:) instead")
+  public func resolve<T, A, B, C, D, E, F>(tag tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> T {
+    return try resolve(tag: tag) { factory in try factory(arg1, arg2, arg3, arg4, arg5, arg6) }
+  }
+  
+  @available(*, deprecated=4.6.1, message="Use resolve(_:tag:arguments:_:_:_:_:_:) instead")
+  public func resolve<A, B, C, D, E, F>(type: Any.Type, tag: DependencyTagConvertible? = nil, withArguments arg1: A, _ arg2: B, _ arg3: C, _ arg4: D, _ arg5: E, _ arg6: F) throws -> Any {
+    return try resolve(type, tag: tag) { factory in try factory((arg1, arg2, arg3, arg4, arg5, arg6)) }
+  }
+  
 }
 

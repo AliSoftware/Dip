@@ -212,7 +212,7 @@ class AutoWiringTests: XCTestCase {
     
     //when
     let service = try! container.resolve() as Service
-    AssertThrows(expression: try container.resolve(withArguments: service) as AutoWiredClient,
+    AssertThrows(expression: try container.resolve(arguments: service) as AutoWiredClient,
       "Container should not use auto-wiring when resolving with runtime arguments")
   }
   
@@ -283,7 +283,7 @@ class AutoWiringTests: XCTestCase {
     //when
     let service1 = try! container.resolve() as Service?
     let service2 = try! container.resolve() as ServiceImp2
-    let resolved = try! container.resolve(withArguments: service1, service2) as AutoWiredClient
+    let resolved = try! container.resolve(arguments: service1, service2) as AutoWiredClient
     
     //then
     //when doing another auto-wiring during resolve we should reuse instance
