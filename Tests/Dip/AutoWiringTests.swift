@@ -116,7 +116,7 @@ class AutoWiringTests: XCTestCase {
     //2 args
     var factoryWithMostNumberOfArgumentsCalled = false
     container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { _ in
+      .resolvingProperties { _ in
         factoryWithMostNumberOfArgumentsCalled = true
     }
     
@@ -168,7 +168,7 @@ class AutoWiringTests: XCTestCase {
     container.register(tag: "tag", .Shared) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
     
     //2 arg tagged
-    container.register(tag: "tag", .Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }.resolveDependencies { _ in
+    container.register(tag: "tag", .Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }.resolvingProperties { _ in
       taggedFactoryWithMostNumberOfArgumentsCalled = true
     }
 
@@ -187,7 +187,7 @@ class AutoWiringTests: XCTestCase {
     
     //1 arg
     var notTaggedFactoryWithMostNumberOfArgumentsCalled = false
-    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }.resolveDependencies {_ in
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }.resolvingProperties { _ in
       notTaggedFactoryWithMostNumberOfArgumentsCalled = true
     }
     
@@ -219,7 +219,7 @@ class AutoWiringTests: XCTestCase {
   func testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency() {
     //given
     container.register(.Shared) { AutoWiredClientImp() as AutoWiredClient }
-      .resolveDependencies { container, resolved in
+      .resolvingProperties { container, resolved in
         resolved.service1 = try container.resolve() as Service
         resolved.service2 = try container.resolve() as ServiceImp2
         
@@ -228,7 +228,7 @@ class AutoWiringTests: XCTestCase {
     }
     
     container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, resolved in
+      .resolvingProperties { container, resolved in
         //auto-wiring should be performed only when definition for type to resolve is not found
         //but not for any other type along the way in the graph
         XCTFail("Auto-wiring should not be performed if instance was actually resolved.")
@@ -251,7 +251,7 @@ class AutoWiringTests: XCTestCase {
     var anotherInstance: AutoWiredClient?
     
     container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve() as AutoWiredClient
         }
@@ -274,7 +274,7 @@ class AutoWiringTests: XCTestCase {
     var anotherInstance: AutoWiredClient?
     
     container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve() as AutoWiredClient
         }
@@ -299,7 +299,7 @@ class AutoWiringTests: XCTestCase {
     var anotherInstance: AutoWiredClient?
     
     container.register(tag: "tag", .Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve(tag: "tag") as AutoWiredClient
         }
@@ -322,7 +322,7 @@ class AutoWiringTests: XCTestCase {
     var anotherInstance: AutoWiredClient?
     
     container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve() as AutoWiredClient
         }

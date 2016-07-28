@@ -135,7 +135,7 @@ extension DependencyContainer {
    container.register {
      //container will pass through the tag ("tag") used to resolve SomeService to resolve $0
      SomeServiceImp(dependency: $0) as SomeService
-   }.resolveDependencies { container, service in
+   }.resolvingProperties { container, service in
      //container will use `nil` tag to resolve this dependency
      self.dependency = try container.resolve() as SomeDependency
    
@@ -483,7 +483,7 @@ extension DependencyContainer {
     }
 
     try autoInjectProperties(resolvedInstance)
-    try definition.resolveDependenciesOf(resolvedInstance, withContainer: self)
+    try definition.resolveProperties(instance: resolvedInstance, container: self)
     
     log(.Verbose, "Resolved type \(key.type) with \(resolvedInstance)")
     return resolvedInstance

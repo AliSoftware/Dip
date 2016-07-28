@@ -90,7 +90,7 @@ class DipTests: XCTestCase {
         //referencing container in factory
         let _ = container
         return ServiceImp1() as Service
-        }.resolveDependencies() { container, _ in
+        }.resolvingProperties { container, _ in
           //when container is passed as argument there will be no retain cycle
           let _ = container
       }
@@ -217,7 +217,7 @@ class DipTests: XCTestCase {
   func testThatItCallsResolveDependenciesOnDefinition() {
     //given
     var resolveDependenciesCalled = false
-    container.register { ServiceImp1() as Service }.resolveDependencies { (c, s) in
+    container.register { ServiceImp1() as Service }.resolvingProperties { (c, s) in
       resolveDependenciesCalled = true
     }
     
@@ -360,7 +360,7 @@ class DipTests: XCTestCase {
     let failedKey = DefinitionKey(type: Any.self, typeOfArguments: Any.self)
     let expectedError = DipError.DefinitionNotFound(key: failedKey)
     container.register { ServiceImp1() as Service }
-      .resolveDependencies { container, service in
+      .resolvingProperties { container, service in
         //simulate throwing error when resolving dependency
         throw expectedError
     }
@@ -385,19 +385,19 @@ class DipTests: XCTestCase {
   func testThatItCallsDidResolveDependenciesOnResolvableIntance() {
     //given
     container.register { ResolvableService() as Service }
-      .resolveDependencies { _, service in
+      .resolvingProperties { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
     }
 
     container.register(tag: "graph", .Shared) { ResolvableService() as Service }
-      .resolveDependencies { _, service in
+      .resolvingProperties { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
     }
 
     container.register(tag: "singleton", .Singleton) { ResolvableService() as Service }
-      .resolveDependencies { _, service in
+      .resolvingProperties { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
     }
@@ -436,7 +436,7 @@ class DipTests: XCTestCase {
     var resolveDependenciesCalled = false
     var service2: Service!
     container.register { ResolvableService() as Service }
-      .resolveDependencies { _, service in
+      .resolvingProperties { _, service in
         if !resolveDependenciesCalled {
           resolveDependenciesCalled = true
           service2 = try self.container.resolve() as Service
@@ -499,13 +499,13 @@ class DipTests: XCTestCase {
 
     //given
     container.register(.Shared) { try ResolvableServer(client: self.container.resolve()) as Server }
-      .resolveDependencies { (container: DependencyContainer, server: Server) in
+      .resolvingProperties { (container: DependencyContainer, server: Server) in
         let server = server as! ResolvableServer
         server.secondClient = try container.resolve() as Client
     }
     
     container.register(.Shared) { ResolvableClient() as Client }
-      .resolveDependencies { (container: DependencyContainer, client: Client) in
+      .resolvingProperties { (container: DependencyContainer, client: Client) in
         let client = client as! ResolvableClient
         client.server = try container.resolve() as Server
         client.secondServer = try container.resolve() as Server
@@ -537,7 +537,7 @@ class DipTests: XCTestCase {
     var createdService = false
     
     let service = container.register { ServiceImp1() }
-      .resolveDependencies { container, _ in
+      .resolvingProperties { container, _ in
         if container.context.resolvingType == ServiceImp1.self {
           createdService1 = true
         }
@@ -548,12 +548,12 @@ class DipTests: XCTestCase {
     container.register(service, type: Service.self)
     
     container.register(tag: "tag") { ServiceImp2() as Service }
-      .resolveDependencies { _ in
+      .resolvingProperties { _ in
         createdService2 = true
     }
     
     container.register() { (arg: String) in ServiceImp1() }
-      .resolveDependencies { _ in
+      .resolvingProperties { _ in
         createdService3 = true
     }
     
@@ -677,7 +677,7 @@ extension DipTests {
 
     let clientContainer = DependencyContainer()
     clientContainer.register(.Shared) { ClientImp() as Client }
-      .resolveDependencies { container, client in
+      .resolvingProperties { container, client in
         let client = client as! ClientImp
         client.server = try container.resolve() as Server
         client.anotherServer = try container.resolve() as Server

@@ -54,7 +54,7 @@ sharedService as! ServiceImp3 === sameSharedService as! ServiceImp3
 
 var resolvedEagerSingleton = false
 let definition = container.register(tag: "eager shared instance", .EagerSingleton) { ServiceImp1() as Service }
-    .resolveDependencies { _ in resolvedEagerSingleton = true }
+    .resolvingProperties { _ in resolvedEagerSingleton = true }
 
 try! container.bootstrap()
 resolvedEagerSingleton

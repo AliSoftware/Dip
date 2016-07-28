@@ -79,7 +79,7 @@ class TypeForwardingTests: XCTestCase {
   func testThatItReusesInstanceResolvedByTypeForwarding() {
     //given
     let def = container.register(.Shared) { ServiceImp1() as Service }
-      .resolveDependencies { container, resolved in
+      .resolvingProperties { container, resolved in
         //when
         let forwardType = try container.resolve() as ForwardedType
         let anyForwardType = try container.resolve(ForwardedType.self) as! ForwardedType
@@ -125,7 +125,7 @@ class TypeForwardingTests: XCTestCase {
     var resolveDependenciesCalled = false
     //given
     let def = container.register(.Shared) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in
+      .resolvingProperties { container, service in
         guard resolveDependenciesCalled == false else { return }
         resolveDependenciesCalled = true
 
@@ -153,12 +153,12 @@ class TypeForwardingTests: XCTestCase {
     var originalResolveDependenciesCalled = false
     var resolveDependenciesCalled = false
     let def = container.register { ServiceImp1() }
-      .resolveDependencies { container, service in
+      .resolvingProperties { container, service in
         originalResolveDependenciesCalled = true
     }
     
     container.register(def, type: Service.self)
-      .resolveDependencies { container, object in
+      .resolvingProperties { container, object in
         resolveDependenciesCalled = true
     }
     
@@ -196,7 +196,7 @@ class TypeForwardingTests: XCTestCase {
   func testThatItFirstUsesTaggedDefinitionWhenResolvingOptional() {
     let expectedTag: DependencyContainer.Tag = .String("tag")
     container.register(tag: expectedTag) { ServiceImp1() as Service }
-      .resolveDependencies { container, resolved in
+      .resolvingProperties { container, resolved in
         XCTAssertEqual(container.context.tag, expectedTag)
     }
     container.register { ServiceImp2() as Service }

@@ -173,13 +173,13 @@ class AutoInjectionTests: XCTestCase {
     
     //given
     container.register(.Shared) { ServerImp() as Server }
-      .resolveDependencies { (container, server) -> () in
+      .resolvingProperties { (container, server) -> () in
         serverBlockWasCalled = true
     }
 
     var clientBlockWasCalled = false
     container.register(.Shared) { ClientImp() as Client }
-      .resolveDependencies { (container, client) -> () in
+      .resolvingProperties { (container, client) -> () in
         clientBlockWasCalled = true
     }
 
@@ -194,12 +194,12 @@ class AutoInjectionTests: XCTestCase {
   func testThatItReusesResolvedAutoInjectedInstances() {
     //given
     container.register(.Shared) { ServerImp() as Server }
-      .resolveDependencies { (container, server) -> () in
+      .resolvingProperties { (container, server) -> () in
         server.anotherClient = try! container.resolve() as Client
     }
 
     container.register(.Shared) { ClientImp() as Client }
-      .resolveDependencies { (container, client) -> () in
+      .resolvingProperties { (container, client) -> () in
         client.anotherServer = try! container.resolve() as Server
     }
 
@@ -323,7 +323,7 @@ class AutoInjectionTests: XCTestCase {
     container.register(tag: "tagged", .Shared) { ServerImp() as Server }
 
     container.register(.Shared) { ClientImp() as Client }
-      .resolveDependencies { (container, client) -> () in
+      .resolvingProperties { (container, client) -> () in
         client.anotherServer = try! container.resolve() as Server
     }
 

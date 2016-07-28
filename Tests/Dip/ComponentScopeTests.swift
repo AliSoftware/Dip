@@ -201,7 +201,7 @@ class ComponentScopeTests: XCTestCase {
     container.register(.Shared) { Client(server: try self.container.resolve()) as Client }
     
     container.register(.Shared) { Server() as Server }
-      .resolveDependencies { container, server in
+      .resolvingProperties { container, server in
         server.client = try container.resolve() as Client
     }
     
@@ -217,7 +217,7 @@ class ComponentScopeTests: XCTestCase {
     //given
     container.register(.Shared) { Client(server: try self.container.resolve()) as Client }
     container.register(.Shared) { Server() as Server }
-      .resolveDependencies { container, server in
+      .resolvingProperties { container, server in
         server.client = try container.resolve() as Client
     }
     
@@ -237,7 +237,7 @@ class ComponentScopeTests: XCTestCase {
     //given
     var service2: Service?
     container.register(.Shared) { ServiceImp1() as Service }
-      .resolveDependencies { (c, _) in
+      .resolvingProperties { (c, _) in
         //when service1 is resolved using this definition due to fallback to nil tag
         service2 = try c.resolve(tag: "service") as Service
         
@@ -257,7 +257,7 @@ class ComponentScopeTests: XCTestCase {
     //given
     var service2: Service?
     container.register(.Shared) { ServiceImp1() as Service }
-      .resolveDependencies { (c, service1) in
+      .resolvingProperties { (c, service1) in
         guard service2 == nil else { return }
         
         //when service1 is resolved using this definition due to fallback to nil tag
@@ -280,16 +280,16 @@ class ComponentScopeTests: XCTestCase {
     var eagerSingletonResolved = false
     
     container.register(tag: "eager", .EagerSingleton) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in eagerSingletonResolved = true }
+      .resolvingProperties { container, service in eagerSingletonResolved = true }
     
     container.register(tag: "singleton", .Singleton) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in XCTFail() }
+      .resolvingProperties { container, service in XCTFail() }
 
     container.register(tag: "prototype", .Unique) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in XCTFail() }
+      .resolvingProperties { container, service in XCTFail() }
 
     container.register(tag: "graph", .Shared) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in XCTFail() }
+      .resolvingProperties { container, service in XCTFail() }
     
     //when
     try! container.bootstrap()
@@ -311,7 +311,7 @@ class ComponentScopeTests: XCTestCase {
     var anyImpOtherService: Any!
     
     container.register(.Shared) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in
+      .resolvingProperties { container, service in
         otherService = try! container.resolve() as Service?
         impOtherService = try! container.resolve() as Service!
         anyOtherService = try! container.resolve((Service?).self)

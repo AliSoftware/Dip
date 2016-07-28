@@ -31,7 +31,7 @@ container.register() { TrackerImp() as Tracker }
 container.register() { LoggerImp() as Logger }
 
 container.register() { ServiceImp() as Service }
-    .resolveDependencies { container, service in
+    .resolvingProperties { container, service in
         let service = service as! ServiceImp
         service.logger = try container.resolve() as Logger
         service.tracker = try container.resolve() as Tracker
@@ -132,7 +132,7 @@ container.register(.Shared) {
 }
 
 container.register(.Shared) { ServerImp() as Server }
-    .resolveDependencies { (container: DependencyContainer, server: Server) in
+    .resolvingProperties { (container: DependencyContainer, server: Server) in
         (server as! ServerImp).client = try container.resolve() as ServerClient
 }
 
@@ -176,7 +176,7 @@ class ViewController: UIViewController {
 }
 
 container.register { ViewController() }
-    .resolveDependencies { container, controller in
+    .resolvingProperties { container, controller in
         controller.logger = try container.resolve() as Logger
         controller.tracker = try container.resolve() as Tracker
         controller.dataProvider = try container.resolve() as DataProvider

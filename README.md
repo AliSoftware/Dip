@@ -100,7 +100,7 @@ extension DependencyContainer {
 	static func configure() -> DependencyContainer {
 		return DependencyContainer { container in 
 			container.register(tag: "ViewController") { ViewController() }
-			  .resolveDependencies { container, controller in
+			  .resolvingProperties { container, controller in
 				  controller.animationsFactory = try container.resolve() as AnimatonsFactory
 			}
     

@@ -191,7 +191,7 @@ class ThreadSafetyTests: XCTestCase {
     }
     
     container.register(.Shared) { ServerImp() as Server }
-      .resolveDependencies { container, server in
+      .resolvingProperties { container, server in
         server.client = resolveClientSync()
     }
     

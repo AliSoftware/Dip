@@ -215,13 +215,13 @@ public final class DefinitionOf<T, F>: Definition {
    container.register { ClientImp(service: try container.resolve() as Service) as Client }
    
    container.register { ServiceImp() as Service }
-     .resolveDependencies { container, service in
+     .resolvingProperties { container, service in
        service.client = try container.resolve() as Client
      }
    ```
    
    */
-  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+  public func resolvingProperties(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
     let oldBlock = self.resolveDependenciesBlock
     self.resolveDependenciesBlock = {
       try oldBlock?($0, $1 as! T)
@@ -229,10 +229,10 @@ public final class DefinitionOf<T, F>: Definition {
     }
     return self
   }
-  
+
   /// Calls `resolveDependencies` block if it was set.
-  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws {
-    guard let resolvedInstance = resolvedInstance as? T else { return }
+  func resolveProperties(instance instance: Any, container: DependencyContainer) throws {
+    guard let resolvedInstance = instance as? T else { return }
     if let resolveDependenciesBlock = self.resolveDependenciesBlock {
       try resolveDependenciesBlock(container, resolvedInstance)
     }
@@ -277,7 +277,7 @@ public final class DefinitionOf<T, F>: Definition {
           definition.implements(implementingTypes)
         }
         forwardsToDefinition.forwardsFromDefinitions.append(self)
-        resolveDependencies({ try forwardsToDefinition.resolveDependenciesOf($1, withContainer: $0) })
+        resolvingProperties({ try forwardsToDefinition.resolveProperties(instance: $1, container: $0) })
       }
     }
   }
@@ -293,7 +293,7 @@ protocol _Definition: Definition, AutoWiringDefinition, TypeForwardingDefinition
   var type: Any.Type { get }
   var scope: ComponentScope { get }
   var weakFactory: (Any throws -> Any)! { get }
-  func resolveDependenciesOf(resolvedInstance: Any, withContainer container: DependencyContainer) throws
+  func resolveProperties(instance instance: Any, container: DependencyContainer) throws
 }
 
 //MARK: - Type Forwarding
@@ -347,3 +347,13 @@ class DefinitionBuilder<T, U> {
   }
 }
 
+//MARK: - Deprecated methods
+
+extension DefinitionOf {
+  
+  @available(*, deprecated=4.6.1, message="Use resolvingProperties(_:)")
+  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+    return resolvingProperties(block)
+  }
+
+}

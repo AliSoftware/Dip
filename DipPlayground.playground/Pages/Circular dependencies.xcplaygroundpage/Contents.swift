@@ -48,7 +48,7 @@ container.register(.Shared) {
 }
 
 container.register(.Shared) { NetworkClientImp() as NetworkClient }
-    .resolveDependencies { (container, client) -> () in
+    .resolvingProperties { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }
 
@@ -96,7 +96,7 @@ container.register(.Unique) {
 }
 
 container.register(.Shared) { NetworkClientImp() as NetworkClient }
-    .resolveDependencies { (container, client) -> () in
+    .resolvingProperties { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }
 

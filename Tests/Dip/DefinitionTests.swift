@@ -87,12 +87,12 @@ class DefinitionTests: XCTestCase {
     
     //given
     let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
-      .resolveDependencies { container, service in
+      .resolvingProperties { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveDependenciesOf(ServiceImp(), withContainer: DependencyContainer())
+    try! def.resolveProperties(instance: ServiceImp(), container: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -103,12 +103,12 @@ class DefinitionTests: XCTestCase {
     
     //given
     let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
-      .resolveDependencies { container, service in
+      .resolvingProperties { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveDependenciesOf(String(), withContainer: DependencyContainer())
+    try! def.resolveProperties(instance: String(), container: DependencyContainer())
     
     //then
     XCTAssertFalse(blockCalled)

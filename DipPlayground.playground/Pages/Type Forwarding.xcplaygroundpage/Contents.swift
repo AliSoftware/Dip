@@ -31,18 +31,18 @@ container.register(.Shared) { ListWireframe(addWireFrame: $0, listPresenter: $1)
 container.register(.Shared) { AddWireframe(addPresenter: $0) }
 
 var listInteractorDefinition = container.register(.Shared) { ListInteractor() }
-    .resolveDependencies { container, interactor in
+    .resolvingProperties { container, interactor in
         interactor.output = try container.resolve() as ListPresenter
 }
 
 var listPresenterDefinition = container.register(.Shared) { ListPresenter() }
-    .resolveDependencies { container, presenter in
+    .resolvingProperties { container, presenter in
         presenter.listInteractor = try container.resolve() as ListInteractor
         presenter.listWireframe = try container.resolve()
 }
 
 var addPresenterDefinition = container.register(.Shared) { AddPresenter() }
-    .resolveDependencies { container, presenter in
+    .resolvingProperties { container, presenter in
         presenter.addModuleDelegate = try container.resolve() as ListPresenter
 }
 
@@ -58,18 +58,18 @@ listWireframe?.listPresenter === listPresenter
  */
 
 listInteractorDefinition = container.register(.Shared) { ListInteractor() }
-    .resolveDependencies { container, interactor in
+    .resolvingProperties { container, interactor in
         interactor.output = try container.resolve()
 }
 
 listPresenterDefinition = container.register(.Shared) { ListPresenter() }
-    .resolveDependencies { container, presenter in
+    .resolvingProperties { container, presenter in
         presenter.listInteractor = try container.resolve()
         presenter.listWireframe = try container.resolve()
 }
 
 addPresenterDefinition = container.register(.Shared) { AddPresenter() }
-    .resolveDependencies { container, presenter in
+    .resolvingProperties { container, presenter in
         presenter.addModuleDelegate = try container.resolve()
 }
 
@@ -97,11 +97,11 @@ listWireframe?.listPresenter === listPresenter
  You can also provide `resolveDependencies` block for forwarded definition. First container will call `resolveDependencies` block of the source definition, and then of forwarded definition:
  */
 listInteractorDefinition
-    .resolveDependencies { container, interactor in
+    .resolvingProperties { container, interactor in
         print("resolved ListInteractor")
 }
 container.register(listInteractorDefinition, type: ListInteractorInput.self)
-    .resolveDependencies { container, interactor in
+    .resolvingProperties { container, interactor in
         print("resolved ListInteractorInput")
 }
 addPresenter = try! container.resolve() as AddPresenter
