@@ -267,7 +267,7 @@ extension DependencyContainer {
    container.register { try ClientImp(service: container.resolve() as Service) as Client }
    ```
    */
-  public func register<T>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Unique, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
+  public func register<T>(scope: ComponentScope = .Unique, tag: DependencyTagConvertible? = nil, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
     let definition = DefinitionBuilder<T, ()> {
       $0.scope = scope
       $0.factory = factory
