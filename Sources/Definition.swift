@@ -233,7 +233,7 @@ public final class DefinitionOf<T, F>: Definition {
   
   /// Return `true` if type can be resolved using this definition
   func doesImplements(_ type: Any.Type) -> Bool {
-    return implementingTypes.contains({ $0 == type })
+    return implementingTypes.contains(where: { $0 == type })
   }
   
   //MARK: - _TypeForwardingDefinition

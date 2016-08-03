@@ -143,4 +143,5 @@ extension Collection where Index: Comparable, Self.Indices.Index == Index {
   
 #else
   import Foundation
+  typealias RecursiveLock = NSRecursiveLock
 #endif

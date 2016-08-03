@@ -70,7 +70,7 @@ extension DependencyContainer {
     //filter definitions
     definitions = definitions
       .filter({ $0.definition.supportsAutoWiring() })
-      .sorted(isOrderedBefore: { $0.definition.numberOfArguments > $1.definition.numberOfArguments })
+      .sorted(by: { $0.definition.numberOfArguments > $1.definition.numberOfArguments })
     
     definitions = filter(definitions, type: type, tag: tag)
     definitions = order(definitions, tag: tag)

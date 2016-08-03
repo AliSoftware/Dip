@@ -456,7 +456,7 @@ extension DependencyContainer {
      That happens because when Optional is casted to Any Swift can not implicitly unwrap it with as operator.
      As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
      */
-    if let box = resolvedInstance as? BoxType, unboxed = box.unboxed as? T {
+    if let box = resolvedInstance as? BoxType, let unboxed = box.unboxed as? T {
       resolvedInstance = unboxed
     }
     
@@ -537,7 +537,7 @@ extension DependencyContainer {
         //it means that it has been already called to resolve this type,
         //so there is probably a cercular reference between containers.
         //To break it skip this container
-        if let context = collaborator.context where
+        if let context = collaborator.context,
           context.resolvingType == key.protocolType &&
           context.tag == key.associatedTag { continue }
 
@@ -733,7 +733,7 @@ extension DependencyTagConvertible where Self: RawRepresentable, Self.RawValue =
   }
 }
 
-extension DependencyContainer.Tag: StringLiteralConvertible {
+extension DependencyContainer.Tag: ExpressibleByStringLiteral {
   
   public init(stringLiteral value: StringLiteralType) {
     self = .String(value)
@@ -749,7 +749,7 @@ extension DependencyContainer.Tag: StringLiteralConvertible {
   
 }
 
-extension DependencyContainer.Tag: IntegerLiteralConvertible {
+extension DependencyContainer.Tag: ExpressibleByIntegerLiteral {
   
   public init(integerLiteral value: IntegerLiteralType) {
     self = .Int(value)
@@ -775,7 +775,7 @@ public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bo
  
  - seealso: `resolve(tag:)`
 */
-public enum DipError: ErrorProtocol, CustomStringConvertible {
+public enum DipError: Error, CustomStringConvertible {
   
   /**
    Thrown by `resolve(tag:)` if no matching definition was registered in container.
@@ -792,7 +792,7 @@ public enum DipError: ErrorProtocol, CustomStringConvertible {
       - type: The type of the property
       - underlyingError: The error that caused auto-injection to fail
   */
-  case AutoInjectionFailed(label: String?, type: Any.Type, underlyingError: ErrorProtocol)
+  case AutoInjectionFailed(label: String?, type: Any.Type, underlyingError: Error)
   
   /**
    Thrown by `resolve(tag:)` if failed to auto-wire a type.
@@ -801,7 +801,7 @@ public enum DipError: ErrorProtocol, CustomStringConvertible {
       - type: The type that failed to be resolved by auto-wiring
       - underlyingError: The error that cause auto-wiring to fail
   */
-  case AutoWiringFailed(type: Any.Type, underlyingError: ErrorProtocol)
+  case AutoWiringFailed(type: Any.Type, underlyingError: Error)
 
   /**
    Thrown when auto-wiring type if several definitions with the same number of runtime arguments

@@ -36,11 +36,11 @@ func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expressio
   AssertThrows(expression: expression, checkError: { _ in true }, message)
 }
 
-func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, checkError: (ErrorProtocol) -> Bool) {
+func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, checkError: (Error) -> Bool) {
   AssertThrows(file, line: line, expression: expression, checkError: checkError, "")
 }
 
-func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, checkError: (ErrorProtocol) -> Bool, _ message: String) {
+func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, checkError: (Error) -> Bool, _ message: String) {
   do {
     let _ = try expression()
     XCTFail(message, file: file, line: line)

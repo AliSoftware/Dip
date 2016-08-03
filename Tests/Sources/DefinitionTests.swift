@@ -117,8 +117,8 @@ class DefinitionTests: XCTestCase {
   func testThatItRegisteresOptionalTypesAsForwardedTypes() {
     let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
     
-    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service?.self }))
-    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service!.self }))
+    XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service?.self }))
+    XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service!.self }))
   }
   
 }

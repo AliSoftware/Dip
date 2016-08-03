@@ -83,7 +83,7 @@ let lock = RecursiveLock()
   
 private let resolveClientSync: () -> Client? = {
   var client: Client?
-  DispatchQueue.global(attributes: .qosDefault).sync() {
+  DispatchQueue.global(qos: .default).sync() {
     client = try! container.resolve() as Client
   }
   return client

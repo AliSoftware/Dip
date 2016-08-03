@@ -586,7 +586,7 @@ class DipTests: XCTestCase {
   
   func testThatItFailsValidationOnlyForDipErrors() {
     //given
-    enum SomeError: ErrorProtocol { case error }
+    enum SomeError: Error { case error }
     
     container.register { () -> Service in
       throw SomeError.error
@@ -603,7 +603,7 @@ class DipTests: XCTestCase {
     
     //then
     AssertThrows(expression: try container.validate()) { error in
-      if case let DipError.DefinitionNotFound(_key) = error where _key == key { return true }
+      if case let DipError.DefinitionNotFound(_key) = error, _key == key { return true }
       else { return false }
     }
   }
