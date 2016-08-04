@@ -76,7 +76,6 @@ addPresenterDefinition = container.register(.ObjectGraph) { AddPresenter() }
 /*:
  And now we register definitions for type-forwarding:
  */
-
 container.register(listInteractorDefinition, type: ListInteractorInput.self)
 container.register(listPresenterDefinition, type: ListInteractorOutput.self)
 container.register(listPresenterDefinition, type: ListModuleInterface.self)

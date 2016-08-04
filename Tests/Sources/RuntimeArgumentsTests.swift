@@ -276,7 +276,7 @@ class RuntimeArgumentsTests: XCTestCase {
   
   func testThatDifferentFactoriesRegisteredIfArgumentIsOptional() {
     //given
-    let name1 = "1", name2 = "2"//, name3 = "3"
+    let name1 = "1", name2 = "2"
     container.register { (port: Int, url: String) in ServiceImp(name: name1, baseURL: url, port: port) as Service }
     container.register { (port: Int, url: String?) in ServiceImp(name: name2, baseURL: url!, port: port) as Service }
     
@@ -293,9 +293,10 @@ class RuntimeArgumentsTests: XCTestCase {
     //but when argement of T! will be passed to `resolve` method it will be transformed to T?
     //and wrong definition will be used
     //When fixed using T? and T! should not register two different definitions
-    
+
+//    let name3 = "3"
 //    container.register { (port: Int, url: String!) in ServiceImp(name: name3, baseURL: url, port: port) as Service }
-//    let service3 = try! container.resolve(withArguments: "http://example.com" as String!) as Service
+//    let service3 = try! container.resolve(withArguments: 80, "http://example.com" as String!) as Service
 //    XCTAssertEqual(service3.name, name3)
   }
   
