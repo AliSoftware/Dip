@@ -436,6 +436,7 @@
 					};
 					0903B3AE1C1618AF002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
+						LastSwiftMigration = 0800;
 					};
 					0903B4031C162862002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
@@ -836,6 +837,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.alisoftware.Dip-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
+				SWIFT_VERSION = 3.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Debug;
@@ -849,6 +851,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 			};
 			name = Release;
