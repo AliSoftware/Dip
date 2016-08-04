@@ -115,7 +115,10 @@ class ServerImp: Server {
     weak var client: ServerClient?
 }
 
-class ServerClientImp: ServerClient {
+//There is currently a bug in Swift that causes runtime crash
+//when trying to auto-inject not-NSObject weak property.
+//https://bugs.swift.org/browse/SR-2144
+class ServerClientImp: NSObject, ServerClient {
     var server: Server?
     
     init(server: Server) {
@@ -148,7 +151,10 @@ class InjectedServerImp: Server {
     var client: ServerClient? { return injectedClient.value }
 }
 
-class InjectedClientImp: ServerClient {
+//There is currently a bug in Swift that causes runtime crash 
+//when trying to auto-inject not-NSObject weak property.
+//https://bugs.swift.org/browse/SR-2144
+class InjectedClientImp: NSObject, ServerClient {
     private var injectedServer = Injected<Server>()
     var server: Server? { get { return injectedServer.value } }
 }
