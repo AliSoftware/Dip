@@ -34,7 +34,7 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
             let id = segue.identifier, segueID = UIStoryboard.Segue.Main(rawValue: id)
             where segueID == .PilotsSegue,
             let indexPath = self.tableView.indexPathForSelectedRow,
-            let destVC = segue.destinationViewController as? PersonListViewController,
+            let destVC = segue.destination as? PersonListViewController,
             let starship = self.objects?[indexPath.row]
             else {
                 fatalError()

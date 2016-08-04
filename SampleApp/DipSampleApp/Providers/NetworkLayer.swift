@@ -14,9 +14,9 @@ enum NetworkResponse {
     
     func unwrap() throws -> (Data, HTTPURLResponse) {
         switch self {
-        case Success(let data, let response):
+        case .Success(let data, let response):
             return (data, response)
-        case Error(let error):
+        case .Error(let error):
             throw error
         }
     }

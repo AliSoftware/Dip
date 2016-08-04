@@ -14,19 +14,19 @@ struct URLSessionNetworkLayer : NetworkLayer {
     let session: URLSession
     let responseQueue: DispatchQueue
     
-    init?(baseURL: String, session: URLSession = .shared(), responseQueue: DispatchQueue = DispatchQueue.main) {
-        guard let url = NSURL(string: baseURL) else { return nil }
+    init?(baseURL: String, session: URLSession = URLSession.shared, responseQueue: DispatchQueue = DispatchQueue.main) {
+        guard let url = URL(string: baseURL) else { return nil }
         self.init(baseURL: url, session: session)
     }
     
-    init(baseURL: URL, session: URLSession = .shared(), responseQueue: DispatchQueue = DispatchQueue.main) {
+    init(baseURL: URL, session: URLSession = URLSession.shared, responseQueue: DispatchQueue = DispatchQueue.main) {
         self.baseURL = baseURL
         self.session = session
         self.responseQueue = responseQueue
     }
     
     func request(path: String, completion: (NetworkResponse) -> Void) {
-        guard let url = try? self.baseURL.appendingPathComponent(path) else { return }
+        let url = self.baseURL.appendingPathComponent(path)
         let task = session.dataTask(with: url) { data, response, error in
             if let data = data, let response = response as? HTTPURLResponse {
                 self.responseQueue.async() {
@@ -34,7 +34,7 @@ struct URLSessionNetworkLayer : NetworkLayer {
                 }
             }
             else {
-                let err = error ?? NSError(domain: NSURLErrorDomain, code: NSURLError.unknown.rawValue, userInfo: nil)
+                let err = error ?? NSError(domain: NSURLErrorDomain, code: URLError.unknown.rawValue, userInfo: nil)
                 self.responseQueue.async() {
                     completion(NetworkResponse.Error(err))
                 }

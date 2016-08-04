@@ -46,8 +46,8 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
                     let name = json["name"] as? String,
                     let model = json["model"] as? String,
                     let manufacturer = json["manufacturer"] as? String,
-                    let crewStr = json["crew"] as? String, crew = Int(crewStr),
-                    let passengersStr = json["passengers"] as? String, passengers = Int(passengersStr),
+                    let crewStr = json["crew"] as? String, let crew = Int(crewStr),
+                    let passengersStr = json["passengers"] as? String, let passengers = Int(passengersStr),
                     let pilotIDStrings = json["pilots"] as? [String]
                     else {
                         throw SWAPIError.InvalidJSON

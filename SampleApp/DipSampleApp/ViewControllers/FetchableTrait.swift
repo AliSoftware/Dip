@@ -63,7 +63,7 @@ extension FetchableTrait {
         }
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
         label.text = text
-        label.textColor = .gray()
+        label.textColor = .gray
         label.font = UIFont.systemFont(ofSize: 12)
         label.sizeToFit()
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: label)

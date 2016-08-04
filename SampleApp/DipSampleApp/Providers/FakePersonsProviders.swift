@@ -40,9 +40,9 @@ class PlistPersonProvider : PersonProviderAPI {
     
     init(plist basename: String) {
         guard
-            let path = Bundle.main().pathForResource(basename, ofType: "plist"),
+            let path = Bundle.main.path(forResource: basename, ofType: "plist"),
             let list = NSArray(contentsOfFile: path),
-            peopleDict = list as? [[String:AnyObject]]
+            let peopleDict = list as? [[String:AnyObject]]
             else {
                 fatalError("PLIST for \(basename) not found")
         }
@@ -65,12 +65,12 @@ class PlistPersonProvider : PersonProviderAPI {
     private static func personFromDict(dict: [String:AnyObject]) -> Person {
         guard
             let name = dict["name"] as? String,
-            height = dict["height"] as? Int,
-            mass = dict["mass"] as? Int,
-            hairColor = dict["hairColor"] as? String,
-            eyeColor = dict["eyeColor"] as? String,
-            genderStr = dict["gender"] as? String,
-            starshipsIDs = dict["starships"] as? [Int]
+            let height = dict["height"] as? Int,
+            let mass = dict["mass"] as? Int,
+            let hairColor = dict["hairColor"] as? String,
+            let eyeColor = dict["eyeColor"] as? String,
+            let genderStr = dict["gender"] as? String,
+            let starshipsIDs = dict["starships"] as? [Int]
             else {
                 fatalError("Invalid Plist")
         }
@@ -103,7 +103,7 @@ class FakePersonsProvider: PersonProviderAPI {
     }
     
     func fetch(id: Int, completion: (Person?) -> Void) {
-        if let plistProvider = plistProvider where id == 0 {
+        if let plistProvider = plistProvider, id == 0 {
             plistProvider.fetch(id: id, completion: completion)
         }
         else {

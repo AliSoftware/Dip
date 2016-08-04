@@ -44,8 +44,8 @@ struct SWAPIPersonProvider : PersonProviderAPI {
                 let json = try response.json() as NSDictionary
                 guard
                     let name = json["name"] as? String,
-                    let heightStr = json["height"] as? String, height = Int(heightStr),
-                    let massStr = json["mass"] as? String, mass = Int(massStr),
+                    let heightStr = json["height"] as? String, let height = Int(heightStr),
+                    let massStr = json["mass"] as? String, let mass = Int(massStr),
                     let hairColor = json["hair_color"] as? String,
                     let eyeColor = json["eye_color"] as? String,
                     let gender = json["gender"] as? String,
