@@ -51,7 +51,7 @@ File an issue if you have any question.
 - **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types.
 - **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
 - **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.
-- **[Easy configuration](../../wiki/configuration)**. No complex container hierarchy, no unneeded functionality;
+- **[Easy configuration](../../wiki/containers-collaboration)**. No complex container hierarchy, no unneeded functionality;
 - **Thread safety**. Registering and resolving components is thread safe;
 - **Helpful error messages and configuration validation**. You can validate your container configuration. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
 
