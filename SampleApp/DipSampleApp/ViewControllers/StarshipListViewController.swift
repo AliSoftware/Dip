@@ -31,8 +31,9 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     
     override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
         guard
-            let id = segue.identifier, segueID = UIStoryboard.Segue.Main(rawValue: id)
-            where segueID == .PilotsSegue,
+            let id = segue.identifier,
+            let segueID = UIStoryboard.Segue.Main(rawValue: id),
+            segueID == .PilotsSegue,
             let indexPath = self.tableView.indexPathForSelectedRow,
             let destVC = segue.destination as? PersonListViewController,
             let starship = self.objects?[indexPath.row]

@@ -30,7 +30,7 @@ extension FetchableTrait {
             fetchOne(id: objectID) { (object: ObjectType?) in
                 // Exit if we failed to retrive an object for this ID, or if the request
                 // should be ignored because a new batch request has been started since
-                guard let object = object where batch == self.batchRequestID else { return }
+                guard let object = object, batch == self.batchRequestID else { return }
 
                 if self.objects == nil { self.objects = [] }
                 self.objects?.append(object)
