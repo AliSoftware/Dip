@@ -76,10 +76,10 @@ addPresenterDefinition = container.register(.ObjectGraph) { AddPresenter() }
 /*:
  And now we register definitions for type-forwarding:
  */
-container.register(listInteractorDefinition, type: ListInteractorInput.self)
-container.register(listPresenterDefinition, type: ListInteractorOutput.self)
-container.register(listPresenterDefinition, type: ListModuleInterface.self)
-container.register(listPresenterDefinition, type: AddModuleDelegate.self)
+let _ = container.register(listInteractorDefinition, type: ListInteractorInput.self)
+let _ = container.register(listPresenterDefinition, type: ListInteractorOutput.self)
+let _ = container.register(listPresenterDefinition, type: ListModuleInterface.self)
+let _ = container.register(listPresenterDefinition, type: AddModuleDelegate.self)
 
 addPresenter = try! container.resolve() as AddPresenter
 listPresenter = addPresenter.addModuleDelegate as! ListPresenter
@@ -99,7 +99,7 @@ listInteractorDefinition
     .resolveDependencies { container, interactor in
         print("resolved ListInteractor")
 }
-container.register(listInteractorDefinition, type: ListInteractorInput.self)
+let _ = container.register(listInteractorDefinition, type: ListInteractorInput.self)
     .resolveDependencies { container, interactor in
         print("resolved ListInteractorInput")
 }
