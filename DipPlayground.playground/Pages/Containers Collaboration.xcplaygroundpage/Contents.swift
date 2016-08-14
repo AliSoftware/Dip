@@ -22,20 +22,17 @@ class EventsListWireframe {
 }
 
 
-let rootContainer = DependencyContainer() { container in
-    container.register(.Singleton) { CoreDataStore() as DataStore }
+let rootContainer = DependencyContainer()
+rootContainer.register(.Singleton) { CoreDataStore() as DataStore }
+
+let eventsListModule = DependencyContainer()
+eventsListModule.register(.Shared) { EventsListWireframe(dataStore: $0) }
+    .resolvingProperties { container, wireframe in
+        wireframe.addEventWireframe = try container.resolve()
 }
 
-let eventsListModule = DependencyContainer() { container in
-    container.register(.ObjectGraph) { EventsListWireframe(dataStore: $0) }
-        .resolveDependencies { container, wireframe in
-            wireframe.addEventWireframe = try container.resolve()
-    }
-}
-
-let addEventModule = DependencyContainer() { container in
-    container.register { AddEventWireframe() }
-}
+let addEventModule = DependencyContainer()
+addEventModule.register { AddEventWireframe() }
 
 eventsListModule.collaborate(with: addEventModule, rootContainer)
 
@@ -51,13 +48,13 @@ eventsListWireframe.addEventWireframe
 eventsListModule.reset()
 addEventModule.reset()
 
-eventsListModule.register(.ObjectGraph) { EventsListWireframe(dataStore: $0) }
-    .resolveDependencies { container, wireframe in
+eventsListModule.register(.Shared) { EventsListWireframe(dataStore: $0) }
+    .resolvingProperties { container, wireframe in
         wireframe.addEventWireframe = try container.resolve()
 }
 
-addEventModule.register(.ObjectGraph) { AddEventWireframe() }
-    .resolveDependencies { container, wireframe in
+addEventModule.register(.Shared) { AddEventWireframe() }
+    .resolvingProperties { container, wireframe in
         wireframe.eventsListWireframe = try container.resolve()
 }
 

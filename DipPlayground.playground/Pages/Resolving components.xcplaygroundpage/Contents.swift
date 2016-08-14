@@ -1,9 +1,8 @@
 //: [Previous: Registering Components](@previous)
 
 import Dip
-let container = DependencyContainer { container in
-    container.register { ServiceImp1() as Service }
-}
+let container = DependencyContainer()
+container.register { ServiceImp1() as Service }
 
 /*:
 
@@ -42,6 +41,6 @@ let defaultService = try! container.resolve() as Service
 You can use runtime arguments to resolve components. Dip supports up to six arguments. For more details see ["Runtime arguments"](Runtime%20arguments).
 */
 container.register { service in ClientImp1(service: service) as Client }
-let client = try! container.resolve(withArguments: service) as Client
+let client = try! container.resolve(arguments: service) as Client
 
 //: [Next: Runtime Arguments](@next)

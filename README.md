@@ -1,6 +1,6 @@
 # Dip
 
-[![CI Status](http://img.shields.io/travis/AliSoftware/Dip.svg?style=flat)](https://travis-ci.org/AliSoftware/Dip)
+[![CI Status](https://travis-ci.org/AliSoftware/Dip.svg?branch=develop)](https://travis-ci.org/AliSoftware/Dip)
 [![Version](https://img.shields.io/cocoapods/v/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
@@ -24,7 +24,7 @@ It's aimed to be as simple as possible yet provide rich functionality usual for 
 
 ## Documentation & Usage Examples
 
-Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.6.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
+Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.6.1/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
 
@@ -43,7 +43,7 @@ File an issue if you have any question.
 
 ## Features
 
-- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Prototype_, _ObjectGraph_, _Singleton_, _EagerSingleton_;
+- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Prototype_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
 - **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
 - **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
 - **[Circular dependencies](../../wiki/circular-dependencies)**. Dip can resolve circular dependencies;
@@ -51,7 +51,7 @@ File an issue if you have any question.
 - **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types.
 - **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
 - **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.
-- **[Easy configuration](../../wiki/configuration)**. No complex container hierarchy, no unneeded functionality;
+- **[Easy configuration](../../wiki/containers-collaboration)**. No complex container hierarchy, no unneeded functionality;
 - **Thread safety**. Registering and resolving components is thread safe;
 - **Helpful error messages and configuration validation**. You can validate your container configuration. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
 
@@ -100,7 +100,7 @@ extension DependencyContainer {
 	static func configure() -> DependencyContainer {
 		return DependencyContainer { container in 
 			container.register(tag: "ViewController") { ViewController() }
-			  .resolveDependencies { container, controller in
+			  .resolvingProperties { container, controller in
 				  controller.animationsFactory = try container.resolve() as AnimatonsFactory
 			}
     
@@ -159,7 +159,7 @@ If you use [Swift Package Manager](https://swift.org/package-manager/) add Dip a
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.6.0")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.6.1")
   ]
 )
 ```

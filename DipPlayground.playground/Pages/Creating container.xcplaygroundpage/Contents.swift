@@ -21,6 +21,9 @@ or using a configuration block:
 */
 
 container = DependencyContainer { container in
+    //do not forget to use unowned reference if you will need
+    //to reference container inside definition's factory
+    unowned let container = container
     //register components here
 }
 
