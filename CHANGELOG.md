@@ -1,11 +1,13 @@
 # CHANGELOG
 
-## Develop
+## 4.6.1
 
 #### Fixed
 
 * Fixed sharing singletons between collaborating containers
-  [#103](https://github.com/AliSoftware/Dip/issues/103) 
+  [#103](https://github.com/AliSoftware/Dip/issues/103), [@ilyapuchka](https://github.com/ilyapuchka)
+* Renamed some public API's (see release notes for more info)
+  [#105](https://github.com/AliSoftware/Dip/issues/105), [@ilyapuchka](https://github.com/ilyapuchka)
 
 ## 4.6.0
 

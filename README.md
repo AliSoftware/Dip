@@ -24,7 +24,7 @@ It's aimed to be as simple as possible yet provide rich functionality usual for 
 
 ## Documentation & Usage Examples
 
-Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.6.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
+Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.6.1/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
 
@@ -159,7 +159,7 @@ If you use [Swift Package Manager](https://swift.org/package-manager/) add Dip a
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.6.0")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.6.1")
   ]
 )
 ```
