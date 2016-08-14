@@ -33,7 +33,7 @@ func configureContainer(dip: DependencyContainer) {
         // 1) Register fake persons provider
         //Here we use constructor injection for one of the dependencies property injection for another, and we provide dependencies manually
         dip.register() { FakePersonsProvider(dummyProvider: DummyPilotProvider()) as PersonProviderAPI }
-            .resolveDependencies { (_, resolved: PersonProviderAPI) in
+            .resolvingProperties { (_, resolved: PersonProviderAPI) in
                 //here we resolve optional dependencies
                 //see what happens when you comment this out
                 (resolved as! FakePersonsProvider).plistProvider = PlistPersonProvider(plist: "mainPilot")
@@ -60,7 +60,7 @@ func configureContainer(dip: DependencyContainer) {
         //Here we use constructor injection, but instead of providing dependencies manually container resolves them for us
         dip.register() {
             FakeStarshipProvider(
-                dummyProvider: try dip.resolve(tag: DependencyTags.Dummy, withArguments: "Main Pilot"),
+                dummyProvider: try dip.resolve(tag: DependencyTags.Dummy, arguments: "Main Pilot"),
                 hardCodedProvider: try dip.resolve(tag: DependencyTags.Hardcoded)) as StarshipProviderAPI
         }
         

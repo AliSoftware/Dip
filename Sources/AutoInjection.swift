@@ -34,7 +34,7 @@ extension DependencyContainer {
   private func resolveChild(child: Mirror.Child) throws {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
-    let contextKey = DefinitionKey(protocolType: injectedPropertyBox.dynamicType.wrappedType, argumentsType: Void.self, associatedTag: context.tag)
+    let contextKey = DefinitionKey(type: injectedPropertyBox.dynamicType.wrappedType, typeOfArguments: Void.self, tag: context.tag)
     try inContext(contextKey, injectedInProperty: child.label, logErrors: false) {
         try injectedPropertyBox.resolve(self)
     }
@@ -267,7 +267,7 @@ private class _InjectedPropertyBox<T> {
     let tag = overrideTag ? self.tag : container.context.tag
     do {
       container.context.key = container.context.key.tagged(tag)
-      let key = DefinitionKey(protocolType: T.self, argumentsType: Void.self, associatedTag: tag?.dependencyTag)
+      let key = DefinitionKey(type: T.self, typeOfArguments: Void.self, tag: tag?.dependencyTag)
       return try resolve(container, key: key, builder: { factory in try factory() }) as? T
     }
     catch {

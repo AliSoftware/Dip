@@ -41,16 +41,16 @@ extension DependencyContainer {
     defer { context.logErrors = shouldLogErrors }
     context.logErrors = false
     
-    guard key.argumentsType == Void.self else {
+    guard key.typeOfArguments == Void.self else {
       throw DipError.DefinitionNotFound(key: key)
     }
     
-    let tag = key.associatedTag
-    let type = key.protocolType
+    let tag = key.tag
+    let type = key.type
     let resolved: Any?
     do {
-      let definitions = autoWiringDefinitions(type, tag: tag)
-      resolved = try resolve(enumerating: definitions) { try resolveKey($0, tag: tag, type: type) }
+      let definitions = autoWiringDefinitions(byKey: key)
+      resolved = try resolve(enumerating: definitions, tag: tag)
     }
     catch {
       throw DipError.AutoWiringFailed(type: type, underlyingError: error)
@@ -64,7 +64,7 @@ extension DependencyContainer {
     }
   }
 
-  private func autoWiringDefinitions(type: Any.Type, tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+  private func autoWiringDefinitions(byKey key: DefinitionKey) -> [KeyDefinitionPair] {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
     //filter definitions
@@ -72,36 +72,32 @@ extension DependencyContainer {
       .filter({ $0.definition.supportsAutoWiring() })
       .sort({ $0.definition.numberOfArguments > $1.definition.numberOfArguments })
     
-    definitions = filter(definitions, type: type, tag: tag)
-    definitions = order(definitions, tag: tag)
+    definitions = filter(definitions, byKey: key)
+    definitions = order(definitions, byTag: key.tag)
 
     return definitions
   }
   
   /// Enumerates definitions one by one until one of them succeeds, otherwise returns nil
-  private func resolve(enumerating keyDefinitionPairs: [KeyDefinitionPair], @noescape block: (DefinitionKey) throws -> Any?) throws -> Any? {
-    for (index, keyDefinitionPair) in keyDefinitionPairs.enumerate() {
+  private func resolve(enumerating autoWiringDefinitions: [KeyDefinitionPair], tag: DependencyContainer.Tag?) throws -> Any? {
+    for (index, autoWiringDefinition) in autoWiringDefinitions.enumerate() {
       //If the next definition matches current definition then they are ambigous
-      if let nextPair = keyDefinitionPairs[next: index], case keyDefinitionPair = nextPair {
+      if let nextPair = autoWiringDefinitions[next: index], case autoWiringDefinition = nextPair {
           throw DipError.AmbiguousDefinitions(
-            type: keyDefinitionPair.key.protocolType,
-            definitions: [keyDefinitionPair.definition, nextPair.definition]
+            type: autoWiringDefinition.key.type,
+            definitions: [autoWiringDefinition.definition, nextPair.definition]
         )
       }
       
-      if let resolved = try block(keyDefinitionPair.key) {
+      let key = autoWiringDefinition.key.tagged(tag ?? context.tag)
+      let resolved: Any? = try? resolveKey(key) { definition in
+        try definition.autoWiringFactory!(self, tag)
+      }
+      if let resolved = resolved {
         return resolved
       }
     }
     return nil
-  }
-  
-  private func resolveKey(key: DefinitionKey, tag: DependencyContainer.Tag?, type: Any.Type) throws -> Any {
-    let key = key.tagged(tag ?? context.tag)
-    let resolved: Any = try resolveKey(key, builder: { definition in
-      try definition.autoWiringFactory!(self, tag)
-    })
-    return resolved
   }
   
 }
@@ -120,27 +116,27 @@ typealias KeyDefinitionPair = (key: DefinitionKey, definition: _Definition)
 
 /// Definitions are matched if they are registered for the same tag and thier factories accept the same number of runtime arguments.
 private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
-  guard lhs.key.protocolType == rhs.key.protocolType else { return false }
-  guard lhs.key.associatedTag == rhs.key.associatedTag else { return false }
+  guard lhs.key.type == rhs.key.type else { return false }
+  guard lhs.key.tag == rhs.key.tag else { return false }
   guard lhs.definition.numberOfArguments == rhs.definition.numberOfArguments else { return false }
   return true
 }
 
-func filter(definitions: [KeyDefinitionPair], type: Any.Type, tag: DependencyContainer.Tag?, argumentsType: Any.Type? = nil) -> [KeyDefinitionPair] {
-  let definitions =  definitions
-    .filter({ $0.key.protocolType == type || $0.definition.doesImplements(type) })
-    .filter({ $0.key.associatedTag == tag || $0.key.associatedTag == nil })
-  
-  if let argumentsType = argumentsType {
-    return definitions.filter({ $0.key.argumentsType == argumentsType })
-  }
+func filter(definitions: [KeyDefinitionPair], byKey key: DefinitionKey) -> [KeyDefinitionPair] {
   return definitions
+    .filter({ $0.key.type == key.type || $0.definition.doesImplements(key.type) })
+    .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
 }
 
-func order(definitions: [KeyDefinitionPair], tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+func filter(definitions: [KeyDefinitionPair], byKeyAndTypeOfArguments key: DefinitionKey) -> [KeyDefinitionPair] {
+  return filter(definitions, byKey: key)
+    .filter({ $0.key.typeOfArguments == key.typeOfArguments })
+}
+
+func order(definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
   return
     //first will try to use tagged definitions
-    definitions.filter({ $0.key.associatedTag == tag }) +
+    definitions.filter({ $0.key.tag == tag }) +
     //then will use not tagged definitions
-    definitions.filter({ $0.key.associatedTag != tag })
+    definitions.filter({ $0.key.tag != tag })
 }

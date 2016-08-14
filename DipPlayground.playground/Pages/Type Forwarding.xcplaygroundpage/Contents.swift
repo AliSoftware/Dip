@@ -27,22 +27,22 @@ extension AddPresenter: AddModuleInterface {}
  We can achieve this result by explicitly rosolving concrete types:
  */
 
-container.register(.ObjectGraph) { ListWireframe(addWireFrame: $0, listPresenter: $1) }
-container.register(.ObjectGraph) { AddWireframe(addPresenter: $0) }
+container.register(.Shared) { ListWireframe(addWireFrame: $0, listPresenter: $1) }
+container.register(.Shared) { AddWireframe(addPresenter: $0) }
 
-var listInteractorDefinition = container.register(.ObjectGraph) { ListInteractor() }
-    .resolveDependencies { container, interactor in
+var listInteractorDefinition = container.register(.Shared) { ListInteractor() }
+    .resolvingProperties { container, interactor in
         interactor.output = try container.resolve() as ListPresenter
 }
 
-var listPresenterDefinition = container.register(.ObjectGraph) { ListPresenter() }
-    .resolveDependencies { container, presenter in
+var listPresenterDefinition = container.register(.Shared) { ListPresenter() }
+    .resolvingProperties { container, presenter in
         presenter.listInteractor = try container.resolve() as ListInteractor
         presenter.listWireframe = try container.resolve()
 }
 
-var addPresenterDefinition = container.register(.ObjectGraph) { AddPresenter() }
-    .resolveDependencies { container, presenter in
+var addPresenterDefinition = container.register(.Shared) { AddPresenter() }
+    .resolvingProperties { container, presenter in
         presenter.addModuleDelegate = try container.resolve() as ListPresenter
 }
 
@@ -54,22 +54,22 @@ var listWireframe = listPresenter.listWireframe
 listWireframe?.listPresenter === listPresenter
 
 /*:
- Alternatively we can use type-forwarding. With type-forwarding we register definition for one (source) type and also for another (forwarded) type. When container will try to resolve forwarded type it will use the same definition as for source type, and (if registered in `ObjectGraph` scope or as a singleton) will reuse the same instance. With that you don't need to resolve concrete types in definitions:
+ Alternatively we can use type-forwarding. With type-forwarding we register definition for one (source) type and also for another (forwarded) type. When container will try to resolve forwarded type it will use the same definition as for source type, and (if registered in `Shared` scope or as a singleton) will reuse the same instance. With that you don't need to resolve concrete types in definitions:
  */
 
-listInteractorDefinition = container.register(.ObjectGraph) { ListInteractor() }
-    .resolveDependencies { container, interactor in
+listInteractorDefinition = container.register(.Shared) { ListInteractor() }
+    .resolvingProperties { container, interactor in
         interactor.output = try container.resolve()
 }
 
-listPresenterDefinition = container.register(.ObjectGraph) { ListPresenter() }
-    .resolveDependencies { container, presenter in
+listPresenterDefinition = container.register(.Shared) { ListPresenter() }
+    .resolvingProperties { container, presenter in
         presenter.listInteractor = try container.resolve()
         presenter.listWireframe = try container.resolve()
 }
 
-addPresenterDefinition = container.register(.ObjectGraph) { AddPresenter() }
-    .resolveDependencies { container, presenter in
+addPresenterDefinition = container.register(.Shared) { AddPresenter() }
+    .resolvingProperties { container, presenter in
         presenter.addModuleDelegate = try container.resolve()
 }
 
@@ -97,11 +97,11 @@ listWireframe?.listPresenter === listPresenter
  You can also provide `resolveDependencies` block for forwarded definition. First container will call `resolveDependencies` block of the source definition, and then of forwarded definition:
  */
 listInteractorDefinition
-    .resolveDependencies { container, interactor in
+    .resolvingProperties { container, interactor in
         print("resolved ListInteractor")
 }
 container.register(listInteractorDefinition, type: ListInteractorInput.self)
-    .resolveDependencies { container, interactor in
+    .resolvingProperties { container, interactor in
         print("resolved ListInteractorInput")
 }
 addPresenter = try! container.resolve() as AddPresenter
