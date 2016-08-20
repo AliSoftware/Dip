@@ -77,9 +77,9 @@ class ComponentScopeTests: XCTestCase {
   }
   #endif
   
-  func testThatUniqueIsDefaultScope() {
+  func testThatSharedIsDefaultScope() {
     let def = container.register { ServiceImp1() as Service }
-    XCTAssertEqual(def.scope, ComponentScope.Unique)
+    XCTAssertEqual(def.scope, ComponentScope.Shared)
   }
   
   func testThatScopeCanBeChanged() {
