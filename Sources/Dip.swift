@@ -251,7 +251,7 @@ extension DependencyContainer {
 
    - parameters:
       - tag: The arbitrary tag to associate this factory with. Pass `nil` to associate with any tag. Default value is `nil`.
-      - scope: The scope to use for instance created by the factory.
+      - scope: The scope to use for instance created by the factory. Default value is `Shared`.
       - factory: The factory to register.
 
    - returns: A registered definition.
@@ -263,11 +263,11 @@ extension DependencyContainer {
    ```swift
    container.register { ServiceImp() as Service }
    container.register(tag: "service") { ServiceImp() as Service }
-   container.register(.Shared) { ServiceImp() as Service }
+   container.register(.Unique) { ServiceImp() as Service }
    container.register { try ClientImp(service: container.resolve() as Service) as Client }
    ```
    */
-  public func register<T>(scope: ComponentScope = .Unique, tag: DependencyTagConvertible? = nil, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
+  public func register<T>(scope: ComponentScope = .Shared, tag: DependencyTagConvertible? = nil, factory: () throws -> T) -> DefinitionOf<T, () throws -> T> {
     let definition = DefinitionBuilder<T, ()> {
       $0.scope = scope
       $0.factory = factory
@@ -293,7 +293,7 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Unique, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
+   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Shared, factory: (A, B, C, ...) throws -> T) -> DefinitionOf<T, (A, B, C, ...) throws -> T> {
      return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: ...) { container, tag in
         try factory(container.resolve(tag: tag), ...)
       }
