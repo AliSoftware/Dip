@@ -171,17 +171,18 @@ public enum ComponentScope {
 }
 
 ///Dummy protocol to store definitions for different types in collection
-public protocol Definition: class { }
+public protocol DefinitionType: class { }
 
 /**
- `DefinitionOf<T, F>` describes how instances of type `T` should be created when this type is resolved by the `DependencyContainer`.
+ `Definition<T, U>` describes how instances of type `T` should be created when this type is resolved by the `DependencyContainer`.
  
  - `T` is the type of the instance to resolve
- - `F` is the type of the factory that will create an instance of T.
+ - `U` is the type of runtime arguments accepted by factory that will create an instance of T.
  
- For example `DefinitionOf<Service, (String) -> Service>` is the type of definition that will create an instance of type `Service` using factory that accepts `String` argument.
+ For example `Definition<Service, String>` is the type of definition that will create an instance of type `Service` using factory that accepts `String` argument.
 */
-public final class DefinitionOf<T, F>: Definition {
+public final class Definition<T, U>: DefinitionType {
+  public typealias F = (U) throws -> T
   
   init(scope: ComponentScope, factory: F) {
     self.factory = factory
@@ -190,6 +191,8 @@ public final class DefinitionOf<T, F>: Definition {
   
   //MARK: - _Definition
 
+  weak var container: DependencyContainer?
+  
   let factory: F
   let scope: ComponentScope
   private(set) var weakFactory: (Any throws -> Any)!
@@ -221,7 +224,7 @@ public final class DefinitionOf<T, F>: Definition {
    ```
    
    */
-  public func resolvingProperties(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+  public func resolvingProperties(block: (DependencyContainer, T) throws -> ()) -> Definition {
     let oldBlock = self.resolveDependenciesBlock
     self.resolveDependenciesBlock = {
       try oldBlock?($0, $1 as! T)
@@ -264,7 +267,7 @@ public final class DefinitionOf<T, F>: Definition {
   private func implements(types: [Any.Type]) {
     implementingTypes.appendContentsOf(types.filter({ !doesImplements($0) }))
   }
-
+  
   /// Definition to which resolution will be forwarded to
   private weak var forwardsToDefinition: _TypeForwardingDefinition? {
     didSet {
@@ -289,11 +292,12 @@ public final class DefinitionOf<T, F>: Definition {
 
 //MARK: - _Definition
 
-protocol _Definition: Definition, AutoWiringDefinition, TypeForwardingDefinition {
+protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefinition {
   var type: Any.Type { get }
   var scope: ComponentScope { get }
   var weakFactory: (Any throws -> Any)! { get }
   func resolveProperties(instance instance: Any, container: DependencyContainer) throws
+  var container: DependencyContainer? { get set }
 }
 
 //MARK: - Type Forwarding
@@ -305,13 +309,13 @@ private protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definitio
   func implements(type: [Any.Type])
 }
 
-extension DefinitionOf: _TypeForwardingDefinition {
+extension Definition: _TypeForwardingDefinition {
   var type: Any.Type {
     return T.self
   }
 }
 
-extension DefinitionOf: CustomStringConvertible {
+extension Definition: CustomStringConvertible {
   public var description: String {
     return "type: \(T.self), factory: \(F.self), scope: \(scope)"
   }
@@ -320,7 +324,6 @@ extension DefinitionOf: CustomStringConvertible {
 //MARK: - Definition Builder
 
 /// Internal class used to build definition
-/// Need this builder as alternative to changing to DefinitionOf<T, U> where U - type of arguments
 class DefinitionBuilder<T, U> {
   typealias F = U throws -> T
   
@@ -336,9 +339,9 @@ class DefinitionBuilder<T, U> {
     configure(self)
   }
   
-  func build() -> DefinitionOf<T, F> {
+  func build() -> Definition<T, U> {
     let factory = self.factory
-    let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
+    let definition = Definition<T, U>(scope: scope, factory: factory)
     definition.numberOfArguments = numberOfArguments
     definition.autoWiringFactory = autoWiringFactory
     definition.weakFactory = { try factory($0 as! U) }
@@ -349,10 +352,10 @@ class DefinitionBuilder<T, U> {
 
 //MARK: - Deprecated methods
 
-extension DefinitionOf {
+extension Definition {
   
   @available(*, deprecated=4.6.1, message="Use resolvingProperties(_:)")
-  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+  public func resolveDependencies(block: (DependencyContainer, T) throws -> ()) -> Definition {
     return resolvingProperties(block)
   }
 
