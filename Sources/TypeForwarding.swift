@@ -43,7 +43,7 @@ extension DependencyContainer {
    - returns: New definition for passed type.
    */
   @discardableResult public func register<T, U, F>(_ definition: DefinitionOf<T, (U) throws -> T>, type: F.Type, tag: DependencyTagConvertible? = nil) -> DefinitionOf<F, (U) throws -> F> {
-    let key = DefinitionKey(protocolType: F.self, argumentsType: U.self)
+    let key = DefinitionKey(type: F.self, typeOfArguments: U.self)
     
     let forwardDefinition = DefinitionBuilder<F, U> {
       $0.scope = definition.scope
@@ -77,11 +77,11 @@ extension DependencyContainer {
   func typeForwardingDefinition(_ key: DefinitionKey) -> KeyDefinitionPair? {
     var forwardingDefinitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    forwardingDefinitions = filter(forwardingDefinitions, type: key.protocolType, tag: key.associatedTag, argumentsType: key.argumentsType)
-    forwardingDefinitions = order(forwardingDefinitions, tag: key.associatedTag)
+    forwardingDefinitions = filter(forwardingDefinitions, byKeyAndTypeOfArguments: key)
+    forwardingDefinitions = order(forwardingDefinitions, byTag: key.tag)
 
     //we need to carry on original tag
-    return forwardingDefinitions.first.map({ ($0.key.tagged(key.associatedTag), $0.definition) })
+    return forwardingDefinitions.first.map({ ($0.key.tagged(key.tag), $0.definition) })
   }
   
 }

@@ -32,5 +32,5 @@ enum NetworkResponse {
 }
 
 protocol NetworkLayer {
-    func request(path: String, completion: (NetworkResponse) -> Void)
+    func request(path: String, completion: @escaping (NetworkResponse) -> Void)
 }

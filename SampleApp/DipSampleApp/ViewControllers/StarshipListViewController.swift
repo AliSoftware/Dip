@@ -16,10 +16,10 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var starshipProvider: StarshipProviderAPI!
     var personProvider: PersonProviderAPI!
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         starshipProvider.fetchIDs(completion: completion)
     }
-    func fetchOne(id shipID:Int, completion: (Starship?) -> Void) {
+    func fetchOne(id shipID:Int, completion: @escaping (Starship?) -> Void) {
         starshipProvider.fetch(id: shipID, completion: completion)
     }
     
@@ -29,7 +29,7 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard
             let id = segue.identifier,
             let segueID = UIStoryboard.Segue.Main(rawValue: id),

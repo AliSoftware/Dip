@@ -31,7 +31,7 @@ container.register() { TrackerImp() as Tracker }
 container.register() { LoggerImp() as Logger }
 
 container.register() { ServiceImp() as Service }
-    .resolveDependencies { container, service in
+    .resolvingProperties { container, service in
         let service = service as! ServiceImp
         service.logger = try container.resolve() as Logger
         service.tracker = try container.resolve() as Tracker
@@ -130,12 +130,12 @@ class ServerClientImp: NSObject, ServerClient {
 The standard way to register such components in `DependencyContainer` will lead to such code:
 */
 
-container.register(.ObjectGraph) {
+container.register(.Shared) {
     ServerClientImp(server: try container.resolve()) as ServerClient
 }
 
-container.register(.ObjectGraph) { ServerImp() as Server }
-    .resolveDependencies { (container: DependencyContainer, server: Server) in
+container.register(.Shared) { ServerImp() as Server }
+    .resolvingProperties { (container: DependencyContainer, server: Server) in
         (server as! ServerImp).client = try container.resolve() as ServerClient
 }
 
@@ -159,8 +159,8 @@ class InjectedClientImp: NSObject, ServerClient {
     var server: Server? { get { return injectedServer.value } }
 }
 
-container.register(.ObjectGraph) { InjectedServerImp() as Server }
-container.register(.ObjectGraph) { InjectedClientImp() as ServerClient }
+container.register(.Shared) { InjectedServerImp() as Server }
+container.register(.Shared) { InjectedClientImp() as ServerClient }
 
 let injectedClient = try! container.resolve() as ServerClient
 injectedClient.server
@@ -182,7 +182,7 @@ class ViewController: UIViewController {
 }
 
 container.register { ViewController() }
-    .resolveDependencies { container, controller in
+    .resolvingProperties { container, controller in
         controller.logger = try container.resolve() as Logger
         controller.tracker = try container.resolve() as Tracker
         controller.dataProvider = try container.resolve() as DataProvider

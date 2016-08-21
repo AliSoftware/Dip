@@ -9,6 +9,6 @@
 import Foundation
 
 protocol StarshipProviderAPI {
-    func fetchIDs(completion: ([Int]) -> Void)
-    func fetch(id: Int, completion: (Starship?) -> Void)
+    func fetchIDs(completion: @escaping ([Int]) -> Void)
+    func fetch(id: Int, completion: @escaping (Starship?) -> Void)
 }

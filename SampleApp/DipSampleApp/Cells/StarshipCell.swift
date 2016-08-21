@@ -21,7 +21,7 @@ final class StarshipCell : UITableViewCell, FillableCell {
         nameLabel.text = starship.name
         modelLabel.text = starship.model
         manufacturerLabel.text = starship.manufacturer
-        crewLabel.text = numberFormatter.string(from: starship.crew)
-        passengersLabel.text = numberFormatter.string(from: starship.passengers)
+        crewLabel.text = numberFormatter.string(from: NSNumber(integerLiteral: starship.crew))
+        passengersLabel.text = numberFormatter.string(from: NSNumber(integerLiteral: starship.passengers))
     }
 }

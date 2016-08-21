@@ -11,11 +11,11 @@ import Foundation
 ///Provides some dummy Person entities
 struct DummyPilotProvider : PersonProviderAPI {
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         completion(Array(0..<5))
     }
     
-    func fetch(id: Int, completion: (Person?) -> Void) {
+    func fetch(id: Int, completion: @escaping (Person?) -> Void) {
         completion(dummyPerson(idx: id))
     }
     
@@ -50,11 +50,11 @@ class PlistPersonProvider : PersonProviderAPI {
         self.people = peopleDict.map(PlistPersonProvider.personFromDict)
     }
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         completion(Array(0..<people.count))
     }
     
-    func fetch(id: Int, completion: (Person?) -> Void) {
+    func fetch(id: Int, completion: @escaping (Person?) -> Void) {
         guard id < people.count else {
             completion(nil)
             return
@@ -98,11 +98,11 @@ class FakePersonsProvider: PersonProviderAPI {
         self.dummyProvider = dummyProvider
     }
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         dummyProvider.fetchIDs(completion: completion)
     }
     
-    func fetch(id: Int, completion: (Person?) -> Void) {
+    func fetch(id: Int, completion: @escaping (Person?) -> Void) {
         if let plistProvider = plistProvider, id == 0 {
             plistProvider.fetch(id: id, completion: completion)
         }

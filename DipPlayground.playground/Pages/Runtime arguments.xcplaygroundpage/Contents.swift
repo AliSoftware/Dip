@@ -17,9 +17,9 @@ container.register { (port: Int, url: NSURL) in ServiceImp4(name: "2", baseURL: 
 container.register { (port: Int, url: NSURL?) in ServiceImp4(name: "3", baseURL: url!, port: port) as Service }
 
 let url: NSURL = NSURL(string: "http://example.com")!
-let service1 = try! container.resolve(withArguments: url, 80) as Service
-let service2 = try! container.resolve(withArguments: 80, url) as Service
-let service3 = try! container.resolve(withArguments: 80, NSURL(string: "http://example.com")) as Service
+let service1 = try! container.resolve(arguments: url, 80) as Service
+let service2 = try! container.resolve(arguments: 80, url) as Service
+let service3 = try! container.resolve(arguments: 80, NSURL(string: "http://example.com")) as Service
 
 (service1 as! ServiceImp4).name
 (service2 as! ServiceImp4).name
@@ -34,7 +34,7 @@ _Dip_ supports up to six runtime arguments. If that is not enougth you can exten
 extension DependencyContainer {
     
     @discardableResult
-    public func register<T, A, B, C, D, E, F, G>(tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Prototype, factory: (A, B, C, D, E, F, G) throws -> T) -> DefinitionOf<T, (A, B, C, D, E, F, G) throws -> T> {
+    public func register<T, A, B, C, D, E, F, G>(tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Unique, factory: (A, B, C, D, E, F, G) throws -> T) -> Definition<T, (A, B, C, D, E, F, G)> {
         return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 7) { container, tag in
             try factory(container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag))
         }

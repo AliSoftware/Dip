@@ -12,12 +12,12 @@ import Foundation
 struct DummyStarshipProvider : StarshipProviderAPI {
     var pilotName: String
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         let nbShips = pilotName.characters.count
         completion(Array(0..<nbShips))
     }
     
-    func fetch(id: Int, completion: (Starship?) -> Void) {
+    func fetch(id: Int, completion: @escaping (Starship?) -> Void) {
         completion(dummyStarship(idx: id))
     }
     
@@ -42,11 +42,11 @@ class HardCodedStarshipProvider : StarshipProviderAPI {
         Starship(name: "Third Ship", model: "AwesomeShip Cargo", manufacturer: "HardCoded Inc.", crew: 12, passengers: 150, pilotIDs: [2]),
         ] + Array(4..<75).map { Starship(name: "Ship #\($0)", model: "AwesomeShip Fighter", manufacturer: "HardCoded Inc.", crew: 1, passengers: 2, pilotIDs: [1]) }
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         completion(Array(0..<starships.count))
     }
     
-    func fetch(id: Int, completion: (Starship?) -> Void) {
+    func fetch(id: Int, completion: @escaping (Starship?) -> Void) {
         guard id < starships.count else {
             completion(nil)
             return
@@ -66,11 +66,11 @@ class FakeStarshipProvider: StarshipProviderAPI {
         self.hardCodedProvider = hardCodedProvider
     }
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         hardCodedProvider.fetchIDs(completion: completion)
     }
     
-    func fetch(id: Int, completion: (Starship?) -> Void) {
+    func fetch(id: Int, completion: @escaping (Starship?) -> Void) {
         if id == 0 {
             dummyProvider.fetch(id: id, completion: completion)
         }

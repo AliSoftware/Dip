@@ -31,13 +31,13 @@ private class ServiceImp2: Service { }
 private class ServiceImp3 {}
 
 private protocol AutoWiredClient: class {
-  var service1: Service! { get set }
-  var service2: Service! { get set }
+  var service1: Service? { get set }
+  var service2: Service? { get set }
 }
 
 private class AutoWiredClientImp: AutoWiredClient {
-  var service1: Service!
-  var service2: Service!
+  var service1: Service?
+  var service2: Service?
   
   init(service1: Service?, service2: ServiceImp2) {
     self.service1 = service1
@@ -84,10 +84,10 @@ class AutoWiringTests: XCTestCase {
 
   func testThatItCanResolveWithAutoWiring() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
     
     //when
     let client = try! container.resolve() as AutoWiredClient
@@ -109,19 +109,19 @@ class AutoWiringTests: XCTestCase {
     //given
     
     //1 arg
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
     //1 arg
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }
     
     //2 args
     var factoryWithMostNumberOfArgumentsCalled = false
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { _ in
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+      .resolvingProperties { _ in
         factoryWithMostNumberOfArgumentsCalled = true
     }
     
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     //when
     let _ = try! container.resolve() as AutoWiredClient
@@ -134,12 +134,12 @@ class AutoWiringTests: XCTestCase {
     //given
     
     //1 arg
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
     //1 arg
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }
     
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     //when
     AssertThrows(expression: try container.resolve() as AutoWiredClient) { error -> Bool in
@@ -156,24 +156,24 @@ class AutoWiringTests: XCTestCase {
     //given
     
     //1 arg
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
     //1 arg
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }
     
     //2 args
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
     
     //1 arg tagged
     var taggedFactoryWithMostNumberOfArgumentsCalled = false
-    container.register(tag: "tag", .ObjectGraph) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
+    container.register(.Shared, tag: "tag") { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
     
     //2 arg tagged
-    container.register(tag: "tag", .ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }.resolveDependencies { _ in
+    container.register(.Shared, tag: "tag") { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }.resolvingProperties { _ in
       taggedFactoryWithMostNumberOfArgumentsCalled = true
     }
 
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     //when
     let _ = try! container.resolve(tag: "tag") as AutoWiredClient
@@ -187,15 +187,15 @@ class AutoWiringTests: XCTestCase {
     
     //1 arg
     var notTaggedFactoryWithMostNumberOfArgumentsCalled = false
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }.resolveDependencies {_ in
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }.resolvingProperties { _ in
       notTaggedFactoryWithMostNumberOfArgumentsCalled = true
     }
     
     //1 arg tagged
-    container.register(tag: "tag", .ObjectGraph) { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
+    container.register(.Shared, tag: "tag") { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
     
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     //when
     let _ = try! container.resolve(tag: "other tag") as AutoWiredClient
@@ -206,36 +206,36 @@ class AutoWiringTests: XCTestCase {
   
   func testThatItDoesNotTryToUseAutoWiringWhenCallingResolveWithArguments() {
     //given
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     //when
     let service = try! container.resolve() as Service
-    AssertThrows(expression: try container.resolve(withArguments: service) as AutoWiredClient,
+    AssertThrows(expression: try container.resolve(arguments: service) as AutoWiredClient,
       "Container should not use auto-wiring when resolving with runtime arguments")
   }
   
   func testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency() {
     //given
-    container.register(.ObjectGraph) { AutoWiredClientImp() as AutoWiredClient }
-      .resolveDependencies { container, resolved in
+    container.register(.Shared) { AutoWiredClientImp() as AutoWiredClient }
+      .resolvingProperties { container, resolved in
         resolved.service1 = try container.resolve() as Service
         resolved.service2 = try container.resolve() as ServiceImp2
         
         //simulate that something goes wrong on the way
-        throw DipError.DefinitionNotFound(key: DefinitionKey(protocolType: ServiceImp1.self, argumentsType: Any.self))
+        throw DipError.DefinitionNotFound(key: DefinitionKey(type: ServiceImp1.self, typeOfArguments: Any.self))
     }
     
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, resolved in
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+      .resolvingProperties { container, resolved in
         //auto-wiring should be performed only when definition for type to resolve is not found
         //but not for any other type along the way in the graph
         XCTFail("Auto-wiring should not be performed if instance was actually resolved.")
     }
     
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     //then
     AssertThrows(expression: try container.resolve() as AutoWiredClient,
@@ -245,13 +245,13 @@ class AutoWiringTests: XCTestCase {
   func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain() {
     
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     var anotherInstance: AutoWiredClient?
     
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve() as AutoWiredClient
         }
@@ -268,13 +268,13 @@ class AutoWiringTests: XCTestCase {
   func testThatItReusesInstancesResolvedWithoutAutoWiringWhenUsingAutoWiringAgain() {
     
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     var anotherInstance: AutoWiredClient?
     
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve() as AutoWiredClient
         }
@@ -283,7 +283,7 @@ class AutoWiringTests: XCTestCase {
     //when
     let service1 = try! container.resolve() as Service?
     let service2 = try! container.resolve() as ServiceImp2
-    let resolved = try! container.resolve(withArguments: service1, service2) as AutoWiredClient
+    let resolved = try! container.resolve(arguments: service1, service2) as AutoWiredClient
     
     //then
     //when doing another auto-wiring during resolve we should reuse instance
@@ -293,13 +293,13 @@ class AutoWiringTests: XCTestCase {
   func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag() {
     
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     var anotherInstance: AutoWiredClient?
     
-    container.register(tag: "tag", .ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+    container.register(.Shared, tag: "tag") { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve(tag: "tag") as AutoWiredClient
         }
@@ -316,13 +316,13 @@ class AutoWiringTests: XCTestCase {
   func testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithAnotherTag() {
     
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
     
     var anotherInstance: AutoWiredClient?
     
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolveDependencies { container, _ in
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+      .resolvingProperties { container, _ in
         if anotherInstance == nil {
           anotherInstance = try! container.resolve() as AutoWiredClient
         }
@@ -338,10 +338,10 @@ class AutoWiringTests: XCTestCase {
   
   func testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(tag: "tag", .ObjectGraph) { ServiceImp2() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared, tag: "tag") { ServiceImp2() as Service }
     
-    container.register(.ObjectGraph) { (dep1: Service) -> ServiceImp3 in
+    container.register(.Shared) { (dep1: Service) -> ServiceImp3 in
       XCTAssertTrue(dep1 is ServiceImp2)
       return ServiceImp3()
     }
@@ -352,10 +352,10 @@ class AutoWiringTests: XCTestCase {
 
   func testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Arguments() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(tag: "tag", .ObjectGraph) { ServiceImp2() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared, tag: "tag") { ServiceImp2() as Service }
     
-    container.register(.ObjectGraph) { (dep1: Service, dep2: Service) -> ServiceImp3 in
+    container.register(.Shared) { (dep1: Service, dep2: Service) -> ServiceImp3 in
       XCTAssertTrue(dep1 is ServiceImp2)
       XCTAssertTrue(dep2 is ServiceImp2)
       return ServiceImp3()
@@ -367,10 +367,10 @@ class AutoWiringTests: XCTestCase {
 
   func testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Arguments() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(tag: "tag", .ObjectGraph) { ServiceImp2() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared, tag: "tag") { ServiceImp2() as Service }
     
-    container.register(.ObjectGraph) { (dep1: Service, dep2: Service, dep3: Service) -> ServiceImp3 in
+    container.register(.Shared) { (dep1: Service, dep2: Service, dep3: Service) -> ServiceImp3 in
       XCTAssertTrue(dep1 is ServiceImp2)
       XCTAssertTrue(dep2 is ServiceImp2)
       XCTAssertTrue(dep3 is ServiceImp2)
@@ -383,10 +383,10 @@ class AutoWiringTests: XCTestCase {
 
   func testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Arguments() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(tag: "tag", .ObjectGraph) { ServiceImp2() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared, tag: "tag") { ServiceImp2() as Service }
     
-    container.register(.ObjectGraph) { (dep1: Service, dep2: Service, dep3: Service, dep4: Service) -> ServiceImp3 in
+    container.register(.Shared) { (dep1: Service, dep2: Service, dep3: Service, dep4: Service) -> ServiceImp3 in
       XCTAssertTrue(dep1 is ServiceImp2)
       XCTAssertTrue(dep2 is ServiceImp2)
       XCTAssertTrue(dep3 is ServiceImp2)
@@ -400,10 +400,10 @@ class AutoWiringTests: XCTestCase {
 
   func testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Arguments() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(tag: "tag", .ObjectGraph) { ServiceImp2() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared, tag: "tag") { ServiceImp2() as Service }
     
-    container.register(.ObjectGraph) { (dep1: Service, dep2: Service, dep3: Service, dep4: Service, dep5: Service) -> ServiceImp3 in
+    container.register(.Shared) { (dep1: Service, dep2: Service, dep3: Service, dep4: Service, dep5: Service) -> ServiceImp3 in
       XCTAssertTrue(dep1 is ServiceImp2)
       XCTAssertTrue(dep2 is ServiceImp2)
       XCTAssertTrue(dep3 is ServiceImp2)
@@ -418,10 +418,10 @@ class AutoWiringTests: XCTestCase {
 
   func testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Arguments() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(tag: "tag", .ObjectGraph) { ServiceImp2() as Service }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared, tag: "tag") { ServiceImp2() as Service }
     
-    container.register(.ObjectGraph) { (dep1: Service, dep2: Service, dep3: Service, dep4: Service, dep5: Service, dep6: Service) -> ServiceImp3 in
+    container.register(.Shared) { (dep1: Service, dep2: Service, dep3: Service, dep4: Service, dep5: Service, dep6: Service) -> ServiceImp3 in
       XCTAssertTrue(dep1 is ServiceImp2)
       XCTAssertTrue(dep2 is ServiceImp2)
       XCTAssertTrue(dep3 is ServiceImp2)
@@ -437,9 +437,9 @@ class AutoWiringTests: XCTestCase {
 
   func testThatItCanAutoWireOptional() {
     //given
-    container.register(.ObjectGraph) { ServiceImp1() as Service }
-    container.register(.ObjectGraph) { ServiceImp2() }
-    container.register(.ObjectGraph) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
+    container.register(.Shared) { ServiceImp1() as Service }
+    container.register(.Shared) { ServiceImp2() }
+    container.register(.Shared) { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
     
     var resolved: AutoWiredClient?
     //when

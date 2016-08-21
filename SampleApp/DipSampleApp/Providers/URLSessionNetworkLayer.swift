@@ -25,7 +25,7 @@ struct URLSessionNetworkLayer : NetworkLayer {
         self.responseQueue = responseQueue
     }
     
-    func request(path: String, completion: (NetworkResponse) -> Void) {
+    func request(path: String, completion: @escaping (NetworkResponse) -> Void) {
         let url = self.baseURL.appendingPathComponent(path)
         let task = session.dataTask(with: url) { data, response, error in
             if let data = data, let response = response as? HTTPURLResponse {
@@ -36,7 +36,7 @@ struct URLSessionNetworkLayer : NetworkLayer {
             else {
                 let err = error ?? NSError(domain: NSURLErrorDomain, code: URLError.unknown.rawValue, userInfo: nil)
                 self.responseQueue.async() {
-                    completion(NetworkResponse.Error(err))
+                    completion(NetworkResponse.Error(err as NSError))
                 }
             }
         }

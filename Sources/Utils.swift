@@ -75,7 +75,8 @@ class WeakBox<T>: WeakBoxType {
   }
 
   init(_ value: T) {
-    guard let value = value as? AnyObject else {
+    weak var value: AnyObject? = value as AnyObject
+    guard value != nil else {
       fatalError("Can not store weak reference to not a class instance (\(T.self))")
     }
     self.unboxed = value

@@ -78,24 +78,30 @@ class TypeForwardingTests: XCTestCase {
   
   func testThatItReusesInstanceResolvedByTypeForwarding() {
     //given
-    let def = container.register(.ObjectGraph) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in
+    let def = container.register(.Shared) { ServiceImp1() as Service }
+      .resolvingProperties { container, resolved in
         //when
         let forwardType = try container.resolve() as ForwardedType
         let anyForwardType = try container.resolve(ForwardedType.self) as! ForwardedType
         let object = try container.resolve() as NSObject
         let anyObject = try container.resolve(NSObject.self) as! NSObject
-        
+        let service = try container.resolve() as Service
+        let anyService = try container.resolve(Service.self) as! Service
+
         //then
-        XCTAssertTrue(forwardType === service as! ForwardedType)
-        XCTAssertTrue(anyForwardType === service as! ForwardedType)
-        XCTAssertTrue(object === service as! NSObject)
-        XCTAssertTrue(anyObject === service as! NSObject)
+        XCTAssertTrue(forwardType === resolved as! ForwardedType)
+        XCTAssertTrue(anyForwardType === resolved as! ForwardedType)
+        XCTAssertTrue(object === resolved as! NSObject)
+        XCTAssertTrue(anyObject === resolved as! NSObject)
+        XCTAssertTrue(service === resolved)
+        XCTAssertTrue(anyService === resolved)
     }
     container.register(def, type: ForwardedType.self)
     container.register(def, type: NSObject.self)
     
     let _ = try! container.resolve() as Service
+    let _ = try! container.resolve() as ForwardedType
+    let _ = try! container.resolve() as NSObject
   }
   
   func testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag() {
@@ -118,8 +124,8 @@ class TypeForwardingTests: XCTestCase {
   func testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag() {
     var resolveDependenciesCalled = false
     //given
-    let def = container.register(.ObjectGraph) { ServiceImp1() as Service }
-      .resolveDependencies { container, service in
+    let def = container.register(.Shared) { ServiceImp1() as Service }
+      .resolvingProperties { container, service in
         guard resolveDependenciesCalled == false else { return }
         resolveDependenciesCalled = true
 
@@ -144,27 +150,33 @@ class TypeForwardingTests: XCTestCase {
   
   func testThatItCallsResolvedDependenciesBlockWhenResolvingByTypeForwarding() {
     //given
+    var originalResolveDependenciesCalled = false
     var resolveDependenciesCalled = false
-    let def = container.register { ServiceImp1() as Service }
-      .resolveDependencies { container, service in
+    let def = container.register { ServiceImp1() }
+      .resolvingProperties { container, service in
+        originalResolveDependenciesCalled = true
+    }
+    
+    container.register(def, type: Service.self)
+      .resolvingProperties { container, object in
         resolveDependenciesCalled = true
     }
     
-    container.register(def, type: NSObject.self)
-    
     //when
-    let _ = try! container.resolve() as NSObject
+    let _ = try! container.resolve() as Service
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
+    XCTAssertTrue(originalResolveDependenciesCalled)
 
     //and when
     resolveDependenciesCalled = false
-    let _ = try! container.resolve(NSObject.self)
+    originalResolveDependenciesCalled = false
+    let _ = try! container.resolve(Service.self)
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
-    
+    XCTAssertTrue(originalResolveDependenciesCalled)
   }
   
   func testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding() {
@@ -175,6 +187,23 @@ class TypeForwardingTests: XCTestCase {
     //when
     let service = try! container.resolve(tag: "tag") as NSObject
     let anyService = try! container.resolve(NSObject.self, tag: "tag")
+    
+    //then
+    XCTAssertTrue(service is ServiceImp1)
+    XCTAssertTrue(anyService is ServiceImp1)
+  }
+  
+  func testThatItFirstUsesTaggedDefinitionWhenResolvingOptional() {
+    let expectedTag: DependencyContainer.Tag = .String("tag")
+    container.register(tag: expectedTag) { ServiceImp1() as Service }
+      .resolvingProperties { container, resolved in
+        XCTAssertEqual(container.context.tag, expectedTag)
+    }
+    container.register { ServiceImp2() as Service }
+    
+    //when
+    let service = try! container.resolve(tag: "tag") as Service?
+    let anyService = try! container.resolve((Service?).self, tag: "tag")
     
     //then
     XCTAssertTrue(service is ServiceImp1)

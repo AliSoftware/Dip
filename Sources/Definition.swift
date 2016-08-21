@@ -24,38 +24,49 @@
 
 ///A key used to store definitons in a container.
 public struct DefinitionKey : Hashable, CustomStringConvertible {
-  public let protocolType: Any.Type
-  public let argumentsType: Any.Type
-  public private(set) var associatedTag: DependencyContainer.Tag?
-  
-  init(protocolType: Any.Type, argumentsType: Any.Type, associatedTag: DependencyContainer.Tag? = nil) {
-    self.protocolType = protocolType
-    self.argumentsType = argumentsType
-    self.associatedTag = associatedTag
+  public let type: Any.Type
+  public let typeOfArguments: Any.Type
+  public private(set) var tag: DependencyContainer.Tag?
+
+  init(type: Any.Type, typeOfArguments: Any.Type, tag: DependencyContainer.Tag? = nil) {
+    self.type = type
+    self.typeOfArguments = typeOfArguments
+    self.tag = tag
   }
   
   public var hashValue: Int {
-    return "\(protocolType)-\(argumentsType)-\(associatedTag)".hashValue
+    return "\(type)-\(typeOfArguments)-\(tag)".hashValue
   }
   
   public var description: String {
-    return "type: \(protocolType), arguments: \(argumentsType), tag: \(associatedTag.desc)"
+    return "type: \(type), arguments: \(typeOfArguments), tag: \(tag.desc)"
   }
   
   func tagged(_ tag: DependencyContainer.Tag?) -> DefinitionKey {
     var tagged = self
-    tagged.associatedTag = tag
+    tagged.tag = tag
     return tagged
   }
   
 }
 
-/// Check two definition keys on equality by comparing their `protocolType`, `factoryType` and `associatedTag` properties.
+//MARK: - Deprecated
+extension DefinitionKey {
+  
+  @available(*, deprecated: 4.6.1, message: "Property protocolType was renamed to type")
+  public var protocolType: Any.Type { return type }
+  @available(*, deprecated: 4.6.1, message: "Property argumentsType was renamed to typeOfArguments")
+  public var argumentsType: Any.Type { return typeOfArguments }
+  @available(*, deprecated: 4.6.1, message: "Property associatedTag was renamed to tag")
+  public var associatedTag: DependencyContainer.Tag? { return tag }
+}
+
+/// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
 public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
-    lhs.protocolType == rhs.protocolType &&
-      lhs.argumentsType == rhs.argumentsType &&
-      lhs.associatedTag == rhs.associatedTag
+    lhs.type == rhs.type &&
+      lhs.typeOfArguments == rhs.typeOfArguments &&
+      lhs.tag == rhs.tag
 }
 
 ///Component scope defines a strategy used by the `DependencyContainer` to manage resolved instances life cycle.
@@ -80,6 +91,9 @@ public enum ComponentScope {
    
    ```
    */
+  case Unique
+  
+  @available(*, deprecated: 4.6.1, message: "Prototype scope is renamed to Unique")
   case Prototype
   
   /**
@@ -92,7 +106,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.ObjectGraph) { ServiceImp() as Service }
+   container.register(.Shared) { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service
@@ -106,6 +120,9 @@ public enum ComponentScope {
    consumer1.service1 !== consumer2.service1 //true
    ```
    */
+  case Shared
+  
+  @available(*, deprecated: 4.6.1, message: "ObjectGraph scope is renamed to Shared")
   case ObjectGraph
 
   /**
@@ -175,8 +192,8 @@ public final class DefinitionOf<T, F>: Definition {
 
   let factory: F
   let scope: ComponentScope
-  private(set) var weakFactory: ((Any) throws -> Any)!
-  private(set) var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
+  fileprivate(set) var weakFactory: ((Any) throws -> Any)!
+  fileprivate(set) var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
   
   /**
    Set the block that will be used to resolve dependencies of the instance.
@@ -198,13 +215,13 @@ public final class DefinitionOf<T, F>: Definition {
    container.register { ClientImp(service: try container.resolve() as Service) as Client }
    
    container.register { ServiceImp() as Service }
-     .resolveDependencies { container, service in
+     .resolvingProperties { container, service in
        service.client = try container.resolve() as Client
      }
    ```
    
    */
-  @discardableResult public func resolveDependencies(_ block: (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+  @discardableResult public func resolvingProperties(_ block: @escaping (DependencyContainer, T) throws -> ()) -> DefinitionOf {
     let oldBlock = self.resolveDependenciesBlock
     self.resolveDependenciesBlock = {
       try oldBlock?($0, $1 as! T)
@@ -212,10 +229,10 @@ public final class DefinitionOf<T, F>: Definition {
     }
     return self
   }
-  
+
   /// Calls `resolveDependencies` block if it was set.
-  func resolveDependenciesOf(_ resolvedInstance: Any, withContainer container: DependencyContainer) throws {
-    guard let resolvedInstance = resolvedInstance as? T else { return }
+  func resolveProperties(instance: Any, container: DependencyContainer) throws {
+    guard let resolvedInstance = instance as? T else { return }
     if let resolveDependenciesBlock = self.resolveDependenciesBlock {
       try resolveDependenciesBlock(container, resolvedInstance)
     }
@@ -223,13 +240,13 @@ public final class DefinitionOf<T, F>: Definition {
   
   //MARK: - AutoWiringDefinition
   
-  private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
-  private(set) var numberOfArguments: Int?
+  fileprivate(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
+  fileprivate(set) var numberOfArguments: Int?
   
   //MARK: - TypeForwardingDefinition
   
   /// Types that can be resolved using this definition.
-  private(set) var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
+  fileprivate(set) var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
   
   /// Return `true` if type can be resolved using this definition
   func doesImplements(_ type: Any.Type) -> Bool {
@@ -239,17 +256,17 @@ public final class DefinitionOf<T, F>: Definition {
   //MARK: - _TypeForwardingDefinition
 
   /// Adds type as being able to be resolved using this definition
-  private func implements(_ type: Any.Type) {
+  fileprivate func implements(_ type: Any.Type) {
     implements([type])
   }
   
   /// Adds types as being able to be resolved using this definition
-  private func implements(_ types: [Any.Type]) {
+  fileprivate func implements(_ types: [Any.Type]) {
     implementingTypes.append(contentsOf: types.filter({ !doesImplements($0) }))
   }
 
   /// Definition to which resolution will be forwarded to
-  private weak var forwardsToDefinition: _TypeForwardingDefinition? {
+  fileprivate weak var forwardsToDefinition: _TypeForwardingDefinition? {
     didSet {
       if let forwardsToDefinition = forwardsToDefinition {
         implements(forwardsToDefinition.type)
@@ -260,13 +277,13 @@ public final class DefinitionOf<T, F>: Definition {
           definition.implements(implementingTypes)
         }
         forwardsToDefinition.forwardsFromDefinitions.append(self)
-        resolveDependencies({ try forwardsToDefinition.resolveDependenciesOf($1, withContainer: $0) })
+        resolvingProperties({ try forwardsToDefinition.resolveProperties(instance: $1, container: $0) })
       }
     }
   }
   
   /// Definitions that will forward resolution to this definition
-  private var forwardsFromDefinitions: [_TypeForwardingDefinition] = []
+  fileprivate var forwardsFromDefinitions: [_TypeForwardingDefinition] = []
   
 }
 
@@ -276,7 +293,7 @@ protocol _Definition: Definition, AutoWiringDefinition, TypeForwardingDefinition
   var type: Any.Type { get }
   var scope: ComponentScope { get }
   var weakFactory: ((Any) throws -> Any)! { get }
-  func resolveDependenciesOf(_ resolvedInstance: Any, withContainer container: DependencyContainer) throws
+  func resolveProperties(instance: Any, container: DependencyContainer) throws
 }
 
 //MARK: - Type Forwarding
@@ -315,7 +332,7 @@ class DefinitionBuilder<T, U> {
   
   var forwardsDefinition: _Definition?
   
-  init(configure: @noescape (DefinitionBuilder) -> ()) {
+  init(configure: (DefinitionBuilder) -> ()) {
     configure(self)
   }
   
@@ -330,3 +347,13 @@ class DefinitionBuilder<T, U> {
   }
 }
 
+//MARK: - Deprecated methods
+
+extension DefinitionOf {
+  
+  @available(*, deprecated:4.6.1, message:"Use resolvingProperties(_:)")
+  public func resolveDependencies(block: @escaping (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+    return resolvingProperties(block)
+  }
+
+}

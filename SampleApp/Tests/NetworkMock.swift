@@ -16,7 +16,7 @@ var wsDependencies = DependencyContainer()
 struct NetworkMock : NetworkLayer {
     let fakeData: Data?
     
-    init(json: AnyObject) {
+    init(json: Any) {
         do {
             fakeData = try JSONSerialization.data(withJSONObject: json, options: [])
         } catch {
@@ -24,7 +24,7 @@ struct NetworkMock : NetworkLayer {
         }
     }
     
-    func request(path: String, completion: (NetworkResponse) -> Void) {
+    func request(path: String, completion: @escaping (NetworkResponse) -> Void) {
         let fakeURL = NSURL(string: "http://stub")?.appendingPathComponent(path)
         if let data = fakeData {
             let response = HTTPURLResponse(url: fakeURL!, statusCode: 200, httpVersion: "1.1", headerFields:nil)!

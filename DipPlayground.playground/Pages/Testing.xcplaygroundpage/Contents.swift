@@ -59,7 +59,7 @@ class FakeService: ServiceType {
 func configure(container: DependencyContainer) {
     container.register { RealService() as ServiceType }
     container.register { Client() }
-        .resolveDependencies { container, client in
+        .resolvingProperties { container, client in
             client.service = try container.resolve()
     }
 }

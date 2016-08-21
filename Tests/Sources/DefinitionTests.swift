@@ -51,32 +51,32 @@ class DefinitionTests: XCTestCase {
   #endif
 
   func testThatDefinitionKeyIsEqualBy_Type_Factory_Tag() {
-    let equalKey1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag1)
-    let equalKey2 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag1)
+    let equalKey1 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: tag1)
+    let equalKey2 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: tag1)
     
     XCTAssertEqual(equalKey1, equalKey2)
     XCTAssertEqual(equalKey1.hashValue, equalKey2.hashValue)
   }
   
   func testThatDefinitionKeysWithDifferentTypesAreNotEqual() {
-    let keyWithDifferentType1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: nil)
-    let keyWithDifferentType2 = DefinitionKey(protocolType: AnyObject.self, argumentsType: F1.self, associatedTag: nil)
+    let keyWithDifferentType1 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: nil)
+    let keyWithDifferentType2 = DefinitionKey(type: AnyObject.self, typeOfArguments: F1.self, tag: nil)
     
     XCTAssertNotEqual(keyWithDifferentType1, keyWithDifferentType2)
     XCTAssertNotEqual(keyWithDifferentType1.hashValue, keyWithDifferentType2.hashValue)
   }
   
   func testThatDefinitionKeysWithDifferentFactoriesAreNotEqual() {
-    let keyWithDifferentFactory1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: nil)
-    let keyWithDifferentFactory2 = DefinitionKey(protocolType: Service.self, argumentsType: F2.self, associatedTag: nil)
+    let keyWithDifferentFactory1 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: nil)
+    let keyWithDifferentFactory2 = DefinitionKey(type: Service.self, typeOfArguments: F2.self, tag: nil)
     
     XCTAssertNotEqual(keyWithDifferentFactory1, keyWithDifferentFactory2)
     XCTAssertNotEqual(keyWithDifferentFactory1.hashValue, keyWithDifferentFactory2.hashValue)
   }
   
   func testThatDefinitionKeysWithDifferentTagsAreNotEqual() {
-    let keyWithDifferentTag1 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag1)
-    let keyWithDifferentTag2 = DefinitionKey(protocolType: Service.self, argumentsType: F1.self, associatedTag: tag2)
+    let keyWithDifferentTag1 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: tag1)
+    let keyWithDifferentTag2 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: tag2)
     
     XCTAssertNotEqual(keyWithDifferentTag1, keyWithDifferentTag2)
     XCTAssertNotEqual(keyWithDifferentTag1.hashValue, keyWithDifferentTag2.hashValue)
@@ -86,13 +86,13 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
-      .resolveDependencies { container, service in
+    let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
+      .resolvingProperties { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveDependenciesOf(ServiceImp(), withContainer: DependencyContainer())
+    try! def.resolveProperties(instance: ServiceImp(), container: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -102,20 +102,20 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
-      .resolveDependencies { container, service in
+    let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
+      .resolvingProperties { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveDependenciesOf(String(), withContainer: DependencyContainer())
+    try! def.resolveProperties(instance: String(), container: DependencyContainer())
     
     //then
     XCTAssertFalse(blockCalled)
   }
   
   func testThatItRegisteresOptionalTypesAsForwardedTypes() {
-    let def = DefinitionOf<Service, () -> Service>(scope: .Prototype) { ServiceImp() as Service }
+    let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
     
     XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service?.self }))
     XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service!.self }))

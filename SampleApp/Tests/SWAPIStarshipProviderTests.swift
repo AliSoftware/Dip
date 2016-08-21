@@ -10,9 +10,9 @@ import XCTest
 import Dip
 
 class SWAPIStarshipProviderTests: XCTestCase {
-    let fakeShip1 = ["name": "Falcon", "model": "Fighter", "manufacturer": "Fake Industries", "crew": "7", "passengers": "15",
+    let fakeShip1: [String: Any] = ["name": "Falcon", "model": "Fighter", "manufacturer": "Fake Industries", "crew": "7", "passengers": "15",
         "pilots": ["http://people/1/", "http://people/9"], "url": "http://starship/4"]
-    let fakeShip2 = ["name": "Voyager", "model": "Cargo", "manufacturer": "Fake Industries", "crew": "18", "passengers": "150",
+    let fakeShip2: [String: Any] = ["name": "Voyager", "model": "Cargo", "manufacturer": "Fake Industries", "crew": "18", "passengers": "150",
         "pilots": ["http://people/2/", "http://people/3"], "url": "http://starship/31"]
     
     override func setUp() {

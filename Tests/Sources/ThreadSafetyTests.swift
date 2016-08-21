@@ -49,7 +49,7 @@ private class ServerImp: Server, Hashable {
   init() {}
   
   var hashValue: Int {
-    return unsafeAddress(of: self).hashValue
+    return Unmanaged.passUnretained(self).toOpaque().hashValue
   }
 }
 
@@ -209,12 +209,12 @@ class ThreadSafetyTests: XCTestCase {
   
   
   func testCircularReferenceThreadSafety() {
-    container.register(.ObjectGraph) {
+    container.register(.Shared) {
       ClientImp(server: try container.resolve()) as Client
     }
     
-    container.register(.ObjectGraph) { ServerImp() as Server }
-      .resolveDependencies { container, server in
+    container.register(.Shared) { ServerImp() as Server }
+      .resolvingProperties { container, server in
         server.client = resolveClientSync()
     }
     

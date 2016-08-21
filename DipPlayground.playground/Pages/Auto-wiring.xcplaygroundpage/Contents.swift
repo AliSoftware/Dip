@@ -86,10 +86,10 @@ But then to resolve presenter or interactor you will first need to resolve their
 */
 
 let service = try! container.resolve() as Service
-let interactor = try! container.resolve(withArguments: service) as Interactor
+let interactor = try! container.resolve(arguments: service) as Interactor
 let view = try! container.resolve() as ViewOutput
 let router = try! container.resolve() as Router
-presenter = try! container.resolve(withArguments: view, interactor, router) as Presenter
+presenter = try! container.resolve(arguments: view, interactor, router) as Presenter
 presenter.interactor.service
 
 /*:

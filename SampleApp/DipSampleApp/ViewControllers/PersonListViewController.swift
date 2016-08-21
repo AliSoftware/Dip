@@ -15,11 +15,11 @@ class PersonListViewController: UITableViewController, FetchableTrait {
     var personProvider: PersonProviderAPI!
     var starshipProvider: StarshipProviderAPI!
     
-    func fetchIDs(completion: ([Int]) -> Void) {
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
         return personProvider.fetchIDs(completion: completion)
     }
     
-    func fetchOne(id personID: Int, completion: (Person?) -> Void) {
+    func fetchOne(id personID: Int, completion: @escaping (Person?) -> Void) {
         return personProvider.fetch(id: personID, completion: completion)
     }
     
@@ -29,7 +29,7 @@ class PersonListViewController: UITableViewController, FetchableTrait {
         }
     }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         guard
             let id = segue.identifier,
             let segueID = UIStoryboard.Segue.Main(rawValue: id),
