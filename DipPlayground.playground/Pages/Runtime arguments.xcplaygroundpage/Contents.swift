@@ -35,7 +35,7 @@ _Dip_ supports up to six runtime arguments. If that is not enougth you can exten
 */
 
 extension DependencyContainer {
-    public func register<T, A, B, C, D, E, F, G>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Shared, factory: (A, B, C, D, E, F, G) throws -> T) -> DefinitionOf<T, (A, B, C, D, E, F, G) throws -> T> {
+    public func register<T, A, B, C, D, E, F, G>(tag tag: DependencyTagConvertible? = nil, _ scope: ComponentScope = .Shared, factory: (A, B, C, D, E, F, G) throws -> T) -> Definition<T, (A, B, C, D, E, F, G)> {
         return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: 7) { container, tag in try factory(container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag), container.resolve(tag: tag))
         }
     }
