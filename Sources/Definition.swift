@@ -202,7 +202,7 @@ public final class Definition<T, U>: DefinitionType {
    Set the block that will be used to resolve dependencies of the instance.
    This block will be called before `resolve(tag:)` returns.
    
-   - parameter block: The block to use to resolve dependencies of the instance.
+   - parameter block: The block to resolve property dependencies of the instance.
    
    - returns: modified definition
    
@@ -225,10 +225,14 @@ public final class Definition<T, U>: DefinitionType {
    
    */
   public func resolvingProperties(block: (DependencyContainer, T) throws -> ()) -> Definition {
-    let oldBlock = self.resolveProperties
-    self.resolveProperties = {
-      try oldBlock?($0, $1 as! T)
-      try block($0, $1 as! T)
+    if let oldBlock = self.resolveProperties {
+      self.resolveProperties = {
+        try oldBlock($0, $1 as! T)
+        try block($0, $1 as! T)
+      }
+    }
+    else {
+      self.resolveProperties = { try block($0, $1 as! T) }
     }
     return self
   }
@@ -236,6 +240,9 @@ public final class Definition<T, U>: DefinitionType {
   /// Calls `resolveDependencies` block if it was set.
   func resolveProperties(of instance: Any, container: DependencyContainer) throws {
     guard let resolvedInstance = instance as? T else { return }
+    if let forwardsTo = forwardsTo {
+      try forwardsTo.resolveProperties(of: resolvedInstance, container: container)
+    }
     if let resolveProperties = self.resolveProperties {
       try resolveProperties(container, resolvedInstance)
     }
@@ -269,24 +276,35 @@ public final class Definition<T, U>: DefinitionType {
   }
   
   /// Definition to which resolution will be forwarded to
-  private weak var forwardsToDefinition: _TypeForwardingDefinition? {
+  private weak var forwardsTo: _TypeForwardingDefinition? {
     didSet {
-      if let forwardsToDefinition = forwardsToDefinition {
-        implements(forwardsToDefinition.type)
-        implements(forwardsToDefinition.implementingTypes)
+      //both definitions (self and forwardsTo) can resolve
+      //each other types and each other implementing types
+      //this relationship can be used to reuse previously resolved instances
+      if let forwardsTo = forwardsTo {
+        implements(forwardsTo.type)
+        implements(forwardsTo.implementingTypes)
         
-        for definition in [forwardsToDefinition] + forwardsToDefinition.forwardsFromDefinitions {
+        //definitions for types that can be resolved by `forwardsTo` definition
+        //can also be used to resolve self type and it's implementing types
+        //this way container properly reuses previosly resolved instances
+        //when there are several forwarded definitions
+        //see testThatItReusesInstanceResolvedByTypeForwarding)
+        for definition in forwardsTo.forwardsFrom {
           definition.implements(type)
           definition.implements(implementingTypes)
         }
-        forwardsToDefinition.forwardsFromDefinitions.append(self)
-        resolvingProperties({ try forwardsToDefinition.resolveProperties(of: $1, container: $0) })
+        
+        //forwardsTo can be used to resolve self type and it's implementing types
+        forwardsTo.implements(type)
+        forwardsTo.implements(implementingTypes)
+        forwardsTo.forwardsFrom.append(self)
       }
     }
   }
   
   /// Definitions that will forward resolution to this definition
-  private var forwardsFromDefinitions: [_TypeForwardingDefinition] = []
+  private var forwardsFrom: [_TypeForwardingDefinition] = []
   
 }
 
@@ -303,8 +321,8 @@ protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefini
 //MARK: - Type Forwarding
 
 private protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definition {
-  weak var forwardsToDefinition: _TypeForwardingDefinition? { get set }
-  var forwardsFromDefinitions: [_TypeForwardingDefinition] { get set }
+  weak var forwardsTo: _TypeForwardingDefinition? { get set }
+  var forwardsFrom: [_TypeForwardingDefinition] { get set }
   func implements(type: Any.Type)
   func implements(type: [Any.Type])
 }
@@ -333,7 +351,7 @@ class DefinitionBuilder<T, U> {
   var numberOfArguments: Int?
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
   
-  var forwardsDefinition: _Definition?
+  var forwardsTo: _Definition?
   
   init(@noescape configure: (DefinitionBuilder -> ())) {
     configure(self)
@@ -345,7 +363,7 @@ class DefinitionBuilder<T, U> {
     definition.numberOfArguments = numberOfArguments
     definition.autoWiringFactory = autoWiringFactory
     definition.weakFactory = { try factory($0 as! U) }
-    definition.forwardsToDefinition = forwardsDefinition as? _TypeForwardingDefinition
+    definition.forwardsTo = forwardsTo as? _TypeForwardingDefinition
     return definition
   }
 }
