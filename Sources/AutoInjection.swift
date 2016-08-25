@@ -284,7 +284,7 @@ private class _InjectedPropertyBox<T> {
   }
   
   private func resolve<U>(container: DependencyContainer, key: DefinitionKey, builder: (U throws -> Any) throws -> Any) throws -> Any {
-    return try container.resolveKey(key, builder: { definition throws -> Any in
+    return try container.resolve(key: key, builder: { definition throws -> Any in
       try builder(definition.weakFactory)
     })
   }

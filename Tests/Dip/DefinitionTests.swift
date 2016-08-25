@@ -92,7 +92,7 @@ class DefinitionTests: XCTestCase {
     }
     
     //when
-    try! def.resolveProperties(instance: ServiceImp(), container: DependencyContainer())
+    try! def.resolveProperties(of: ServiceImp(), container: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -108,7 +108,7 @@ class DefinitionTests: XCTestCase {
     }
     
     //when
-    try! def.resolveProperties(instance: String(), container: DependencyContainer())
+    try! def.resolveProperties(of: String(), container: DependencyContainer())
     
     //then
     XCTAssertFalse(blockCalled)

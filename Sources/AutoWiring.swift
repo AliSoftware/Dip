@@ -90,7 +90,7 @@ extension DependencyContainer {
       }
       
       let key = autoWiringDefinition.key.tagged(tag ?? context.tag)
-      let resolved: Any? = try? resolveKey(key) { definition in
+      let resolved: Any? = try? resolve(key: key) { definition in
         try definition.autoWiringFactory!(self, tag)
       }
       if let resolved = resolved {

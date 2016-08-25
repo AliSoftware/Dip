@@ -196,7 +196,7 @@ public final class Definition<T, U>: DefinitionType {
   let factory: F
   let scope: ComponentScope
   private(set) var weakFactory: (Any throws -> Any)!
-  private(set) var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
+  private(set) var resolveProperties: ((DependencyContainer, Any) throws -> ())?
   
   /**
    Set the block that will be used to resolve dependencies of the instance.
@@ -225,8 +225,8 @@ public final class Definition<T, U>: DefinitionType {
    
    */
   public func resolvingProperties(block: (DependencyContainer, T) throws -> ()) -> Definition {
-    let oldBlock = self.resolveDependenciesBlock
-    self.resolveDependenciesBlock = {
+    let oldBlock = self.resolveProperties
+    self.resolveProperties = {
       try oldBlock?($0, $1 as! T)
       try block($0, $1 as! T)
     }
@@ -234,10 +234,10 @@ public final class Definition<T, U>: DefinitionType {
   }
 
   /// Calls `resolveDependencies` block if it was set.
-  func resolveProperties(instance instance: Any, container: DependencyContainer) throws {
+  func resolveProperties(of instance: Any, container: DependencyContainer) throws {
     guard let resolvedInstance = instance as? T else { return }
-    if let resolveDependenciesBlock = self.resolveDependenciesBlock {
-      try resolveDependenciesBlock(container, resolvedInstance)
+    if let resolveProperties = self.resolveProperties {
+      try resolveProperties(container, resolvedInstance)
     }
   }
   
@@ -280,7 +280,7 @@ public final class Definition<T, U>: DefinitionType {
           definition.implements(implementingTypes)
         }
         forwardsToDefinition.forwardsFromDefinitions.append(self)
-        resolvingProperties({ try forwardsToDefinition.resolveProperties(instance: $1, container: $0) })
+        resolvingProperties({ try forwardsToDefinition.resolveProperties(of: $1, container: $0) })
       }
     }
   }
@@ -296,7 +296,7 @@ protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefini
   var type: Any.Type { get }
   var scope: ComponentScope { get }
   var weakFactory: (Any throws -> Any)! { get }
-  func resolveProperties(instance instance: Any, container: DependencyContainer) throws
+  func resolveProperties(of instance: Any, container: DependencyContainer) throws
   var container: DependencyContainer? { get set }
 }
 

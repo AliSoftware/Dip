@@ -293,8 +293,8 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, A, B, C, ...>(tag: Tag? = nil, scope: ComponentScope = .Shared, factory: (A, B, C, ...) throws -> T) -> Definition<T, (A, B, C, ...)> {
-     return registerFactory(tag: tag, scope: scope, factory: factory, numberOfArguments: ...) { container, tag in
+   public func register<T, A, B, C, ...>(scope: ComponentScope = .Shared, tag: Tag? = nil, factory: (A, B, C, ...) throws -> T) -> Definition<T, (A, B, C, ...)> {
+     return register(scope, tag: tag, factory: factory, numberOfArguments: ...) { container, tag in
         try factory(container.resolve(tag: tag), ...)
       }
    }
@@ -429,16 +429,16 @@ extension DependencyContainer {
     let key = DefinitionKey(type: type, typeOfArguments: U.self, tag: tag?.dependencyTag)
     
     return try inContext(key) {
-      try resolveKey(key, builder: { definition in
+      try resolve(key: key, builder: { definition in
         try builder(definition.weakFactory)
       })
     }
   }
   
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
-  func resolveKey<T>(key: DefinitionKey, builder: (_Definition throws -> T)) throws -> T {
+  func resolve<T>(key key: DefinitionKey, builder: (_Definition throws -> T)) throws -> T {
     guard let matching = self.definition(matching: key) else {
-      return try resolveWithCollaborators(key, builder: builder) ?? autowire(key)
+      return try resolveCollaborating(key, builder: builder) ?? autowire(key)
     }
     
     let (key, definition) = matching
@@ -477,14 +477,14 @@ extension DependencyContainer {
       return previouslyResolved
     }
 
-    resolvedInstances[forKey: key, inScope: definition.scope] = resolvedInstance
+    resolvedInstances[key: key, inScope: definition.scope] = resolvedInstance
 
     if let resolvable = resolvedInstance as? Resolvable {
       resolvedInstances.resolvableInstances.append(resolvable)
     }
 
     try autoInjectProperties(resolvedInstance)
-    try definition.resolveProperties(instance: resolvedInstance, container: self)
+    try definition.resolveProperties(of: resolvedInstance, container: self)
     
     log(.Verbose, "Resolved type \(key.type) with \(resolvedInstance)")
     return resolvedInstance
@@ -495,7 +495,7 @@ extension DependencyContainer {
       DefinitionKey(type: $0, typeOfArguments: key.typeOfArguments, tag: key.tag)
     })
     for key in [key] + keys {
-      if let previouslyResolved = resolvedInstances[forKey: key, inScope: definition.scope] as? T {
+      if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope] as? T {
         return previouslyResolved
       }
     }
@@ -543,7 +543,7 @@ extension DependencyContainer {
   }
   
   /// Tries to resolve key using collaborating containers
-  private func resolveWithCollaborators<T>(key: DefinitionKey, builder: _Definition throws -> T) -> T? {
+  private func resolveCollaborating<T>(key: DefinitionKey, builder: _Definition throws -> T) -> T? {
     for collaborator in _collaborators {
       do {
         //if container is already in a context resolving this type 
@@ -566,7 +566,7 @@ extension DependencyContainer {
         }
         
         let resolved = try collaborator.inContext(key, injectedInProperty: self.context.injectedInProperty, injectedInType: self.context.injectedInType, logErrors: false) {
-          try collaborator.resolveKey(key, builder: builder)
+          try collaborator.resolve(key: key, builder: builder)
         }
 
         return resolved
@@ -640,7 +640,7 @@ extension DependencyContainer {
         for argumentsSet in arguments where argumentsSet.dynamicType == key.typeOfArguments {
           do {
             try inContext(key) {
-              try resolveKey(key, builder: { definition throws -> Any in
+              try resolve(key: key, builder: { definition throws -> Any in
                 try definition.weakFactory(argumentsSet)
               })
             }
@@ -686,8 +686,7 @@ private class ResolvedInstances {
     get { return weakSingletonsBox.unboxed }
     set { weakSingletonsBox.unboxed = newValue }
   }
-
-  subscript(forKey key: DefinitionKey, inScope scope: ComponentScope) -> Any? {
+  subscript(key key: DefinitionKey, inScope scope: ComponentScope) -> Any? {
     get {
       switch scope {
       case .Singleton, .EagerSingleton: return singletons[key]
