@@ -186,11 +186,11 @@ class ThreadSafetyTests: XCTestCase {
   
   
   func testCircularReferenceThreadSafety() {
-    container.register(.Shared) {
+    container.register {
       ClientImp(server: try container.resolve()) as Client
     }
     
-    container.register(.Shared) { ServerImp() as Server }
+    container.register { ServerImp() as Server }
       .resolvingProperties { container, server in
         server.client = resolveClientSync()
     }

@@ -125,11 +125,11 @@ class ServerClientImp: ServerClient {
 The standard way to register such components in `DependencyContainer` will lead to such code:
 */
 
-container.register(.Shared) {
+container.register {
     ServerClientImp(server: try container.resolve()) as ServerClient
 }
 
-container.register(.Shared) { ServerImp() as Server }
+container.register { ServerImp() as Server }
     .resolvingProperties { (container: DependencyContainer, server: Server) in
         (server as! ServerImp).client = try container.resolve() as ServerClient
 }
@@ -151,8 +151,8 @@ class InjectedClientImp: ServerClient {
     var server: Server? { get { return injectedServer.value } }
 }
 
-container.register(.Shared) { InjectedServerImp() as Server }
-container.register(.Shared) { InjectedClientImp() as ServerClient }
+container.register { InjectedServerImp() as Server }
+container.register { InjectedClientImp() as ServerClient }
 
 let injectedClient = try! container.resolve() as ServerClient
 injectedClient.server

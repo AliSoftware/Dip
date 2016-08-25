@@ -26,7 +26,7 @@ let rootContainer = DependencyContainer()
 rootContainer.register(.Singleton) { CoreDataStore() as DataStore }
 
 let eventsListModule = DependencyContainer()
-eventsListModule.register(.Shared) { EventsListWireframe(dataStore: $0) }
+eventsListModule.register { EventsListWireframe(dataStore: $0) }
     .resolvingProperties { container, wireframe in
         wireframe.addEventWireframe = try container.resolve()
 }
@@ -48,12 +48,12 @@ eventsListWireframe.addEventWireframe
 eventsListModule.reset()
 addEventModule.reset()
 
-eventsListModule.register(.Shared) { EventsListWireframe(dataStore: $0) }
+eventsListModule.register { EventsListWireframe(dataStore: $0) }
     .resolvingProperties { container, wireframe in
         wireframe.addEventWireframe = try container.resolve()
 }
 
-addEventModule.register(.Shared) { AddEventWireframe() }
+addEventModule.register { AddEventWireframe() }
     .resolvingProperties { container, wireframe in
         wireframe.eventsListWireframe = try container.resolve()
 }

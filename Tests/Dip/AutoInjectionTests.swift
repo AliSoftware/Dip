@@ -123,8 +123,8 @@ class AutoInjectionTests: XCTestCase {
   #endif
 
   func testThatItResolvesAutoInjectedDependencies() {
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp() as Server }
+    container.register { ClientImp() as Client }
     
     let client = try! container.resolve() as Client
     let server = client.server
@@ -139,8 +139,8 @@ class AutoInjectionTests: XCTestCase {
       var client2: Client? { return _client2.value }
     }
 
-    container.register(.Shared) { ServerImp2() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp2() as Server }
+    container.register { ClientImp() as Client }
     
     //when
     let client = try! container.resolve() as Client
@@ -150,8 +150,8 @@ class AutoInjectionTests: XCTestCase {
   }
   
   func testThatItCanSetInjectedProperty() {
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp() as Server }
+    container.register { ClientImp() as Client }
     
     let client = (try! container.resolve() as Client) as! ClientImp
     let server = client.server as! ServerImp
@@ -166,7 +166,7 @@ class AutoInjectionTests: XCTestCase {
   }
   
   func testThatItThrowsErrorIfFailsToAutoInjectDependency() {
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ClientImp() as Client }
     
     AssertThrows(expression: try container.resolve() as Client)
   }
@@ -193,13 +193,13 @@ class AutoInjectionTests: XCTestCase {
     var serverBlockWasCalled = false
     
     //given
-    container.register(.Shared) { ServerImp() as Server }
+    container.register { ServerImp() as Server }
       .resolvingProperties { (container, server) -> () in
         serverBlockWasCalled = true
     }
 
     var clientBlockWasCalled = false
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ClientImp() as Client }
       .resolvingProperties { (container, client) -> () in
         clientBlockWasCalled = true
     }
@@ -214,12 +214,12 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItReusesResolvedAutoInjectedInstances() {
     //given
-    container.register(.Shared) { ServerImp() as Server }
+    container.register { ServerImp() as Server }
       .resolvingProperties { (container, server) -> () in
         server.anotherClient = try! container.resolve() as Client
     }
 
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ClientImp() as Client }
       .resolvingProperties { (container, client) -> () in
         client.anotherServer = try! container.resolve() as Server
     }
@@ -242,9 +242,9 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection() {
     //given
-    container.register(.Shared) { Obj1() }
-    container.register(.Shared) { Obj2() }
-    container.register(.Shared) { Obj3(obj: try self.container.resolve()) }
+    container.register { Obj1() }
+    container.register { Obj2() }
+    container.register { Obj3(obj: try self.container.resolve()) }
     
     //when
     let obj2 = try! container.resolve() as Obj2
@@ -259,8 +259,8 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies() {
     //given
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp() as Server }
+    container.register { ClientImp() as Client }
 
     //when
     var client: Client? = try! container.resolve() as Client
@@ -283,8 +283,8 @@ class AutoInjectionTests: XCTestCase {
     AutoInjectionTests.serverDidInjectCalled = false
     
     //given
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp() as Server }
+    container.register { ClientImp() as Client }
     
     //when
     try! container.resolve() as Client
@@ -296,17 +296,17 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected() {
     //given
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp() as Server }
+    container.register { ClientImp() as Client }
 
     AssertNoThrow(expression: try container.resolve() as Client, "Container should not throw error if failed to resolve optional auto-injected properties.")
   }
   
   func testThatItResolvesTaggedAutoInjectedProperties() {
     //given
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(tag: "tagged", .Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp() as Server }
+    container.register(tag: "tagged") { ServerImp() as Server }
+    container.register { ClientImp() as Client }
     
     //when
     let client = try! container.resolve() as Client
@@ -323,9 +323,9 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItPassesTagToAutoInjectedProperty() {
     //given
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(tag: "tagged", .Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ServerImp() as Server }
+    container.register(tag: "tagged") { ServerImp() as Server }
+    container.register { ClientImp() as Client }
     
     //when
     let client = try! container.resolve(tag: "tagged") as Client
@@ -340,10 +340,10 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag() {
     //given
-    container.register(.Shared) { ServerImp() as Server }
-    container.register(tag: "tagged", .Shared) { ServerImp() as Server }
+    container.register { ServerImp() as Server }
+    container.register(tag: "tagged") { ServerImp() as Server }
 
-    container.register(.Shared) { ClientImp() as Client }
+    container.register { ClientImp() as Client }
       .resolvingProperties { (container, client) -> () in
         client.anotherServer = try! container.resolve() as Server
     }
@@ -367,8 +367,8 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItAutoInjectsPropertyWithCollaboratingContainer() {
     let collaborator = DependencyContainer()
-    collaborator.register(.Shared) { ServerImp() as Server }
-    container.register(.Shared) { ClientImp() as Client }
+    collaborator.register { ServerImp() as Server }
+    container.register { ClientImp() as Client }
     
     container.collaborate(with: collaborator)
     collaborator.collaborate(with: container)

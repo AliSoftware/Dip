@@ -20,9 +20,9 @@ The `Unique` scope is the default. To set a scope you pass it as an argument to 
 */
 
 container.register { ServiceImp1() as Service }
-container.register(tag: "prototype", .Unique) { ServiceImp1() as Service }
-container.register(tag: "object graph", .Shared) { ServiceImp2() as Service }
-container.register(tag: "shared instance", .Singleton) { ServiceImp3() as Service }
+container.register(.Unique, tag: "prototype") { ServiceImp1() as Service }
+container.register(.Shared, tag: "object graph") { ServiceImp2() as Service }
+container.register(.Singleton, tag: "shared instance") { ServiceImp3() as Service }
 
 let service = try! container.resolve() as Service
 let anotherService = try! container.resolve() as Service
