@@ -42,9 +42,13 @@ class TypeForwardingTests: XCTestCase {
       ("testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag", testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag),
       ("testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag",  testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag),
       ("testThatItCallsResolvedDependenciesBlockWhenResolvingByTypeForwarding", testThatItCallsResolvedDependenciesBlockWhenResolvingByTypeForwarding),
+      ("testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding",testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding),
       ("testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding", testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding),
+      ("testThatItCanResolveOptional", testThatItCanResolveOptional),
+      ("testThatItFirstUsesTaggedDefinitionWhenResolvingOptional", testThatItFirstUsesTaggedDefinitionWhenResolvingOptional),
       ("testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding", testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding),
-      ("testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType)
+      ("testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType),
+      ("testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag", testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag)
     ]
   }
   
@@ -80,6 +84,7 @@ class TypeForwardingTests: XCTestCase {
     container.register(.Shared) { ServiceImp1() as Service }
       .resolvingProperties { container, resolved in
         //when
+        //resolving forwarded type
         let forwardType = try container.resolve() as ForwardedType
         let anyForwardType = try container.resolve(ForwardedType.self) as! ForwardedType
         let object = try container.resolve() as NSObject
@@ -94,13 +99,13 @@ class TypeForwardingTests: XCTestCase {
         XCTAssertTrue(anyObject === resolved as! NSObject)
         XCTAssertTrue(service === resolved)
         XCTAssertTrue(anyService === resolved)
-    }
+      }
       .implements(ForwardedType.self)
       .implements(NSObject.self)
     
     let _ = try! container.resolve() as Service
     let _ = try! container.resolve() as ForwardedType
-    let _ = try! container.resolve() as NSObject
+//    let _ = try! container.resolve() as NSObject
   }
   
   func testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag() {
@@ -128,6 +133,8 @@ class TypeForwardingTests: XCTestCase {
         guard resolveDependenciesCalled == false else { return }
         resolveDependenciesCalled = true
 
+        //when
+        //resolving via type-forawrding for tag different then tag for original definition
         let forwardType = try container.resolve(tag: "tag") as ForwardedType
         let anyForwardType = try container.resolve(ForwardedType.self, tag: "tag") as! ForwardedType
 
@@ -152,9 +159,9 @@ class TypeForwardingTests: XCTestCase {
     var originalResolvingPropertiesCalled = false
     var resolvingPropertiesCalled = false
     container.register { ServiceImp1() }
-      .resolvingProperties { container, service in
+      .resolvingProperties { _ in
         originalResolvingPropertiesCalled = true
-      }.implements(Service.self) { container, object in
+      }.implements(Service.self) { _ in
         resolvingPropertiesCalled = true
       }
     
@@ -175,19 +182,79 @@ class TypeForwardingTests: XCTestCase {
     XCTAssertTrue(originalResolvingPropertiesCalled)
   }
   
-  func testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding() {
+  func testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding() {
     //given
-    let def = container.register { ServiceImp1() as Service }
-    container.register { ServiceImp2() as Service }
-    def.implements(NSObject.self)
+    //resolvingProperties provided after registering definition
+    var originalResolvingPropertiesCalled = false
+    var resolvingPropertiesCalled = false
+    container.reset()
+    let definition = container.register { ServiceImp1() }
+      .implements(Service.self) { container, object in
+        resolvingPropertiesCalled = true
+    }
+    
+    definition.resolvingProperties { _ in
+      originalResolvingPropertiesCalled = true
+    }
     
     //when
-    let service = try! container.resolve(tag: "tag") as NSObject
-    let anyService = try! container.resolve(NSObject.self, tag: "tag")
+    let _ = try! container.resolve() as Service
+    
+    //then
+    XCTAssertTrue(resolvingPropertiesCalled)
+    XCTAssertTrue(originalResolvingPropertiesCalled)
+
+    //and when
+    resolvingPropertiesCalled = false
+    originalResolvingPropertiesCalled = false
+    let _ = try! container.resolve(Service.self)
+    
+    //then
+    XCTAssertTrue(resolvingPropertiesCalled)
+    XCTAssertTrue(originalResolvingPropertiesCalled)
+  }
+  
+  func testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding() {
+    //given
+    container.register { ServiceImp1() as Service }
+      .implements(ForwardedType.self)
+    
+    //when
+    let service = try! container.resolve(tag: "tag") as ForwardedType
+    let anyService = try! container.resolve(ForwardedType.self, tag: "tag")
     
     //then
     XCTAssertTrue(service is ServiceImp1)
     XCTAssertTrue(anyService is ServiceImp1)
+  }
+  
+  func testThatItCanResolveOptional() {
+    container.register { ServiceImp1() as Service }
+      .implements(ForwardedType.self, NSObject.self)
+    
+    //when
+    let service = try! container.resolve() as Service?
+    let anyService = try! container.resolve((Service?).self)
+    
+    //then
+    XCTAssertTrue(service is ServiceImp1)
+    XCTAssertTrue(anyService is ServiceImp1)
+
+    //when
+    let forwardedType = try! container.resolve() as ForwardedType?
+    let anyForwardedType = try! container.resolve((ForwardedType?).self)
+    
+    //then
+    XCTAssertTrue(forwardedType is ServiceImp1)
+    XCTAssertTrue(anyForwardedType is ServiceImp1)
+  
+    //when
+    let object = try! container.resolve() as NSObject?
+    let anyObject = try! container.resolve((NSObject?).self)
+    
+    //then
+    XCTAssertTrue(object is ServiceImp1)
+    XCTAssertTrue(anyObject is ServiceImp1)
   }
   
   func testThatItFirstUsesTaggedDefinitionWhenResolvingOptional() {
@@ -218,32 +285,53 @@ class TypeForwardingTests: XCTestCase {
   }
   
   func testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType() {
-    let def1 = container.register { ServiceImp1() as Service }
-    let def2 = container.register { ServiceImp2() as Service }
-    def1.implements(NSObject.self)
+    let def1 = container.register { ServiceImp1() }
+    let def2 = container.register { ServiceImp2() }
+    
+    //when
+    def1.implements(ForwardedType.self)
 
-    XCTAssertTrue(try! container.resolve() as NSObject is ServiceImp1)
-    XCTAssertTrue(try! container.resolve(NSObject.self) is ServiceImp1)
+    //then
+    XCTAssertTrue(try! container.resolve() as ForwardedType is ServiceImp1)
+    XCTAssertTrue(try! container.resolve(ForwardedType.self) is ServiceImp1)
 
     //when
-    def2.implements(NSObject.self)
+    //another definition implements the same type
+    def2.implements(ForwardedType.self)
     
     //then
-    XCTAssertTrue(try! container.resolve() as NSObject is ServiceImp2)
-    XCTAssertTrue(try! container.resolve(NSObject.self) is ServiceImp2)
+    XCTAssertTrue(try! container.resolve() as ForwardedType is ServiceImp2)
+    XCTAssertTrue(try! container.resolve(ForwardedType.self) is ServiceImp2)
     
-    //and given
-    def2.implements(NSObject.self, tag: "tag")
+    //when
+    def1.implements(ForwardedType.self, tag: "tag")
 
-    XCTAssertTrue(try! container.resolve(tag: "tag") as NSObject is ServiceImp2)
-    XCTAssertTrue(try! container.resolve(NSObject.self, tag: "tag") is ServiceImp2)
+    //then
+    XCTAssertTrue(try! container.resolve(tag: "tag") as ForwardedType is ServiceImp1)
+    XCTAssertTrue(try! container.resolve(ForwardedType.self, tag: "tag") is ServiceImp1)
 
     //when
-    def1.implements(NSObject.self, tag: "tag")
+    //another definition implements the same type for the same tag
+    def2.implements(ForwardedType.self, tag: "tag")
     
     //then
-    XCTAssertTrue(try! container.resolve(tag: "tag") as NSObject is ServiceImp1)
-    XCTAssertTrue(try! container.resolve(NSObject.self, tag: "tag") is ServiceImp1)
+    XCTAssertTrue(try! container.resolve(tag: "tag") as ForwardedType is ServiceImp2)
+    XCTAssertTrue(try! container.resolve(ForwardedType.self, tag: "tag") is ServiceImp2)
+    
+  }
+  
+  func testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag() {
+    let def1 = container.register { ServiceImp1() }
+    let def2 = container.register { ServiceImp2() }
+
+    //when
+    def1.implements(ForwardedType.self, tag: "tag")
+    //another definition implements the same type for a different tag
+    def2.implements(ForwardedType.self, tag: "anotherTag")
+    
+    //then
+    XCTAssertTrue(try! container.resolve(tag: "tag") as ForwardedType is ServiceImp1)
+    XCTAssertTrue(try! container.resolve(ForwardedType.self, tag: "tag") is ServiceImp1)
   }
   
 }

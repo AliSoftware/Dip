@@ -347,6 +347,9 @@ extension DependencyContainer {
     
     threadSafe {
       let key = DefinitionKey(type: T.self, typeOfArguments: U.self, tag: tag?.dependencyTag)
+      if let _ = definitions[key] {
+        remove(definitionForKey: key)
+      }
       
       definition.container = self
       definitions[key] = definition
@@ -511,10 +514,15 @@ extension DependencyContainer {
   }
   
   private func previouslyResolved<T>(definition: _Definition, key: DefinitionKey) -> T? {
+    //first check if exact key was already resolved
+    if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope] as? T {
+      return previouslyResolved
+    }
+    //then check if any related type was already resolved
     let keys = definition.implementingTypes.map({
       DefinitionKey(type: $0, typeOfArguments: key.typeOfArguments, tag: key.tag)
     })
-    for key in [key] + keys {
+    for key in keys {
       if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope] as? T {
         return previouslyResolved
       }
@@ -524,15 +532,15 @@ extension DependencyContainer {
   
   /// Searches for definition that matches provided key
   private func definition(matching key: DefinitionKey) -> KeyDefinitionPair? {
-    let typeDefinitions = definitions.filter({ $0.0.type ==  key.type })
-    guard !typeDefinitions.isEmpty else {
-      return typeForwardingDefinition(key)
-    }
-    
     if let definition = (self.definitions[key] ?? self.definitions[key.tagged(nil)]) {
       return (key, definition)
     }
-
+    
+    //if no definition registered for exact type try to find type-forwarding definition that can resolve the type
+    //that will actually happen only when resolving optionals
+    if definitions.filter({ $0.0.type == key.type }).isEmpty {
+      return typeForwardingDefinition(key)
+    }
     return nil
   }
   
