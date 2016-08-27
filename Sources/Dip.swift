@@ -292,7 +292,6 @@ extension DependencyContainer {
       $0.scope = scope
       $0.factory = factory
     }.build()
-    print("\(T.self)")
     register(definition, forTag: tag)
     return definition
   }
