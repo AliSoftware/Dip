@@ -64,6 +64,8 @@ extension Definition {
    - returns: definition on which `implements` was called
    */
   public func implements<F>(type: F.Type, tag: DependencyTagConvertible? = nil, resolvingProperties: (DependencyContainer, F) throws -> ()) -> Definition {
+    precondition(container != nil, "Definition should be registered in the container.")
+    
     let forwardDefinition = container!.register(self, type: type, tag: tag)
     forwardDefinition.resolvingProperties(resolvingProperties)
     return self
