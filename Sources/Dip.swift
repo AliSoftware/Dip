@@ -504,6 +504,7 @@ extension DependencyContainer {
 
     if let resolvable = resolvedInstance as? Resolvable {
       resolvedInstances.resolvableInstances.append(resolvable)
+      resolvable.resolveDependencies(self)
     }
 
     try autoInjectProperties(resolvedInstance)
@@ -745,10 +746,18 @@ extension DependencyContainer: CustomStringConvertible {
 
 //MARK: - Resolvable
 
-/// Conform to this protocol when you need to have a callback when all the dependencies are injected.
+/// Resolvable protocol provides some extension points for resolving dependencies with property injection.
 public protocol Resolvable {
-  /// This method is called by the container when all dependencies of the instance are resolved.
+  /// This method will be called right after instance is created by the container.
+  func resolveDependencies(_ container: DependencyContainer)
+  /// This method will be called when all dependencies of the instance are resolved.
+  /// When resolving objects graph the last resolved instance will receive this callback first.
   func didResolveDependencies()
+}
+
+extension Resolvable {
+  func resolveDependencies(_ container: DependencyContainer) { }
+  func didResolveDependencies() { }
 }
 
 //MARK: - DependencyTagConvertible

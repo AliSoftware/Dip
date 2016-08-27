@@ -65,6 +65,7 @@ class DipTests: XCTestCase {
       ("testThatItThrowsErrorIfFailsToResolveDependency", testThatItThrowsErrorIfFailsToResolveDependency),
       ("testThatItCallsDidResolveDependenciesOnResolvableIntance", testThatItCallsDidResolveDependenciesOnResolvableIntance),
       ("testThatItCallsDidResolveDependenciesInReverseOrder", testThatItCallsDidResolveDependenciesInReverseOrder),
+      ("testItCallsResolveDependenciesOnResolableInstance", testItCallsResolveDependenciesOnResolableInstance),
       ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies),
       ("testThatItCanResolveUsingContainersCollaboration", testThatItCanResolveUsingContainersCollaboration),
       ("testThatCollaboratingWithSelfIsIgnored", testThatCollaboratingWithSelfIsIgnored),
@@ -453,6 +454,36 @@ class DipTests: XCTestCase {
     //then
     XCTAssertTrue(ResolvableService.resolved.first === service2)
     XCTAssertTrue(ResolvableService.resolved.last === service1)
+  }
+  
+  func testItCallsResolveDependenciesOnResolableInstance() {
+    
+    class Class: Resolvable {
+      var resolveDependenciesCalled = false
+      
+      func resolveDependencies(_ container: DependencyContainer) {
+        resolveDependenciesCalled = true
+      }
+    }
+    
+    class SubClass: Class {
+      override func resolveDependencies(_ container: DependencyContainer) {
+        super.resolveDependencies(container)
+      }
+    }
+    
+    container.register { Class() }
+      .resolvingProperties { _, instance in
+        XCTAssertTrue(instance.resolveDependenciesCalled)
+    }
+    
+    container.register { SubClass() }
+      .resolvingProperties { _, instance in
+        XCTAssertTrue(instance.resolveDependenciesCalled)
+    }
+    
+    let _ = try! container.resolve() as Class
+    let _ = try! container.resolve() as SubClass
   }
   
   func testThatItResolvesCircularDependencies() {
