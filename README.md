@@ -43,11 +43,12 @@ File an issue if you have any question.
 
 ## Features
 
-- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Prototype_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
+- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Unique_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
 - **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
 - **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
 - **[Circular dependencies](../../wiki/circular-dependencies)**. Dip can resolve circular dependencies;
 - **[Auto-wiring](../../wiki/auto-wiring)** & **[Auto-injection](../../wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
+- **[Resolving optionals](../../wiki/resolving-optionals)**. Dip is able to resolve constructor or property dependencies defined as optionals.
 - **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types.
 - **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
 - **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.

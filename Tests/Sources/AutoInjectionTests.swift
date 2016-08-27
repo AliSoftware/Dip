@@ -40,6 +40,7 @@ private class ServerImp: Server {
   var _client = InjectedWeak<Client>() { _ in
     AutoInjectionTests.clientDidInjectCalled = true
   }
+
   var client: Client? {
     return _client.value
   }
@@ -54,6 +55,7 @@ private class ClientImp: Client {
   var _server = Injected<Server>() { _ in
     AutoInjectionTests.serverDidInjectCalled = true
   }
+
   var server: Server? {
     return _server.value
   }

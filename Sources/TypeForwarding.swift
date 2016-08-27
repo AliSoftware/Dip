@@ -22,9 +22,70 @@
 // THE SOFTWARE.
 //
 
-protocol TypeForwardingDefinition: Definition {
+protocol TypeForwardingDefinition: DefinitionType {
   var implementingTypes: [Any.Type] { get }
   func doesImplements(_ type: Any.Type) -> Bool
+}
+
+extension Definition {
+  
+  /**
+   Registers definition for passed type.
+   
+   If instance created by factory of definition on which method is called 
+   does not implement type passed in a `type` parameter,
+   container will throw `DipError.DefinitionNotFound` error when trying to resolve that type.
+   
+   - parameters:
+      - type: Type to register definition for
+      - tag: Optional tag to associate definition with. Default is `nil`.
+   
+   - returns: definition on which `implements` was called
+   */
+  @discardableResult public func implements<F>(_ type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition {
+    precondition(container != nil, "Definition should be registered in the container.")
+
+    container!.register(self, type: type, tag: tag)
+    return self
+  }
+  
+  /**
+   Registers definition for passed type.
+   
+   If instance created by factory of definition on which method is called
+   does not implement type passed in a `type` parameter,
+   container will throw `DipError.DefinitionNotFound` error when trying to resolve that type.
+   
+   - parameters:
+      - type: Type to register definition for
+      - tag: Optional tag to associate definition with. Default is `nil`.
+      - resolvingProperties: Optional block to be called to resolve instance property dependencies
+   
+   - returns: definition on which `implements` was called
+   */
+  @discardableResult public func implements<F>(_ type: F.Type, tag: DependencyTagConvertible? = nil, resolvingProperties: @escaping (DependencyContainer, F) throws -> ()) -> Definition {
+    precondition(container != nil, "Definition should be registered in the container.")
+
+    let forwardDefinition = container!.register(self, type: type, tag: tag)
+    forwardDefinition.resolvingProperties(resolvingProperties)
+    return self
+  }
+
+  ///Registers definition for types passed as parameters
+  @discardableResult public func implements<A, B>(_ a: A.Type, _ b: B.Type) -> Definition {
+    return implements(a).implements(b)
+  }
+
+  ///Registers definition for types passed as parameters
+  @discardableResult public func implements<A, B, C>(_ a: A.Type, _ b: B.Type, _ c: C.Type) -> Definition {
+    return implements(a).implements(b).implements(c)
+  }
+
+  ///Registers definition for types passed as parameters
+  @discardableResult public func implements<A, B, C, D>(_ a: A.Type, _ b: B.Type, c: C.Type, d: D.Type) -> Definition {
+    return implements(a).implements(b).implements(c).implements(d)
+  }
+
 }
 
 extension DependencyContainer {
@@ -32,7 +93,8 @@ extension DependencyContainer {
   /**
    Registers definition for passed type.
    
-   If instance created by definition factory does not implement registered type
+   If instance created by factory of definition, passed as a first parameter,
+   does not implement type passed in a `type` parameter,
    container will throw `DipError.DefinitionNotFound` error when trying to resolve that type.
    
    - parameters:
@@ -40,9 +102,11 @@ extension DependencyContainer {
       - type: Type to register definition for
       - tag: Optional tag to associate definition with. Default is `nil`.
    
-   - returns: New definition for passed type.
+   - returns: New definition registered for passed type.
    */
-  @discardableResult public func register<T, U, F>(_ definition: DefinitionOf<T, (U) throws -> T>, type: F.Type, tag: DependencyTagConvertible? = nil) -> DefinitionOf<F, (U) throws -> F> {
+  @discardableResult public func register<T, U, F>(_ definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
+    precondition(definition.container === self, "Definition should be registered in the container.")
+    
     let key = DefinitionKey(type: F.self, typeOfArguments: U.self)
     
     let forwardDefinition = DefinitionBuilder<F, U> {
@@ -65,8 +129,7 @@ extension DependencyContainer {
           return resolved
         }
       })
-
-      $0.forwardsDefinition = definition
+      $0.forwardsTo = definition
       }.build()
     
     register(forwardDefinition, forTag: tag)
@@ -77,7 +140,7 @@ extension DependencyContainer {
   func typeForwardingDefinition(_ key: DefinitionKey) -> KeyDefinitionPair? {
     var forwardingDefinitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    forwardingDefinitions = filter(forwardingDefinitions, byKeyAndTypeOfArguments: key)
+    forwardingDefinitions = filter(forwardingDefinitions, byKey: key, byTypeOfArguments: true)
     forwardingDefinitions = order(forwardingDefinitions, byTag: key.tag)
 
     //we need to carry on original tag

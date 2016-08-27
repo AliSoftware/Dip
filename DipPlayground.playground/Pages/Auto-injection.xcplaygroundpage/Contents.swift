@@ -83,9 +83,7 @@ container.register { ServerWithRequiredClient() }
 do {
     let serverWithClient = try container.resolve() as ServerWithRequiredClient
 }
-catch {
-    print(error)
-}
+catch {}
 
 /*:
 You can make auto-injected property optional by passing `false` to `required` parameter of `Injected<T>`/`InjectedWeak<T>` constructor. For such properties container will ignore any errors when it resolves this property (or any of its dependencies).

@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 
-protocol AutoWiringDefinition: Definition {
+protocol AutoWiringDefinition: DefinitionType {
   var numberOfArguments: Int? { get }
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
 }
@@ -89,7 +89,7 @@ extension DependencyContainer {
       }
       
       let key = autoWiringDefinition.key.tagged(tag ?? context.tag)
-      let resolved: Any? = try? resolveKey(key) { definition in
+      let resolved: Any? = try? resolve(key: key) { definition in
         try definition.autoWiringFactory!(self, tag)
       }
       if let resolved = resolved {
@@ -111,21 +111,24 @@ private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
   return true
 }
 
-func filter(_ definitions: [KeyDefinitionPair], byKey key: DefinitionKey) -> [KeyDefinitionPair] {
-  return definitions
+/// Returns key-defintion pairs with definitions able to resolve that type (directly or via type forwarding) 
+/// and which tag matches provided key's tag or is nil.
+/// Additionally matches defintions by type of runtime arguments.
+func filter(_ definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
+  let definitions = definitions
     .filter({ $0.key.type == key.type || $0.definition.doesImplements(key.type) })
     .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
+  if byTypeOfArguments {
+    return definitions.filter({ $0.key.typeOfArguments == key.typeOfArguments })
+  }
+  else {
+    return definitions
+  }
 }
 
-func filter(_ definitions: [KeyDefinitionPair], byKeyAndTypeOfArguments key: DefinitionKey) -> [KeyDefinitionPair] {
-  return filter(definitions, byKey: key)
-    .filter({ $0.key.typeOfArguments == key.typeOfArguments })
-}
-
+/// Orders key-definition pairs putting first definitions registered for the same tag.
 func order(_ definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
   return
-    //first will try to use tagged definitions
     definitions.filter({ $0.key.tag == tag }) +
-    //then will use not tagged definitions
     definitions.filter({ $0.key.tag != tag })
 }

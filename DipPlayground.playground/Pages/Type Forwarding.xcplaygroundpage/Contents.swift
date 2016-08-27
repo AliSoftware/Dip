@@ -76,10 +76,12 @@ addPresenterDefinition = container.register(.Shared) { AddPresenter() }
 /*:
  And now we register definitions for type-forwarding:
  */
-let _ = container.register(listInteractorDefinition, type: ListInteractorInput.self)
-let _ = container.register(listPresenterDefinition, type: ListInteractorOutput.self)
-let _ = container.register(listPresenterDefinition, type: ListModuleInterface.self)
-let _ = container.register(listPresenterDefinition, type: AddModuleDelegate.self)
+listInteractorDefinition
+    .implements(ListInteractorInput.self)
+listPresenterDefinition
+    .implements(ListInteractorOutput.self)
+    .implements(ListModuleInterface.self)
+    .implements(AddModuleDelegate.self)
 
 addPresenter = try! container.resolve() as AddPresenter
 listPresenter = addPresenter.addModuleDelegate as! ListPresenter

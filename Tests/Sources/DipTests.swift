@@ -545,7 +545,7 @@ class DipTests: XCTestCase {
     var createdService3 = false
     var createdService = false
     
-    let service = container.register { ServiceImp1() }
+    container.register { ServiceImp1() }
       .resolvingProperties { container, _ in
         if container.context.resolvingType == ServiceImp1.self {
           createdService1 = true
@@ -553,8 +553,7 @@ class DipTests: XCTestCase {
         if container.context.resolvingType == Service.self {
           createdService = true
         }
-    }
-    container.register(service, type: Service.self)
+      }.implements(Service.self)
     
     container.register(tag: "tag") { ServiceImp2() as Service }
       .resolvingProperties { _ in

@@ -171,17 +171,18 @@ public enum ComponentScope {
 }
 
 ///Dummy protocol to store definitions for different types in collection
-public protocol Definition: class { }
+public protocol DefinitionType: class { }
 
 /**
- `DefinitionOf<T, F>` describes how instances of type `T` should be created when this type is resolved by the `DependencyContainer`.
+ `Definition<T, U>` describes how instances of type `T` should be created when this type is resolved by the `DependencyContainer`.
  
  - `T` is the type of the instance to resolve
- - `F` is the type of the factory that will create an instance of T.
+ - `U` is the type of runtime arguments accepted by factory that will create an instance of T.
  
- For example `DefinitionOf<Service, (String) -> Service>` is the type of definition that will create an instance of type `Service` using factory that accepts `String` argument.
+ For example `Definition<Service, String>` is the type of definition that will create an instance of type `Service` using factory that accepts `String` argument.
 */
-public final class DefinitionOf<T, F>: Definition {
+public final class Definition<T, U>: DefinitionType {
+  public typealias F = (U) throws -> T
   
   init(scope: ComponentScope, factory: F) {
     self.factory = factory
@@ -190,16 +191,18 @@ public final class DefinitionOf<T, F>: Definition {
   
   //MARK: - _Definition
 
+  weak var container: DependencyContainer?
+  
   let factory: F
   let scope: ComponentScope
   fileprivate(set) var weakFactory: ((Any) throws -> Any)!
-  fileprivate(set) var resolveDependenciesBlock: ((DependencyContainer, Any) throws -> ())?
+  fileprivate(set) var resolveProperties: ((DependencyContainer, Any) throws -> ())?
   
   /**
    Set the block that will be used to resolve dependencies of the instance.
    This block will be called before `resolve(tag:)` returns.
    
-   - parameter block: The block to use to resolve dependencies of the instance.
+   - parameter block: The block to resolve property dependencies of the instance.
    
    - returns: modified definition
    
@@ -221,20 +224,27 @@ public final class DefinitionOf<T, F>: Definition {
    ```
    
    */
-  @discardableResult public func resolvingProperties(_ block: @escaping (DependencyContainer, T) throws -> ()) -> DefinitionOf {
-    let oldBlock = self.resolveDependenciesBlock
-    self.resolveDependenciesBlock = {
-      try oldBlock?($0, $1 as! T)
-      try block($0, $1 as! T)
+  @discardableResult public func resolvingProperties(_ block: @escaping (DependencyContainer, T) throws -> ()) -> Definition {
+    if let oldBlock = self.resolveProperties {
+      self.resolveProperties = {
+        try oldBlock($0, $1 as! T)
+        try block($0, $1 as! T)
+      }
+    }
+    else {
+      self.resolveProperties = { try block($0, $1 as! T) }
     }
     return self
   }
 
   /// Calls `resolveDependencies` block if it was set.
-  func resolveProperties(instance: Any, container: DependencyContainer) throws {
+  func resolveProperties(of instance: Any, container: DependencyContainer) throws {
     guard let resolvedInstance = instance as? T else { return }
-    if let resolveDependenciesBlock = self.resolveDependenciesBlock {
-      try resolveDependenciesBlock(container, resolvedInstance)
+    if let forwardsTo = forwardsTo {
+      try forwardsTo.resolveProperties(of: resolvedInstance, container: container)
+    }
+    if let resolveProperties = self.resolveProperties {
+      try resolveProperties(container, resolvedInstance)
     }
   }
   
@@ -256,62 +266,74 @@ public final class DefinitionOf<T, F>: Definition {
   //MARK: - _TypeForwardingDefinition
 
   /// Adds type as being able to be resolved using this definition
-  fileprivate func implements(_ type: Any.Type) {
-    implements([type])
+  fileprivate func _implements(_ type: Any.Type) {
+    _implements([type])
   }
   
   /// Adds types as being able to be resolved using this definition
-  fileprivate func implements(_ types: [Any.Type]) {
+  fileprivate func _implements(_ types: [Any.Type]) {
     implementingTypes.append(contentsOf: types.filter({ !doesImplements($0) }))
   }
-
+  
   /// Definition to which resolution will be forwarded to
-  fileprivate weak var forwardsToDefinition: _TypeForwardingDefinition? {
+  fileprivate weak var forwardsTo: _TypeForwardingDefinition? {
     didSet {
-      if let forwardsToDefinition = forwardsToDefinition {
-        implements(forwardsToDefinition.type)
-        implements(forwardsToDefinition.implementingTypes)
+      //both definitions (self and forwardsTo) can resolve
+      //each other types and each other implementing types
+      //this relationship can be used to reuse previously resolved instances
+      if let forwardsTo = forwardsTo {
+        _implements(forwardsTo.type)
+        _implements(forwardsTo.implementingTypes)
         
-        for definition in [forwardsToDefinition] + forwardsToDefinition.forwardsFromDefinitions {
-          definition.implements(type)
-          definition.implements(implementingTypes)
+        //definitions for types that can be resolved by `forwardsTo` definition
+        //can also be used to resolve self type and it's implementing types
+        //this way container properly reuses previosly resolved instances
+        //when there are several forwarded definitions
+        //see testThatItReusesInstanceResolvedByTypeForwarding)
+        for definition in forwardsTo.forwardsFrom {
+          definition._implements(type)
+          definition._implements(implementingTypes)
         }
-        forwardsToDefinition.forwardsFromDefinitions.append(self)
-        resolvingProperties({ try forwardsToDefinition.resolveProperties(instance: $1, container: $0) })
+        
+        //forwardsTo can be used to resolve self type and it's implementing types
+        forwardsTo._implements(type)
+        forwardsTo._implements(implementingTypes)
+        forwardsTo.forwardsFrom.append(self)
       }
     }
   }
   
   /// Definitions that will forward resolution to this definition
-  fileprivate var forwardsFromDefinitions: [_TypeForwardingDefinition] = []
+  fileprivate var forwardsFrom: [_TypeForwardingDefinition] = []
   
 }
 
 //MARK: - _Definition
 
-protocol _Definition: Definition, AutoWiringDefinition, TypeForwardingDefinition {
+protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefinition {
   var type: Any.Type { get }
   var scope: ComponentScope { get }
   var weakFactory: ((Any) throws -> Any)! { get }
-  func resolveProperties(instance: Any, container: DependencyContainer) throws
+  func resolveProperties(of instance: Any, container: DependencyContainer) throws
+  var container: DependencyContainer? { get set }
 }
 
 //MARK: - Type Forwarding
 
 private protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definition {
-  weak var forwardsToDefinition: _TypeForwardingDefinition? { get set }
-  var forwardsFromDefinitions: [_TypeForwardingDefinition] { get set }
-  func implements(_ type: Any.Type)
-  func implements(_ type: [Any.Type])
+  weak var forwardsTo: _TypeForwardingDefinition? { get set }
+  var forwardsFrom: [_TypeForwardingDefinition] { get set }
+  func _implements(_ type: Any.Type)
+  func _implements(_ type: [Any.Type])
 }
 
-extension DefinitionOf: _TypeForwardingDefinition {
+extension Definition: _TypeForwardingDefinition {
   var type: Any.Type {
     return T.self
   }
 }
 
-extension DefinitionOf: CustomStringConvertible {
+extension Definition: CustomStringConvertible {
   public var description: String {
     return "type: \(T.self), factory: \(F.self), scope: \(scope)"
   }
@@ -320,7 +342,6 @@ extension DefinitionOf: CustomStringConvertible {
 //MARK: - Definition Builder
 
 /// Internal class used to build definition
-/// Need this builder as alternative to changing to DefinitionOf<T, U> where U - type of arguments
 class DefinitionBuilder<T, U> {
   typealias F = (U) throws -> T
   
@@ -330,29 +351,29 @@ class DefinitionBuilder<T, U> {
   var numberOfArguments: Int?
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
   
-  var forwardsDefinition: _Definition?
+  var forwardsTo: _Definition?
   
   init(configure: (DefinitionBuilder) -> ()) {
     configure(self)
   }
   
-  func build() -> DefinitionOf<T, F> {
+  func build() -> Definition<T, U> {
     let factory = self.factory!
-    let definition = DefinitionOf<T, F>(scope: scope, factory: factory)
+    let definition = Definition<T, U>(scope: scope, factory: factory)
     definition.numberOfArguments = numberOfArguments
     definition.autoWiringFactory = autoWiringFactory
     definition.weakFactory = { try factory($0 as! U) }
-    definition.forwardsToDefinition = forwardsDefinition as? _TypeForwardingDefinition
+    definition.forwardsTo = forwardsTo as? _TypeForwardingDefinition
     return definition
   }
 }
 
 //MARK: - Deprecated methods
 
-extension DefinitionOf {
+extension Definition {
   
   @available(*, deprecated:4.6.1, message:"Use resolvingProperties(_:)")
-  public func resolveDependencies(block: @escaping (DependencyContainer, T) throws -> ()) -> DefinitionOf {
+  public func resolveDependencies(block: @escaping (DependencyContainer, T) throws -> ()) -> Definition {
     return resolvingProperties(block)
   }
 
