@@ -97,6 +97,7 @@ class AutoInjectionTests: XCTestCase {
   static var allTests: [(String, AutoInjectionTests -> () throws -> Void)] {
     return [
       ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
+      ("testThatItResolvesInheritedDependencies", testThatItResolvesInheritedDependencies),
       ("testThatItCanSetInjectedProperty", testThatItCanSetInjectedProperty),
       ("testThatItThrowsErrorIfFailsToAutoInjectDependency", testThatItThrowsErrorIfFailsToAutoInjectDependency),
       ("testThatItResolvesAutoInjectedSingletons", testThatItResolvesAutoInjectedSingletons),
@@ -128,6 +129,23 @@ class AutoInjectionTests: XCTestCase {
     let client = try! container.resolve() as Client
     let server = client.server
     XCTAssertTrue(client === server?.client)
+  }
+  
+  func testThatItResolvesInheritedDependencies() {
+    class ServerImp2: ServerImp {
+      var _client2 = InjectedWeak<Client>() { _ in
+        XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled, "Inherited properties should be resolved first")
+      }
+      var client2: Client? { return _client2.value }
+    }
+
+    container.register(.Shared) { ServerImp2() as Server }
+    container.register(.Shared) { ClientImp() as Client }
+    
+    let client = try! container.resolve() as Client
+    let server = client.server as? ServerImp2
+    XCTAssertTrue(client === server?.client)
+    XCTAssertTrue(client === server?.client2)
   }
   
   func testThatItCanSetInjectedProperty() {

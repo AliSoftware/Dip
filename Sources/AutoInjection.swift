@@ -28,7 +28,18 @@ extension DependencyContainer {
    Resolves properties of passed object wrapped with `Injected<T>` or `InjectedWeak<T>`
    */
   func autoInjectProperties(instance: Any) throws {
-    try Mirror(reflecting: instance).children.forEach(resolveChild)
+    let mirror = Mirror(reflecting: instance)
+    
+    //mirror only containes class own properties
+    //so we need to walk throw super class mirrors
+    //to resolve super class auto-injected properties
+    var superClassMirror = mirror.superclassMirror()
+    while superClassMirror != nil {
+      try superClassMirror?.children.forEach(resolveChild)
+      superClassMirror = superClassMirror?.superclassMirror()
+    }
+    
+    try mirror.children.forEach(resolveChild)
   }
   
   private func resolveChild(child: Mirror.Child) throws {
