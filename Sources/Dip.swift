@@ -755,7 +755,7 @@ public protocol Resolvable {
   func didResolveDependencies()
 }
 
-extension Resolvable {
+public extension Resolvable {
   func resolveDependencies(container: DependencyContainer) { }
   func didResolveDependencies() { }
 }
