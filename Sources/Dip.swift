@@ -197,9 +197,8 @@ extension DependencyContainer {
   }
 
   /// Pushes new context created with provided values and calls block. When block returns previous context is restored.
-  /// For `nil` values (except tag) new context will use values from the current context.
-  /// Will releas resolved instances and call `Resolvable` callbacks when popped to initial context.
-  func inContext<T>(key: DefinitionKey, injectedInProperty: String? = nil, injectedInType: Any.Type? = nil, logErrors: Bool! = nil, @noescape block: () throws -> T) rethrows -> T {
+  /// When popped to initial (root) context will release all references to resolved instances and call `Resolvable` callbacks.
+  func inContext<T>(key: DefinitionKey, injectedInType: Any.Type?, injectedInProperty: String? = nil, logErrors: Bool! = nil, @noescape block: () throws -> T) rethrows -> T {
     return try threadSafe {
       let currentContext = self.context
       
@@ -225,7 +224,7 @@ extension DependencyContainer {
       
       context = Context(
         key: key,
-        injectedInType: injectedInType ?? currentContext?.resolvingType,
+        injectedInType: injectedInType,
         injectedInProperty: injectedInProperty
       )
       context.logErrors = logErrors ?? currentContext?.logErrors ?? true
@@ -451,7 +450,7 @@ extension DependencyContainer {
   public func resolve<U>(type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (U throws -> Any) throws -> Any) throws -> Any {
     let key = DefinitionKey(type: type, typeOfArguments: U.self, tag: tag?.dependencyTag)
     
-    return try inContext(key) {
+    return try inContext(key, injectedInType: context?.resolvingType) {
       try resolve(key: key, builder: { definition in
         try builder(definition.weakFactory)
       })
@@ -594,7 +593,7 @@ extension DependencyContainer {
           collaborator.context = context
         }
         
-        let resolved = try collaborator.inContext(key, injectedInProperty: self.context.injectedInProperty, injectedInType: self.context.injectedInType, logErrors: false) {
+        let resolved = try collaborator.inContext(key, injectedInType: self.context.injectedInType, injectedInProperty: self.context.injectedInProperty, logErrors: false) {
           try collaborator.resolve(key: key, builder: builder)
         }
 
@@ -668,7 +667,7 @@ extension DependencyContainer {
         //try to resolve key using provided arguments
         for argumentsSet in arguments where argumentsSet.dynamicType == key.typeOfArguments {
           do {
-            try inContext(key) {
+            try inContext(key, injectedInType: nil) {
               try resolve(key: key, builder: { definition throws -> Any in
                 try definition.weakFactory(argumentsSet)
               })

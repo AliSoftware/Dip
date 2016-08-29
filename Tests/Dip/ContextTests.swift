@@ -48,7 +48,9 @@ class ContextTests: XCTestCase {
       ("testThatContextStoresTheTagPassedToResolveWhenAutoInjecting", testThatContextStoresTheTagPassedToResolveWhenAutoInjecting),
       ("testThatContextStoresTheTagPassedToResolveWhenAutoWiring", testThatContextStoresTheTagPassedToResolveWhenAutoWiring),
       ("testThatContextDoesNotOverrideNilTagPassedToResolve", testThatContextDoesNotOverrideNilTagPassedToResolve),
-      ("testThatContextStoresNameOfAutoInjectedProperty", testThatContextStoresNameOfAutoInjectedProperty)
+      ("testThatContextStoresNameOfAutoInjectedProperty", testThatContextStoresNameOfAutoInjectedProperty),
+      ("testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration", testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration),
+      ("testThatContextIsPreservedWhenResolvingWithCollaboration", testThatContextIsPreservedWhenResolvingWithCollaboration)
     ]
   }
   
@@ -217,6 +219,49 @@ class ContextTests: XCTestCase {
     }
     
     let _ = try! container.resolve() as Service
+  }
+  
+  func testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration() {
+    let collaborator = DependencyContainer()
+    
+    collaborator.register { () -> ServiceImp1 in
+      unowned let collaborator = collaborator
+      XCTAssertNil(collaborator.context.injectedInType)
+      return ServiceImp1()
+      }.resolvingProperties { collaborator, _ in
+        XCTAssertNil(collaborator.context.injectedInType)
+    }
+    
+    container.collaborate(with: collaborator)
+    collaborator.collaborate(with: container)
+    
+    let _ = try! container.resolve() as ServiceImp1
+  }
+  
+  func testThatContextIsPreservedWhenResolvingWithCollaboration() {
+    let collaborator = DependencyContainer()
+    
+    container.register { () -> Service in
+      XCTAssertTrue(self.container.context.resolvingType == Service.self)
+      let _ = try self.container.resolve() as ServiceImp1
+      return ServiceImp1() as Service
+      }.resolvingProperties { _ in
+        XCTAssertTrue(self.container.context.resolvingType == Service.self)
+        let _ = try self.container.resolve() as ServiceImp1
+    }
+    
+    collaborator.register { () -> ServiceImp1 in
+      XCTAssertTrue(collaborator.context.resolvingType == ServiceImp1.self)
+      return ServiceImp1()
+      }.resolvingProperties { _ in
+        XCTAssertTrue(collaborator.context.resolvingType == ServiceImp1.self)
+    }
+    
+    container.collaborate(with: collaborator)
+    collaborator.collaborate(with: container)
+    let _ = try! container.resolve() as Service
+
+    collaborator.reset()
   }
   
 }
