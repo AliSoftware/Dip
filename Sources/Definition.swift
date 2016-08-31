@@ -251,7 +251,7 @@ public final class Definition<T, U>: DefinitionType {
   //MARK: - AutoWiringDefinition
   
   private(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
-  private(set) var numberOfArguments: Int?
+  private(set) var numberOfArguments: Int = 0
   
   //MARK: - TypeForwardingDefinition
   
@@ -348,7 +348,7 @@ class DefinitionBuilder<T, U> {
   var scope: ComponentScope!
   var factory: F!
   
-  var numberOfArguments: Int?
+  var numberOfArguments: Int = 0
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> T)?
   
   var forwardsTo: _Definition?
@@ -366,6 +366,40 @@ class DefinitionBuilder<T, U> {
     definition.forwardsTo = forwardsTo as? _TypeForwardingDefinition
     return definition
   }
+}
+
+//MARK: - KeyDefinitionPair
+
+typealias KeyDefinitionPair = (key: DefinitionKey, definition: _Definition)
+
+/// Definitions are matched if they are registered for the same tag and thier factories accept the same number of runtime arguments.
+private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
+  guard lhs.key.type == rhs.key.type else { return false }
+  guard lhs.key.tag == rhs.key.tag else { return false }
+  guard lhs.definition.numberOfArguments == rhs.definition.numberOfArguments else { return false }
+  return true
+}
+
+/// Returns key-defintion pairs with definitions able to resolve that type (directly or via type forwarding)
+/// and which tag matches provided key's tag or is nil.
+/// In the end filters defintions by type of runtime arguments.
+func filter(definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
+  let definitions = definitions
+    .filter({ $0.key.type == key.type || $0.definition.doesImplements(key.type) })
+    .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
+  if byTypeOfArguments {
+    return definitions.filter({ $0.key.typeOfArguments == key.typeOfArguments })
+  }
+  else {
+    return definitions
+  }
+}
+
+/// Orders key-definition pairs putting first definitions registered for provided tag.
+func order(definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+  return
+    definitions.filter({ $0.key.tag == tag }) +
+      definitions.filter({ $0.key.tag != tag })
 }
 
 //MARK: - Deprecated methods
