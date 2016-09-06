@@ -23,123 +23,52 @@
 //
 
 protocol AutoWiringDefinition: DefinitionType {
-  var numberOfArguments: Int? { get }
+  var numberOfArguments: Int { get }
   var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
-}
-
-extension AutoWiringDefinition {
-  func supportsAutoWiring() -> Bool {
-    return autoWiringFactory != nil && numberOfArguments > 0
-  }
 }
 
 extension DependencyContainer {
   
-  /// Tries to resolve instance using auto-wire factories
+  /// Tries to resolve instance using auto-wiring
   func autowire<T>(key: DefinitionKey) throws -> T {
-    let shouldLogErrors = context.logErrors
-    defer { context.logErrors = shouldLogErrors }
-    context.logErrors = false
-    
     guard key.typeOfArguments == Void.self else {
       throw DipError.DefinitionNotFound(key: key)
     }
     
-    let tag = key.tag
-    let type = key.type
-    let resolved: Any?
+    let autoWiringKey = try autoWiringDefinition(byKey: key).key
+    
     do {
-      let definitions = autoWiringDefinitions(byKey: key)
-      resolved = try resolve(enumerating: definitions, tag: tag)
+      let key = autoWiringKey.tagged(key.tag ?? context.tag)
+      return try resolve(key: key) { definition in
+        try definition.autoWiringFactory!(self, key.tag) as! T
+      }
     }
     catch {
-      throw DipError.AutoWiringFailed(type: type, underlyingError: error)
-    }
-    
-    if let resolved = resolved as? T  {
-      return resolved
-    }
-    else {
-      throw DipError.DefinitionNotFound(key: key)
+      throw DipError.AutoWiringFailed(type: key.type, underlyingError: error)
     }
   }
 
-  private func autoWiringDefinitions(byKey key: DefinitionKey) -> [KeyDefinitionPair] {
+  private func autoWiringDefinition(byKey key: DefinitionKey) throws -> KeyDefinitionPair {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    //filter definitions
-    definitions = definitions
-      .filter({ $0.definition.supportsAutoWiring() })
-      .sort({ $0.definition.numberOfArguments > $1.definition.numberOfArguments })
-    
     definitions = filter(definitions, byKey: key)
+    definitions = definitions.sort({ $0.definition.numberOfArguments > $1.definition.numberOfArguments })
+
+    guard definitions.count > 0 && definitions[0].definition.numberOfArguments > 0 else {
+      throw DipError.DefinitionNotFound(key: key)
+    }
+    
+    let maximumNumberOfArguments = definitions.first?.definition.numberOfArguments
+    definitions = definitions.filter({ $0.definition.numberOfArguments == maximumNumberOfArguments })
     definitions = order(definitions, byTag: key.tag)
 
-    return definitions
-  }
-  
-  /// Enumerates definitions one by one until one of them succeeds, otherwise returns nil
-  private func resolve(enumerating autoWiringDefinitions: [KeyDefinitionPair], tag: DependencyContainer.Tag?) throws -> Any? {
-    for (index, autoWiringDefinition) in autoWiringDefinitions.enumerate() {
-      //If the next definition matches current definition then they are ambigous
-      if let nextPair = autoWiringDefinitions[next: index], case autoWiringDefinition = nextPair {
-          throw DipError.AmbiguousDefinitions(
-            type: autoWiringDefinition.key.type,
-            definitions: [autoWiringDefinition.definition, nextPair.definition]
-        )
-      }
-      
-      let key = autoWiringDefinition.key.tagged(tag ?? context.tag)
-      let resolved: Any? = try? resolve(key: key) { definition in
-        try definition.autoWiringFactory!(self, tag)
-      }
-      if let resolved = resolved {
-        return resolved
-      }
+    //when there are several definitions with the same number of arguments but different arguments types
+    if definitions.count > 1 && definitions[0].key.typeOfArguments != definitions[1].key.typeOfArguments {
+      let error = DipError.AmbiguousDefinitions(type: key.type, definitions: definitions.map({ $0.definition }))
+      throw DipError.AutoWiringFailed(type: key.type, underlyingError: error)
+    } else {
+      return definitions[0]
     }
-    return nil
   }
   
-}
-
-extension CollectionType where Self.Index: Comparable {
-  subscript(safe index: Index) -> Generator.Element? {
-    guard indices ~= index else { return nil }
-    return self[index]
-  }
-  subscript(next index: Index) -> Generator.Element? {
-    return self[safe: index.advancedBy(1)]
-  }
-}
-
-typealias KeyDefinitionPair = (key: DefinitionKey, definition: _Definition)
-
-/// Definitions are matched if they are registered for the same tag and thier factories accept the same number of runtime arguments.
-private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
-  guard lhs.key.type == rhs.key.type else { return false }
-  guard lhs.key.tag == rhs.key.tag else { return false }
-  guard lhs.definition.numberOfArguments == rhs.definition.numberOfArguments else { return false }
-  return true
-}
-
-/// Returns key-defintion pairs with definitions able to resolve that type (directly or via type forwarding) 
-/// and which tag matches provided key's tag or is nil.
-/// Additionally matches defintions by type of runtime arguments.
-func filter(definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
-  let definitions = definitions
-    .filter({ $0.key.type == key.type || $0.definition.doesImplements(key.type) })
-    .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
-  if byTypeOfArguments {
-    return definitions.filter({ $0.key.typeOfArguments == key.typeOfArguments })
-  }
-  else {
-    return definitions
-  }
-}
-
-/// Orders key-definition pairs putting first definitions registered for the same tag.
-func order(definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
-  return
-    definitions.filter({ $0.key.tag == tag }) +
-    definitions.filter({ $0.key.tag != tag })
 }
