@@ -184,7 +184,7 @@ public protocol DefinitionType: class { }
 public final class Definition<T, U>: DefinitionType {
   public typealias F = (U) throws -> T
   
-  init(scope: ComponentScope, factory: F) {
+  init(scope: ComponentScope, factory: @escaping F) {
     self.factory = factory
     self.scope = scope
   }
