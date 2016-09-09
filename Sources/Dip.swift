@@ -368,18 +368,16 @@ extension DependencyContainer {
 extension DependencyContainer {
   
   /**
-   Resolve a an instance of type `T`.
+   Resolve an instance of type `T`.
    
    If no matching definition was registered with provided `tag`,
    container will lookup definition associated with `nil` tag.
    
    - parameter tag: The arbitrary tag to use to lookup definition.
    
-   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`, `DipError.InvalidType`
    
    - returns: An instance of type `T`.
-   
-   - seealso: `register(tag:_:factory:)`
    
    **Example**:
    ```swift
@@ -388,24 +386,33 @@ extension DependencyContainer {
    let service: Service = try! container.resolve()
    ```
    
+   - seealso: `register(tag:_:factory:)`
    */
   public func resolve<T>(tag tag: DependencyTagConvertible? = nil) throws -> T {
     return try resolve(tag: tag) { factory in try factory() }
   }
   
   /**
-   Resolve an instance of provided type. Weakly-typed alternative of `resolve(tag:)`
+   Resolve an instance of requested type. Weakly-typed alternative of `resolve(tag:)`
    
    - warning: This method does not make any type checks, so there is no guaranty that
               resulting instance is actually an instance of requested type.
               That can happen if you register forwarded type that is not implemented by resolved instance.
    
+   - parameters:
+      - type: Type to resolve
+      - tag: The arbitrary tag to use to lookup definition.
+   
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`, `DipError.InvalidType`
+   
+   - returns: An instance of requested type.
+
    **Example**:
    ```swift
    let service = try! container.resolve(Service.self) as! Service
    let service = try! container.resolve(Service.self, tag: "service") as! Service
    ```
-   
+
    - seealso: `resolve(tag:)`, `register(tag:_:factory:)`
    */
   public func resolve(type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
@@ -419,7 +426,7 @@ extension DependencyContainer {
       - tag: The arbitrary tag to use to lookup definition.
       - builder: Generic closure that accepts generic factory and returns inctance created by that factory.
    
-   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`, `DipError.InvalidType`
    
    - returns: An instance of type `T`.
    
@@ -761,7 +768,7 @@ public extension Resolvable {
 
 //MARK: - DependencyTagConvertible
 
-/// Implement this protocol of your type if you want to use its instances as `DependencyContainer`'s tags.
+/// Implement this protocol on your type if you want to use its instances as `DependencyContainer`'s tags.
 /// `DependencyContainer.Tag`, `String`, `Int` and any `RawRepresentable` with `RawType` of `String` or `Int` by default confrom to this protocol.
 public protocol DependencyTagConvertible {
   var dependencyTag: DependencyContainer.Tag { get }
@@ -866,7 +873,7 @@ public enum DipError: ErrorType, CustomStringConvertible {
       - underlyingError: The error that cause auto-wiring to fail
   */
   case AutoWiringFailed(type: Any.Type, underlyingError: ErrorType)
-
+  
   /**
    Thrown when auto-wiring type if several definitions with the same number of runtime arguments
    are registered for that type.
@@ -876,6 +883,15 @@ public enum DipError: ErrorType, CustomStringConvertible {
       - definitions: Ambiguous definitions
   */
   case AmbiguousDefinitions(type: Any.Type, definitions: [DefinitionType])
+  
+  /**
+   Thrown by `resolve(tag:)` if resolved instance does not implemenet resolved type (i.e. when type-forwarding).
+   
+   - parameters:
+      - resolved: Resolved instance
+      - key: Definition key used to resolve instance
+   */
+  case InvalidType(resolved: Any?, key: DefinitionKey)
   
   public var description: String {
     switch self {
@@ -888,6 +904,8 @@ public enum DipError: ErrorType, CustomStringConvertible {
     case let .AmbiguousDefinitions(type, definitions):
       return "Ambiguous definitions for \(type):\n" +
       definitions.map({ "\($0)" }).joinWithSeparator(";\n")
+    case let .InvalidType(resolved, key):
+      return "Resolved instance \(resolved ?? "nil") does not implement expected type \(key.type)."
     }
   }
   
