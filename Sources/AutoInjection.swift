@@ -30,8 +30,8 @@ extension DependencyContainer {
   func autoInjectProperties(_ instance: Any) throws {
     let mirror = Mirror(reflecting: instance)
     
-    //mirror only containes class own properties
-    //so we need to walk throw super class mirrors
+    //mirror only contains class own properties
+    //so we need to walk through super class mirrors
     //to resolve super class auto-injected properties
     var superClassMirror = mirror.superclassMirror
     while superClassMirror != nil {
@@ -46,7 +46,7 @@ extension DependencyContainer {
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
     let contextKey = DefinitionKey(type: type(of: injectedPropertyBox).wrappedType, typeOfArguments: Void.self, tag: context.tag)
-    try inContext(contextKey, injectedInProperty: child.label, logErrors: false) {
+    try inContext(contextKey, injectedInType: context?.resolvingType, injectedInProperty: child.label, logErrors: false) {
         try injectedPropertyBox.resolve(self)
     }
   }

@@ -114,19 +114,25 @@ extension DependencyContainer {
       
       let factory = definition.factory
       $0.factory = { [unowned self] in
-        guard let resolved = try factory($0) as? F else {
-          throw DipError.DefinitionNotFound(key: key.tagged(self.context.tag))
+        let resolved = try factory($0)
+        if let resolved = resolved as? F {
+          return resolved
         }
-        return resolved
+        else {
+          throw DipError.InvalidType(resolved: resolved, key: key.tagged(self.context.tag))
+        }
       }
 
       $0.numberOfArguments = definition.numberOfArguments
-      $0.autoWiringFactory = definition.autoWiringFactory.map({ autoWiringFactory in
+      $0.autoWiringFactory = definition.autoWiringFactory.map({ factory in
         { [unowned self] in
-          guard let resolved = try autoWiringFactory($0, $1) as? F else {
-            throw DipError.DefinitionNotFound(key: key.tagged(self.context.tag))
+          let resolved = try factory($0, $1)
+          if let resolved = resolved as? F {
+            return resolved
           }
-          return resolved
+          else {
+            throw DipError.InvalidType(resolved: resolved, key: key.tagged(self.context.tag))
+          }
         }
       })
       $0.forwardsTo = definition

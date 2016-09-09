@@ -197,9 +197,8 @@ extension DependencyContainer {
   }
 
   /// Pushes new context created with provided values and calls block. When block returns previous context is restored.
-  /// For `nil` values (except tag) new context will use values from the current context.
-  /// Will releas resolved instances and call `Resolvable` callbacks when popped to initial context.
-  func inContext<T>(_ key: DefinitionKey, injectedInProperty: String? = nil, injectedInType: Any.Type? = nil, logErrors: Bool! = nil, block: () throws -> T) rethrows -> T {
+  /// When popped to initial (root) context will release all references to resolved instances and call `Resolvable` callbacks.
+  func inContext<T>(_ key: DefinitionKey, injectedInType: Any.Type?, injectedInProperty: String? = nil, logErrors: Bool! = nil, block: () throws -> T) rethrows -> T {
     return try threadSafe {
       let currentContext = self.context
       
@@ -225,7 +224,7 @@ extension DependencyContainer {
       
       context = Context(
         key: key,
-        injectedInType: injectedInType ?? currentContext?.resolvingType,
+        injectedInType: injectedInType,
         injectedInProperty: injectedInProperty
       )
       context.logErrors = logErrors ?? currentContext?.logErrors ?? true
@@ -369,18 +368,16 @@ extension DependencyContainer {
 extension DependencyContainer {
   
   /**
-   Resolve a an instance of type `T`.
+   Resolve an instance of type `T`.
    
    If no matching definition was registered with provided `tag`,
    container will lookup definition associated with `nil` tag.
    
    - parameter tag: The arbitrary tag to use to lookup definition.
    
-   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`, `DipError.InvalidType`
    
    - returns: An instance of type `T`.
-   
-   - seealso: `register(tag:_:factory:)`
    
    **Example**:
    ```swift
@@ -389,24 +386,33 @@ extension DependencyContainer {
    let service: Service = try! container.resolve()
    ```
    
+   - seealso: `register(tag:_:factory:)`
    */
   public func resolve<T>(tag: DependencyTagConvertible? = nil) throws -> T {
     return try resolve(tag: tag) { factory in try factory() }
   }
   
   /**
-   Resolve an instance of provided type. Weakly-typed alternative of `resolve(tag:)`
+   Resolve an instance of requested type. Weakly-typed alternative of `resolve(tag:)`
    
    - warning: This method does not make any type checks, so there is no guaranty that
               resulting instance is actually an instance of requested type.
               That can happen if you register forwarded type that is not implemented by resolved instance.
    
+   - parameters:
+      - type: Type to resolve
+      - tag: The arbitrary tag to use to lookup definition.
+   
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`, `DipError.InvalidType`
+   
+   - returns: An instance of requested type.
+
    **Example**:
    ```swift
    let service = try! container.resolve(Service.self) as! Service
    let service = try! container.resolve(Service.self, tag: "service") as! Service
    ```
-   
+
    - seealso: `resolve(tag:)`, `register(tag:_:factory:)`
    */
   public func resolve(_ type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
@@ -420,7 +426,7 @@ extension DependencyContainer {
       - tag: The arbitrary tag to use to lookup definition.
       - builder: Generic closure that accepts generic factory and returns inctance created by that factory.
    
-   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`
+   - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`, `DipError.InvalidType`
    
    - returns: An instance of type `T`.
    
@@ -451,7 +457,7 @@ extension DependencyContainer {
   public func resolve<U>(_ type: Any.Type, tag: DependencyTagConvertible? = nil, builder: ((U) throws -> Any) throws -> Any) throws -> Any {
     let key = DefinitionKey(type: type, typeOfArguments: U.self, tag: tag?.dependencyTag)
     
-    return try inContext(key) {
+    return try inContext(key, injectedInType: context?.resolvingType) {
       try resolve(key: key, builder: { definition in
         try builder(definition.weakFactory)
       })
@@ -594,7 +600,7 @@ extension DependencyContainer {
           collaborator.context = context
         }
         
-        let resolved = try collaborator.inContext(key, injectedInProperty: self.context.injectedInProperty, injectedInType: self.context.injectedInType, logErrors: false) {
+        let resolved = try collaborator.inContext(key, injectedInType: self.context.injectedInType, injectedInProperty: self.context.injectedInProperty, logErrors: false) {
           try collaborator.resolve(key: key, builder: builder)
         }
 
@@ -668,7 +674,7 @@ extension DependencyContainer {
         //try to resolve key using provided arguments
         for argumentsSet in arguments where type(of: argumentsSet) == key.typeOfArguments {
           do {
-            let _ = try inContext(key) {
+            let _ = try inContext(key, injectedInType: nil) {
               try resolve(key: key, builder: { definition throws -> Any in
                 try definition.weakFactory(argumentsSet)
               })
@@ -755,14 +761,14 @@ public protocol Resolvable {
   func didResolveDependencies()
 }
 
-extension Resolvable {
+public extension Resolvable {
   func resolveDependencies(_ container: DependencyContainer) { }
   func didResolveDependencies() { }
 }
 
 //MARK: - DependencyTagConvertible
 
-/// Implement this protocol of your type if you want to use its instances as `DependencyContainer`'s tags.
+/// Implement this protocol on your type if you want to use its instances as `DependencyContainer`'s tags.
 /// `DependencyContainer.Tag`, `String`, `Int` and any `RawRepresentable` with `RawType` of `String` or `Int` by default confrom to this protocol.
 public protocol DependencyTagConvertible {
   var dependencyTag: DependencyContainer.Tag { get }
@@ -867,7 +873,7 @@ public enum DipError: Error, CustomStringConvertible {
       - underlyingError: The error that cause auto-wiring to fail
   */
   case AutoWiringFailed(type: Any.Type, underlyingError: Error)
-
+  
   /**
    Thrown when auto-wiring type if several definitions with the same number of runtime arguments
    are registered for that type.
@@ -878,6 +884,15 @@ public enum DipError: Error, CustomStringConvertible {
   */
   case AmbiguousDefinitions(type: Any.Type, definitions: [DefinitionType])
   
+  /**
+   Thrown by `resolve(tag:)` if resolved instance does not implemenet resolved type (i.e. when type-forwarding).
+   
+   - parameters:
+      - resolved: Resolved instance
+      - key: Definition key used to resolve instance
+   */
+  case InvalidType(resolved: Any?, key: DefinitionKey)
+  
   public var description: String {
     switch self {
     case let .DefinitionNotFound(key):
@@ -887,7 +902,10 @@ public enum DipError: Error, CustomStringConvertible {
     case let .AutoWiringFailed(type, error):
       return "Failed to auto-wire type \"\(type)\". \(error)"
     case let .AmbiguousDefinitions(type, definitions):
-      return "Ambiguous definitions for \(type):\n" + definitions.map({ "\($0)" }).joined(separator: ";\n")
+      return "Ambiguous definitions for \(type):\n" +
+      definitions.map({ "\($0)" }).joined(separator: ";\n")
+    case let .InvalidType(resolved, key):
+      return "Resolved instance \(resolved ?? "nil") does not implement expected type \(key.type)."
     }
   }
   

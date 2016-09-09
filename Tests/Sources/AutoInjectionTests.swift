@@ -143,6 +143,7 @@ class AutoInjectionTests: XCTestCase {
     container.register(.Shared) { ServerImp2() as Server }
     container.register(.Shared) { ClientImp() as Client }
     
+    //when
     let client = try! container.resolve() as Client
     let server = client.server as? ServerImp2
     XCTAssertTrue(client === server?.client)
