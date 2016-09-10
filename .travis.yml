@@ -7,10 +7,10 @@ matrix:
     - os: linux
   include:
     - script:
-        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip-iOS -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
-        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip-OSX -sdk macosx -destination 'platform=OS X,arch=x86_64' ONLY_ACTIVE_ARCH=NO | xcpretty -c
-        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip-tvOS -sdk appletvsimulator -destination 'platform=tvOS Simulator,name=Apple TV 1080p,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
-        - set -o pipefail && xcodebuild -workspace Dip.xcworkspace -scheme Dip-watchOS -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch - 38mm,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty - c
+        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
+        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk macosx -destination 'platform=OS X,arch=x86_64' ONLY_ACTIVE_ARCH=NO | xcpretty -c
+        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk appletvsimulator -destination 'platform=tvOS Simulator,name=Apple TV 1080p,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
+        - set -o pipefail && xcodebuild -workspace Dip.xcworkspace -scheme Dip -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch - 38mm,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty - c
         - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme DipSampleApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
         - pod lib lint --quick
         - carthage build --no-skip-current
