@@ -50,7 +50,6 @@ class AutoWiringTests: XCTestCase {
   
   let container = DependencyContainer()
 
-  #if os(Linux)
   static var allTests = {
     return [
       ("testThatItCanResolveWithAutoWiring", testThatItCanResolveWithAutoWiring),
@@ -76,11 +75,6 @@ class AutoWiringTests: XCTestCase {
   override func setUp() {
     container.reset()
   }
-  #else
-  override func setUp() {
-    container.reset()
-  }
-  #endif
 
   func testThatItCanResolveWithAutoWiring() {
     //given

@@ -36,7 +36,6 @@ class DefinitionTests: XCTestCase {
   let tag1 = DependencyContainer.Tag.String("tag1")
   let tag2 = DependencyContainer.Tag.String("tag2")
   
-  #if os(Linux)
   static var allTests = {
     return [
       ("testThatDefinitionKeyIsEqualBy_Type_Factory_Tag", testThatDefinitionKeyIsEqualBy_Type_Factory_Tag),
@@ -48,7 +47,6 @@ class DefinitionTests: XCTestCase {
       ("testThatItRegisteresOptionalTypesAsForwardedTypes", testThatItRegisteresOptionalTypesAsForwardedTypes)
     ]
   }()
-  #endif
 
   func testThatDefinitionKeyIsEqualBy_Type_Factory_Tag() {
     let equalKey1 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: tag1)

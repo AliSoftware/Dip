@@ -18,8 +18,7 @@ matrix:
       osx_image: xcode8
       language: objective-c
     - script:
-        - swift build
-        - cd Tests && swift build && .build/debug/DipTests
+        - swift build --clean && swift build && swift test
       os: linux
       dist: trusty
       sudo: required
@@ -27,7 +26,7 @@ matrix:
       before_install:
         - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
         - cd ..
-        - export SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2016-07-25-a
+        - export SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2016-09-07-a
         - wget https://swift.org/builds/development/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"

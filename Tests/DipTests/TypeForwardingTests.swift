@@ -34,7 +34,6 @@ class TypeForwardingTests: XCTestCase {
   
   let container = DependencyContainer()
 
-  #if os(Linux)
   static var allTests = {
     return [
       ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
@@ -55,12 +54,7 @@ class TypeForwardingTests: XCTestCase {
   override func setUp() {
     container.reset()
   }
-  #else
-  override func setUp() {
-    container.reset()
-  }
-  #endif
-
+  
   func testThatItResolvesInstanceByTypeForwarding() {
     //given
     container.register { ServiceImp1() as Service }

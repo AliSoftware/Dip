@@ -49,7 +49,6 @@ class DipTests: XCTestCase {
 
   let container = DependencyContainer()
 
-  #if os(Linux)
   static var allTests = {
     return [
       ("testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle", testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle),
@@ -77,11 +76,6 @@ class DipTests: XCTestCase {
   override func setUp() {
     container.reset()
   }
-  #else
-  override func setUp() {
-    container.reset()
-  }
-  #endif
   
   func testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle() {
     var container: DependencyContainer! = DependencyContainer() { container in

@@ -71,7 +71,7 @@ private var lock: pthread_spinlock_t = 0
 private let resolveClientSync: () -> Client? = {
   let pointer = dispatch_sync { _ in
     let resolved = try! container.resolve() as Client
-    return UnsafeMutablePointer<Void>(Unmanaged.passRetained(resolved as! ClientImp).toOpaque())
+    return UnsafeMutableRawPointer(Unmanaged.passRetained(resolved as! ClientImp).toOpaque())
   }
   guard let clientPointer = pointer else { return nil }
   return Unmanaged<ClientImp>.fromOpaque(clientPointer).takeRetainedValue()
@@ -118,10 +118,11 @@ let resolveClientAsync = {
 class ThreadSafetyTests: XCTestCase {
   
   #if os(Linux)
-  required init(name: String, testClosure: (XCTestCase) throws -> Void) {
+  required init(name: String, testClosure: @escaping (XCTestCase) throws -> Void) {
     pthread_spin_init(&lock, 0)
     super.init(name: name, testClosure: testClosure)
   }
+  #endif
   
   static var allTests = {
     return [
@@ -140,17 +141,6 @@ class ThreadSafetyTests: XCTestCase {
     resolvedServers.removeAll()
     resolvedClients.removeAll()
   }
-  #else
-  override func setUp() {
-    Dip.logLevel = .Verbose
-    container = DependencyContainer()
-  }
-  
-  override func tearDown() {
-    resolvedServers.removeAll()
-    resolvedClients.removeAll()
-  }
-  #endif
   
   func testSingletonThreadSafety() {
     container.register(.Singleton) { ServerImp() as Server }

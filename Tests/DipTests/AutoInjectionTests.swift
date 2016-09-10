@@ -93,7 +93,6 @@ class AutoInjectionTests: XCTestCase {
 
   let container = DependencyContainer()
   
-  #if os(Linux)
   static var allTests = {
     return [
       ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
@@ -117,11 +116,6 @@ class AutoInjectionTests: XCTestCase {
   override func setUp() {
     container.reset()
   }
-  #else
-  override func setUp() {
-    container.reset()
-  }
-  #endif
 
   func testThatItResolvesAutoInjectedDependencies() {
     container.register(.Shared) { ServerImp() as Server }

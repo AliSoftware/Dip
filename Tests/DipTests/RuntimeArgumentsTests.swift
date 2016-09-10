@@ -51,7 +51,6 @@ class RuntimeArgumentsTests: XCTestCase {
   
   let container = DependencyContainer()
  
-  #if os(Linux)
   static var allTests = {
     return [
       ("testThatItResolvesInstanceWithOneArgument", testThatItResolvesInstanceWithOneArgument),
@@ -71,11 +70,6 @@ class RuntimeArgumentsTests: XCTestCase {
   override func setUp() {
     container.reset()
   }
-  #else
-  override func setUp() {
-    container.reset()
-  }
-  #endif
   
   func testThatItResolvesInstanceWithOneArgument() {
     //given

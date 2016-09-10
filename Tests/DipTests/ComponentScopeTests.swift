@@ -47,10 +47,9 @@ class ComponentScopeTests: XCTestCase {
   
   let container = DependencyContainer()
   
-  #if os(Linux)
   static var allTests = {
     return [
-      ("testThatUniqueIsDefaultScope", testThatUniqueIsDefaultScope),
+      ("testThatSharedIsDefaultScope", testThatSharedIsDefaultScope),
       ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),
       ("testThatItResolvesTypeAsNewInstanceForUniqueScope", testThatItResolvesTypeAsNewInstanceForUniqueScope),
       ("testThatItReusesInstanceForSingletonScope", testThatItReusesInstanceForSingletonScope),
@@ -71,11 +70,6 @@ class ComponentScopeTests: XCTestCase {
   override func setUp() {
     container.reset()
   }
-  #else
-  override func setUp() {
-    container.reset()
-  }
-  #endif
   
   func testThatSharedIsDefaultScope() {
     let def = container.register { ServiceImp1() as Service }

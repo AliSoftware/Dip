@@ -65,20 +65,20 @@ func AssertNoThrow<T>(_ file: StaticString = #file, line: UInt = #line, expressi
 
 #if os(Linux)
 import Glibc
-typealias TMain = @convention(c) (UnsafeMutablePointer<Void>?) -> UnsafeMutablePointer<Void>?
+typealias TMain = @convention(c) (UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer?
 
-private func startThread(_ block: TMain) -> pthread_t  {
+private func startThread(_ block: @escaping TMain) -> pthread_t  {
   var pid: pthread_t = 0
   pthread_create(&pid, nil, block, nil)
   return pid
 }
 
-func dispatch_async(block: TMain) -> pthread_t {
+func dispatch_async(block: @escaping TMain) -> pthread_t {
   return startThread(block)
 }
 
-func dispatch_sync(block: TMain) -> UnsafeMutablePointer<Void>? {
-  var result: UnsafeMutablePointer<Void>? = UnsafeMutablePointer<Void>(allocatingCapacity: 1)
+func dispatch_sync(block: @escaping TMain) -> UnsafeMutableRawPointer? {
+  var result: UnsafeMutableRawPointer? = UnsafeMutableRawPointer.allocate(bytes: 1, alignedTo: 0)
   let pid = startThread(block)
   pthread_join(pid, &result)
   return result
