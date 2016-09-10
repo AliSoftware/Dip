@@ -8,7 +8,7 @@ let container = DependencyContainer()
 
 ### Auto-Injection
 
-On the previous page you saw how auto-wiring helps us get rid of boilerplate code when registering and resolving components with consturctor injection. Auto-injection solves the same problem for property injection.
+On the previous page you saw how auto-wiring helps us to get rid of boilerplate code when registering and resolving components with consturctor injection. Auto-injection solves the same problem for property injection.
 
 Let's say you have following related components:
 */
@@ -47,10 +47,10 @@ With auto-injection your code transforms to this:
 */
 
 class AutoInjectedServiceImp: Service {
-    private var injectedLogger = Injected<Logger>()
+    private let injectedLogger = Injected<Logger>()
     var logger: Logger? { return injectedLogger.value }
     
-    private var injectedTracker = Injected<Tracker>()
+    private let injectedTracker = Injected<Tracker>()
     var tracker: Tracker? { return injectedTracker.value }
 }
 

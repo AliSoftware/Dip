@@ -7,7 +7,7 @@ import UIKit
 
 ### Auto-wiring
 
-Among three main DI patterns - _constructor_, _property_ and _method_ injection - construction injection should be your choise by default. Dip makes use of this pattern very simple. 
+Among three main DI patterns - _constructor_, _property_ and _method_ injection - constructor injection should be your choise by default. Dip makes using this pattern very simple.
 
 Let's say you have some VIPER module with following components:
 */
@@ -28,7 +28,7 @@ class View: UIView, ViewOutput {}
 class ServiceImp: Service {}
 
 /*:
-VIPER module by its nature consists of a lot of components, wired up using protocols. Using construction injection you can end up with following constructors for presenter and interactor:
+VIPER module by its nature consists of a lot of components, wired up using protocols. Using constructor injection you can end up with following constructors for presenter and interactor:
 */
 
 class InteractorImp: Interactor {
