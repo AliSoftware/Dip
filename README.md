@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Swift Version](https://img.shields.io/badge/Linux-compatible-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
-[![Swift Version](https://img.shields.io/badge/Swift-2.2-F16D39.svg?style=flat)](https://developer.apple.com/swift)
+[![Swift Version](https://img.shields.io/badge/Swift-2.2-3.0-F16D39.svg?style=flat)](https://developer.apple.com/swift)
 
 ![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)  
 _Photo courtesy of [www.kevinandamanda.com](http://www.kevinandamanda.com/recipes/appetizer/homemade-soft-cinnamon-sugar-pretzel-bites-with-salted-caramel-dipping-sauce.html)_
@@ -139,7 +139,7 @@ class ViewController {
 
 ## Installation
 
-Since version 4.3.1 Dip is built with Swift 2.2. The latest version built with Swift 2.1 is 4.3.0.
+Since version 5.0.0 Dip is built with Swift 3.0. For Swift 2.2-2.3 compatible version use "swift2.3" branch.
 
 Dip is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
