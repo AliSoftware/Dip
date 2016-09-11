@@ -73,7 +73,7 @@ class MyTests/*: XCTestCase*/ {
  Reset container configuration to normal state:
 */
         container.reset()
-        configure(container)
+        configure(container: container)
     }
     
     func testThatDoSomethingIsCalled() {

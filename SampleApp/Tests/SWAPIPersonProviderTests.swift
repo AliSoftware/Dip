@@ -10,10 +10,10 @@ import XCTest
 import Dip
 
 class SWAPIPersonProviderTests: XCTestCase {
-    let fakePerson1 = ["name": "John Doe", "mass": "72", "height": "172", "eye_color": "brown", "hair_color": "black", "gender": "male",
-        "starships": ["stub://starship/7/", "stub://starship/15"], "url": "stub://people/1"]
-    let fakePerson2 = ["name": "Jane Doe", "mass": "63", "height": "167", "eye_color": "blue", "hair_color": "red", "gender": "female",
-        "starships": ["stub://starship/11/"], "url": "stub://people/12"]
+    let fakePerson1: [String : Any] = ["name": "John Doe", "mass": "72", "height": "172", "eye_color": "brown", "hair_color": "black", "gender": "male",
+        "starships": ["http://starship/7/", "http://starship/15"], "url": "http://people/1"]
+    let fakePerson2: [String: Any] = ["name": "Jane Doe", "mass": "63", "height": "167", "eye_color": "blue", "hair_color": "red", "gender": "female",
+        "starships": ["http://starship/11/"], "url": "http://people/12"]
     
     override func setUp() {
         super.setUp()
@@ -40,7 +40,7 @@ class SWAPIPersonProviderTests: XCTestCase {
         wsDependencies.register(.Singleton) { mock as NetworkLayer }
         
         let provider = SWAPIPersonProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(1) { person in
+        provider.fetch(id: 1) { person in
             XCTAssertNotNil(person)
             XCTAssertEqual(person?.name, "John Doe")
             XCTAssertEqual(person?.mass, 72)
@@ -60,7 +60,7 @@ class SWAPIPersonProviderTests: XCTestCase {
         wsDependencies.register(.Singleton) { mock as NetworkLayer }
         
         let provider = SWAPIPersonProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(12) { person in
+        provider.fetch(id: 12) { person in
             XCTAssertNil(person)
         }
     }

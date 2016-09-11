@@ -15,13 +15,13 @@ final class StarshipCell : UITableViewCell, FillableCell {
     @IBOutlet weak var crewLabel: UILabel!
     @IBOutlet weak var passengersLabel: UILabel!
     
-    let numberFormatter = NSNumberFormatter()
+    let numberFormatter = NumberFormatter()
     
-    func fillWithObject(starship: Starship) {
+    func fillWithObject(object starship: Starship) {
         nameLabel.text = starship.name
         modelLabel.text = starship.model
         manufacturerLabel.text = starship.manufacturer
-        crewLabel.text = numberFormatter.stringFromNumber(starship.crew)
-        passengersLabel.text = numberFormatter.stringFromNumber(starship.passengers)
+        crewLabel.text = numberFormatter.string(from: NSNumber(integerLiteral: starship.crew))
+        passengersLabel.text = numberFormatter.string(from: NSNumber(integerLiteral: starship.passengers))
     }
 }

@@ -29,7 +29,7 @@ public enum LogLevel {
 }
 public var logLevel: LogLevel = .Errors
 
-func log(logLevel: LogLevel, _ message: Any) {
+func log(_ logLevel: LogLevel, _ message: Any) {
   guard case logLevel = Dip.logLevel else { return }
   print(message)
 }
@@ -42,7 +42,7 @@ protocol BoxType {
 extension Optional: BoxType {
   var unboxed: Any? {
     switch self {
-    case let .Some(value): return value
+    case let .some(value): return value
     default: return nil
     }
   }
@@ -51,7 +51,7 @@ extension Optional: BoxType {
 extension ImplicitlyUnwrappedOptional: BoxType {
   var unboxed: Any? {
     switch self {
-    case let .Some(value): return value
+    case let .some(value): return value
     default: return nil
     }
   }
@@ -75,7 +75,12 @@ class WeakBox<T>: WeakBoxType {
   }
 
   init(_ value: T) {
-    guard let value = value as? AnyObject else {
+    #if os(Linux)
+      weak var value: AnyObject? = value as? AnyObject
+    #else
+      weak var value: AnyObject? = value as AnyObject
+    #endif
+    guard value != nil else {
       fatalError("Can not store weak reference to not a class instance (\(T.self))")
     }
     self.unboxed = value
@@ -98,6 +103,16 @@ extension Dictionary {
 extension Optional {
   var desc: String {
     return self.map { "\($0)" } ?? "nil"
+  }
+}
+
+extension Collection where Index: Comparable, Self.Indices.Index == Index {
+  subscript(safe index: Index) -> Generator.Element? {
+    guard indices.startIndex..<indices.endIndex ~= index else { return nil }
+    return self[index]
+  }
+  subscript(next index: Index) -> Generator.Element? {
+    return self[safe: indices.index(after: index)]
   }
 }
 
@@ -131,7 +146,7 @@ extension Optional {
   
   extension pthread_mutex_t {
     mutating func lock() {
-      pthread_mutex_trylock(&self)
+      pthread_mutex_lock(&self)
     }
     mutating func unlock() {
       pthread_mutex_unlock(&self)

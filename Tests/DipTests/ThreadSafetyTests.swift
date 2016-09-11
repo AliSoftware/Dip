@@ -49,7 +49,7 @@ private class ServerImp: Server, Hashable {
   init() {}
   
   var hashValue: Int {
-    return unsafeAddressOf(self).hashValue
+    return Unmanaged.passUnretained(self).toOpaque().hashValue
   }
 }
 
@@ -64,24 +64,26 @@ private var container: DependencyContainer!
 
 #if os(Linux)
 import Glibc
+  
+private var runningThreads: Int = 0
 private var lock: pthread_spinlock_t = 0
 
 private let resolveClientSync: () -> Client? = {
-  var clientPointer: UnsafeMutablePointer<Void> = nil
-  clientPointer = dispatch_sync { _ in
+  let pointer = dispatch_sync { _ in
     let resolved = try! container.resolve() as Client
-    return UnsafeMutablePointer(Unmanaged.passUnretained(resolved as! ClientImp).toOpaque())
+    return UnsafeMutableRawPointer(Unmanaged.passRetained(resolved as! ClientImp).toOpaque())
   }
-  return Unmanaged<ClientImp>.fromOpaque(COpaquePointer(clientPointer)).takeUnretainedValue()
+  guard let clientPointer = pointer else { return nil }
+  return Unmanaged<ClientImp>.fromOpaque(clientPointer).takeRetainedValue()
 }
   
 #else
-let queue = NSOperationQueue()
-let lock = NSRecursiveLock()
+let queue = OperationQueue()
+let lock = RecursiveLock()
   
 private let resolveClientSync: () -> Client? = {
   var client: Client?
-  dispatch_sync(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+  DispatchQueue.global(qos: .default).sync() {
     client = try! container.resolve() as Client
   }
   return client
@@ -90,9 +92,14 @@ private let resolveClientSync: () -> Client? = {
 #endif
 
 let resolveServerAsync = {
-  let service = try! container.resolve() as Server
+  let server = try! container.resolve() as Server
   lock.lock()
-  resolvedServers.insert(service as! ServerImp)
+  resolvedServers.insert(server as! ServerImp)
+
+  #if os(Linux)
+    runningThreads -= 1
+  #endif
+
   lock.unlock()
 }
 
@@ -100,34 +107,33 @@ let resolveClientAsync = {
   let client = try! container.resolve() as Client
   lock.lock()
   resolvedClients.append(client as! ClientImp)
+
+  #if os(Linux)
+    runningThreads -= 1
+  #endif
+
   lock.unlock()
 }
 
 class ThreadSafetyTests: XCTestCase {
   
   #if os(Linux)
-  required init(name: String, testClosure: XCTestCase throws -> Void) {
+  required init(name: String, testClosure: @escaping (XCTestCase) throws -> Void) {
     pthread_spin_init(&lock, 0)
+    super.init(name: name, testClosure: testClosure)
   }
+  #endif
   
-  static var allTests: [(String, ThreadSafetyTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testSingletonThreadSafety", testSingletonThreadSafety),
       ("testFactoryThreadSafety", testFactoryThreadSafety),
       ("testCircularReferenceThreadSafety", testCircularReferenceThreadSafety)
     ]
-  }
+  }()
   
-  func setUp() {
-    container = DependencyContainer()
-  }
-  
-  func tearDown() {
-    resolvedServers.removeAll()
-    resolvedClients.removeAll()
-  }
-  #else
   override func setUp() {
+    Dip.logLevel = .Verbose
     container = DependencyContainer()
   }
   
@@ -135,24 +141,27 @@ class ThreadSafetyTests: XCTestCase {
     resolvedServers.removeAll()
     resolvedClients.removeAll()
   }
-  #endif
   
   func testSingletonThreadSafety() {
     container.register(.Singleton) { ServerImp() as Server }
     
     for _ in 0..<100 {
       #if os(Linux)
-      dispatch_async({ _ in
+      lock.lock()
+      runningThreads += 1
+      lock.unlock()
+        
+      dispatch_async { _ in
         resolveServerAsync()
         return nil
-      })
+      }
       #else
-      queue.addOperationWithBlock(resolveServerAsync)
+      queue.addOperation(resolveServerAsync)
       #endif
     }
     
     #if os(Linux)
-    sleep(1)
+    while runningThreads > 0 { sleep(1) }
     #else
     queue.waitUntilAllOperationsAreFinished()
     #endif
@@ -166,17 +175,21 @@ class ThreadSafetyTests: XCTestCase {
     
     for _ in 0..<100 {
       #if os(Linux)
-      dispatch_async({ _ in
+      lock.lock()
+      runningThreads += 1
+      lock.unlock()
+
+      dispatch_async { _ in
         resolveServerAsync()
         return nil
-      })
+      }
       #else
-      queue.addOperationWithBlock(resolveServerAsync)
+      queue.addOperation(resolveServerAsync)
       #endif
     }
     
     #if os(Linux)
-    sleep(1)
+    while runningThreads > 0 { sleep(1) }
     #else
     queue.waitUntilAllOperationsAreFinished()
     #endif
@@ -197,17 +210,21 @@ class ThreadSafetyTests: XCTestCase {
     
     for _ in 0..<100 {
       #if os(Linux)
-      dispatch_async({ _ in
+      lock.lock()
+      runningThreads += 1
+      lock.unlock()
+
+      dispatch_async { _ in
         resolveClientAsync()
         return nil
-      })
+      }
       #else
-      queue.addOperationWithBlock(resolveClientAsync)
+      queue.addOperation(resolveClientAsync)
       #endif
     }
     
     #if os(Linux)
-    sleep(1)
+    while runningThreads > 0 { sleep(1) }
     #else
     queue.waitUntilAllOperationsAreFinished()
     #endif

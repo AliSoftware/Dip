@@ -47,10 +47,9 @@ class ComponentScopeTests: XCTestCase {
   
   let container = DependencyContainer()
   
-  #if os(Linux)
-  static var allTests: [(String, ComponentScopeTests -> () throws -> Void)] {
+  static var allTests = {
     return [
-      ("testThatUniqueIsDefaultScope", testThatUniqueIsDefaultScope),
+      ("testThatSharedIsDefaultScope", testThatSharedIsDefaultScope),
       ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),
       ("testThatItResolvesTypeAsNewInstanceForUniqueScope", testThatItResolvesTypeAsNewInstanceForUniqueScope),
       ("testThatItReusesInstanceForSingletonScope", testThatItReusesInstanceForSingletonScope),
@@ -66,16 +65,11 @@ class ComponentScopeTests: XCTestCase {
       ("testThatItHoldsWeakReferenceToWeakSingletonInstance",
           testThatItHoldsWeakReferenceToWeakSingletonInstance)
     ]
-  }
+  }()
   
-  func setUp() {
-    container.reset()
-  }
-  #else
   override func setUp() {
     container.reset()
   }
-  #endif
   
   func testThatSharedIsDefaultScope() {
     let def = container.register { ServiceImp1() as Service }
@@ -100,7 +94,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatItReusesInstanceForSingletonScope() {
-    func test(scope: ComponentScope, line: UInt = #line) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
       container.register(scope) { ServiceImp1() as Service }
       
@@ -118,7 +112,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatSingletonIsNotReusedAcrossContainers() {
-    func test(scope: ComponentScope, line: UInt = #line) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
       let def = container.register(scope) { ServiceImp1() as Service }
       let secondContainer = DependencyContainer()
@@ -138,7 +132,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsRemoved() {
-    func test(scope: ComponentScope, line: UInt = #line) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
       let def = container.register(scope) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
@@ -158,7 +152,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsOverridden() {
-    func test(scope: ComponentScope, line: UInt = #line) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
       let def = container.register(scope) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
@@ -177,7 +171,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatSingletonIsReleasedWhenContainerIsReset() {
-    func test(scope: ComponentScope, line: UInt = #line) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       //given
       let def = container.register(scope) { ServiceImp1() as Service }
       let service1 = try! container.resolve() as Service
@@ -244,7 +238,7 @@ class ComponentScopeTests: XCTestCase {
         //then we don't want every next resolve of service for other tags to reuse it
         XCTAssertTrue(service2 is ServiceImp2)
     }
-    container.register(tag: "service", .Shared) { ServiceImp2() as Service}
+    container.register(tag: "service") { ServiceImp2() as Service}
     
     //when
     let service1 = try! container.resolve(tag: "tag") as Service
@@ -342,7 +336,7 @@ class ComponentScopeTests: XCTestCase {
   }
   
   func testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer() {
-    func test(scope: ComponentScope, line: UInt = #line) {
+    func test(_ scope: ComponentScope, line: UInt = #line) {
       let container1 = DependencyContainer()
       container1.register(scope) { ServiceImp1() as Service }
       
@@ -356,7 +350,7 @@ class ComponentScopeTests: XCTestCase {
       let service1 = try! container1.resolve() as Service
       let service2 = try! container2.resolve() as Service
       
-      XCTAssertTrue(service1 === service2, line: line, "\(scope) should be reused when first resolved from another container")
+      XCTAssertTrue(service1 === service2, "\(scope) should be reused when first resolved from another container", line: line)
     }
     
     test(.Singleton)

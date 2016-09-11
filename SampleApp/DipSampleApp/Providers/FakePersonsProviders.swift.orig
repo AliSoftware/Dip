@@ -11,11 +11,15 @@ import Foundation
 ///Provides some dummy Person entities
 struct DummyPilotProvider : PersonProviderAPI {
     
-    func fetchIDs(completion: @escaping ([Int]) -> Void) {
+    func fetchIDs(completion: ([Int]) -> Void) {
         completion(Array(0..<5))
     }
     
-    func fetch(id: Int, completion: @escaping (Person?) -> Void) {
+<<<<<<< HEAD
+    func fetch(id: Int, completion: Person? -> Void) {
+=======
+    func fetch(id: Int, completion: (Person?) -> Void) {
+>>>>>>> feature/swift3
         completion(dummyPerson(idx: id))
     }
     
@@ -40,9 +44,13 @@ class PlistPersonProvider : PersonProviderAPI {
     
     init(plist basename: String) {
         guard
-            let path = Bundle.main.path(forResource: basename, ofType: "plist"),
+<<<<<<< HEAD
+            let path = NSBundle.main().pathForResource(basename, ofType: "plist"),
+=======
+            let path = Bundle.main().pathForResource(basename, ofType: "plist"),
+>>>>>>> feature/swift3
             let list = NSArray(contentsOfFile: path),
-            let peopleDict = list as? [[String:AnyObject]]
+            peopleDict = list as? [[String:AnyObject]]
             else {
                 fatalError("PLIST for \(basename) not found")
         }
@@ -50,11 +58,11 @@ class PlistPersonProvider : PersonProviderAPI {
         self.people = peopleDict.map(PlistPersonProvider.personFromDict)
     }
     
-    func fetchIDs(completion: @escaping ([Int]) -> Void) {
+    func fetchIDs(completion: ([Int]) -> Void) {
         completion(Array(0..<people.count))
     }
     
-    func fetch(id: Int, completion: @escaping (Person?) -> Void) {
+    func fetch(id: Int, completion: (Person?) -> Void) {
         guard id < people.count else {
             completion(nil)
             return
@@ -65,12 +73,12 @@ class PlistPersonProvider : PersonProviderAPI {
     private static func personFromDict(dict: [String:AnyObject]) -> Person {
         guard
             let name = dict["name"] as? String,
-            let height = dict["height"] as? Int,
-            let mass = dict["mass"] as? Int,
-            let hairColor = dict["hairColor"] as? String,
-            let eyeColor = dict["eyeColor"] as? String,
-            let genderStr = dict["gender"] as? String,
-            let starshipsIDs = dict["starships"] as? [Int]
+            height = dict["height"] as? Int,
+            mass = dict["mass"] as? Int,
+            hairColor = dict["hairColor"] as? String,
+            eyeColor = dict["eyeColor"] as? String,
+            genderStr = dict["gender"] as? String,
+            starshipsIDs = dict["starships"] as? [Int]
             else {
                 fatalError("Invalid Plist")
         }
@@ -98,12 +106,16 @@ class FakePersonsProvider: PersonProviderAPI {
         self.dummyProvider = dummyProvider
     }
     
-    func fetchIDs(completion: @escaping ([Int]) -> Void) {
+<<<<<<< HEAD
+    func fetchIDs(completion: [Int] -> Void) {
+=======
+    func fetchIDs(completion: ([Int]) -> Void) {
+>>>>>>> feature/swift3
         dummyProvider.fetchIDs(completion: completion)
     }
     
-    func fetch(id: Int, completion: @escaping (Person?) -> Void) {
-        if let plistProvider = plistProvider, id == 0 {
+    func fetch(id: Int, completion: (Person?) -> Void) {
+        if let plistProvider = plistProvider where id == 0 {
             plistProvider.fetch(id: id, completion: completion)
         }
         else {

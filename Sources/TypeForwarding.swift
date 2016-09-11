@@ -24,7 +24,7 @@
 
 protocol TypeForwardingDefinition: DefinitionType {
   var implementingTypes: [Any.Type] { get }
-  func doesImplements(type: Any.Type) -> Bool
+  func doesImplements(_ type: Any.Type) -> Bool
 }
 
 extension Definition {
@@ -42,7 +42,7 @@ extension Definition {
    
    - returns: definition on which `implements` was called
    */
-  public func implements<F>(type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition {
+  @discardableResult public func implements<F>(_ type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition {
     precondition(container != nil, "Definition should be registered in the container.")
 
     container!.register(self, type: type, tag: tag)
@@ -63,26 +63,26 @@ extension Definition {
    
    - returns: definition on which `implements` was called
    */
-  public func implements<F>(type: F.Type, tag: DependencyTagConvertible? = nil, resolvingProperties: (DependencyContainer, F) throws -> ()) -> Definition {
+  @discardableResult public func implements<F>(_ type: F.Type, tag: DependencyTagConvertible? = nil, resolvingProperties: @escaping (DependencyContainer, F) throws -> ()) -> Definition {
     precondition(container != nil, "Definition should be registered in the container.")
-    
+
     let forwardDefinition = container!.register(self, type: type, tag: tag)
     forwardDefinition.resolvingProperties(resolvingProperties)
     return self
   }
 
   ///Registers definition for types passed as parameters
-  public func implements<A, B>(a: A.Type, _ b: B.Type) -> Definition {
+  @discardableResult public func implements<A, B>(_ a: A.Type, _ b: B.Type) -> Definition {
     return implements(a).implements(b)
   }
 
   ///Registers definition for types passed as parameters
-  public func implements<A, B, C>(a: A.Type, _ b: B.Type, _ c: C.Type) -> Definition {
+  @discardableResult public func implements<A, B, C>(_ a: A.Type, _ b: B.Type, _ c: C.Type) -> Definition {
     return implements(a).implements(b).implements(c)
   }
 
   ///Registers definition for types passed as parameters
-  public func implements<A, B, C, D>(a: A.Type, _ b: B.Type, c: C.Type, d: D.Type) -> Definition {
+  @discardableResult public func implements<A, B, C, D>(_ a: A.Type, _ b: B.Type, c: C.Type, d: D.Type) -> Definition {
     return implements(a).implements(b).implements(c).implements(d)
   }
 
@@ -104,7 +104,7 @@ extension DependencyContainer {
    
    - returns: New definition registered for passed type.
    */
-  public func register<T, U, F>(definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
+  @discardableResult public func register<T, U, F>(_ definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
     precondition(definition.container === self, "Definition should be registered in the container.")
     
     let key = DefinitionKey(type: F.self, typeOfArguments: U.self)
@@ -143,7 +143,7 @@ extension DependencyContainer {
   }
   
   /// Searches for definition that forwards requested type
-  func typeForwardingDefinition(key: DefinitionKey) -> KeyDefinitionPair? {
+  func typeForwardingDefinition(_ key: DefinitionKey) -> KeyDefinitionPair? {
     var forwardingDefinitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
     forwardingDefinitions = filter(forwardingDefinitions, byKey: key, byTypeOfArguments: true)

@@ -16,10 +16,17 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
     var starshipProvider: StarshipProviderAPI!
     var personProvider: PersonProviderAPI!
     
-    func fetchIDs(completion: @escaping ([Int]) -> Void) {
+<<<<<<< HEAD
+    func fetchIDs(completion: [Int] -> Void) {
         starshipProvider.fetchIDs(completion: completion)
     }
-    func fetchOne(id shipID:Int, completion: @escaping (Starship?) -> Void) {
+    func fetchOne(id shipID:Int, completion: Starship? -> Void) {
+=======
+    func fetchIDs(completion: ([Int]) -> Void) {
+        starshipProvider.fetchIDs(completion: completion)
+    }
+    func fetchOne(id shipID:Int, completion: (Starship?) -> Void) {
+>>>>>>> feature/swift3
         starshipProvider.fetch(id: shipID, completion: completion)
     }
     
@@ -29,13 +36,12 @@ class StarshipListViewController : UITableViewController, FetchableTrait {
         }
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
         guard
-            let id = segue.identifier,
-            let segueID = UIStoryboard.Segue.Main(rawValue: id),
-            segueID == .PilotsSegue,
+            let id = segue.identifier, segueID = UIStoryboard.Segue.Main(rawValue: id)
+            where segueID == .PilotsSegue,
             let indexPath = self.tableView.indexPathForSelectedRow,
-            let destVC = segue.destination as? PersonListViewController,
+            let destVC = segue.destinationViewController as? PersonListViewController,
             let starship = self.objects?[indexPath.row]
             else {
                 fatalError()
@@ -51,9 +57,15 @@ extension StarshipListViewController {
         return objects?.count ?? 0
     }
     
+<<<<<<< HEAD
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: NSIndexPath) -> UITableViewCell {
+        guard let object = self.objects?[indexPath.row] else { fatalError() }
+        let cell = StarshipCell.dequeueFromTableView(tableView: tableView, forIndexPath: indexPath)
+=======
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let object = self.objects?[indexPath.row] else { fatalError() }
         let cell = StarshipCell.dequeueFromTableView(tableView, forIndexPath: indexPath)
+>>>>>>> feature/swift3
         cell.fillWithObject(object: object)
         return cell
     }

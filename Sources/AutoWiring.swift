@@ -30,7 +30,7 @@ protocol AutoWiringDefinition: DefinitionType {
 extension DependencyContainer {
   
   /// Tries to resolve instance using auto-wiring
-  func autowire<T>(key: DefinitionKey) throws -> T {
+  func autowire<T>(_ key: DefinitionKey) throws -> T {
     guard key.typeOfArguments == Void.self else {
       throw DipError.DefinitionNotFound(key: key)
     }
@@ -52,7 +52,7 @@ extension DependencyContainer {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
     definitions = filter(definitions, byKey: key)
-    definitions = definitions.sort({ $0.definition.numberOfArguments > $1.definition.numberOfArguments })
+    definitions = definitions.sorted(by: { $0.definition.numberOfArguments > $1.definition.numberOfArguments })
 
     guard definitions.count > 0 && definitions[0].definition.numberOfArguments > 0 else {
       throw DipError.DefinitionNotFound(key: key)

@@ -33,7 +33,7 @@ class ApiClientSingleton {
 }
 
 class MyViewControllerWithSingleton: UIViewController {
-  override func viewDidAppear(amimated: Bool) {
+  override func viewDidAppear(_ amimated: Bool) {
     super.viewDidAppear(amimated)
     ApiClientSingleton.sharedInstance.get("/users") { /* refresh your UI */ }
   }
@@ -71,13 +71,13 @@ class MyViewController: UIViewController {
   var apiClient: ApiClientProtocol!
   
   override func viewDidAppear(amimated: Bool) {
-    super.viewDidAppear(amimated)
+    super.viewDidAppear(_ amimated)
     apiClient.get("path") {}
   }
   
   convenience init(apiClient: ApiClientProtocol) {
-    self.init()
     self.apiClient = apiClient
+    self.init()
   }
   
   init() {

@@ -39,8 +39,7 @@ class ContextTests: XCTestCase {
 
   let container = DependencyContainer()
   
-  #if os(Linux)
-  static var allTests: [(String, ContextTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatContextStoresCurrentlyResolvedType", testThatContextStoresCurrentlyResolvedType),
       ("testThatContextStoresInjectedInType", testThatContextStoresInjectedInType),
@@ -52,17 +51,12 @@ class ContextTests: XCTestCase {
       ("testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration", testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration),
       ("testThatContextIsPreservedWhenResolvingWithCollaboration", testThatContextIsPreservedWhenResolvingWithCollaboration)
     ]
-  }
+  }()
   
-  func setUp() {
-    container.reset()
-  }
-  #else
   override func setUp() {
     container.reset()
     container.register { ServiceImp2() }
   }
-  #endif
 
   func testThatContextStoresCurrentlyResolvedType() {
     container.register { () -> Service in
@@ -132,7 +126,7 @@ class ContextTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     container.register { ServiceImp1() }
     
-    container.register() { () -> ServiceImp2 in
+    container.register { () -> ServiceImp2 in
       if self.container.context.injectedInProperty == "injectedNilTag" {
         XCTAssertNil(self.container.context.tag)
       }
@@ -209,7 +203,7 @@ class ContextTests: XCTestCase {
     
     let names = ["injected", "injectedWeak", "taggedInjected", "taggedInjectedWeak", "injectedNilTag"]
     
-    container.register() { () -> ServiceImp2 in
+    container.register { () -> ServiceImp2 in
       XCTAssertNotNil(self.container.context.injectedInProperty)
       XCTAssertTrue(names.contains(self.container.context.injectedInProperty!))
       return ServiceImp2()

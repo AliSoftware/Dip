@@ -49,8 +49,7 @@ class DipTests: XCTestCase {
 
   let container = DependencyContainer()
 
-  #if os(Linux)
-  static var allTests: [(String, DipTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle", testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle),
       ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
@@ -67,18 +66,16 @@ class DipTests: XCTestCase {
       ("testThatItCallsDidResolveDependenciesInReverseOrder", testThatItCallsDidResolveDependenciesInReverseOrder),
       ("testItCallsResolveDependenciesOnResolableInstance", testItCallsResolveDependenciesOnResolableInstance),
       ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies),
-      ("testContainerCollaborators", testContainerCollaborators)
+      ("testThatItCanResolveUsingContainersCollaboration", testThatItCanResolveUsingContainersCollaboration),
+      ("testThatCollaboratingWithSelfIsIgnored", testThatCollaboratingWithSelfIsIgnored),
+      ("testThatCollaboratingContainersAreWeakReferences", testThatCollaboratingContainersAreWeakReferences),
+      ("testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer", testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer),
     ]
-  }
+  }()
 
-  func setUp() {
-    container.reset()
-  }
-  #else
   override func setUp() {
     container.reset()
   }
-  #endif
   
   func testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle() {
     var container: DependencyContainer! = DependencyContainer() { container in
@@ -223,22 +220,14 @@ class DipTests: XCTestCase {
     }
     
     //when
-    try! container.resolve() as Service
+    let _ = try! container.resolve() as Service
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
     resolveDependenciesCalled = false
     
     //and when
-    try! container.resolve(Service.self)
-    
-    //then
-    XCTAssertTrue(resolveDependenciesCalled)
-
-    resolveDependenciesCalled = false
-    
-    //and when
-    try! container.resolve((Service?).self)
+    let _ = try! container.resolve(Service.self)
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
@@ -246,7 +235,15 @@ class DipTests: XCTestCase {
     resolveDependenciesCalled = false
     
     //and when
-    try! container.resolve((Service!).self)
+    let _ = try! container.resolve((Service?).self)
+    
+    //then
+    XCTAssertTrue(resolveDependenciesCalled)
+
+    resolveDependenciesCalled = false
+    
+    //and when
+    let _ = try! container.resolve((Service!).self)
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
@@ -391,13 +388,13 @@ class DipTests: XCTestCase {
         return
     }
 
-    container.register(tag: "graph", .Shared) { ResolvableService() as Service }
+    container.register(tag: "graph") { ResolvableService() as Service }
       .resolvingProperties { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
     }
 
-    container.register(tag: "singleton", .Singleton) { ResolvableService() as Service }
+    container.register(.Singleton, tag: "singleton") { ResolvableService() as Service }
       .resolvingProperties { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
@@ -458,13 +455,13 @@ class DipTests: XCTestCase {
     class Class: Resolvable {
       var resolveDependenciesCalled = false
       
-      func resolveDependencies(container: DependencyContainer) {
+      func resolveDependencies(_ container: DependencyContainer) {
         resolveDependenciesCalled = true
       }
     }
     
     class SubClass: Class {
-      override func resolveDependencies(container: DependencyContainer) {
+      override func resolveDependencies(_ container: DependencyContainer) {
         super.resolveDependencies(container)
       }
     }
@@ -508,11 +505,17 @@ class DipTests: XCTestCase {
       
     }
     
-    class ResolvableClient: Client, Resolvable {
+    //Due to a bug in Swift 3 Mirror fails if weak property is not NSObject
+    //https://bugs.swift.org/browse/SR-2144
+    class ResolvableClient: NSObject, Client, Resolvable {
       var server: Server?
       var secondServer: Server?
       
+      #if os(Linux)
       init() {}
+      #else
+      override init() { super.init() }
+      #endif
       
       var didResolveDependenciesCalled = false
       
@@ -582,7 +585,7 @@ class DipTests: XCTestCase {
         createdService2 = true
     }
     
-    container.register() { (arg: String) in ServiceImp1() }
+    container.register { (arg: String) in ServiceImp1() }
       .resolvingProperties { _ in
         createdService3 = true
     }
@@ -633,8 +636,10 @@ class DipTests: XCTestCase {
   
   func testThatItFailsValidationOnlyForDipErrors() {
     //given
+    enum SomeError: Error { case error }
+    
     container.register { () -> Service in
-      throw NSError(domain: "", code: 0, userInfo: nil)
+      throw SomeError.error
     }
     
     //then
@@ -648,7 +653,7 @@ class DipTests: XCTestCase {
     
     //then
     AssertThrows(expression: try container.validate()) { error in
-      if case let DipError.DefinitionNotFound(_key) = error where _key == key { return true }
+      if case let DipError.DefinitionNotFound(_key) = error, _key == key { return true }
       else { return false }
     }
   }
@@ -696,10 +701,18 @@ extension DipTests {
       weak var client: Client?
       init(client: Client) { self.client = client }
     }
-    class ClientImp: Client {
+    
+    //Due to a bug in Swift 3 Mirror fails if weak property is not NSObject
+    //https://bugs.swift.org/browse/SR-2144
+    class ClientImp: NSObject, Client {
       var server: Server?
       var anotherServer: Server?
+
+      #if os(Linux)
       init() {}
+      #else
+      override init() { super.init() }
+      #endif
     }
     
     let serverContainer = DependencyContainer()

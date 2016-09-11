@@ -10,33 +10,33 @@ import Foundation
 
 ///NetworkLayer implementation on top of NSURLSession
 struct URLSessionNetworkLayer : NetworkLayer {
-    let baseURL: NSURL
-    let session: NSURLSession
-    let responseQueue: dispatch_queue_t
+    let baseURL: URL
+    let session: URLSession
+    let responseQueue: DispatchQueue
     
-    init?(baseURL: String, session: NSURLSession = .sharedSession(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
-        guard let url = NSURL(string: baseURL) else { return nil }
+    init?(baseURL: String, session: URLSession = URLSession.shared, responseQueue: DispatchQueue = DispatchQueue.main) {
+        guard let url = URL(string: baseURL) else { return nil }
         self.init(baseURL: url, session: session)
     }
     
-    init(baseURL: NSURL, session: NSURLSession = .sharedSession(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
+    init(baseURL: URL, session: URLSession = URLSession.shared, responseQueue: DispatchQueue = DispatchQueue.main) {
         self.baseURL = baseURL
         self.session = session
         self.responseQueue = responseQueue
     }
     
-    func request(path: String, completion: NetworkResponse -> Void) {
-        let url = self.baseURL.URLByAppendingPathComponent(path)
-        let task = session.dataTaskWithURL(url) { data, response, error in
-            if let data = data, let response = response as? NSHTTPURLResponse {
-                dispatch_async(self.responseQueue) {
+    func request(path: String, completion: @escaping (NetworkResponse) -> Void) {
+        let url = self.baseURL.appendingPathComponent(path)
+        let task = session.dataTask(with: url) { data, response, error in
+            if let data = data, let response = response as? HTTPURLResponse {
+                self.responseQueue.async() {
                     completion(NetworkResponse.Success(data, response))
                 }
             }
             else {
-                let err = error ?? NSError(domain: NSURLErrorDomain, code: NSURLError.Unknown.rawValue, userInfo: nil)
-                dispatch_async(self.responseQueue) {
-                    completion(NetworkResponse.Error(err))
+                let err = error ?? NSError(domain: NSURLErrorDomain, code: URLError.unknown.rawValue, userInfo: nil)
+                self.responseQueue.async() {
+                    completion(NetworkResponse.Error(err as NSError))
                 }
             }
         }

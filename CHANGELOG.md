@@ -155,7 +155,7 @@
   This code: 
   
   ```swift
-  container.register("some tag") { SomeClass() as SomeProtocol }
+  container.register(tag: "some tag") { SomeClass() as SomeProtocol }
   container.resolve("some tag") as SomeProtocol
   ```
   

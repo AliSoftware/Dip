@@ -93,8 +93,7 @@ class AutoInjectionTests: XCTestCase {
 
   let container = DependencyContainer()
   
-  #if os(Linux)
-  static var allTests: [(String, AutoInjectionTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
       ("testThatItResolvesInheritedDependencies", testThatItResolvesInheritedDependencies),
@@ -109,18 +108,14 @@ class AutoInjectionTests: XCTestCase {
       ("testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected", testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected),
       ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties),
       ("testThatItPassesTagToAutoInjectedProperty", testThatItPassesTagToAutoInjectedProperty),
-      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag)
+      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag),
+      ("testThatItAutoInjectsPropertyWithCollaboratingContainer", testThatItAutoInjectsPropertyWithCollaboratingContainer)
     ]
-  }
+  }()
 
-  func setUp() {
-    container.reset()
-  }
-  #else
   override func setUp() {
     container.reset()
   }
-  #endif
 
   func testThatItResolvesAutoInjectedDependencies() {
     container.register { ServerImp() as Server }
@@ -205,10 +200,10 @@ class AutoInjectionTests: XCTestCase {
     }
 
     //when
-    try! container.resolve() as Client
+    let _ = try! container.resolve() as Client
     XCTAssertTrue(serverBlockWasCalled)
     
-    try! container.resolve() as Server
+    let _ = try! container.resolve() as Server
     XCTAssertTrue(clientBlockWasCalled)
   }
   
@@ -287,7 +282,7 @@ class AutoInjectionTests: XCTestCase {
     container.register { ClientImp() as Client }
     
     //when
-    try! container.resolve() as Client
+    let _ = try! container.resolve() as Client
     
     //then
     XCTAssertTrue(AutoInjectionTests.clientDidInjectCalled)

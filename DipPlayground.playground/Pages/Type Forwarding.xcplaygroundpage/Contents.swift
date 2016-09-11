@@ -101,7 +101,7 @@ listInteractorDefinition
     .resolvingProperties { container, interactor in
         print("resolved ListInteractor")
 }
-container.register(listInteractorDefinition, type: ListInteractorInput.self)
+let _ = container.register(listInteractorDefinition, type: ListInteractorInput.self)
     .resolvingProperties { container, interactor in
         print("resolved ListInteractorInput")
 }

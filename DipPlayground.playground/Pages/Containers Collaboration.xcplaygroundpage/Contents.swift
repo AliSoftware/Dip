@@ -11,10 +11,10 @@ import Dip
 protocol DataStore {}
 class CoreDataStore: DataStore {}
 class AddEventWireframe {
-    var eventsListWireframe: EventsListWireframe!
+    var eventsListWireframe: EventsListWireframe?
 }
 class EventsListWireframe {
-    var addEventWireframe: AddEventWireframe!
+    var addEventWireframe: AddEventWireframe?
     let dataStore: DataStore
     init(dataStore: DataStore) {
         self.dataStore = dataStore
@@ -62,7 +62,7 @@ addEventModule.collaborate(with: eventsListModule)
 
 eventsListWireframe = try eventsListModule.resolve() as EventsListWireframe
 eventsListWireframe.addEventWireframe
-eventsListWireframe.addEventWireframe.eventsListWireframe === eventsListWireframe
+eventsListWireframe.addEventWireframe?.eventsListWireframe === eventsListWireframe
 
 /*:
  If you try to link container with itself it will be silently ignored. When forwarding request collaborating containers will be iterated in the same order that they were added.

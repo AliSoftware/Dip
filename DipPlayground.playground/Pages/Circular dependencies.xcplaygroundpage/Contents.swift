@@ -1,6 +1,7 @@
 //: [Previous: Scopes](@previous)
 
 import Dip
+import Foundation
 
 let container = DependencyContainer()
 
@@ -25,7 +26,7 @@ class NetworkClientImp: NetworkClient {
     init() {}
 }
 
-class Interactor: NetworkClientDelegate {
+class Interactor: NSObject, NetworkClientDelegate {
     let networkClient: NetworkClient
     init(networkClient: NetworkClient) {
         self.networkClient = networkClient

@@ -36,8 +36,7 @@ class DefinitionTests: XCTestCase {
   let tag1 = DependencyContainer.Tag.String("tag1")
   let tag2 = DependencyContainer.Tag.String("tag2")
   
-  #if os(Linux)
-  static var allTests: [(String, DefinitionTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatDefinitionKeyIsEqualBy_Type_Factory_Tag", testThatDefinitionKeyIsEqualBy_Type_Factory_Tag),
       ("testThatDefinitionKeysWithDifferentTypesAreNotEqual", testThatDefinitionKeysWithDifferentTypesAreNotEqual),
@@ -47,8 +46,7 @@ class DefinitionTests: XCTestCase {
       ("testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance", testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance),
       ("testThatItRegisteresOptionalTypesAsForwardedTypes", testThatItRegisteresOptionalTypesAsForwardedTypes)
     ]
-  }
-  #endif
+  }()
 
   func testThatDefinitionKeyIsEqualBy_Type_Factory_Tag() {
     let equalKey1 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: tag1)
@@ -117,8 +115,8 @@ class DefinitionTests: XCTestCase {
   func testThatItRegisteresOptionalTypesAsForwardedTypes() {
     let def = Definition<Service, ()>(scope: .Unique) { ServiceImp() as Service }
     
-    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service?.self }))
-    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service!.self }))
+    XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service?.self }))
+    XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service!.self }))
   }
   
 }

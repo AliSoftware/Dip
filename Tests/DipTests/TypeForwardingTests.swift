@@ -34,8 +34,7 @@ class TypeForwardingTests: XCTestCase {
   
   let container = DependencyContainer()
 
-  #if os(Linux)
-  static var allTests: [(String, TypeForwardingTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
       ("testThatItReusesInstanceResolvedByTypeForwarding", testThatItReusesInstanceResolvedByTypeForwarding),
@@ -50,21 +49,17 @@ class TypeForwardingTests: XCTestCase {
       ("testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType),
       ("testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag", testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag)
     ]
-  }
+  }()
   
-  func setUp() {
-    container.reset()
-  }
-  #else
   override func setUp() {
     container.reset()
   }
-  #endif
-
+  
   func testThatItResolvesInstanceByTypeForwarding() {
     //given
     container.register { ServiceImp1() as Service }
-      .implements(ForwardedType.self, NSObject.self)
+      .implements(ForwardedType.self)
+      .implements(NSObject.self)
     
     //when
     let anotherService = try! container.resolve() as ForwardedType
@@ -81,7 +76,7 @@ class TypeForwardingTests: XCTestCase {
   
   func testThatItReusesInstanceResolvedByTypeForwarding() {
     //given
-    container.register { ServiceImp1() as Service }
+    container.register() { ServiceImp1() as Service }
       .resolvingProperties { container, resolved in
         //when
         //resolving forwarded type
@@ -128,7 +123,7 @@ class TypeForwardingTests: XCTestCase {
   func testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag() {
     var resolveDependenciesCalled = false
     //given
-    container.register { ServiceImp1() as Service }
+    container.register() { ServiceImp1() as Service }
       .resolvingProperties { container, service in
         guard resolveDependenciesCalled == false else { return }
         resolveDependenciesCalled = true
@@ -230,7 +225,8 @@ class TypeForwardingTests: XCTestCase {
   
   func testThatItCanResolveOptional() {
     container.register { ServiceImp1() as Service }
-      .implements(ForwardedType.self, NSObject.self)
+      .implements(ForwardedType.self)
+      .implements(NSObject.self)
     
     //when
     let service = try! container.resolve() as Service?
