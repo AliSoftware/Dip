@@ -32,7 +32,7 @@ extension DependencyContainer {
   /// Tries to resolve instance using auto-wiring
   func autowire<T>(_ key: DefinitionKey) throws -> T {
     guard key.typeOfArguments == Void.self else {
-      throw DipError.DefinitionNotFound(key: key)
+      throw DipError.definitionNotFound(key: key)
     }
     
     let autoWiringKey = try autoWiringDefinition(byKey: key).key
@@ -44,7 +44,7 @@ extension DependencyContainer {
       }
     }
     catch {
-      throw DipError.AutoWiringFailed(type: key.type, underlyingError: error)
+      throw DipError.autoWiringFailed(type: key.type, underlyingError: error)
     }
   }
 
@@ -55,7 +55,7 @@ extension DependencyContainer {
     definitions = definitions.sorted(by: { $0.definition.numberOfArguments > $1.definition.numberOfArguments })
 
     guard definitions.count > 0 && definitions[0].definition.numberOfArguments > 0 else {
-      throw DipError.DefinitionNotFound(key: key)
+      throw DipError.definitionNotFound(key: key)
     }
     
     let maximumNumberOfArguments = definitions.first?.definition.numberOfArguments
@@ -64,8 +64,8 @@ extension DependencyContainer {
 
     //when there are several definitions with the same number of arguments but different arguments types
     if definitions.count > 1 && definitions[0].key.typeOfArguments != definitions[1].key.typeOfArguments {
-      let error = DipError.AmbiguousDefinitions(type: key.type, definitions: definitions.map({ $0.definition }))
-      throw DipError.AutoWiringFailed(type: key.type, underlyingError: error)
+      let error = DipError.ambiguousDefinitions(type: key.type, definitions: definitions.map({ $0.definition }))
+      throw DipError.autoWiringFailed(type: key.type, underlyingError: error)
     } else {
       return definitions[0]
     }

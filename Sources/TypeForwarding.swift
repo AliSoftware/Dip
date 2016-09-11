@@ -119,7 +119,7 @@ extension DependencyContainer {
           return resolved
         }
         else {
-          throw DipError.InvalidType(resolved: resolved, key: key.tagged(self.context.tag))
+          throw DipError.invalidType(resolved: resolved, key: key.tagged(self.context.tag))
         }
       }
 
@@ -131,7 +131,7 @@ extension DependencyContainer {
             return resolved
           }
           else {
-            throw DipError.InvalidType(resolved: resolved, key: key.tagged(self.context.tag))
+            throw DipError.invalidType(resolved: resolved, key: key.tagged(self.context.tag))
           }
         }
       })

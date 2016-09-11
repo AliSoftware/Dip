@@ -851,7 +851,7 @@ public enum DipError: Error, CustomStringConvertible {
    
    - parameter key: definition key used to lookup matching definition
   */
-  case DefinitionNotFound(key: DefinitionKey)
+  case definitionNotFound(key: DefinitionKey)
 
   /**
    Thrown by `resolve(tag:)` if failed to auto-inject required property.
@@ -861,7 +861,7 @@ public enum DipError: Error, CustomStringConvertible {
       - type: The type of the property
       - underlyingError: The error that caused auto-injection to fail
   */
-  case AutoInjectionFailed(label: String?, type: Any.Type, underlyingError: Error)
+  case autoInjectionFailed(label: String?, type: Any.Type, underlyingError: Error)
   
   /**
    Thrown by `resolve(tag:)` if failed to auto-wire a type.
@@ -870,7 +870,7 @@ public enum DipError: Error, CustomStringConvertible {
       - type: The type that failed to be resolved by auto-wiring
       - underlyingError: The error that cause auto-wiring to fail
   */
-  case AutoWiringFailed(type: Any.Type, underlyingError: Error)
+  case autoWiringFailed(type: Any.Type, underlyingError: Error)
   
   /**
    Thrown when auto-wiring type if several definitions with the same number of runtime arguments
@@ -880,7 +880,7 @@ public enum DipError: Error, CustomStringConvertible {
       - type: The type that failed to be resolved by auto-wiring
       - definitions: Ambiguous definitions
   */
-  case AmbiguousDefinitions(type: Any.Type, definitions: [DefinitionType])
+  case ambiguousDefinitions(type: Any.Type, definitions: [DefinitionType])
   
   /**
    Thrown by `resolve(tag:)` if resolved instance does not implemenet resolved type (i.e. when type-forwarding).
@@ -889,20 +889,20 @@ public enum DipError: Error, CustomStringConvertible {
       - resolved: Resolved instance
       - key: Definition key used to resolve instance
    */
-  case InvalidType(resolved: Any?, key: DefinitionKey)
+  case invalidType(resolved: Any?, key: DefinitionKey)
   
   public var description: String {
     switch self {
-    case let .DefinitionNotFound(key):
+    case let .definitionNotFound(key):
       return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.type)."
-    case let .AutoInjectionFailed(label, type, error):
+    case let .autoInjectionFailed(label, type, error):
       return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
-    case let .AutoWiringFailed(type, error):
+    case let .autoWiringFailed(type, error):
       return "Failed to auto-wire type \"\(type)\". \(error)"
-    case let .AmbiguousDefinitions(type, definitions):
+    case let .ambiguousDefinitions(type, definitions):
       return "Ambiguous definitions for \(type):\n" +
       definitions.map({ "\($0)" }).joined(separator: ";\n")
-    case let .InvalidType(resolved, key):
+    case let .invalidType(resolved, key):
       return "Resolved instance \(resolved ?? "nil") does not implement expected type \(key.type)."
     }
   }

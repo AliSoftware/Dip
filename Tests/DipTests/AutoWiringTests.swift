@@ -138,8 +138,8 @@ class AutoWiringTests: XCTestCase {
     //when
     AssertThrows(expression: try container.resolve() as AutoWiredClient) { error -> Bool in
       switch error {
-      case let DipError.AutoWiringFailed(_, error):
-        if case DipError.AmbiguousDefinitions = error { return true }
+      case let DipError.autoWiringFailed(_, error):
+        if case DipError.ambiguousDefinitions = error { return true }
         else { return false }
       default: return false
       }
@@ -218,7 +218,7 @@ class AutoWiringTests: XCTestCase {
         resolved.service2 = try container.resolve() as ServiceImp2
         
         //simulate that something goes wrong on the way
-        throw DipError.DefinitionNotFound(key: DefinitionKey(type: ServiceImp1.self, typeOfArguments: Any.self))
+        throw DipError.definitionNotFound(key: DefinitionKey(type: ServiceImp1.self, typeOfArguments: Any.self))
     }
     
     container.register { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
