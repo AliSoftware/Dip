@@ -106,7 +106,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.Shared) { ServiceImp() as Service }
+   container.register { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service

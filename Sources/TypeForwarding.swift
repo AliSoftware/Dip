@@ -138,7 +138,7 @@ extension DependencyContainer {
       $0.forwardsTo = definition
       }.build()
     
-    register(forwardDefinition, forTag: tag)
+    register(forwardDefinition, tag: tag)
     return forwardDefinition
   }
   
