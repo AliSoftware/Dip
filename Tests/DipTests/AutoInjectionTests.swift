@@ -168,8 +168,8 @@ class AutoInjectionTests: XCTestCase {
 
   func testThatItResolvesAutoInjectedSingletons() {
     //given
-    container.register(.Singleton) { ServerImp() as Server }
-    container.register(.Singleton) { ClientImp() as Client }
+    container.register(.singleton) { ServerImp() as Server }
+    container.register(.singleton) { ClientImp() as Client }
     
     //when
     let sharedClient = try! container.resolve() as Client

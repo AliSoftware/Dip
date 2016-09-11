@@ -50,17 +50,6 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
   
 }
 
-//MARK: - Deprecated
-extension DefinitionKey {
-  
-  @available(*, deprecated:4.6.1, message:"Property protocolType was renamed to type")
-  public var protocolType: Any.Type { return type }
-  @available(*, deprecated: 4.6.1, message: "Property argumentsType was renamed to typeOfArguments")
-  public var argumentsType: Any.Type { return typeOfArguments }
-  @available(*, deprecated: 4.6.1, message: "Property associatedTag was renamed to tag")
-  public var associatedTag: DependencyContainer.Tag? { return tag }
-}
-
 /// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
 public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
@@ -91,10 +80,7 @@ public enum ComponentScope {
    
    ```
    */
-  case Unique
-  
-  @available(*, deprecated: 4.6.1, message: "Prototype scope is renamed to Unique")
-  case Prototype
+  case unique
   
   /**
    Instance resolved with the same definition will be reused until topmost `resolve(tag:)` method returns.
@@ -120,11 +106,8 @@ public enum ComponentScope {
    consumer1.service1 !== consumer2.service1 //true
    ```
    */
-  case Shared
+  case shared
   
-  @available(*, deprecated: 4.6.1, message: "ObjectGraph scope is renamed to Shared")
-  case ObjectGraph
-
   /**
    Resolved instance will be retained by the container and always reused.
    Do not mix this life cycle with _singleton pattern_.
@@ -139,7 +122,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.Singleton) { ServiceImp() as Service }
+   container.register(.singleton) { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service
@@ -153,21 +136,21 @@ public enum ComponentScope {
    consumer1.service1 === consumer2.service1 //true
    ```
    */
-  case Singleton
+  case singleton
   
   /**
    The same scope as a `Singleton`, but instance will be created when container is bootstrapped.
    
    - seealso: `bootstrap()`
   */
-  case EagerSingleton
+  case eagerSingleton
   
   /**
    The same scope as a `Singleton`, but container stores week reference to the resolved instance.
    While a strong reference to the resolved instance exists resolve will return the same instance.
    After the resolved instance is deallocated next resolve will produce a new instance.
   */
-  case WeakSingleton
+  case weakSingleton
 }
 
 ///Dummy protocol to store definitions for different types in collection
@@ -400,15 +383,4 @@ func order(_ definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Ta
   return
     definitions.filter({ $0.key.tag == tag }) +
       definitions.filter({ $0.key.tag != tag })
-}
-
-//MARK: - Deprecated methods
-
-extension Definition {
-  
-  @available(*, deprecated:4.6.1, message:"Use resolvingProperties(_:)")
-  public func resolveDependencies(block: @escaping (DependencyContainer, T) throws -> ()) -> Definition {
-    return resolvingProperties(block)
-  }
-
 }

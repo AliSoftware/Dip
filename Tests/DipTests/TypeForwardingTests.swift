@@ -277,14 +277,14 @@ class TypeForwardingTests: XCTestCase {
     
     //then
     AssertThrows(expression: try container.resolve() as ServiceImp2) { error in
-      guard case let DipError.InvalidType(_, key) = error else { return false }
+      guard case let DipError.invalidType(_, key) = error else { return false }
       
       let expectedKey = DefinitionKey(type: ServiceImp2.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
       return true
     }
     AssertThrows(expression: try container.resolve(ServiceImp2.self)) { error in
-      guard case let DipError.InvalidType(_, key) = error else { return false }
+      guard case let DipError.invalidType(_, key) = error else { return false }
       
       let expectedKey = DefinitionKey(type: ServiceImp2.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)

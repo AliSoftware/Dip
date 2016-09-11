@@ -275,7 +275,7 @@ private class _InjectedPropertyBox<T> {
       return try resolve(container, key: key, builder: { factory in try factory() }) as? T
     }
     catch {
-      let error = DipError.AutoInjectionFailed(label: container.context.injectedInProperty, type: container.context.resolvingType, underlyingError: error)
+      let error = DipError.autoInjectionFailed(label: container.context.injectedInProperty, type: container.context.resolvingType, underlyingError: error)
       
       if required {
         throw error

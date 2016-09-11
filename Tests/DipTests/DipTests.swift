@@ -255,7 +255,7 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
-      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      guard case let DipError.definitionNotFound(key) = error else { return false }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
@@ -266,7 +266,7 @@ class DipTests: XCTestCase {
 
     //and when
     AssertThrows(expression: try container.resolve(Service.self)) { error in
-      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      guard case let DipError.definitionNotFound(key) = error else { return false }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
@@ -282,7 +282,7 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve(tag: "other tag") as Service) { error in
-      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      guard case let DipError.definitionNotFound(key) = error else { return false }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: "other tag")
@@ -293,7 +293,7 @@ class DipTests: XCTestCase {
 
     //and when
     AssertThrows(expression: try container.resolve(Service.self, tag: "other tag")) { error in
-      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      guard case let DipError.definitionNotFound(key) = error else { return false }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: "other tag")
@@ -309,7 +309,7 @@ class DipTests: XCTestCase {
     
     //when
     AssertThrows(expression: try container.resolve(arguments: "some string") as Service) { error in
-      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      guard case let DipError.definitionNotFound(key) = error else { return false }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: String.self, tag: nil)
@@ -320,7 +320,7 @@ class DipTests: XCTestCase {
 
     //and when
     AssertThrows(expression: try container.resolve(Service.self, arguments: "some string")) { error in
-      guard case let DipError.DefinitionNotFound(key) = error else { return false }
+      guard case let DipError.definitionNotFound(key) = error else { return false }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: String.self, tag: nil)
@@ -333,13 +333,13 @@ class DipTests: XCTestCase {
   func testThatItThrowsErrorIfConstructorThrows() {
     //given
     let failedKey = DefinitionKey(type: Any.self, typeOfArguments: Any.self)
-    let expectedError = DipError.DefinitionNotFound(key: failedKey)
+    let expectedError = DipError.definitionNotFound(key: failedKey)
     container.register { () throws -> Service in throw expectedError }
     
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
       switch error {
-      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      case let DipError.definitionNotFound(key) where key == failedKey: return true
       default: return false
       }
     }
@@ -347,7 +347,7 @@ class DipTests: XCTestCase {
     //and when
     AssertThrows(expression: try container.resolve(Service.self)) { error in
       switch error {
-      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      case let DipError.definitionNotFound(key) where key == failedKey: return true
       default: return false
       }
     }
@@ -356,7 +356,7 @@ class DipTests: XCTestCase {
   func testThatItThrowsErrorIfFailsToResolveDependency() {
     //given
     let failedKey = DefinitionKey(type: Any.self, typeOfArguments: Any.self)
-    let expectedError = DipError.DefinitionNotFound(key: failedKey)
+    let expectedError = DipError.definitionNotFound(key: failedKey)
     container.register { ServiceImp1() as Service }
       .resolvingProperties { container, service in
         //simulate throwing error when resolving dependency
@@ -366,7 +366,7 @@ class DipTests: XCTestCase {
     //when
     AssertThrows(expression: try container.resolve() as Service) { error in
       switch error {
-      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      case let DipError.definitionNotFound(key) where key == failedKey: return true
       default: return false
       }
     }
@@ -374,7 +374,7 @@ class DipTests: XCTestCase {
     //and when
     AssertThrows(expression: try container.resolve(Service.self)) { error in
       switch error {
-      case let DipError.DefinitionNotFound(key) where key == failedKey: return true
+      case let DipError.definitionNotFound(key) where key == failedKey: return true
       default: return false
       }
     }
@@ -394,7 +394,7 @@ class DipTests: XCTestCase {
         return
     }
 
-    container.register(.Singleton, tag: "singleton") { ResolvableService() as Service }
+    container.register(.singleton, tag: "singleton") { ResolvableService() as Service }
       .resolvingProperties { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return
@@ -648,12 +648,12 @@ class DipTests: XCTestCase {
     //given
     let key = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
     container.register { () -> Service in
-      throw DipError.DefinitionNotFound(key: key)
+      throw DipError.definitionNotFound(key: key)
     }
     
     //then
     AssertThrows(expression: try container.validate()) { error in
-      if case let DipError.DefinitionNotFound(_key) = error, _key == key { return true }
+      if case let DipError.definitionNotFound(_key) = error, _key == key { return true }
       else { return false }
     }
   }

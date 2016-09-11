@@ -23,7 +23,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
     
     func testFetchStarshipIDs() {
         let mock = NetworkMock(json: ["results": [fakeShip1, fakeShip2]])
-        wsDependencies.register(.Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
         provider.fetchIDs { shipIDs in
@@ -38,7 +38,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
     func testFetchOneStarship() {
         
         let mock = NetworkMock(json: fakeShip1)
-        wsDependencies.register(.Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
         provider.fetch(id: 1) { starship in
@@ -57,7 +57,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
     func testFetchInvalidStarship() {
         let json = ["error":"whoops"]
         let mock = NetworkMock(json: json)
-        wsDependencies.register(.Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
         provider.fetch(id: 12) { starship in

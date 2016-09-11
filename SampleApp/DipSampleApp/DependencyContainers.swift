@@ -26,7 +26,7 @@ enum DependencyTags: Int, DependencyTagConvertible {
 func configure(container dip: DependencyContainer) {
     
     // Register the NetworkLayer, same for everyone here (but we have the ability to register a different one for a specific WebService if we wanted to)
-    dip.register(.Singleton) { URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer }
+    dip.register(.singleton) { URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer }
 
     if FAKE_PERSONS {
         

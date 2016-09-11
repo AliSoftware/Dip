@@ -84,7 +84,7 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = Definition<Service, ()>(scope: .Unique) { ServiceImp() as Service }
+    let def = Definition<Service, ()>(scope: .unique) { ServiceImp() as Service }
       .resolvingProperties { container, service in
         blockCalled = true
     }
@@ -100,7 +100,7 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = Definition<Service, ()>(scope: .Unique) { ServiceImp() as Service }
+    let def = Definition<Service, ()>(scope: .unique) { ServiceImp() as Service }
       .resolvingProperties { container, service in
         blockCalled = true
     }
@@ -113,7 +113,7 @@ class DefinitionTests: XCTestCase {
   }
   
   func testThatItRegisteresOptionalTypesAsForwardedTypes() {
-    let def = Definition<Service, ()>(scope: .Unique) { ServiceImp() as Service }
+    let def = Definition<Service, ()>(scope: .unique) { ServiceImp() as Service }
     
     XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service?.self }))
     XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service!.self }))
