@@ -23,7 +23,7 @@ class EventsListWireframe {
 
 
 let rootContainer = DependencyContainer()
-rootContainer.register(.Singleton) { CoreDataStore() as DataStore }
+rootContainer.register(.singleton) { CoreDataStore() as DataStore }
 
 let eventsListModule = DependencyContainer()
 eventsListModule.register { EventsListWireframe(dataStore: $0) }

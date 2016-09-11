@@ -143,7 +143,7 @@ class ThreadSafetyTests: XCTestCase {
   }
   
   func testSingletonThreadSafety() {
-    container.register(.Singleton) { ServerImp() as Server }
+    container.register(.singleton) { ServerImp() as Server }
     
     for _ in 0..<100 {
       #if os(Linux)

@@ -394,7 +394,7 @@ class DipTests: XCTestCase {
         return
     }
 
-    container.register(.Singleton, tag: "singleton") { ResolvableService() as Service }
+    container.register(.singleton, tag: "singleton") { ResolvableService() as Service }
       .resolvingProperties { _, service in
         XCTAssertFalse((service as! ResolvableService).didResolveDependenciesCalled, "didResolveDependencies should not be called yet")
         return

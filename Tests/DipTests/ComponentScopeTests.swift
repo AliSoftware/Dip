@@ -73,12 +73,12 @@ class ComponentScopeTests: XCTestCase {
   
   func testThatSharedIsDefaultScope() {
     let def = container.register { ServiceImp1() as Service }
-    XCTAssertEqual(def.scope, ComponentScope.Shared)
+    XCTAssertEqual(def.scope, ComponentScope.shared)
   }
   
   func testThatScopeCanBeChanged() {
-    let def = container.register(.Singleton) { ServiceImp1() as Service }
-    XCTAssertEqual(def.scope, ComponentScope.Singleton)
+    let def = container.register(.singleton) { ServiceImp1() as Service }
+    XCTAssertEqual(def.scope, ComponentScope.singleton)
   }
   
   func testThatItResolvesTypeAsNewInstanceForUniqueScope() {
@@ -106,9 +106,9 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 === service2, line: line)
     }
     
-    test(.Singleton)
-    test(.WeakSingleton)
-    test(.EagerSingleton)
+    test(.singleton)
+    test(.weakSingleton)
+    test(.eagerSingleton)
   }
   
   func testThatSingletonIsNotReusedAcrossContainers() {
@@ -126,9 +126,9 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 !== service2, "Singleton instances should not be reused across containers", line: line)
     }
     
-    test(.Singleton)
-    test(.WeakSingleton)
-    test(.EagerSingleton)
+    test(.singleton)
+    test(.weakSingleton)
+    test(.eagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsRemoved() {
@@ -146,9 +146,9 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is removed from the container", line: line)
     }
     
-    test(.Singleton)
-    test(.WeakSingleton)
-    test(.EagerSingleton)
+    test(.singleton)
+    test(.weakSingleton)
+    test(.eagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenDefinitionIsOverridden() {
@@ -165,9 +165,9 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when definition is overridden", line: line)
     }
     
-    test(.Singleton)
-    test(.WeakSingleton)
-    test(.EagerSingleton)
+    test(.singleton)
+    test(.weakSingleton)
+    test(.eagerSingleton)
   }
   
   func testThatSingletonIsReleasedWhenContainerIsReset() {
@@ -185,9 +185,9 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 !== service2, "Singleton instances should be released when container is reset", line: line)
     }
     
-    test(.Singleton)
-    test(.WeakSingleton)
-    test(.EagerSingleton)
+    test(.singleton)
+    test(.weakSingleton)
+    test(.eagerSingleton)
   }
   
   func testThatItReusesInstanceInSharedScopeDuringResolve() {
@@ -273,16 +273,16 @@ class ComponentScopeTests: XCTestCase {
     //given
     var eagerSingletonResolved = false
     
-    container.register(.EagerSingleton, tag: "eager") { ServiceImp1() as Service }
+    container.register(.eagerSingleton, tag: "eager") { ServiceImp1() as Service }
       .resolvingProperties { container, service in eagerSingletonResolved = true }
     
-    container.register(.Singleton, tag: "singleton") { ServiceImp1() as Service }
+    container.register(.singleton, tag: "singleton") { ServiceImp1() as Service }
       .resolvingProperties { container, service in XCTFail() }
 
-    container.register(.Unique, tag: "prototype") { ServiceImp1() as Service }
+    container.register(.unique, tag: "prototype") { ServiceImp1() as Service }
       .resolvingProperties { container, service in XCTFail() }
 
-    container.register(.Shared, tag: "graph") { ServiceImp1() as Service }
+    container.register(.shared, tag: "graph") { ServiceImp1() as Service }
       .resolvingProperties { container, service in XCTFail() }
     
     //when
@@ -321,7 +321,7 @@ class ComponentScopeTests: XCTestCase {
   
   func testThatItHoldsWeakReferenceToWeakSingletonInstance() {
     //given
-    container.register(.WeakSingleton) { ServiceImp1() as Service }
+    container.register(.weakSingleton) { ServiceImp1() as Service }
     var strongSingleton: Service? = try! container.resolve() as Service
     weak var weakSingleton = try! container.resolve() as Service
     
@@ -353,9 +353,9 @@ class ComponentScopeTests: XCTestCase {
       XCTAssertTrue(service1 === service2, "\(scope) should be reused when first resolved from another container", line: line)
     }
     
-    test(.Singleton)
-    test(.WeakSingleton)
-    test(.EagerSingleton)
+    test(.singleton)
+    test(.weakSingleton)
+    test(.eagerSingleton)
   }
   
 }

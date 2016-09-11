@@ -91,7 +91,7 @@ public enum ComponentScope {
    
    ```
    */
-  case Unique
+  case unique
   
   @available(*, deprecated: 4.6.1, message: "Prototype scope is renamed to Unique")
   case Prototype
@@ -120,7 +120,7 @@ public enum ComponentScope {
    consumer1.service1 !== consumer2.service1 //true
    ```
    */
-  case Shared
+  case shared
   
   @available(*, deprecated: 4.6.1, message: "ObjectGraph scope is renamed to Shared")
   case ObjectGraph
@@ -139,7 +139,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.Singleton) { ServiceImp() as Service }
+   container.register(.singleton) { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service
@@ -153,21 +153,21 @@ public enum ComponentScope {
    consumer1.service1 === consumer2.service1 //true
    ```
    */
-  case Singleton
+  case singleton
   
   /**
    The same scope as a `Singleton`, but instance will be created when container is bootstrapped.
    
    - seealso: `bootstrap()`
   */
-  case EagerSingleton
+  case eagerSingleton
   
   /**
    The same scope as a `Singleton`, but container stores week reference to the resolved instance.
    While a strong reference to the resolved instance exists resolve will return the same instance.
    After the resolved instance is deallocated next resolve will produce a new instance.
   */
-  case WeakSingleton
+  case weakSingleton
 }
 
 ///Dummy protocol to store definitions for different types in collection

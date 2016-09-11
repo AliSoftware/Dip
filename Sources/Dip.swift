@@ -270,7 +270,7 @@ extension DependencyContainer {
    container.register(tag: "service") { ServiceImp() as Service }
    
    //Register unique ServiceImp as Service
-   container.register(.Unique) { ServiceImp() as Service }
+   container.register(.unique) { ServiceImp() as Service }
    
    //Register ClientImp as Client and resolve it's service dependency
    container.register { try ClientImp(service: container.resolve() as Service) as Client }
@@ -286,7 +286,7 @@ extension DependencyContainer {
    container.register(Client.self, factory: ClientImp.init(service:))
    ```
    */
-  @discardableResult public func register<T>(_ scope: ComponentScope = .Shared, type: T.Type = T.self, tag: DependencyTagConvertible? = nil, factory: @escaping () throws -> T) -> Definition<T, ()> {
+  @discardableResult public func register<T>(_ scope: ComponentScope = .shared, type: T.Type = T.self, tag: DependencyTagConvertible? = nil, factory: @escaping () throws -> T) -> Definition<T, ()> {
     let definition = DefinitionBuilder<T, ()> {
       $0.scope = scope
       $0.factory = factory
@@ -312,7 +312,7 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, A, B, C, ...>(_ scope: ComponentScope = .Shared, type: T.Type = T.self, tag: Tag? = nil, factory: (A, B, C, ...) throws -> T) -> Definition<T, (A, B, C, ...)> {
+   public func register<T, A, B, C, ...>(_ scope: ComponentScope = .shared, type: T.Type = T.self, tag: Tag? = nil, factory: (A, B, C, ...) throws -> T) -> Definition<T, (A, B, C, ...)> {
      return register(scope: scope, type: type, tag: tag, factory: factory, numberOfArguments: ...) { container, tag in
         try factory(container.resolve(tag: tag), ...)
       }
@@ -355,7 +355,7 @@ extension DependencyContainer {
       resolvedInstances.singletons[key] = nil
       resolvedInstances.weakSingletons[key] = nil
       
-      if case .EagerSingleton = definition.scope {
+      if case .eagerSingleton = definition.scope {
         bootstrapQueue.append({ let _ = try self.resolve(tag: tag) as T })
       }
     }
@@ -722,18 +722,18 @@ private class ResolvedInstances {
   subscript(key key: DefinitionKey, inScope scope: ComponentScope) -> Any? {
     get {
       switch scope {
-      case .Singleton, .EagerSingleton: return singletons[key]
-      case .WeakSingleton: return (weakSingletons[key] as? WeakBoxType)?.unboxed ?? weakSingletons[key]
-      case .Shared, .ObjectGraph: return resolvedInstances[key]
-      case .Unique, .Prototype: return nil
+      case .singleton, .eagerSingleton: return singletons[key]
+      case .weakSingleton: return (weakSingletons[key] as? WeakBoxType)?.unboxed ?? weakSingletons[key]
+      case .shared, .ObjectGraph: return resolvedInstances[key]
+      case .unique, .Prototype: return nil
       }
     }
     set {
       switch scope {
-      case .Singleton, .EagerSingleton: singletons[key] = newValue
-      case .WeakSingleton: weakSingletons[key] = newValue
-      case .Shared, .ObjectGraph: resolvedInstances[key] = newValue
-      case .Unique, .Prototype: break
+      case .singleton, .eagerSingleton: singletons[key] = newValue
+      case .weakSingleton: weakSingletons[key] = newValue
+      case .shared, .ObjectGraph: resolvedInstances[key] = newValue
+      case .unique, .Prototype: break
       }
     }
   }
