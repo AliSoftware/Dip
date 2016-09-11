@@ -50,17 +50,6 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
   
 }
 
-//MARK: - Deprecated
-extension DefinitionKey {
-  
-  @available(*, deprecated:4.6.1, message:"Property protocolType was renamed to type")
-  public var protocolType: Any.Type { return type }
-  @available(*, deprecated: 4.6.1, message: "Property argumentsType was renamed to typeOfArguments")
-  public var argumentsType: Any.Type { return typeOfArguments }
-  @available(*, deprecated: 4.6.1, message: "Property associatedTag was renamed to tag")
-  public var associatedTag: DependencyContainer.Tag? { return tag }
-}
-
 /// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
 public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
   return
@@ -93,9 +82,6 @@ public enum ComponentScope {
    */
   case unique
   
-  @available(*, deprecated: 4.6.1, message: "Prototype scope is renamed to Unique")
-  case Prototype
-  
   /**
    Instance resolved with the same definition will be reused until topmost `resolve(tag:)` method returns.
    When you resolve the same object graph again the container will create new instances.
@@ -122,9 +108,6 @@ public enum ComponentScope {
    */
   case shared
   
-  @available(*, deprecated: 4.6.1, message: "ObjectGraph scope is renamed to Shared")
-  case ObjectGraph
-
   /**
    Resolved instance will be retained by the container and always reused.
    Do not mix this life cycle with _singleton pattern_.
@@ -400,15 +383,4 @@ func order(_ definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Ta
   return
     definitions.filter({ $0.key.tag == tag }) +
       definitions.filter({ $0.key.tag != tag })
-}
-
-//MARK: - Deprecated methods
-
-extension Definition {
-  
-  @available(*, deprecated:4.6.1, message:"Use resolvingProperties(_:)")
-  public func resolveDependencies(block: @escaping (DependencyContainer, T) throws -> ()) -> Definition {
-    return resolvingProperties(block)
-  }
-
 }
