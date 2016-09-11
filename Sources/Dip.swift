@@ -290,8 +290,8 @@ extension DependencyContainer {
     let definition = DefinitionBuilder<T, ()> {
       $0.scope = scope
       $0.factory = factory
-      }.build()
-    register(definition, forTag: tag)
+    }.build()
+    register(definition, tag: tag)
     return definition
   }
 
@@ -312,8 +312,8 @@ extension DependencyContainer {
    than _Dip_ supports (currently it's up to six) like in the following example:
    
    ```swift
-   public func register<T, A, B, C, ...>(scope: ComponentScope = .Shared, tag: Tag? = nil, factory: (A, B, C, ...) throws -> T) -> Definition<T, (A, B, C, ...)> {
-     return register(scope, tag: tag, factory: factory, numberOfArguments: ...) { container, tag in
+   public func register<T, A, B, C, ...>(_ scope: ComponentScope = .Shared, type: T.Type = T.self, tag: Tag? = nil, factory: (A, B, C, ...) throws -> T) -> Definition<T, (A, B, C, ...)> {
+     return register(scope: scope, type: type, tag: tag, factory: factory, numberOfArguments: ...) { container, tag in
         try factory(container.resolve(tag: tag), ...)
       }
    }
@@ -321,14 +321,14 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
-  public func registerFactory<T, U>(tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: @escaping (U) throws -> T, numberOfArguments: Int, autoWiringFactory: @escaping (DependencyContainer, Tag?) throws -> T) -> Definition<T, U> {
+  public func register<T, U>(scope: ComponentScope, type: T.Type, tag: DependencyTagConvertible?, factory: @escaping (U) throws -> T, numberOfArguments: Int, autoWiringFactory: @escaping (DependencyContainer, Tag?) throws -> T) -> Definition<T, U> {
     let definition = DefinitionBuilder<T, U> {
       $0.scope = scope
       $0.factory = factory
       $0.numberOfArguments = numberOfArguments
       $0.autoWiringFactory = autoWiringFactory
     }.build()
-    register(definition, forTag: tag)
+    register(definition, tag: tag)
     return definition
   }
 
@@ -341,7 +341,7 @@ extension DependencyContainer {
       - definition: The definition to register in the container.
    
    */
-  public func register<T, U>(_ definition: Definition<T, U>, forTag tag: DependencyTagConvertible? = nil) {
+  public func register<T, U>(_ definition: Definition<T, U>, tag: DependencyTagConvertible? = nil) {
     precondition(!bootstrapped, "You can not modify container's definitions after it was bootstrapped.")
     
     threadSafe {
@@ -386,7 +386,7 @@ extension DependencyContainer {
    let service: Service = try! container.resolve()
    ```
    
-   - seealso: `register(tag:_:factory:)`
+   - seealso: `register(_:type:tag:factory:)`
    */
   public func resolve<T>(tag: DependencyTagConvertible? = nil) throws -> T {
     return try resolve(tag: tag) { factory in try factory() }
@@ -413,7 +413,7 @@ extension DependencyContainer {
    let service = try! container.resolve(Service.self, tag: "service") as! Service
    ```
 
-   - seealso: `resolve(tag:)`, `register(tag:_:factory:)`
+   - seealso: `resolve(tag:)`, `register(_:type:tag:factory:)`
    */
   public func resolve(_ type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
     return try resolve(type, tag: tag) { factory in try factory() }
@@ -580,15 +580,15 @@ extension DependencyContainer {
   /// Tries to resolve key using collaborating containers
   fileprivate func resolveCollaborating<T>(_ key: DefinitionKey, builder: (_Definition) throws -> T) -> T? {
     for collaborator in _collaborators {
-      do {
-        //if container is already in a context resolving this type 
-        //it means that it has been already called to resolve this type,
-        //so there is probably a cercular reference between containers.
-        //To break it skip this container
-        if let context = collaborator.context,
-          context.resolvingType == key.type &&
+      //if container is already in a context resolving this type
+      //it means that it has been already called to resolve this type,
+      //so there is probably a cercular reference between containers.
+      //To break it skip this container
+      if let context = collaborator.context,
+        context.resolvingType == key.type &&
           context.tag == key.tag { continue }
-
+      
+      do {
         //Pass current container's instances pool to collect instances resolved by collaborator
         let resolvedInstances = collaborator.resolvedInstances
         collaborator.resolvedInstances = self.resolvedInstances
@@ -606,9 +606,7 @@ extension DependencyContainer {
 
         return resolved
       }
-      catch {
-        continue
-      }
+      catch { }
     }
     return nil
   }
@@ -626,7 +624,7 @@ extension DependencyContainer {
       - tag: The tag used to register definition.
       - definition: The definition to remove
    */
-  public func remove<T, U>(_ definition: Definition<T, U>, forTag tag: DependencyTagConvertible? = nil) {
+  public func remove<T, U>(_ definition: Definition<T, U>, tag: DependencyTagConvertible? = nil) {
     let key = DefinitionKey(type: T.self, typeOfArguments: U.self, tag: tag?.dependencyTag)
     remove(definitionForKey: key)
   }
@@ -914,13 +912,13 @@ public enum DipError: Error, CustomStringConvertible {
 //MARK: - Deprecated methods
 
 extension DependencyContainer {
-  @available(*, deprecated:4.3.0, message:"Use registerFactory(tag:scope:factory:numberOfArguments:autoWiringFactory:) instead.")
+  @available(*, deprecated:4.3.0, message:"Use register(_:type:tag:factory:numberOfArguments:autoWiringFactory:) instead.")
   public func registerFactory<T, U>(tag: DependencyTagConvertible? = nil, scope: ComponentScope, factory: @escaping (U) throws -> T) -> Definition<T, U> {
     let definition = DefinitionBuilder<T, U> {
       $0.scope = scope
       $0.factory = factory
       }.build()
-    register(definition, forTag: tag)
+    register(definition, tag: tag)
     return definition
   }
 }

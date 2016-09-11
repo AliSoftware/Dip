@@ -14,9 +14,23 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0903B3771C1615EC002241C1"
+               BlueprintIdentifier = "0903B3571C161543002241C1"
                BuildableName = "Dip.framework"
-               BlueprintName = "Dip-iOS"
+               BlueprintName = "Dip"
+               ReferencedContainer = "container:Dip.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0903B3601C161543002241C1"
+               BuildableName = "DipTests.xctest"
+               BlueprintName = "DipTests"
                ReferencedContainer = "container:Dip.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -33,9 +47,9 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "0903B3801C1615EC002241C1"
-               BuildableName = "Dip-iOSTests.xctest"
-               BlueprintName = "Dip-iOSTests"
+               BlueprintIdentifier = "0903B3601C161543002241C1"
+               BuildableName = "DipTests.xctest"
+               BlueprintName = "DipTests"
                ReferencedContainer = "container:Dip.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -43,9 +57,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0903B3771C1615EC002241C1"
+            BlueprintIdentifier = "0903B3571C161543002241C1"
             BuildableName = "Dip.framework"
-            BlueprintName = "Dip-iOS"
+            BlueprintName = "Dip"
             ReferencedContainer = "container:Dip.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -65,9 +79,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0903B3771C1615EC002241C1"
+            BlueprintIdentifier = "0903B3571C161543002241C1"
             BuildableName = "Dip.framework"
-            BlueprintName = "Dip-iOS"
+            BlueprintName = "Dip"
             ReferencedContainer = "container:Dip.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -83,9 +97,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "0903B3771C1615EC002241C1"
+            BlueprintIdentifier = "0903B3571C161543002241C1"
             BuildableName = "Dip.framework"
-            BlueprintName = "Dip-iOS"
+            BlueprintName = "Dip"
             ReferencedContainer = "container:Dip.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

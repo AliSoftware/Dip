@@ -53,7 +53,7 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
 //MARK: - Deprecated
 extension DefinitionKey {
   
-  @available(*, deprecated: 4.6.1, message: "Property protocolType was renamed to type")
+  @available(*, deprecated:4.6.1, message:"Property protocolType was renamed to type")
   public var protocolType: Any.Type { return type }
   @available(*, deprecated: 4.6.1, message: "Property argumentsType was renamed to typeOfArguments")
   public var argumentsType: Any.Type { return typeOfArguments }
@@ -106,7 +106,7 @@ public enum ComponentScope {
    **Example**:
    
    ```
-   container.register(.Shared) { ServiceImp() as Service }
+   container.register { ServiceImp() as Service }
    container.register {
      ServiceConsumerImp(
        service1: try container.resolve() as Service

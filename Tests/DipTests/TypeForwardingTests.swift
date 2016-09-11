@@ -76,7 +76,7 @@ class TypeForwardingTests: XCTestCase {
   
   func testThatItReusesInstanceResolvedByTypeForwarding() {
     //given
-    container.register(.Shared) { ServiceImp1() as Service }
+    container.register() { ServiceImp1() as Service }
       .resolvingProperties { container, resolved in
         //when
         //resolving forwarded type
@@ -123,7 +123,7 @@ class TypeForwardingTests: XCTestCase {
   func testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag() {
     var resolveDependenciesCalled = false
     //given
-    container.register(.Shared) { ServiceImp1() as Service }
+    container.register() { ServiceImp1() as Service }
       .resolvingProperties { container, service in
         guard resolveDependenciesCalled == false else { return }
         resolveDependenciesCalled = true

@@ -8,7 +8,7 @@ let container = DependencyContainer()
 
 ### Auto-Injection
 
-On the previous page you saw how auto-wiring helps us get rid of boilerplate code when registering and resolving components with consturctor injection. Auto-injection solves the same problem for property injection.
+On the previous page you saw how auto-wiring helps us to get rid of boilerplate code when registering and resolving components with consturctor injection. Auto-injection solves the same problem for property injection.
 
 Let's say you have following related components:
 */
@@ -47,10 +47,10 @@ With auto-injection your code transforms to this:
 */
 
 class AutoInjectedServiceImp: Service {
-    private var injectedLogger = Injected<Logger>()
+    private let injectedLogger = Injected<Logger>()
     var logger: Logger? { return injectedLogger.value }
     
-    private var injectedTracker = Injected<Tracker>()
+    private let injectedTracker = Injected<Tracker>()
     var tracker: Tracker? { return injectedTracker.value }
 }
 
@@ -128,11 +128,11 @@ class ServerClientImp: NSObject, ServerClient {
 The standard way to register such components in `DependencyContainer` will lead to such code:
 */
 
-container.register(.Shared) {
+container.register {
     ServerClientImp(server: try container.resolve()) as ServerClient
 }
 
-container.register(.Shared) { ServerImp() as Server }
+container.register { ServerImp() as Server }
     .resolvingProperties { (container: DependencyContainer, server: Server) in
         (server as! ServerImp).client = try container.resolve() as ServerClient
 }
@@ -157,8 +157,8 @@ class InjectedClientImp: NSObject, ServerClient {
     var server: Server? { get { return injectedServer.value } }
 }
 
-container.register(.Shared) { InjectedServerImp() as Server }
-container.register(.Shared) { InjectedClientImp() as ServerClient }
+container.register { InjectedServerImp() as Server }
+container.register { InjectedClientImp() as ServerClient }
 
 let injectedClient = try! container.resolve() as ServerClient
 injectedClient.server

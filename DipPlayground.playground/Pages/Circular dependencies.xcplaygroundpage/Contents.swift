@@ -44,11 +44,11 @@ It's very important that _at least one_ of them uses property injection, because
 Now you can register those classes in container:
 */
 
-container.register(.Shared) {
+container.register {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(.Shared) { NetworkClientImp() as NetworkClient }
+container.register { NetworkClientImp() as NetworkClient }
     .resolvingProperties { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }
@@ -96,7 +96,7 @@ container.register(.Unique) {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(.Shared) { NetworkClientImp() as NetworkClient }
+container.register { NetworkClientImp() as NetworkClient }
     .resolvingProperties { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }
