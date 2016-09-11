@@ -8,7 +8,7 @@ let container = DependencyContainer()
 
 ### Auto-Injection
 
-On the previous page you saw how auto-wiring helps us get rid of boilerplate code when registering and resolving components with consturctor injection. Auto-injection solves the same problem for property injection.
+On the previous page you saw how auto-wiring helps us to get rid of boilerplate code when registering and resolving components with consturctor injection. Auto-injection solves the same problem for property injection.
 
 Let's say you have following related components:
 */
@@ -47,10 +47,10 @@ With auto-injection your code transforms to this:
 */
 
 class AutoInjectedServiceImp: Service {
-    private var injectedLogger = Injected<Logger>()
+    private let injectedLogger = Injected<Logger>()
     var logger: Logger? { return injectedLogger.value }
     
-    private var injectedTracker = Injected<Tracker>()
+    private let injectedTracker = Injected<Tracker>()
     var tracker: Tracker? { return injectedTracker.value }
 }
 
@@ -83,9 +83,7 @@ container.register { ServerWithRequiredClient() }
 do {
     let serverWithClient = try container.resolve() as ServerWithRequiredClient
 }
-catch {
-    print(error)
-}
+catch {}
 
 /*:
 You can make auto-injected property optional by passing `false` to `required` parameter of `Injected<T>`/`InjectedWeak<T>` constructor. For such properties container will ignore any errors when it resolves this property (or any of its dependencies).
@@ -115,7 +113,10 @@ class ServerImp: Server {
     weak var client: ServerClient?
 }
 
-class ServerClientImp: ServerClient {
+//There is currently a bug in Swift that causes runtime crash
+//when trying to auto-inject not-NSObject weak property.
+//https://bugs.swift.org/browse/SR-2144
+class ServerClientImp: NSObject, ServerClient {
     var server: Server?
     
     init(server: Server) {
@@ -127,11 +128,11 @@ class ServerClientImp: ServerClient {
 The standard way to register such components in `DependencyContainer` will lead to such code:
 */
 
-container.register(.Shared) {
+container.register {
     ServerClientImp(server: try container.resolve()) as ServerClient
 }
 
-container.register(.Shared) { ServerImp() as Server }
+container.register { ServerImp() as Server }
     .resolvingProperties { (container: DependencyContainer, server: Server) in
         (server as! ServerImp).client = try container.resolve() as ServerClient
 }
@@ -148,13 +149,16 @@ class InjectedServerImp: Server {
     var client: ServerClient? { return injectedClient.value }
 }
 
-class InjectedClientImp: ServerClient {
+//There is currently a bug in Swift that causes runtime crash 
+//when trying to auto-inject not-NSObject weak property.
+//https://bugs.swift.org/browse/SR-2144
+class InjectedClientImp: NSObject, ServerClient {
     private var injectedServer = Injected<Server>()
     var server: Server? { get { return injectedServer.value } }
 }
 
-container.register(.Shared) { InjectedServerImp() as Server }
-container.register(.Shared) { InjectedClientImp() as ServerClient }
+container.register { InjectedServerImp() as Server }
+container.register { InjectedClientImp() as ServerClient }
 
 let injectedClient = try! container.resolve() as ServerClient
 injectedClient.server

@@ -20,13 +20,13 @@ The `Unique` scope is the default. To set a scope you pass it as an argument to 
 */
 
 container.register { ServiceImp1() as Service }
-container.register(tag: "prototype", .Unique) { ServiceImp1() as Service }
-container.register(tag: "object graph", .Shared) { ServiceImp2() as Service }
-container.register(tag: "shared instance", .Singleton) { ServiceImp3() as Service }
+container.register(.unique, tag: "prototype") { ServiceImp1() as Service }
+container.register(.shared, tag: "object graph") { ServiceImp2() as Service }
+container.register(.singleton, tag: "shared instance") { ServiceImp3() as Service }
 
 let service = try! container.resolve() as Service
 let anotherService = try! container.resolve() as Service
-// They are different instances as the scope defaults to .Unique
+// They are different instances as the scope defaults to .unique
 service as! ServiceImp1 === anotherService as! ServiceImp1 // false
 
 let prototypeService = try! container.resolve(tag: "prototype") as Service
@@ -53,7 +53,7 @@ sharedService as! ServiceImp3 === sameSharedService as! ServiceImp3
  */
 
 var resolvedEagerSingleton = false
-let definition = container.register(tag: "eager shared instance", .EagerSingleton) { ServiceImp1() as Service }
+let definition = container.register(.eagerSingleton, tag: "eager shared instance") { ServiceImp1() as Service }
     .resolvingProperties { _ in resolvedEagerSingleton = true }
 
 try! container.bootstrap()

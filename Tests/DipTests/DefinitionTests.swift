@@ -36,8 +36,7 @@ class DefinitionTests: XCTestCase {
   let tag1 = DependencyContainer.Tag.String("tag1")
   let tag2 = DependencyContainer.Tag.String("tag2")
   
-  #if os(Linux)
-  static var allTests: [(String, DefinitionTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatDefinitionKeyIsEqualBy_Type_Factory_Tag", testThatDefinitionKeyIsEqualBy_Type_Factory_Tag),
       ("testThatDefinitionKeysWithDifferentTypesAreNotEqual", testThatDefinitionKeysWithDifferentTypesAreNotEqual),
@@ -47,8 +46,7 @@ class DefinitionTests: XCTestCase {
       ("testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance", testThatResolveDependenciesBlockIsNotCalledWhenPassedWrongInstance),
       ("testThatItRegisteresOptionalTypesAsForwardedTypes", testThatItRegisteresOptionalTypesAsForwardedTypes)
     ]
-  }
-  #endif
+  }()
 
   func testThatDefinitionKeyIsEqualBy_Type_Factory_Tag() {
     let equalKey1 = DefinitionKey(type: Service.self, typeOfArguments: F1.self, tag: tag1)
@@ -86,13 +84,13 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
+    let def = Definition<Service, ()>(scope: .unique) { ServiceImp() as Service }
       .resolvingProperties { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveProperties(instance: ServiceImp(), container: DependencyContainer())
+    try! def.resolveProperties(of: ServiceImp(), container: DependencyContainer())
     
     //then
     XCTAssertTrue(blockCalled)
@@ -102,23 +100,23 @@ class DefinitionTests: XCTestCase {
     var blockCalled = false
     
     //given
-    let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
+    let def = Definition<Service, ()>(scope: .unique) { ServiceImp() as Service }
       .resolvingProperties { container, service in
         blockCalled = true
     }
     
     //when
-    try! def.resolveProperties(instance: String(), container: DependencyContainer())
+    try! def.resolveProperties(of: String(), container: DependencyContainer())
     
     //then
     XCTAssertFalse(blockCalled)
   }
   
   func testThatItRegisteresOptionalTypesAsForwardedTypes() {
-    let def = DefinitionOf<Service, () -> Service>(scope: .Unique) { ServiceImp() as Service }
+    let def = Definition<Service, ()>(scope: .unique) { ServiceImp() as Service }
     
-    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service?.self }))
-    XCTAssertTrue(def.implementingTypes.contains({ $0 == Service!.self }))
+    XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service?.self }))
+    XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service!.self }))
   }
   
 }

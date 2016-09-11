@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Swift Version](https://img.shields.io/badge/Linux-compatible-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
-[![Swift Version](https://img.shields.io/badge/Swift-2.2-F16D39.svg?style=flat)](https://developer.apple.com/swift)
+[![Swift Version](https://img.shields.io/badge/Swift-2.2-3.0-F16D39.svg?style=flat)](https://developer.apple.com/swift)
 
 ![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)  
 _Photo courtesy of [www.kevinandamanda.com](http://www.kevinandamanda.com/recipes/appetizer/homemade-soft-cinnamon-sugar-pretzel-bites-with-salted-caramel-dipping-sauce.html)_
@@ -24,7 +24,7 @@ It's aimed to be as simple as possible yet provide rich functionality usual for 
 
 ## Documentation & Usage Examples
 
-Dip is completely [documented](http://cocoadocs.org/docsets/Dip/4.6.1/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
+Dip is completely [documented](http://cocoadocs.org/docsets/Dip/5.0.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
 
@@ -43,11 +43,12 @@ File an issue if you have any question.
 
 ## Features
 
-- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Prototype_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
+- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Unique_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
 - **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
 - **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
 - **[Circular dependencies](../../wiki/circular-dependencies)**. Dip can resolve circular dependencies;
 - **[Auto-wiring](../../wiki/auto-wiring)** & **[Auto-injection](../../wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
+- **[Resolving optionals](../../wiki/resolving-optionals)**. Dip is able to resolve constructor or property dependencies defined as optionals.
 - **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types.
 - **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
 - **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.
@@ -138,7 +139,7 @@ class ViewController {
 
 ## Installation
 
-Since version 4.3.1 Dip is built with Swift 2.2. The latest version built with Swift 2.1 is 4.3.0.
+Since version 5.0.0 Dip is built with Swift 3.0. For Swift 2.2-2.3 compatible version use "swift2.3" branch.
 
 Dip is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
@@ -159,7 +160,7 @@ If you use [Swift Package Manager](https://swift.org/package-manager/) add Dip a
 let package = Package(
   name: "MyPackage",
   dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "4.6.1")
+    .Package(url: "https://github.com/AliSoftware/Dip.git", "5.0.0")
   ]
 )
 ```

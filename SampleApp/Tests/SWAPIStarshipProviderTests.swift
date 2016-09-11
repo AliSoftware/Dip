@@ -10,10 +10,10 @@ import XCTest
 import Dip
 
 class SWAPIStarshipProviderTests: XCTestCase {
-    let fakeShip1 = ["name": "Falcon", "model": "Fighter", "manufacturer": "Fake Industries", "crew": "7", "passengers": "15",
-        "pilots": ["stub://people/1/", "stub://people/9"], "url": "stub://starship/4"]
-    let fakeShip2 = ["name": "Voyager", "model": "Cargo", "manufacturer": "Fake Industries", "crew": "18", "passengers": "150",
-        "pilots": ["stub://people/2/", "stub://people/3"], "url": "stub://starship/31"]
+    let fakeShip1: [String: Any] = ["name": "Falcon", "model": "Fighter", "manufacturer": "Fake Industries", "crew": "7", "passengers": "15",
+        "pilots": ["http://people/1/", "http://people/9"], "url": "http://starship/4"]
+    let fakeShip2: [String: Any] = ["name": "Voyager", "model": "Cargo", "manufacturer": "Fake Industries", "crew": "18", "passengers": "150",
+        "pilots": ["http://people/2/", "http://people/3"], "url": "http://starship/31"]
     
     override func setUp() {
         super.setUp()
@@ -23,7 +23,7 @@ class SWAPIStarshipProviderTests: XCTestCase {
     
     func testFetchStarshipIDs() {
         let mock = NetworkMock(json: ["results": [fakeShip1, fakeShip2]])
-        wsDependencies.register(.Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
         provider.fetchIDs { shipIDs in
@@ -38,10 +38,10 @@ class SWAPIStarshipProviderTests: XCTestCase {
     func testFetchOneStarship() {
         
         let mock = NetworkMock(json: fakeShip1)
-        wsDependencies.register(.Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(1) { starship in
+        provider.fetch(id: 1) { starship in
             XCTAssertNotNil(starship)
             XCTAssertEqual(starship?.name, "Falcon")
             XCTAssertEqual(starship?.model, "Fighter")
@@ -57,10 +57,10 @@ class SWAPIStarshipProviderTests: XCTestCase {
     func testFetchInvalidStarship() {
         let json = ["error":"whoops"]
         let mock = NetworkMock(json: json)
-        wsDependencies.register(.Singleton) { mock as NetworkLayer }
+        wsDependencies.register(.singleton) { mock as NetworkLayer }
         
         let provider = SWAPIStarshipProvider(webService: try! wsDependencies.resolve())
-        provider.fetch(12) { starship in
+        provider.fetch(id: 12) { starship in
             XCTAssertNil(starship)
         }
     }

@@ -14,16 +14,20 @@ enum NetworkResponse {
     
     func unwrap() throws -> (Data, HTTPURLResponse) {
         switch self {
-        case .Success(let data, let response):
+        case Success(let data, let response):
             return (data, response)
-        case .Error(let error):
+        case Error(let error):
             throw error
         }
     }
     
     func json<T>() throws -> T {
         let (data, _) = try self.unwrap()
+<<<<<<< HEAD
+        let obj = try NSJSONSerialization.jsonObject(with: data, options: [])
+=======
         let obj = try JSONSerialization.jsonObject(with: data, options: [])
+>>>>>>> feature/swift3
         guard let json = obj as? T else {
             throw SWAPIError.InvalidJSON
         }
@@ -32,5 +36,5 @@ enum NetworkResponse {
 }
 
 protocol NetworkLayer {
-    func request(path: String, completion: @escaping (NetworkResponse) -> Void)
+    func request(path: String, completion: (NetworkResponse) -> Void)
 }

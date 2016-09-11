@@ -1,6 +1,7 @@
 //: [Previous: Scopes](@previous)
 
 import Dip
+import Foundation
 
 let container = DependencyContainer()
 
@@ -25,7 +26,7 @@ class NetworkClientImp: NetworkClient {
     init() {}
 }
 
-class Interactor: NetworkClientDelegate {
+class Interactor: NSObject, NetworkClientDelegate {
     let networkClient: NetworkClient
     init(networkClient: NetworkClient) {
         self.networkClient = networkClient
@@ -43,11 +44,11 @@ It's very important that _at least one_ of them uses property injection, because
 Now you can register those classes in container:
 */
 
-container.register(.Shared) {
+container.register {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(.Shared) { NetworkClientImp() as NetworkClient }
+container.register { NetworkClientImp() as NetworkClient }
     .resolvingProperties { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }
@@ -77,25 +78,25 @@ let networkClient = try! container.resolve() as NetworkClient
 networkClient.delegate // delegate was alread released =(
 
 /*:
-Note also that we used `.Shared` scope to register implementations. This is also very important to preserve consistency of objects relationships.
+Note also that we used `.shared` scope to register implementations. This is also very important to preserve consistency of objects relationships.
 
-If we would have used `.Unique` scope for both components then container would not reuse instances and we would have an infinite loop:
+If we would have used `.unique` scope for both components then container would not reuse instances and we would have an infinite loop:
 
  - Each attempt to resolve `NetworkClientDelegate` will create new instance of `Interactor`.
  - It will resolve `NetworkClient` which will create new instance of `NetworkClientImp`.
  - It will try to resolve it's delegate property and that will create new instance of `Interactor`
  - … And so on and so on.
 
-If we would have used `.Unique` for one of the components it will lead to the same infinite loop or one of the relationships will be invalid:
+If we would have used `.unique` for one of the components it will lead to the same infinite loop or one of the relationships will be invalid:
 */
 
 container.reset()
 
-container.register(.Unique) {
+container.register(.unique) {
     Interactor(networkClient: try container.resolve()) as NetworkClientDelegate
 }
 
-container.register(.Shared) { NetworkClientImp() as NetworkClient }
+container.register { NetworkClientImp() as NetworkClient }
     .resolvingProperties { (container, client) -> () in
         client.delegate = try container.resolve() as NetworkClientDelegate
 }

@@ -20,8 +20,8 @@ struct SWAPIPersonProvider : PersonProviderAPI {
         self.ws = webService
     }
     
-    func fetchIDs(completion: [Int] -> Void) {
-        ws.request("people") { response in
+    func fetchIDs(completion: @escaping ([Int]) -> Void) {
+        ws.request(path: "people") { response in
             do {
                 let dict = try response.json() as NSDictionary
                 guard let results = dict["results"] as? [NSDictionary] else { throw SWAPIError.InvalidJSON }
@@ -38,14 +38,14 @@ struct SWAPIPersonProvider : PersonProviderAPI {
         }
     }
     
-    func fetch(id: Int, completion: Person? -> Void) {
-        ws.request("people/\(id)") { response in
+    func fetch(id: Int, completion: @escaping (Person?) -> Void) {
+        ws.request(path: "people/\(id)") { response in
             do {
                 let json = try response.json() as NSDictionary
                 guard
                     let name = json["name"] as? String,
-                    let heightStr = json["height"] as? String, height = Int(heightStr),
-                    let massStr = json["mass"] as? String, mass = Int(massStr),
+                    let heightStr = json["height"] as? String, let height = Int(heightStr),
+                    let massStr = json["mass"] as? String, let mass = Int(massStr),
                     let hairColor = json["hair_color"] as? String,
                     let eyeColor = json["eye_color"] as? String,
                     let gender = json["gender"] as? String,

@@ -1,0 +1,66 @@
+//
+//  URLSessionNetworkLayer.swift
+//  Dip
+//
+//  Created by Olivier Halligon on 10/10/2015.
+//  Copyright © 2015 AliSoftware. All rights reserved.
+//
+
+import Foundation
+
+///NetworkLayer implementation on top of NSURLSession
+struct URLSessionNetworkLayer : NetworkLayer {
+    let baseURL: URL
+    let session: URLSession
+    let responseQueue: DispatchQueue
+    
+<<<<<<< HEAD
+    init?(baseURL: String, session: NSURLSession = NSURLSession.shared(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
+        guard let url = NSURL(string: baseURL) else { return nil }
+        self.init(baseURL: url, session: session)
+    }
+    
+    init(baseURL: NSURL, session: NSURLSession = .shared(), responseQueue: dispatch_queue_t = dispatch_get_main_queue()) {
+=======
+    init?(baseURL: String, session: URLSession = .shared(), responseQueue: DispatchQueue = DispatchQueue.main) {
+        guard let url = URL(string: baseURL) else { return nil }
+        self.init(baseURL: url, session: session)
+    }
+    
+    init(baseURL: URL, session: URLSession = .shared(), responseQueue: DispatchQueue = DispatchQueue.main) {
+>>>>>>> feature/swift3
+        self.baseURL = baseURL
+        self.session = session
+        self.responseQueue = responseQueue
+    }
+    
+<<<<<<< HEAD
+    func request(path: String, completion: NetworkResponse -> Void) {
+        let url = self.baseURL.appendingPathComponent(path)
+        let task = session.dataTask(with: url) { data, response, error in
+            if let data = data, let response = response as? NSHTTPURLResponse {
+                dispatch_async(self.responseQueue) {
+=======
+    func request(path: String, completion: (NetworkResponse) -> Void) {
+        guard let url = try? self.baseURL.appendingPathComponent(path) else { return }
+        let task = session.dataTask(with: url) { data, response, error in
+            if let data = data, let response = response as? HTTPURLResponse {
+                self.responseQueue.async() {
+>>>>>>> feature/swift3
+                    completion(NetworkResponse.Success(data, response))
+                }
+            }
+            else {
+                let err = error ?? NSError(domain: NSURLErrorDomain, code: NSURLError.unknown.rawValue, userInfo: nil)
+<<<<<<< HEAD
+                dispatch_async(self.responseQueue) {
+=======
+                self.responseQueue.async() {
+>>>>>>> feature/swift3
+                    completion(NetworkResponse.Error(err))
+                }
+            }
+        }
+        task.resume()
+    }
+}

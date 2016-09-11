@@ -20,7 +20,11 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
         self.ws = webService
     }
     
-    func fetchIDs(completion: @escaping ([Int]) -> Void) {
+<<<<<<< HEAD
+    func fetchIDs(completion: [Int] -> Void) {
+=======
+    func fetchIDs(completion: ([Int]) -> Void) {
+>>>>>>> feature/swift3
         ws.request(path: "starships") { response in
             do {
                 let dict = try response.json() as NSDictionary
@@ -38,7 +42,11 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
         }
     }
     
-    func fetch(id: Int, completion: @escaping (Starship?) -> Void) {
+<<<<<<< HEAD
+    func fetch(id: Int, completion: Starship? -> Void) {
+=======
+    func fetch(id: Int, completion: (Starship?) -> Void) {
+>>>>>>> feature/swift3
         ws.request(path: "starships/\(id)") { response in
             do {
                 let json = try response.json() as NSDictionary
@@ -46,8 +54,8 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
                     let name = json["name"] as? String,
                     let model = json["model"] as? String,
                     let manufacturer = json["manufacturer"] as? String,
-                    let crewStr = json["crew"] as? String, let crew = Int(crewStr),
-                    let passengersStr = json["passengers"] as? String, let passengers = Int(passengersStr),
+                    let crewStr = json["crew"] as? String, crew = Int(crewStr),
+                    let passengersStr = json["passengers"] as? String, passengers = Int(passengersStr),
                     let pilotIDStrings = json["pilots"] as? [String]
                     else {
                         throw SWAPIError.InvalidJSON

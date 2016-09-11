@@ -16,6 +16,15 @@ final class PersonCell : UITableViewCell, FillableCell {
     @IBOutlet weak var hairLabel: UILabel!
     @IBOutlet weak var eyesLabel: UILabel!
     
+<<<<<<< HEAD
+    let heightFormatter: NSLengthFormatter = {
+        let f = NSLengthFormatter()
+        f.isForPersonHeightUse = true
+        return f
+        }()
+    let massFormatter: NSMassFormatter = {
+        let f = NSMassFormatter()
+=======
     let heightFormatter: LengthFormatter = {
         let f = LengthFormatter()
         f.isForPersonHeightUse = true
@@ -23,6 +32,7 @@ final class PersonCell : UITableViewCell, FillableCell {
         }()
     let massFormatter: MassFormatter = {
         let f = MassFormatter()
+>>>>>>> feature/swift3
         f.isForPersonMassUse = true
         return f
     }()

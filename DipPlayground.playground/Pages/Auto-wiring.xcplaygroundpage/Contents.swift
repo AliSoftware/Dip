@@ -7,7 +7,7 @@ import UIKit
 
 ### Auto-wiring
 
-Among three main DI patterns - _constructor_, _property_ and _method_ injection - construction injection should be your choise by default. Dip makes use of this pattern very simple. 
+Among three main DI patterns - _constructor_, _property_ and _method_ injection - constructor injection should be your choise by default. Dip makes using this pattern very simple.
 
 Let's say you have some VIPER module with following components:
 */
@@ -28,7 +28,7 @@ class View: UIView, ViewOutput {}
 class ServiceImp: Service {}
 
 /*:
-VIPER module by its nature consists of a lot of components, wired up using protocols. Using construction injection you can end up with following constructors for presenter and interactor:
+VIPER module by its nature consists of a lot of components, wired up using protocols. Using constructor injection you can end up with following constructors for presenter and interactor:
 */
 
 class InteractorImp: Interactor {
@@ -109,7 +109,7 @@ You don't need to call `resolve` in a factory and care about order of arguments 
 
 The only requirement is that all constructor arguments should be registered in the container and there should be no several factories with the same _number_ of arguments registered for the same components. 
 
-In very rare case when you have several different factories with different set of runtime arguments registered for the same component, when you try to resolve it container will try to use these factories one by one until one of them succeeds starting with a factory with most numbers of arguments. If it finds two factories with the same number of arguments it will throw an error.
+In very rare cases when you have several factories for the same component with different set of runtime arguments, when you try to resolve it container will try to use factory registered for the same type and tag (if provided, otherwise registered without tag) and with the maximum number of runtime arguments. If it finds two factories registered for the same type and tag and with the same number but different types of arguments it will throw an error.
 
 You can use auto-wiring with tags. The tag that you pass to `resolve` method will be used to resolve each of the constructor arguments.
 */

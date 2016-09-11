@@ -39,8 +39,7 @@ class ContextTests: XCTestCase {
 
   let container = DependencyContainer()
   
-  #if os(Linux)
-  static var allTests: [(String, ContextTests -> () throws -> Void)] {
+  static var allTests = {
     return [
       ("testThatContextStoresCurrentlyResolvedType", testThatContextStoresCurrentlyResolvedType),
       ("testThatContextStoresInjectedInType", testThatContextStoresInjectedInType),
@@ -48,19 +47,16 @@ class ContextTests: XCTestCase {
       ("testThatContextStoresTheTagPassedToResolveWhenAutoInjecting", testThatContextStoresTheTagPassedToResolveWhenAutoInjecting),
       ("testThatContextStoresTheTagPassedToResolveWhenAutoWiring", testThatContextStoresTheTagPassedToResolveWhenAutoWiring),
       ("testThatContextDoesNotOverrideNilTagPassedToResolve", testThatContextDoesNotOverrideNilTagPassedToResolve),
-      ("testThatContextStoresNameOfAutoInjectedProperty", testThatContextStoresNameOfAutoInjectedProperty)
+      ("testThatContextStoresNameOfAutoInjectedProperty", testThatContextStoresNameOfAutoInjectedProperty),
+      ("testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration", testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration),
+      ("testThatContextIsPreservedWhenResolvingWithCollaboration", testThatContextIsPreservedWhenResolvingWithCollaboration)
     ]
-  }
+  }()
   
-  func setUp() {
-    container.reset()
-  }
-  #else
   override func setUp() {
     container.reset()
     container.register { ServiceImp2() }
   }
-  #endif
 
   func testThatContextStoresCurrentlyResolvedType() {
     container.register { () -> Service in
@@ -130,7 +126,7 @@ class ContextTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     container.register { ServiceImp1() }
     
-    container.register() { () -> ServiceImp2 in
+    container.register { () -> ServiceImp2 in
       if self.container.context.injectedInProperty == "injectedNilTag" {
         XCTAssertNil(self.container.context.tag)
       }
@@ -207,7 +203,7 @@ class ContextTests: XCTestCase {
     
     let names = ["injected", "injectedWeak", "taggedInjected", "taggedInjectedWeak", "injectedNilTag"]
     
-    container.register() { () -> ServiceImp2 in
+    container.register { () -> ServiceImp2 in
       XCTAssertNotNil(self.container.context.injectedInProperty)
       XCTAssertTrue(names.contains(self.container.context.injectedInProperty!))
       return ServiceImp2()
@@ -217,6 +213,49 @@ class ContextTests: XCTestCase {
     }
     
     let _ = try! container.resolve() as Service
+  }
+  
+  func testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration() {
+    let collaborator = DependencyContainer()
+    
+    collaborator.register { () -> ServiceImp1 in
+      unowned let collaborator = collaborator
+      XCTAssertNil(collaborator.context.injectedInType)
+      return ServiceImp1()
+      }.resolvingProperties { collaborator, _ in
+        XCTAssertNil(collaborator.context.injectedInType)
+    }
+    
+    container.collaborate(with: collaborator)
+    collaborator.collaborate(with: container)
+    
+    let _ = try! container.resolve() as ServiceImp1
+  }
+  
+  func testThatContextIsPreservedWhenResolvingWithCollaboration() {
+    let collaborator = DependencyContainer()
+    
+    container.register { () -> Service in
+      XCTAssertTrue(self.container.context.resolvingType == Service.self)
+      let _ = try self.container.resolve() as ServiceImp1
+      return ServiceImp1() as Service
+      }.resolvingProperties { _ in
+        XCTAssertTrue(self.container.context.resolvingType == Service.self)
+        let _ = try self.container.resolve() as ServiceImp1
+    }
+    
+    collaborator.register { () -> ServiceImp1 in
+      XCTAssertTrue(collaborator.context.resolvingType == ServiceImp1.self)
+      return ServiceImp1()
+      }.resolvingProperties { _ in
+        XCTAssertTrue(collaborator.context.resolvingType == ServiceImp1.self)
+    }
+    
+    container.collaborate(with: collaborator)
+    collaborator.collaborate(with: container)
+    let _ = try! container.resolve() as Service
+
+    collaborator.reset()
   }
   
 }
