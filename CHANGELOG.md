@@ -1,12 +1,38 @@
 # CHANGELOG
 
+## 5.0.0
+
+* Migrated to Swift 3.0  
+  [#120](https://github.com/AliSoftware/Dip/issues/120), [@patrick-lind](https://github.com/patrick-lind), [@mark-urbanthings](https://github.com/mark-urbanthings), [@ilyapuchka](https://github.com/ilyapuchka)
+* Renamed `DefinitionOf` to `Definition` and some other source-breaking refactoring.  
+  [#113](https://github.com/AliSoftware/Dip/issues/113), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added `invalidType` error when resolved instance does not implement requested type.  
+  [#118](https://github.com/AliSoftware/Dip/issues/118), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added optional `type` parameter in register methods to be able to specify type when registering using method literal instead of closure.
+  [#115](https://github.com/AliSoftware/Dip/issues/115), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added `implements` family of methods in to `Definition` to register type-forwarding definitions.  
+  [#114](https://github.com/AliSoftware/Dip/issues/114), [@ilyapuchka](https://github.com/ilyapuchka)
+* Shared scope is now the default scope.  
+  [#112](https://github.com/AliSoftware/Dip/issues/112), [@ilyapuchka](https://github.com/ilyapuchka)
+* Single target project setup.  
+  [#121](https://github.com/AliSoftware/Dip/issues/121), [@ilyapuchka](https://github.com/ilyapuchka)
+* Simplified implementation of auto-wiring.  
+  [#117](https://github.com/AliSoftware/Dip/issues/117), [@ilyapuchka](https://github.com/ilyapuchka)
+
+
+#### Fixed
+* Auto-injected properties inherited from super class are now properly injected when resolving subclass. 
+Added `resolveDependencies(_:DependencyContainer)` method to `Resolvable` protocol to handle inheritance when resolving.  
+  [#116](https://github.com/AliSoftware/Dip/issues/116), [@ilyapuchka](https://github.com/ilyapuchka)
+  
+  
 ## 4.6.1
 
 #### Fixed
 
-* Fixed sharing singletons between collaborating containers
+* Fixed sharing singletons between collaborating containers.  
   [#103](https://github.com/AliSoftware/Dip/issues/103), [@ilyapuchka](https://github.com/ilyapuchka)
-* Renamed some public API's (see release notes for more info)
+* Renamed some public API's (see release notes for more info).  
   [#105](https://github.com/AliSoftware/Dip/issues/105), [@ilyapuchka](https://github.com/ilyapuchka)
 
 ## 4.6.0
