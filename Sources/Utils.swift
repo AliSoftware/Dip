@@ -22,15 +22,16 @@
 // THE SOFTWARE.
 //
 
-public enum LogLevel {
-  case Verbose
-  case Errors
+public enum LogLevel: Int {
   case None
+  case Errors
+  case Verbose
 }
+
 public var logLevel: LogLevel = .Errors
 
 func log(_ logLevel: LogLevel, _ message: Any) {
-  guard case logLevel = Dip.logLevel else { return }
+  guard logLevel.rawValue <= Dip.logLevel.rawValue else { return }
   print(message)
 }
 
