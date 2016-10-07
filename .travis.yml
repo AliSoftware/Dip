@@ -1,7 +1,3 @@
-env:
-  global:
-    - MODULE_NAME=Dip
-
 matrix:
   allow_failures:
     - os: linux
@@ -28,11 +24,11 @@ matrix:
       before_install:
         - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
         - cd ..
-        - export SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2016-09-07-a
-        - wget https://swift.org/builds/development/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - export SWIFT_VERSION=swift-3.0-RELEASE
+        - wget https://swift.org/builds/swift-3.0-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
-        - cd $MODULE_NAME
+        - cd Dip
 
 notifications:
   email: false
