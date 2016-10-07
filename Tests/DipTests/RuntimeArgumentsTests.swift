@@ -290,7 +290,7 @@ class RuntimeArgumentsTests: XCTestCase {
 
 //    let name3 = "3"
 //    container.register { (port: Int, url: String!) in ServiceImp(name: name3, baseURL: url, port: port) as Service }
-//    let service3 = try! container.resolve(withArguments: 80, "http://example.com" as String!) as Service
+//    let service3 = try! container.resolve(arguments: 80, "http://example.com" as String!) as Service
 //    XCTAssertEqual(service3.name, name3)
   }
   

@@ -30,10 +30,10 @@ private class ServiceImp1: Service { }
 private class ServiceImp2: Service { }
 
 private protocol Server: class {
-  weak var client: Client? { get }
+  weak var client: Client! { get }
 }
 private protocol Client: class {
-  var server: Server? { get }
+  var server: Server! { get }
 }
 
 class ResolvableService: Service, Resolvable {
@@ -483,8 +483,8 @@ class DipTests: XCTestCase {
   func testThatItResolvesCircularDependencies() {
     
     class ResolvableServer: Server, Resolvable {
-      weak var client: Client?
-      weak var secondClient: Client?
+      weak var client: Client!
+      weak var secondClient: Client!
       
       init(client: Client) {
         self.client = client
@@ -505,17 +505,9 @@ class DipTests: XCTestCase {
       
     }
     
-    //Due to a bug in Swift 3 Mirror fails if weak property is not NSObject
-    //https://bugs.swift.org/browse/SR-2144
-    class ResolvableClient: NSObject, Client, Resolvable {
-      var server: Server?
-      var secondServer: Server?
-      
-      #if os(Linux)
-      init() {}
-      #else
-      override init() { super.init() }
-      #endif
+    class ResolvableClient: Client, Resolvable {
+      var server: Server!
+      var secondServer: Server!
       
       var didResolveDependenciesCalled = false
       
@@ -698,21 +690,13 @@ extension DipTests {
   func testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer() {
     //given
     class ServerImp: Server {
-      weak var client: Client?
+      weak var client: Client!
       init(client: Client) { self.client = client }
     }
     
-    //Due to a bug in Swift 3 Mirror fails if weak property is not NSObject
-    //https://bugs.swift.org/browse/SR-2144
-    class ClientImp: NSObject, Client {
-      var server: Server?
-      var anotherServer: Server?
-
-      #if os(Linux)
-      init() {}
-      #else
-      override init() { super.init() }
-      #endif
+    class ClientImp: Client {
+      var server: Server!
+      var anotherServer: Server!
     }
     
     let serverContainer = DependencyContainer()
