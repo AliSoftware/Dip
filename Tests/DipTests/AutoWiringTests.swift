@@ -31,13 +31,13 @@ private class ServiceImp2: Service { }
 private class ServiceImp3 {}
 
 private protocol AutoWiredClient: class {
-  var service1: Service? { get set }
-  var service2: Service? { get set }
+  var service1: Service! { get set }
+  var service2: Service! { get set }
 }
 
 private class AutoWiredClientImp: AutoWiredClient {
-  var service1: Service?
-  var service2: Service?
+  var service1: Service!
+  var service2: Service!
   
   init(service1: Service?, service2: ServiceImp2) {
     self.service1 = service1
