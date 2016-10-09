@@ -29,6 +29,25 @@ matrix:
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - cd Dip
+    - script:
+        - swift build --clean && swift build
+      os: linux
+      dist: trusty
+      sudo: required
+      language: generic
+      before_install:
+        - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
+        - cd ..
+        - export SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2016-09-07-a
+        - wget https://swift.org/builds/development/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
+        - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
+        - export SWIFT_RELEASE_VERSION=2.2.1
+        - export SWIFT_RELEASE_NAME="${SWIFT_RELEASE_VERSION}-RELEASE"
+        - wget https://swift.org/builds/swift-$SWIFT_RELEASE_VERSION-release/ubuntu1404/swift-$SWIFT_RELEASE_NAME/swift-$SWIFT_RELEASE_NAME-ubuntu14.04.tar.gz
+        - tar xzf swift-$SWIFT_RELEASE_NAME-ubuntu14.04.tar.gz
+        - export SWIFT_EXEC="${PWD}/swift-${SWIFT_RELEASE_NAME}-ubuntu14.04/usr/bin/swiftc"
+        - cd Dip 
 
 notifications:
   email: false
