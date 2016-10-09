@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 5.0.2
+
+#### Fixed
+
+* Fixed Swift 3 issues related to reflection and IUO  
+  [#125](https://github.com/AliSoftware/Dip/issues/125), [@ilyapuchka](https://github.com/ilyapuchka)
+
+## 5.0.1
+
+This release is the same as 5.0.0 and only fixes CocoaPods speck pushed to trunk without macOS, tvOS and watchOS deployment targets. Please use this release instead of 5.0.0 if you integrate Dip via Cocoapods.
+
 ## 5.0.0
 
 * Migrated to Swift 3.0  

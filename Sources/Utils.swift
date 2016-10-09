@@ -118,6 +118,14 @@ extension Collection where Index: Comparable, Self.Indices.Index == Index {
 }
 
 #if os(Linux)
+  
+  extension String {
+    public func hasPrefix(_ prefix: String) -> Bool {
+      return prefix ==
+        String(self.characters.prefix(prefix.characters.count))
+    }
+  }
+  
   import Glibc
   class RecursiveLock {
     private var _lock = _initializeRecursiveMutex()

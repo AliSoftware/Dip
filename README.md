@@ -5,8 +5,8 @@
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
-[![Swift Version](https://img.shields.io/badge/Linux-compatible-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
 [![Swift Version](https://img.shields.io/badge/Swift-2.2--3.0-F16D39.svg?style=flat)](https://developer.apple.com/swift)
+[![Swift Version](https://img.shields.io/badge/Linux-3.0--RELEASE-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
 
 ![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)  
 _Photo courtesy of [www.kevinandamanda.com](http://www.kevinandamanda.com/recipes/appetizer/homemade-soft-cinnamon-sugar-pretzel-bites-with-salted-caramel-dipping-sauce.html)_
@@ -17,46 +17,12 @@ _Photo courtesy of [www.kevinandamanda.com](http://www.kevinandamanda.com/recipe
 
 It's aimed to be as simple as possible yet provide rich functionality usual for DI containers on other platforms. It's inspired by `.NET`'s [Unity Container](https://msdn.microsoft.com/library/ff647202.aspx) and other DI containers.
 
-* You start by creating `let container = DependencyContainer()` and **registering your dependencies, by associating a _protocol_ or _type_ to a `factory`**.
-* Then you can call `container.resolve()` to **resolve an instance of _protocol_ or _type_** using that `DependencyContainer`.
+* You start by creating `let container = DependencyContainer()` and **registering your dependencies, by associating a _protocol_ or _type_ to a `factory`** using `container.register { MyService() as Service }`.
+* Then you can call `container.resolve() as Service` to **resolve an instance of _protocol_ or _type_** using that `DependencyContainer`.
+* You can easily use Dip along with **Storyboards and Nibs** - checkout **[Dip-UI](https://github.com/AliSoftware/Dip-UI)** extensions. There is also a **[code generator](https://github.com/ilyapuchka/dipgen)** that can help to simplify registering new components.
 
-> You can easily use Dip along with Storyboards and Nibs - checkout [Dip-UI](https://github.com/AliSoftware/Dip-UI) extensions. 
-
-## Documentation & Usage Examples
-
-Dip is completely [documented](http://cocoadocs.org/docsets/Dip/5.0.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
-
-> Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip-iOS` scheme and build.
-
-You can find bunch of usage examples in a [wiki](../../wiki). 
-
-If your are using [VIPER](https://www.objc.io/issues/13-architecture/viper/) architecture - [here](https://github.com/ilyapuchka/VIPER-SWIFT) is VIPER demo app that uses Dip instead of manual dependency injection.
-
-There are also several blog posts that describe how to use Dip and some of its implementation details:
-
-- [IoC container in Swift](http://ilya.puchka.me/ioc-container-in-swift/)
-- [IoC container in Swift. Circular dependencies and auto-injection](http://ilya.puchka.me/ioc-container-in-swift-circular-dependencies-and-auto-injection/)
-- [Dependency injection with Dip](http://ilya.puchka.me/dependency-injecinjection-with-dip/)
-
-File an issue if you have any question.
-
-
-## Features
-
-- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Unique_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
-- **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
-- **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments;
-- **[Circular dependencies](../../wiki/circular-dependencies)**. Dip can resolve circular dependencies;
-- **[Auto-wiring](../../wiki/auto-wiring)** & **[Auto-injection](../../wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
-- **[Resolving optionals](../../wiki/resolving-optionals)**. Dip is able to resolve constructor or property dependencies defined as optionals.
-- **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types.
-- **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
-- **Weakly typed components**. Dip can resolve weak types when they are unknown at compile time.
-- **[Easy configuration](../../wiki/containers-collaboration)**. No complex container hierarchy, no unneeded functionality;
-- **Thread safety**. Registering and resolving components is thread safe;
-- **Helpful error messages and configuration validation**. You can validate your container configuration. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
-
-## Basic usage
+<details>
+<summary>Basic usage</summary>
 
 ```swift
 import Dip
@@ -82,7 +48,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 ```
 
-## More sophisticated example
+</details>
+
+<details>
+<summary>More sophisticated example</summary>
 
 ```swift
 import Dip
@@ -100,6 +69,9 @@ extension DependencyContainer {
 
 	static func configure() -> DependencyContainer {
 		return DependencyContainer { container in 
+			unowned let container = container
+			DependencyContainer.uiContainers = [container]
+		
 			container.register(tag: "ViewController") { ViewController() }
 			  .resolvingProperties { container, controller in
 				  controller.animationsFactory = try container.resolve() as AnimatonsFactory
@@ -137,49 +109,84 @@ class ViewController {
 
 ```
 
+</details>
+
+## Documentation & Usage Examples
+
+Dip is completely [documented](http://cocoadocs.org/docsets/Dip/5.0.0/) and comes with a Playground that lets you try all its features and become familiar with API. You can find it in `Dip.xcworkspace`.
+
+> Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip` scheme and build for iPhone Simulator.
+
+You can find bunch of usage examples and usfull tips in a [wiki](../../wiki). 
+
+If your are using [VIPER](https://www.objc.io/issues/13-architecture/viper/) architecture - [here](https://github.com/ilyapuchka/VIPER-SWIFT) is VIPER demo app that uses Dip instead of manual dependency injection.
+
+There are also several blog posts that describe how to use Dip and some of its implementation details:
+
+- [IoC container in Swift](http://ilya.puchka.me/ioc-container-in-swift/)
+- [IoC container in Swift. Circular dependencies and auto-injection](http://ilya.puchka.me/ioc-container-in-swift-circular-dependencies-and-auto-injection/)
+- [Dependency injection with Dip](http://ilya.puchka.me/dependency-injecinjection-with-dip/)
+
+File an issue if you have any question. Pull requests are warmly welcome too.
+
+
+## Features
+
+- **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Unique_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
+- **[Auto-wiring](../../wiki/auto-wiring)** & **[Auto-injection](../../wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
+- **[Resolving optionals](../../wiki/resolving-optionals)**. Dip is able to resolve constructor or property dependencies defined as optionals.
+- **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types implemeted by a single class.
+- **[Circular dependencies](../../wiki/circular-dependencies)**. Dip will be able to resolve circular dependencies if you will follow some simple rules;
+- **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
+- **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
+- **[Runtime arguments](../../wiki/runtime-arguments)**. You can register factories that accept up to 6 runtime arguments (and extend it if you need);
+- **[Easy configuration](../../wiki/containers-collaboration)** & **Code generation**. No complex containers hierarchy, no unneeded functionality. Tired of writing all registrations by hand? There is a [cool code generator](https://github.com/ilyapuchka/dipgen) that will create them for you. The only thing you need is to annotate your code with some comments.
+- **Weakly typed components**. Dip can resolve "weak" types when they are unknown at compile time.
+- **Thread safety**. Registering and resolving components is thread safe;
+- **Helpful error messages and configuration validation**. You can validate your container configuration. If something can not be resolved at runtime Dip throws an error that completely describes the issue;
+
+
 ## Installation
 
 Since version 5.0.0 Dip is built with Swift 3.0. For Swift 2.2-2.3 compatible version use "swift2.3" branch.
 
-Dip is available through [CocoaPods](http://cocoapods.org). To install
-it, simply add the following line to your Podfile:
+You can install Dip using your favorite dependency manager:
+
+<details>
+<summary>CocoaPods</summary>
 
 ```ruby
 pod "Dip"
 ```
+> You need at least 1.1.0.rc.2 version of CocoaPods.
 
-If you use [Carthage](https://github.com/Carthage/Carthage) add this line to your Cartfile:
+</details>
+
+<details>
+<summary>Carthage</summary>
 
 ```
 github "AliSoftware/Dip"
 ```
 
-If you use [Swift Package Manager](https://swift.org/package-manager/) add Dip as dependency to you `Package.swift`:
+</details>
+
+<details>
+<summary>Swift Package Manager</summary>
 
 ```swift
-let package = Package(
-  name: "MyPackage",
-  dependencies: [
-    .Package(url: "https://github.com/AliSoftware/Dip.git", "5.0.0")
-  ]
-)
+.Package(url: "https://github.com/AliSoftware/Dip", majorVersion: 5, minor: 0)
 ```
+
+</details>
 
 ## Running tests
 
-On OSX you can run tests from Xcode. On Linux you need to have Swift Package Manager installed and use it to build and run tests:
-
-```
-cd Dip
-swift build && swift test
-```
-
-> Note: Swift Package Manager is destributed with Swift development snapshots only, so it builds packages using Swift 3. To build Dip you will need to build it with Swift 2.2, for that you need to set [`$SWIFT_EXEC`](https://github.com/apple/swift-package-manager#choosing-swift-version) environment variable.
+On OSX you can run tests from Xcode. On Linux you need to have Swift Package Manager installed and use it to build and run tests using this command: `swift build --clean && swift build && swift test`
 
 ## Credits
 
-This library has been created by [**Olivier Halligon**](olivier@halligon.net).  
-I'd also like to thank [**Ilya Puchka**](https://twitter.com/ilyapuchka) for his big contribution to it, as he added a lot of great features to it.
+This library has been created by [**Olivier Halligon**](olivier@halligon.net) and is maintained by [**Ilya Puchka**](https://twitter.com/ilyapuchka).
 
 **Dip** is available under the **MIT license**. See the `LICENSE` file for more info.
 
