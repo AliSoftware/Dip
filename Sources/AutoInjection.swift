@@ -43,6 +43,8 @@ extension DependencyContainer {
   }
   
   private func resolveChild(child: Mirror.Child) throws {
+    //HOTFIX for https://bugs.swift.org/browse/SR-2282
+    guard !String(describing: type(of: child.value)).hasPrefix("ImplicitlyUnwrappedOptional") else { return }
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     
     let contextKey = DefinitionKey(type: type(of: injectedPropertyBox).wrappedType, typeOfArguments: Void.self, tag: context.tag)

@@ -26,7 +26,7 @@ import XCTest
 @testable import Dip
 
 private protocol Server: class {
-  var client: Client? { get set }
+  var client: Client! { get set }
 }
 
 private protocol Client: class {
@@ -45,7 +45,7 @@ private func ==<T: ClientImp>(lhs: T, rhs: T) -> Bool {
 }
 
 private class ServerImp: Server, Hashable {
-  weak var client: Client?
+  weak var client: Client!
   init() {}
   
   var hashValue: Int {

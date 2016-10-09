@@ -26,13 +26,13 @@ import XCTest
 @testable import Dip
 
 private protocol Server: class {
-  weak var client: Client? {get}
-  var anotherClient: Client? {get set}
+  weak var client: Client! {get}
+  var anotherClient: Client! {get set}
 }
 
 private protocol Client: class {
-  var server: Server? {get}
-  var anotherServer: Server? {get set}
+  var server: Server! {get}
+  var anotherServer: Server! {get set}
 }
 
 private class ServerImp: Server {
@@ -41,11 +41,11 @@ private class ServerImp: Server {
     AutoInjectionTests.clientDidInjectCalled = true
   }
 
-  var client: Client? {
+  var client: Client! {
     return _client.value
   }
   
-  weak var anotherClient: Client?
+  weak var anotherClient: Client!
   
   weak var _optionalProperty = InjectedWeak<AnyObject>(required: false)
 }
@@ -56,11 +56,11 @@ private class ClientImp: Client {
     AutoInjectionTests.serverDidInjectCalled = true
   }
 
-  var server: Server? {
+  var server: Server! {
     return _server.value
   }
 
-  var anotherServer: Server?
+  var anotherServer: Server!
   
   var _optionalProperty = Injected<AnyObject>(required: false)
   
