@@ -723,7 +723,9 @@ private class ResolvedInstances {
     get {
       switch scope {
       case .singleton, .eagerSingleton: return singletons[key]
-      case .weakSingleton: return (weakSingletons[key] as? WeakBoxType)?.unboxed ?? weakSingletons[key]
+      case .weakSingleton:
+        if let boxed = weakSingletons[key] as? WeakBoxType { return boxed.unboxed }
+        else { return weakSingletons[key] }
       case .shared: return resolvedInstances[key]
       case .unique: return nil
       }
