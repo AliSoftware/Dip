@@ -30,7 +30,8 @@ protocol AutoWiringDefinition: DefinitionType {
 extension DependencyContainer {
   
   /// Tries to resolve instance using auto-wiring
-  func autowire<T>(_ key: DefinitionKey) throws -> T {
+  func autowire<T>(key aKey: DefinitionKey) throws -> T {
+    let key = aKey
     guard key.typeOfArguments == Void.self else {
       throw DipError.definitionNotFound(key: key)
     }
@@ -38,8 +39,8 @@ extension DependencyContainer {
     let autoWiringKey = try autoWiringDefinition(byKey: key).key
     
     do {
-      let key = autoWiringKey.tagged(key.tag ?? context.tag)
-      return try resolve(key: key) { definition in
+      let key = autoWiringKey.tagged(with: key.tag ?? context.tag)
+      return try _resolve(key: key) { definition in
         try definition.autoWiringFactory!(self, key.tag) as! T
       }
     }
@@ -51,7 +52,7 @@ extension DependencyContainer {
   private func autoWiringDefinition(byKey key: DefinitionKey) throws -> KeyDefinitionPair {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    definitions = filter(definitions, byKey: key)
+    definitions = filter(definitions: definitions, byKey: key)
     definitions = definitions.sorted(by: { $0.definition.numberOfArguments > $1.definition.numberOfArguments })
 
     guard definitions.count > 0 && definitions[0].definition.numberOfArguments > 0 else {
@@ -60,7 +61,7 @@ extension DependencyContainer {
     
     let maximumNumberOfArguments = definitions.first?.definition.numberOfArguments
     definitions = definitions.filter({ $0.definition.numberOfArguments == maximumNumberOfArguments })
-    definitions = order(definitions, byTag: key.tag)
+    definitions = order(definitions: definitions, byTag: key.tag)
 
     //when there are several definitions with the same number of arguments but different arguments types
     if definitions.count > 1 && definitions[0].key.typeOfArguments != definitions[1].key.typeOfArguments {

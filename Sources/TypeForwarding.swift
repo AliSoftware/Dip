@@ -24,9 +24,11 @@
 
 protocol TypeForwardingDefinition: DefinitionType {
   var implementingTypes: [Any.Type] { get }
-  func doesImplements(_ type: Any.Type) -> Bool
+  func doesImplements(type aType: Any.Type) -> Bool
 }
 
+#if swift(>=3.0)
+  
 extension Definition {
   
   /**
@@ -85,26 +87,15 @@ extension Definition {
   @discardableResult public func implements<A, B, C, D>(_ a: A.Type, _ b: B.Type, c: C.Type, d: D.Type) -> Definition {
     return implements(a).implements(b).implements(c).implements(d)
   }
-
+  
 }
+
+#endif
 
 extension DependencyContainer {
   
-  /**
-   Registers definition for passed type.
-   
-   If instance created by factory of definition, passed as a first parameter,
-   does not implement type passed in a `type` parameter,
-   container will throw `DipError.DefinitionNotFound` error when trying to resolve that type.
-   
-   - parameters:
-      - definition: Definition to register
-      - type: Type to register definition for
-      - tag: Optional tag to associate definition with. Default is `nil`.
-   
-   - returns: New definition registered for passed type.
-   */
-  @discardableResult public func register<T, U, F>(_ definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
+  func _register<T, U, F>(definition aDefinition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
+    let definition = aDefinition
     precondition(definition.container === self, "Definition should be registered in the container.")
     
     let key = DefinitionKey(type: F.self, typeOfArguments: U.self)
@@ -119,7 +110,7 @@ extension DependencyContainer {
           return resolved
         }
         else {
-          throw DipError.invalidType(resolved: resolved, key: key.tagged(self.context.tag))
+          throw DipError.invalidType(resolved: resolved, key: key.tagged(with: self.context.tag))
         }
       }
 
@@ -131,7 +122,7 @@ extension DependencyContainer {
             return resolved
           }
           else {
-            throw DipError.invalidType(resolved: resolved, key: key.tagged(self.context.tag))
+            throw DipError.invalidType(resolved: resolved, key: key.tagged(with: self.context.tag))
           }
         }
       })
@@ -143,14 +134,14 @@ extension DependencyContainer {
   }
   
   /// Searches for definition that forwards requested type
-  func typeForwardingDefinition(_ key: DefinitionKey) -> KeyDefinitionPair? {
+  func typeForwardingDefinition(forKey key: DefinitionKey) -> KeyDefinitionPair? {
     var forwardingDefinitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    forwardingDefinitions = filter(forwardingDefinitions, byKey: key, byTypeOfArguments: true)
-    forwardingDefinitions = order(forwardingDefinitions, byTag: key.tag)
+    forwardingDefinitions = filter(definitions: forwardingDefinitions, byKey: key, byTypeOfArguments: true)
+    forwardingDefinitions = order(definitions: forwardingDefinitions, byTag: key.tag)
 
     //we need to carry on original tag
-    return forwardingDefinitions.first.map({ ($0.key.tagged(key.tag), $0.definition) })
+    return forwardingDefinitions.first.map({ ($0.key.tagged(with: key.tag), $0.definition) })
   }
   
 }
