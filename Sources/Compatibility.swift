@@ -21,23 +21,23 @@
   
   extension CollectionType where Index : RandomAccessIndexType {
     @warn_unused_result
-    public func reversed() -> ReverseRandomAccessCollection<Self> {
+    func reversed() -> ReverseRandomAccessCollection<Self> {
       return reverse()
     }
   }
 
   extension SequenceType where Generator.Element == String {
     @warn_unused_result
-    public func joined(separator aSeparator: String) -> String {
+    func joined(separator aSeparator: String) -> String {
       return joinWithSeparator(aSeparator)
     }
   }
   
   extension Array {
-    public mutating func append<C : CollectionType where C.Generator.Element == Element>(contentsOf newElements: C) {
+    mutating func append<C : CollectionType where C.Generator.Element == Element>(contentsOf newElements: C) {
       appendContentsOf(newElements)
     }
-    public mutating func append<S : SequenceType where S.Generator.Element == Element>(contentsOf newElements: S) {
+    mutating func append<S : SequenceType where S.Generator.Element == Element>(contentsOf newElements: S) {
       appendContentsOf(newElements)
     }
   }
@@ -58,7 +58,7 @@
 
 #if _runtime(_ObjC)
   extension String {
-    public func has(prefix aPrefix: String) -> Bool {
+    func has(prefix aPrefix: String) -> Bool {
       return hasPrefix(aPrefix)
     }
   }
@@ -66,7 +66,7 @@
 #else
   
   extension String {
-    public func has(prefix aPrefix: String) -> Bool {
+    func has(prefix aPrefix: String) -> Bool {
       return aPrefix ==
         String(self.characters.prefix(aPrefix.characters.count))
     }

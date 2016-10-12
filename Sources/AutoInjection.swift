@@ -136,7 +136,7 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
   }
 
   ///Wrapped value.
-  public var value: T? {
+  public internal(set) var value: T? {
     didSet {
       if let value = value { didInject(value) }
     }
