@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 5.0.3
+
+* Added Swift 2.3 compatibility. `swift2.3` brunch is not longer maintained.  
+  [#127](https://github.com/AliSoftware/Dip/issues/127), [@ilyapuchka](https://github.com/ilyapuchka)
+
+#### Fixed
+
+* Fixed reusing instances registered with `WeakSingleton` scope  
+  [#129](https://github.com/AliSoftware/Dip/issues/129), [@ilyapuchka](https://github.com/ilyapuchka)
+
 ## 5.0.2
 
 #### Fixed
