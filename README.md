@@ -5,7 +5,7 @@
 [![Carthage Compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
 [![License](https://img.shields.io/cocoapods/l/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
 [![Platform](https://img.shields.io/cocoapods/p/Dip.svg?style=flat)](http://cocoapods.org/pods/Dip)
-[![Swift Version](https://img.shields.io/badge/Swift-2.2--3.0-F16D39.svg?style=flat)](https://developer.apple.com/swift)
+[![Swift Version](https://img.shields.io/badge/Swift-2.3--3.0-F16D39.svg?style=flat)](https://developer.apple.com/swift)
 [![Swift Version](https://img.shields.io/badge/Linux-3.0--RELEASE-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
 
 ![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)  
@@ -148,16 +148,25 @@ File an issue if you have any question. Pull requests are warmly welcome too.
 
 ## Installation
 
-Since version 5.0.0 Dip is built with Swift 3.0. For Swift 2.2-2.3 compatible version use "swift2.3" branch.
-
-You can install Dip using your favorite dependency manager:
+Since version 5.0.0 Dip is built with Swift 3.0. You can install Dip using your favorite dependency manager:
 
 <details>
 <summary>CocoaPods</summary>
 
+`pod "Dip"`
+
+To build for Swift 2.3 add this code to the bottom of your Podfile
+
 ```ruby
-pod "Dip"
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['SWIFT_VERSION'] = '2.3'
+    end
+  end
+end
 ```
+
 > You need at least 1.1.0.rc.2 version of CocoaPods.
 
 </details>
@@ -168,6 +177,8 @@ pod "Dip"
 ```
 github "AliSoftware/Dip"
 ```
+
+To build for Swift 2.3 run Carthage with `--toolchain com.apple.dt.toolchain.Swift_2_3` option.
 
 </details>
 

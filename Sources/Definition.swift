@@ -42,7 +42,7 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
     return "type: \(type), arguments: \(typeOfArguments), tag: \(tag.desc)"
   }
   
-  func tagged(_ tag: DependencyContainer.Tag?) -> DefinitionKey {
+  func tagged(with tag: DependencyContainer.Tag?) -> DefinitionKey {
     var tagged = self
     tagged.tag = tag
     return tagged
@@ -56,101 +56,6 @@ public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
     lhs.type == rhs.type &&
       lhs.typeOfArguments == rhs.typeOfArguments &&
       lhs.tag == rhs.tag
-}
-
-///Component scope defines a strategy used by the `DependencyContainer` to manage resolved instances life cycle.
-public enum ComponentScope {
-  /**
-   A new instance will be created every time it's resolved.
-   This is a default strategy. Use this strategy when you don't want instances to be shared
-   between different consumers (i.e. if it is not thread safe).
-   
-   **Example**:
-   
-   ```
-   container.register { ServiceImp() as Service }
-   container.register { 
-     ServiceConsumerImp(
-       service1: try container.resolve() as Service
-       service2: try container.resolve() as Service
-     ) as ServiceConsumer
-   }
-   let consumer = container.resolve() as ServiceConsumer
-   consumer.service1 !== consumer.service2 //true
-   
-   ```
-   */
-  case unique
-  
-  /**
-   Instance resolved with the same definition will be reused until topmost `resolve(tag:)` method returns.
-   When you resolve the same object graph again the container will create new instances.
-   Use this strategy if you want different object in objects graph to share the same instance.
-   
-   - warning: Make sure this component is thread safe or accessed always from the same thread.
-   
-   **Example**:
-   
-   ```
-   container.register { ServiceImp() as Service }
-   container.register {
-     ServiceConsumerImp(
-       service1: try container.resolve() as Service
-       service2: try container.resolve() as Service
-     ) as ServiceConsumer
-   }
-   let consumer1 = container.resolve() as ServiceConsumer
-   let consumer2 = container.resolve() as ServiceConsumer
-   consumer1.service1 === consumer1.service2 //true
-   consumer2.service1 === consumer2.service2 //true
-   consumer1.service1 !== consumer2.service1 //true
-   ```
-   */
-  case shared
-  
-  /**
-   Resolved instance will be retained by the container and always reused.
-   Do not mix this life cycle with _singleton pattern_.
-   Instance will be not shared between different containers unless they collaborate.
-   
-   - warning: Make sure this component is thread safe or accessed always from the same thread.
-   
-   - note: When you override or remove definition from the container an instance 
-           that was resolved with this definition will be released. When you reset 
-           the container it will release all singleton instances.
-   
-   **Example**:
-   
-   ```
-   container.register(.singleton) { ServiceImp() as Service }
-   container.register {
-     ServiceConsumerImp(
-       service1: try container.resolve() as Service
-       service2: try container.resolve() as Service
-     ) as ServiceConsumer
-   }
-   let consumer1 = container.resolve() as ServiceConsumer
-   let consumer2 = container.resolve() as ServiceConsumer
-   consumer1.service1 === consumer1.service2 //true
-   consumer2.service1 === consumer2.service2 //true
-   consumer1.service1 === consumer2.service1 //true
-   ```
-   */
-  case singleton
-  
-  /**
-   The same scope as a `Singleton`, but instance will be created when container is bootstrapped.
-   
-   - seealso: `bootstrap()`
-  */
-  case eagerSingleton
-  
-  /**
-   The same scope as a `Singleton`, but container stores week reference to the resolved instance.
-   While a strong reference to the resolved instance exists resolve will return the same instance.
-   After the resolved instance is deallocated next resolve will produce a new instance.
-  */
-  case weakSingleton
 }
 
 ///Dummy protocol to store definitions for different types in collection
@@ -167,20 +72,28 @@ public protocol DefinitionType: class { }
 public final class Definition<T, U>: DefinitionType {
   public typealias F = (U) throws -> T
   
-  init(scope: ComponentScope, factory: @escaping F) {
-    self.factory = factory
-    self.scope = scope
-  }
-  
   //MARK: - _Definition
 
   weak var container: DependencyContainer?
   
   let factory: F
   let scope: ComponentScope
-  fileprivate(set) var weakFactory: ((Any) throws -> Any)!
-  fileprivate(set) var resolveProperties: ((DependencyContainer, Any) throws -> ())?
+  var weakFactory: ((Any) throws -> Any)!
+  var resolveProperties: ((DependencyContainer, Any) throws -> ())?
   
+  #if swift(>=3.0)
+  init(scope: ComponentScope, factory: @escaping F) {
+    self.factory = factory
+    self.scope = scope
+  }
+  #else
+  init(scope: ComponentScope, factory: F) {
+    self.factory = factory
+    self.scope = scope
+  }
+  #endif
+
+  #if swift(>=3.0)
   /**
    Set the block that will be used to resolve dependencies of the instance.
    This block will be called before `resolve(tag:)` returns.
@@ -219,6 +132,46 @@ public final class Definition<T, U>: DefinitionType {
     }
     return self
   }
+  #else
+  /**
+   Set the block that will be used to resolve dependencies of the instance.
+   This block will be called before `resolve(tag:)` returns.
+   
+   - parameter block: The block to resolve property dependencies of the instance.
+   
+   - returns: modified definition
+   
+   - note: To resolve circular dependencies at least one of them should use this block
+           to resolve its dependencies. Otherwise the application will enter an infinite loop and crash.
+   
+   - note: You can call this method several times on the same definition.
+           Container will call all provided blocks in the same order.
+   
+   **Example**
+   
+   ```swift
+   container.register { ClientImp(service: try container.resolve() as Service) as Client }
+   
+   container.register { ServiceImp() as Service }
+     .resolvingProperties { container, service in
+       service.client = try container.resolve() as Client
+   }
+   ```
+   
+   */
+  public func resolvingProperties(block: (DependencyContainer, T) throws -> ()) -> Definition {
+    if let oldBlock = self.resolveProperties {
+      self.resolveProperties = {
+        try oldBlock($0, $1 as! T)
+        try block($0, $1 as! T)
+      }
+    }
+    else {
+      self.resolveProperties = { try block($0, $1 as! T) }
+    }
+    return self
+  }
+  #endif
 
   /// Calls `resolveDependencies` block if it was set.
   func resolveProperties(of instance: Any, container: DependencyContainer) throws {
@@ -233,40 +186,40 @@ public final class Definition<T, U>: DefinitionType {
   
   //MARK: - AutoWiringDefinition
   
-  fileprivate(set) var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
-  fileprivate(set) var numberOfArguments: Int = 0
+  var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)?
+  var numberOfArguments: Int = 0
   
   //MARK: - TypeForwardingDefinition
   
   /// Types that can be resolved using this definition.
-  fileprivate(set) var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
+  private(set) var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
   
   /// Return `true` if type can be resolved using this definition
-  func doesImplements(_ type: Any.Type) -> Bool {
-    return implementingTypes.contains(where: { $0 == type })
+  func doesImplements(type aType: Any.Type) -> Bool {
+    return implementingTypes.contains(where: { $0 == aType })
   }
   
   //MARK: - _TypeForwardingDefinition
 
   /// Adds type as being able to be resolved using this definition
-  fileprivate func _implements(_ type: Any.Type) {
-    _implements([type])
+  func _implements(type aType: Any.Type) {
+    _implements(types: [aType])
   }
   
   /// Adds types as being able to be resolved using this definition
-  fileprivate func _implements(_ types: [Any.Type]) {
-    implementingTypes.append(contentsOf: types.filter({ !doesImplements($0) }))
+  func _implements(types aTypes: [Any.Type]) {
+    implementingTypes.append(contentsOf: aTypes.filter({ !doesImplements(type: $0) }))
   }
   
   /// Definition to which resolution will be forwarded to
-  fileprivate weak var forwardsTo: _TypeForwardingDefinition? {
+  weak var forwardsTo: _TypeForwardingDefinition? {
     didSet {
       //both definitions (self and forwardsTo) can resolve
       //each other types and each other implementing types
       //this relationship can be used to reuse previously resolved instances
       if let forwardsTo = forwardsTo {
-        _implements(forwardsTo.type)
-        _implements(forwardsTo.implementingTypes)
+        _implements(type: forwardsTo.type)
+        _implements(types: forwardsTo.implementingTypes)
         
         //definitions for types that can be resolved by `forwardsTo` definition
         //can also be used to resolve self type and it's implementing types
@@ -274,20 +227,20 @@ public final class Definition<T, U>: DefinitionType {
         //when there are several forwarded definitions
         //see testThatItReusesInstanceResolvedByTypeForwarding)
         for definition in forwardsTo.forwardsFrom {
-          definition._implements(type)
-          definition._implements(implementingTypes)
+          definition._implements(type: type)
+          definition._implements(types: implementingTypes)
         }
         
         //forwardsTo can be used to resolve self type and it's implementing types
-        forwardsTo._implements(type)
-        forwardsTo._implements(implementingTypes)
+        forwardsTo._implements(type: type)
+        forwardsTo._implements(types: implementingTypes)
         forwardsTo.forwardsFrom.append(self)
       }
     }
   }
   
   /// Definitions that will forward resolution to this definition
-  fileprivate var forwardsFrom: [_TypeForwardingDefinition] = []
+  var forwardsFrom: [_TypeForwardingDefinition] = []
   
 }
 
@@ -303,11 +256,11 @@ protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefini
 
 //MARK: - Type Forwarding
 
-private protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definition {
-  weak var forwardsTo: _TypeForwardingDefinition? { get set }
+protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definition {
+  weak var forwardsTo: _TypeForwardingDefinition? { get }
   var forwardsFrom: [_TypeForwardingDefinition] { get set }
-  func _implements(_ type: Any.Type)
-  func _implements(_ type: [Any.Type])
+  func _implements(type aType: Any.Type)
+  func _implements(types aTypes: [Any.Type])
 }
 
 extension Definition: _TypeForwardingDefinition {
@@ -366,9 +319,9 @@ private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
 /// Returns key-defintion pairs with definitions able to resolve that type (directly or via type forwarding)
 /// and which tag matches provided key's tag or is nil.
 /// In the end filters defintions by type of runtime arguments.
-func filter(_ definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
-  let definitions = definitions
-    .filter({ $0.key.type == key.type || $0.definition.doesImplements(key.type) })
+func filter(definitions _definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
+  let definitions = _definitions
+    .filter({ $0.key.type == key.type || $0.definition.doesImplements(type: key.type) })
     .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
   if byTypeOfArguments {
     return definitions.filter({ $0.key.typeOfArguments == key.typeOfArguments })
@@ -379,8 +332,8 @@ func filter(_ definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byType
 }
 
 /// Orders key-definition pairs putting first definitions registered for provided tag.
-func order(_ definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
+func order(definitions _definitions: [KeyDefinitionPair], byTag tag: DependencyContainer.Tag?) -> [KeyDefinitionPair] {
   return
-    definitions.filter({ $0.key.tag == tag }) +
-      definitions.filter({ $0.key.tag != tag })
+    _definitions.filter({ $0.key.tag == tag }) +
+      _definitions.filter({ $0.key.tag != tag })
 }

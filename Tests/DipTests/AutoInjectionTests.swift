@@ -31,7 +31,7 @@ private protocol Server: class {
 }
 
 private protocol Client: class {
-  var server: Server! {get}
+  var server: Server? {get}
   var anotherServer: Server! {get set}
 }
 
@@ -56,7 +56,7 @@ private class ClientImp: Client {
     AutoInjectionTests.serverDidInjectCalled = true
   }
 
-  var server: Server! {
+  var server: Server? {
     return _server.value
   }
 

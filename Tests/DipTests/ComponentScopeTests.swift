@@ -62,8 +62,9 @@ class ComponentScopeTests: XCTestCase {
       ("testThatItDoesNotReuseInstanceInSharedScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInSharedScopeResolvedForNilTagWhenResolvingForAnotherTag),
       ("testThatItReusesInstanceInSharedScopeResolvedForNilTag", testThatItReusesInstanceInSharedScopeResolvedForNilTag),
       ("testThatItReusesResolvedInstanceWhenResolvingOptional", testThatItReusesResolvedInstanceWhenResolvingOptional),
-      ("testThatItHoldsWeakReferenceToWeakSingletonInstance",
-          testThatItHoldsWeakReferenceToWeakSingletonInstance)
+      ("testThatItHoldsWeakReferenceToWeakSingletonInstance", testThatItHoldsWeakReferenceToWeakSingletonInstance),
+      ("testThatItResolvesWeakSingletonAgainAfterItWasReleased", testThatItResolvesWeakSingletonAgainAfterItWasReleased),
+      ("testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer", testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer)
     ]
   }()
   
@@ -333,6 +334,20 @@ class ComponentScopeTests: XCTestCase {
     
     //then
     XCTAssertNil(weakSingleton)
+  }
+  
+  func testThatItResolvesWeakSingletonAgainAfterItWasReleased() {
+    Dip.logLevel = .Verbose
+    //given
+    let service = container.register(.weakSingleton) { ServiceImp1() }
+    container.register(service, type: Service.self)
+    
+    //when
+    //resolve and realease reight away
+    _ = try? container.resolve() as ServiceImp1
+    
+    //then
+    AssertNoThrow(expression: try container.resolve() as Service, "Weak singleton should be resolved again.")
   }
   
   func testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer() {
