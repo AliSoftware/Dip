@@ -2,7 +2,7 @@
 
 ## 5.0.3
 
-* Added Swift 2.3 compatibility. `swift2.3` brunch is not longer maintained.  
+* Added Swift 2.3 compatibility. `swift2.3` brunch is no longer maintained.  
   [#127](https://github.com/AliSoftware/Dip/issues/127), [@ilyapuchka](https://github.com/ilyapuchka)
 
 #### Fixed
