@@ -72,10 +72,10 @@ class WeakBox<T>: WeakBoxType {
   }
 
   init(_ value: T) {
-    #if !_runtime(_ObjC) || !swift(>=3.0)
-      weak var value: AnyObject? = value as? AnyObject
-    #else
+    #if _runtime(_ObjC)
       weak var value: AnyObject? = value as AnyObject
+    #else
+      weak var value: AnyObject? = value as? AnyObject
     #endif
     guard value != nil else {
       fatalError("Can not store weak reference to not a class instance (\(T.self))")

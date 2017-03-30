@@ -22,7 +22,6 @@
 // THE SOFTWARE.
 //
 
-#if swift(>=3.0)
 /**
  Errors thrown by `DependencyContainer`'s methods.
  
@@ -92,5 +91,4 @@ public enum DipError: Error, CustomStringConvertible {
   }
   
 }
-#endif
 
