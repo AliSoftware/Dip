@@ -30,9 +30,15 @@ public enum LogLevel: Int {
 
 public var logLevel: LogLevel = .Errors
 
+public typealias LoggingFunctionType = (LogLevel, Any) -> Void
+
+public var loggingFunction: LoggingFunctionType? = { _, message in
+  print(message)
+}
+
 func log(level logLevel: LogLevel, _ message: Any) {
   guard logLevel.rawValue <= Dip.logLevel.rawValue else { return }
-  print(message)
+  loggingFunction?(logLevel, message)
 }
 
 ///Internal protocol used to unwrap optional values.
