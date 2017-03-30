@@ -35,7 +35,7 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
   }
   
   public var hashValue: Int {
-    return "\(type)-\(typeOfArguments)-\(tag)".hashValue
+    return "\(type)-\(typeOfArguments)-\(tag ?? "")".hashValue
   }
   
   public var description: String {
