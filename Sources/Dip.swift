@@ -257,8 +257,19 @@ extension DependencyContainer {
   public func collaborate(with containers: [DependencyContainer]) {
     _collaborators += containers
     for container in containers {
+      container._collaborators += [self]
       container.resolvedInstances.singletonsBox = self.resolvedInstances.singletonsBox
       container.resolvedInstances.weakSingletonsBox = self.resolvedInstances.weakSingletonsBox
+      updateCollaborationReferences(between: container, and: self)
+    }
+  }
+  
+  private func updateCollaborationReferences(between container: DependencyContainer, and collaborator: DependencyContainer) {
+    for container in container._collaborators {
+      guard container.resolvedInstances.singletonsBox !== collaborator.resolvedInstances.singletonsBox else { continue }
+      container.resolvedInstances.singletonsBox = collaborator.resolvedInstances.singletonsBox
+      container.resolvedInstances.weakSingletonsBox = collaborator.resolvedInstances.weakSingletonsBox
+      updateCollaborationReferences(between: container, and: collaborator)
     }
   }
   
