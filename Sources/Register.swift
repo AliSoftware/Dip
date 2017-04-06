@@ -22,41 +22,39 @@
 // THE SOFTWARE.
 //
 
-#if swift(>=3.0)
-  extension DependencyContainer {
-    /**
-     Registers definition for passed type.
-     
-     If instance created by factory of definition, passed as a first parameter,
-     does not implement type passed in a `type` parameter,
-     container will throw `DipError.DefinitionNotFound` error when trying to resolve that type.
-     
-     - parameters:
-        - definition: Definition to register
-        - type: Type to register definition for
-        - tag: Optional tag to associate definition with. Default is `nil`.
-     
-     - returns: New definition registered for passed type.
-     */
-    @discardableResult public func register<T, U, F>(_ definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
-      return _register(definition: definition, type: type, tag: tag)
-    }
-
-    /**
-     Register definiton in the container and associate it with an optional tag.
-     Will override already registered definition for the same type and factory, associated with the same tag.
-     
-     - parameters:
-        - tag: The arbitrary tag to associate this definition with. Pass `nil` to associate with any tag. Default value is `nil`.
-        - definition: The definition to register in the container.
-     
-     */
-    public func register<T, U>(_ definition: Definition<T, U>, tag: DependencyTagConvertible? = nil) {
-      _register(definition: definition, tag: tag)
-    }
-
+extension DependencyContainer {
+  /**
+   Registers definition for passed type.
+   
+   If instance created by factory of definition, passed as a first parameter,
+   does not implement type passed in a `type` parameter,
+   container will throw `DipError.DefinitionNotFound` error when trying to resolve that type.
+   
+   - parameters:
+      - definition: Definition to register
+      - type: Type to register definition for
+      - tag: Optional tag to associate definition with. Default is `nil`.
+   
+   - returns: New definition registered for passed type.
+   */
+  @discardableResult public func register<T, U, F>(_ definition: Definition<T, U>, type: F.Type, tag: DependencyTagConvertible? = nil) -> Definition<F, U> {
+    return _register(definition: definition, type: type, tag: tag)
   }
-#endif
+
+  /**
+   Register definiton in the container and associate it with an optional tag.
+   Will override already registered definition for the same type and factory, associated with the same tag.
+   
+   - parameters:
+      - tag: The arbitrary tag to associate this definition with. Pass `nil` to associate with any tag. Default value is `nil`.
+      - definition: The definition to register in the container.
+   
+   */
+  public func register<T, U>(_ definition: Definition<T, U>, tag: DependencyTagConvertible? = nil) {
+    _register(definition: definition, tag: tag)
+  }
+
+}
 
 extension DependencyContainer {
   
