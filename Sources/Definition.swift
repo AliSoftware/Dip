@@ -269,12 +269,12 @@ private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
 }
 
 /// Returns key-defintion pairs with definitions able to resolve that type (directly or via type forwarding)
-/// and which tag matches provided key's tag or is nil.
+/// and which tag matches provided key's tag or is nil if strictByTag is false.
 /// In the end filters defintions by type of runtime arguments.
-func filter(definitions _definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
+func filter(definitions _definitions: [KeyDefinitionPair], byKey key: DefinitionKey, strictByTag: Bool = false, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
   let definitions = _definitions
     .filter({ $0.key.type == key.type || $0.definition.doesImplements(type: key.type) })
-    .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
+    .filter({ $0.key.tag == key.tag || (!strictByTag && $0.key.tag == nil) })
   if byTypeOfArguments {
     return definitions.filter({ $0.key.typeOfArguments == key.typeOfArguments })
   }
