@@ -50,19 +50,30 @@ extension DependencyContainer {
   }
 
   private func autoWiringDefinition(byKey key: DefinitionKey) throws -> KeyDefinitionPair {
+    do {
+      return try autoWiringDefinition(byKey: key, strictByTag: true)
+    } catch  {
+      if key.tag != nil {
+        return try autoWiringDefinition(byKey: key, strictByTag: false)
+      } else {
+        throw error
+      }
+    }
+  }
+  
+  private func autoWiringDefinition(byKey key: DefinitionKey, strictByTag: Bool) throws -> KeyDefinitionPair {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
     
-    definitions = filter(definitions: definitions, byKey: key)
+    definitions = filter(definitions: definitions, byKey: key, strictByTag: strictByTag)
     definitions = definitions.sorted(by: { $0.definition.numberOfArguments > $1.definition.numberOfArguments })
-
+    
     guard definitions.count > 0 && definitions[0].definition.numberOfArguments > 0 else {
       throw DipError.definitionNotFound(key: key)
     }
     
     let maximumNumberOfArguments = definitions.first?.definition.numberOfArguments
     definitions = definitions.filter({ $0.definition.numberOfArguments == maximumNumberOfArguments })
-    definitions = order(definitions: definitions, byTag: key.tag)
-
+    
     //when there are several definitions with the same number of arguments but different arguments types
     if definitions.count > 1 && definitions[0].key.typeOfArguments != definitions[1].key.typeOfArguments {
       let error = DipError.ambiguousDefinitions(type: key.type, definitions: definitions.map({ $0.definition }))
