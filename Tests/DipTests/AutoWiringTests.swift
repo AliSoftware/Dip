@@ -56,7 +56,7 @@ class AutoWiringTests: XCTestCase {
       ("testThatItUsesAutoWireFactoryWithMostNumberOfArguments", testThatItUsesAutoWireFactoryWithMostNumberOfArguments),
       ("testThatItThrowsAmbiguityErrorWhenUsingAutoWire", testThatItThrowsAmbiguityErrorWhenUsingAutoWire),
       ("testThatItUsesAutoWireFactoryWithMostNumberOfArguments", testThatItUsesAutoWireFactoryWithMostNumberOfArguments),
-      ("testThatItPrefersTaggedFactoryWithDifferentNumberOfArgumentsWhenUsingAutoWire"), testThatItPrefersTaggedFactoryWithDifferentNumberOfArgumentsWhenUsingAutoWire,
+      ("testThatItPrefersTaggedFactoryWithDifferentNumberOfArgumentsWhenUsingAutoWire", testThatItPrefersTaggedFactoryWithDifferentNumberOfArgumentsWhenUsingAutoWire),
       ("testThatItPrefersTaggedFactoryWithDifferentTypesOfArgumentsWhenUsingAutoWire", testThatItPrefersTaggedFactoryWithDifferentTypesOfArgumentsWhenUsingAutoWire),
       ("testThatItFallbackToNotTaggedFactoryWhenUsingAutoWire", testThatItFallbackToNotTaggedFactoryWhenUsingAutoWire),
       ("testThatItDoesNotTryToUseAutoWiringWhenCallingResolveWithArguments", testThatItDoesNotTryToUseAutoWiringWhenCallingResolveWithArguments),
