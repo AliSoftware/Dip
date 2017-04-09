@@ -27,8 +27,6 @@ protocol TypeForwardingDefinition: DefinitionType {
   func doesImplements(type aType: Any.Type) -> Bool
 }
 
-#if swift(>=3.0)
-  
 extension Definition {
   
   /**
@@ -84,13 +82,17 @@ extension Definition {
   }
 
   ///Registers definition for types passed as parameters
+  @available(*, deprecated: 5.1.0)
   @discardableResult public func implements<A, B, C, D>(_ a: A.Type, _ b: B.Type, c: C.Type, d: D.Type) -> Definition {
     return implements(a).implements(b).implements(c).implements(d)
   }
   
+  ///Registers definition for types passed as parameters
+  @discardableResult public func implements<A, B, C, D>(_ a: A.Type, _ b: B.Type, _ c: C.Type, _ d: D.Type) -> Definition {
+    return implements(a).implements(b).implements(c).implements(d)
+  }
+  
 }
-
-#endif
 
 extension DependencyContainer {
   

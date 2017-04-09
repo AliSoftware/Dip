@@ -658,6 +658,7 @@ extension DipTests {
     //given
     let collaborator = DependencyContainer()
     collaborator.register { ResolvableService() as Service }
+    container.register { "something" }
 
     //when
     container.collaborate(with: collaborator)
@@ -665,13 +666,14 @@ extension DipTests {
     //then
     AssertNoThrow(expression: try container.resolve() as Service)
     AssertNoThrow(expression: try container.resolve(Service.self))
+    AssertNoThrow(expression: try collaborator.resolve() as String)
+    AssertNoThrow(expression: try collaborator.resolve(String.self))
   }
   
   func testThatCollaboratingWithSelfIsIgnored() {
     let collaborator = DependencyContainer()
     collaborator.collaborate(with: collaborator)
     XCTAssertTrue(collaborator._collaborators.isEmpty, "Container should not collaborate with itself")
-    
   }
   
   func testThatCollaboratingContainersAreWeakReferences() {
@@ -728,6 +730,40 @@ extension DipTests {
     XCTAssertTrue(client === client?.server?.client)
     XCTAssertTrue(client === (client as? ClientImp)?.anotherServer?.client)
     XCTAssertTrue(client?.server === (client as? ClientImp)?.anotherServer)
+  }
+  
+  func testThatCollaborationReferencesAreRecursivelyUpdate() {
+    let container = DependencyContainer()
+    container.register(.singleton){ ResolvableService() as Service }
+    
+    //when
+    let collaborator1 = DependencyContainer()
+    let collaborator2 = DependencyContainer()
+    let collaborator3 = DependencyContainer()
+    let collaborator4 = DependencyContainer()
+    
+    collaborator1.collaborate(with: container)
+    XCTAssertTrue(collaborator1.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+
+    collaborator2.collaborate(with: container)
+    XCTAssertTrue(collaborator2.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+
+    collaborator3.collaborate(with: collaborator1)
+    XCTAssertTrue(collaborator3.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+
+    collaborator4.collaborate(with: collaborator2)
+    XCTAssertTrue(collaborator4.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+    
+    let service1 = try! collaborator1.resolve() as Service
+    let service2 = try! collaborator2.resolve() as Service
+    let service3 = try! collaborator3.resolve() as Service
+    let service4 = try! collaborator4.resolve() as Service
+    let serviceRoot = try! container.resolve() as Service
+    
+    XCTAssertTrue(service1 === serviceRoot)
+    XCTAssertTrue(service2 === serviceRoot)
+    XCTAssertTrue(service3 === serviceRoot)
+    XCTAssertTrue(service4 === serviceRoot)
   }
   
 }

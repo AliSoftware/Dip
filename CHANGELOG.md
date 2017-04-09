@@ -1,10 +1,26 @@
 # CHANGELOG
 
+## 5.1
+
+* Dropped Swift 2.3 support.  
+  [#150](https://github.com/AliSoftware/Dip/issues/150), [@ilyapuchka](https://github.com/ilyapuchka)
+* Added custom logging function.  
+  [#146](https://github.com/AliSoftware/Dip/issues/146), [@Pr0Ger](https://github.com/Pr0Ger)
+  
+#### Fixed
+
+* Fixed Swift 3.1 warnings.  
+  [#145](https://github.com/AliSoftware/Dip/issues/145), [@DenHeadless](https://github.com/DenHeadless)
+* Fixed collaboration shared references.  
+  [#151](https://github.com/AliSoftware/Dip/issues/151), [@ilyapuchka](https://github.com/ilyapuchka)
+* Fixed autowiring when using tags.  
+  [#154](https://github.com/AliSoftware/Dip/issues/154), [@ilyapuchka](https://github.com/ilyapuchka)
+
 ## 5.0.4
 
 #### Fixed
 
-* Fixed broken compatibility for Swift 2.3 API in `resolve(tag:arguments:)` method.
+* Fixed broken compatibility for Swift 2.3 API in `resolve(tag:arguments:)` method.  
   [#135](https://github.com/AliSoftware/Dip/issues/135), [@ilyapuchka](https://github.com/ilyapuchka)
   
 ## 5.0.3

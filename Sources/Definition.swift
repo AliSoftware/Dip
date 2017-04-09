@@ -35,7 +35,7 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
   }
   
   public var hashValue: Int {
-    return "\(type)-\(typeOfArguments)-\(tag)".hashValue
+    return "\(type)-\(typeOfArguments)-\(tag.desc)".hashValue
   }
   
   public var description: String {
@@ -81,19 +81,11 @@ public final class Definition<T, U>: DefinitionType {
   var weakFactory: ((Any) throws -> Any)!
   var resolveProperties: ((DependencyContainer, Any) throws -> ())?
   
-  #if swift(>=3.0)
   init(scope: ComponentScope, factory: @escaping F) {
     self.factory = factory
     self.scope = scope
   }
-  #else
-  init(scope: ComponentScope, factory: F) {
-    self.factory = factory
-    self.scope = scope
-  }
-  #endif
 
-  #if swift(>=3.0)
   /**
    Set the block that will be used to resolve dependencies of the instance.
    This block will be called before `resolve(tag:)` returns.
@@ -132,46 +124,6 @@ public final class Definition<T, U>: DefinitionType {
     }
     return self
   }
-  #else
-  /**
-   Set the block that will be used to resolve dependencies of the instance.
-   This block will be called before `resolve(tag:)` returns.
-   
-   - parameter block: The block to resolve property dependencies of the instance.
-   
-   - returns: modified definition
-   
-   - note: To resolve circular dependencies at least one of them should use this block
-           to resolve its dependencies. Otherwise the application will enter an infinite loop and crash.
-   
-   - note: You can call this method several times on the same definition.
-           Container will call all provided blocks in the same order.
-   
-   **Example**
-   
-   ```swift
-   container.register { ClientImp(service: try container.resolve() as Service) as Client }
-   
-   container.register { ServiceImp() as Service }
-     .resolvingProperties { container, service in
-       service.client = try container.resolve() as Client
-   }
-   ```
-   
-   */
-  public func resolvingProperties(block: (DependencyContainer, T) throws -> ()) -> Definition {
-    if let oldBlock = self.resolveProperties {
-      self.resolveProperties = {
-        try oldBlock($0, $1 as! T)
-        try block($0, $1 as! T)
-      }
-    }
-    else {
-      self.resolveProperties = { try block($0, $1 as! T) }
-    }
-    return self
-  }
-  #endif
 
   /// Calls `resolveDependencies` block if it was set.
   func resolveProperties(of instance: Any, container: DependencyContainer) throws {
@@ -317,12 +269,12 @@ private func ~=(lhs: KeyDefinitionPair, rhs: KeyDefinitionPair) -> Bool {
 }
 
 /// Returns key-defintion pairs with definitions able to resolve that type (directly or via type forwarding)
-/// and which tag matches provided key's tag or is nil.
+/// and which tag matches provided key's tag or is nil if strictByTag is false.
 /// In the end filters defintions by type of runtime arguments.
-func filter(definitions _definitions: [KeyDefinitionPair], byKey key: DefinitionKey, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
+func filter(definitions _definitions: [KeyDefinitionPair], byKey key: DefinitionKey, strictByTag: Bool = false, byTypeOfArguments: Bool = false) -> [KeyDefinitionPair] {
   let definitions = _definitions
     .filter({ $0.key.type == key.type || $0.definition.doesImplements(type: key.type) })
-    .filter({ $0.key.tag == key.tag || $0.key.tag == nil })
+    .filter({ $0.key.tag == key.tag || (!strictByTag && $0.key.tag == nil) })
   if byTypeOfArguments {
     return definitions.filter({ $0.key.typeOfArguments == key.typeOfArguments })
   }

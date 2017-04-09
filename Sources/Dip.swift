@@ -99,19 +99,11 @@ public final class DependencyContainer {
     }
   }
 
-  #if swift(>=3.0)
   func threadSafe<T>(_ closure: () throws -> T) rethrows -> T {
     lock.lock()
     defer { lock.unlock() }
     return try closure()
   }
-  #else
-  func threadSafe<T>(@noescape closure: () throws -> T) rethrows -> T {
-    lock.lock()
-    defer { lock.unlock() }
-    return try closure()
-  }
-  #endif
   
 }
 
@@ -265,8 +257,19 @@ extension DependencyContainer {
   public func collaborate(with containers: [DependencyContainer]) {
     _collaborators += containers
     for container in containers {
+      container._collaborators += [self]
       container.resolvedInstances.singletonsBox = self.resolvedInstances.singletonsBox
       container.resolvedInstances.weakSingletonsBox = self.resolvedInstances.weakSingletonsBox
+      updateCollaborationReferences(between: container, and: self)
+    }
+  }
+  
+  private func updateCollaborationReferences(between container: DependencyContainer, and collaborator: DependencyContainer) {
+    for container in container._collaborators {
+      guard container.resolvedInstances.singletonsBox !== collaborator.resolvedInstances.singletonsBox else { continue }
+      container.resolvedInstances.singletonsBox = collaborator.resolvedInstances.singletonsBox
+      container.resolvedInstances.weakSingletonsBox = collaborator.resolvedInstances.weakSingletonsBox
+      updateCollaborationReferences(between: container, and: collaborator)
     }
   }
   
@@ -278,11 +281,7 @@ extension DependencyContainer {
       //it means that it has been already called to resolve this type,
       //so there is probably a cercular reference between containers.
       //To break it skip this container
-      #if swift(>=3.0)
       if let context = collaborator.context, context.resolvingType == key.type && context.tag == key.tag { continue }
-      #else
-        if let context = collaborator.context where context.resolvingType == key.type && context.tag == key.tag { continue }
-      #endif
       
       do {
         //Pass current container's instances pool to collect instances resolved by collaborator
@@ -313,7 +312,6 @@ extension DependencyContainer {
 
 extension DependencyContainer {
   
-  #if swift(>=3.0)
   /**
    Removes definition registered in the container.
    
@@ -324,18 +322,6 @@ extension DependencyContainer {
   public func remove<T, U>(_ definition: Definition<T, U>, tag: DependencyTagConvertible? = nil) {
     _remove(definition: definition, tag: tag)
   }
-  #else
-  /**
-   Removes definition registered in the container.
-   
-   - parameters:
-      - tag: The tag used to register definition.
-      - definition: The definition to remove
-   */
-  public func remove<T, U>(definition: Definition<T, U>, tag: DependencyTagConvertible? = nil) {
-  _remove(definition: definition, tag: tag)
-  }
-  #endif
   
   func _remove<T, U>(definition aDefinition: Definition<T, U>, tag: DependencyTagConvertible? = nil) {
     let key = DefinitionKey(type: T.self, typeOfArguments: U.self, tag: tag?.dependencyTag)
@@ -372,7 +358,6 @@ extension DependencyContainer {
 
 extension DependencyContainer {
   
-  #if swift(>=3.0)
   /**
    Validates container configuration trying to resolve each registered definition one by one.
    If definition fails to be resolved without arguments will search provided arguments array
@@ -385,20 +370,6 @@ extension DependencyContainer {
   public func validate(_ arguments: Any...) throws {
     try _validate(arguments: arguments)
   }
-  #else
-  /**
-   Validates container configuration trying to resolve each registered definition one by one.
-   If definition fails to be resolved without arguments will search provided arguments array
-   for arguments matched by type and try to resolve this definition using these arguments.
-   If there are no matching arguments will rethrow original error.
-   
-   - parameter arguments: Set of arguments to use to resolve registered definitions.
-                          Use a tuple for registered factories that accept several runtime arguments.
-   */
-  public func validate(arguments: Any...) throws {
-    try _validate(arguments: arguments)
-  }
-  #endif
   
   func _validate(arguments _arguments: [Any]) throws {
     let arguments = _arguments
@@ -406,11 +377,7 @@ extension DependencyContainer {
       do {
         //try to resolve key using provided arguments
         for argumentsSet in arguments {
-          #if swift(>=3.0)
-            guard type(of: argumentsSet) == key.typeOfArguments else { continue }
-          #else
-            guard argumentsSet.dynamicType == key.typeOfArguments else { continue }
-          #endif
+          guard type(of: argumentsSet) == key.typeOfArguments else { continue }
           do {
             let _ = try inContext(key:key, injectedInType: nil) {
               try self._resolve(key: key, builder: { definition throws -> Any in

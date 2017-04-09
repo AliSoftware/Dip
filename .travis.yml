@@ -3,15 +3,16 @@ matrix:
     - os: linux
   include:
     - script:
-        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
+        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=10.1' ONLY_ACTIVE_ARCH=NO | xcpretty -c
         - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk macosx -destination 'platform=macOS,arch=x86_64' ONLY_ACTIVE_ARCH=NO | xcpretty -c
         - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk appletvsimulator -destination 'platform=tvOS Simulator,name=Apple TV 1080p,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
-        - set -o pipefail && xcodebuild -workspace Dip.xcworkspace -scheme Dip -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch - 38mm,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty - c
-        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme DipSampleApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
-        - pod spec lint
+        # disable running watchos until https://github.com/travis-ci/travis-ci/issues/7580 is fixed
+        #- set -o pipefail && xcodebuild -workspace Dip.xcworkspace -scheme Dip -sdk watchsimulator -destination 'platform=watchOS Simulator,name=Apple Watch - 38mm,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty - c
+        - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme DipSampleApp -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=10.1' ONLY_ACTIVE_ARCH=NO | xcpretty -c
+        - pod spec lint --allow-warnings
         - carthage build --no-skip-current
       os: osx
-      osx_image: xcode8
+      osx_image: xcode8.3
       language: objective-c
       before_install:
         - gem install cocoapods --version 1.1.0.rc.2 --no-document
@@ -30,7 +31,7 @@ matrix:
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - cd Dip
     - script:
-        - swift build --clean && swift build
+        - swift build --clean && swift build && swift test
       os: linux
       dist: trusty
       sudo: required
@@ -38,16 +39,11 @@ matrix:
       before_install:
         - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
         - cd ..
-        - export SWIFT_VERSION=swift-DEVELOPMENT-SNAPSHOT-2016-09-07-a
-        - wget https://swift.org/builds/development/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - export SWIFT_VERSION=swift-3.1-RELEASE
+        - wget https://swift.org/builds/swift-3.1-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
-        - export SWIFT_RELEASE_VERSION=2.2.1
-        - export SWIFT_RELEASE_NAME="${SWIFT_RELEASE_VERSION}-RELEASE"
-        - wget https://swift.org/builds/swift-$SWIFT_RELEASE_VERSION-release/ubuntu1404/swift-$SWIFT_RELEASE_NAME/swift-$SWIFT_RELEASE_NAME-ubuntu14.04.tar.gz
-        - tar xzf swift-$SWIFT_RELEASE_NAME-ubuntu14.04.tar.gz
-        - export SWIFT_EXEC="${PWD}/swift-${SWIFT_RELEASE_NAME}-ubuntu14.04/usr/bin/swiftc"
-        - cd Dip 
+        - cd Dip
 
 notifications:
   email: false
