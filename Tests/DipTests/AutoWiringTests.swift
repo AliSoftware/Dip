@@ -53,6 +53,7 @@ class AutoWiringTests: XCTestCase {
   static var allTests = {
     return [
       ("testThatItCanResolveWithAutoWiring", testThatItCanResolveWithAutoWiring),
+      ("testThatItPrioritizesDefinitionWithTheMatchingTag", testThatItPrioritizesDefinitionWithTheMatchingTag),
       ("testThatItUsesAutoWireFactoryWithMostNumberOfArguments", testThatItUsesAutoWireFactoryWithMostNumberOfArguments),
       ("testThatItThrowsAmbiguityErrorWhenUsingAutoWire", testThatItThrowsAmbiguityErrorWhenUsingAutoWire),
       ("testThatItFirstTriesToUseTaggedFactoriesWhenUsingAutoWire", testThatItFirstTriesToUseTaggedFactoriesWhenUsingAutoWire),
@@ -97,6 +98,23 @@ class AutoWiringTests: XCTestCase {
     
     //then
     XCTAssertTrue(anyClient is AutoWiredClientImp)
+  }
+  
+  func testThatItPrioritizesDefinitionWithTheMatchingTag(){
+    //given
+    let tag = "tag"
+    
+    container.register { AutoWiredClientImp(service1: $1, service2: $0) as AutoWiredClient }
+    container.register (tag: tag, factory: { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient })
+
+    container.register { ServiceImp1() as Service }
+    container.register { ServiceImp2() }
+    
+    var resolved: AutoWiredClient?
+    
+    //when
+    AssertNoThrow(expression: resolved = try container.resolve(tag: tag) as AutoWiredClient)
+    XCTAssertNotNil(resolved)
   }
   
   func testThatItUsesAutoWireFactoryWithMostNumberOfArguments() {

@@ -62,9 +62,15 @@ extension DependencyContainer {
     let maximumNumberOfArguments = definitions.first?.definition.numberOfArguments
     definitions = definitions.filter({ $0.definition.numberOfArguments == maximumNumberOfArguments })
     definitions = order(definitions: definitions, byTag: key.tag)
-
-    //when there are several definitions with the same number of arguments but different arguments types
-    if definitions.count > 1 && definitions[0].key.typeOfArguments != definitions[1].key.typeOfArguments {
+    
+    let firstDefinitionHasAMatchingTag = (key.tag == definitions[0].key.tag)
+    let secondDefinitionHasADifferentTag = definitions.count > 1 && (key.tag != definitions[1].key.tag)
+    
+      //when there are several definitions but only one matches the tag
+    if firstDefinitionHasAMatchingTag && secondDefinitionHasADifferentTag{
+      return definitions[0]
+    }else if definitions.count > 1 && definitions[0].key.typeOfArguments != definitions[1].key.typeOfArguments {
+      //when there are several definitions with the same number of arguments but different arguments types
       let error = DipError.ambiguousDefinitions(type: key.type, definitions: definitions.map({ $0.definition }))
       throw DipError.autoWiringFailed(type: key.type, underlyingError: error)
     } else {
