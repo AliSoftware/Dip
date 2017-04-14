@@ -107,7 +107,7 @@ viewController = try MyViewController(apiClient: container.resolve())
 viewController.apiClient = try container.resolve()
 
 /*:
-Of cource `DependencyContainer` should not be a singleton too. There is just no need for that because you never should call `DependencyContainer` from inside of your components. That will make it a [service locator antipatter]((http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/)). You may only call `DependencyContainer` from the _Composition root_ - the place where all the components are configured and wired together.
+Of cource `DependencyContainer` should not be a singleton too. There is just no need for that because you never should call `DependencyContainer` from inside of your components. That will make it a [service locator antipattern]((http://blog.ploeh.dk/2010/02/03/ServiceLocatorisanAnti-Pattern/)). You may only call `DependencyContainer` from the _Composition root_ - the place where all the components are configured and wired together.
 
 Dependency Injection is a pattern (more precisely - a set of patterns) as well as a singleton. And any pattern can be abused. DI can be used in a [wrong way]((http://www.loosecouplings.com/2011/01/dependency-injection-using-di-container.html)), container can easily become a service locator. You should carefully decide when to use DI, you should not inject everything and everywhere and define a protocol for every single class you use. For every tool there is a right time and the same way as singleton can harm you the same way DI and protocols abuse can make your code unnececerry complex.
 
