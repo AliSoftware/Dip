@@ -24,6 +24,7 @@ enum DependencyTags: Int, DependencyTagConvertible {
 
 // MARK: Dependency Container for Providers
 func configure(container dip: DependencyContainer) {
+    dip.register(.singleton) { try CoreDataServiceImpl() as CoreDataService}
     
     // Register the NetworkLayer, same for everyone here (but we have the ability to register a different one for a specific WebService if we wanted to)
     dip.register(.singleton) { URLSessionNetworkLayer(baseURL: "http://swapi.co/api/")! as NetworkLayer }

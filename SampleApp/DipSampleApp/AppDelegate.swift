@@ -22,6 +22,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //This is a composition root where container is configured and all dependencies are resolved
         configure(container: container)
         
+        let coredataService = try! container.resolve() as CoreDataService
+        
         let personProvider = try! container.resolve() as PersonProviderAPI
         let starshipProvider = try! container.resolve() as StarshipProviderAPI
         
