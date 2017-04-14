@@ -23,7 +23,7 @@
 //
 
 ///A key used to store definitons in a container.
-public struct DefinitionKey : Hashable, CustomStringConvertible {
+public struct DefinitionKey: Hashable, CustomStringConvertible {
   public let type: Any.Type
   public let typeOfArguments: Any.Type
   public private(set) var tag: DependencyContainer.Tag?
@@ -47,15 +47,15 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
     tagged.tag = tag
     return tagged
   }
-  
-}
 
-/// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
-public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
-  return
-    lhs.type == rhs.type &&
+  /// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
+  public static func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
+    return
+      lhs.type == rhs.type &&
       lhs.typeOfArguments == rhs.typeOfArguments &&
       lhs.tag == rhs.tag
+  }
+  
 }
 
 ///Dummy protocol to store definitions for different types in collection

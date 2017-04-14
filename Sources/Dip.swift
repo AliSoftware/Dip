@@ -34,7 +34,7 @@ public final class DependencyContainer {
    
    - seealso: `DependencyTagConvertible`
    */
-  public enum Tag: Equatable {
+  public enum Tag {
     case String(StringLiteralType)
     case Int(IntegerLiteralType)
   }
@@ -477,13 +477,17 @@ extension DependencyContainer.Tag: ExpressibleByIntegerLiteral {
   
 }
 
-public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
-  switch (lhs, rhs) {
-  case let (.String(lhsString), .String(rhsString)):
-    return lhsString == rhsString
-  case let (.Int(lhsInt), .Int(rhsInt)):
-    return lhsInt == rhsInt
-  default:
-    return false
+extension DependencyContainer.Tag: Equatable {
+
+  public static func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
+    switch (lhs, rhs) {
+    case let (.String(lhsString), .String(rhsString)):
+      return lhsString == rhsString
+    case let (.Int(lhsInt), .Int(rhsInt)):
+      return lhsInt == rhsInt
+    default:
+      return false
+    }
   }
+
 }
