@@ -248,7 +248,98 @@ class DipTests: XCTestCase {
     //then
     XCTAssertTrue(resolveDependenciesCalled)
   }
-  
+
+  private class CountedClient: Client {
+    static var createdInstances: Int = 0
+
+    let server: Server!
+
+    init(server: Server) {
+      self.server = server
+      CountedClient.createdInstances += 1
+    }
+  }
+
+  private class CountedServer: Server {
+    static var createdInstances: Int = 0
+
+    weak var client: Client!
+
+    init() {
+      CountedServer.createdInstances += 1
+    }
+  }
+
+  func testThatSingletonCreatedOnlyOnce() {
+    // given
+    CountedClient.createdInstances = 0
+    CountedServer.createdInstances = 0
+
+    container.register(.singleton, factory: CountedClient.init)
+        .implements(Client.self)
+
+    container.register(.singleton, factory: CountedServer.init)
+        .resolvingProperties { (container, service) in
+          service.client = try! container.resolve()
+        }
+        .implements(Server.self)
+
+    // when
+    let client: Client = try! container.resolve()
+
+    // then
+    XCTAssertNotNil(client.server.client)
+    XCTAssertTrue(client === client.server.client)
+    XCTAssertEqual(CountedClient.createdInstances, 1)
+    XCTAssertEqual(CountedServer.createdInstances, 1)
+  }
+
+  func testThatSharedInstancesCreatedOncePerResolve() {
+    // given
+    CountedClient.createdInstances = 0
+    CountedServer.createdInstances = 0
+
+    container.register(.singleton, factory: CountedClient.init)
+        .implements(Client.self)
+
+    container.register(.singleton, factory: CountedServer.init)
+        .resolvingProperties { (container, service) in
+          service.client = try! container.resolve()
+        }
+        .implements(Server.self)
+
+    // when
+    let client: Client = try! container.resolve()
+
+    // then
+    XCTAssertNotNil(client.server.client)
+    XCTAssertTrue(client === client.server.client)
+    XCTAssertEqual(CountedClient.createdInstances, 1)
+    XCTAssertEqual(CountedServer.createdInstances, 1)
+  }
+
+  // remove underscore, this test crashes with stackoverflow error (I guess)
+  func _testThatItThrowsErrorIfDetectsInvalidCircularDependencies() {
+    // given
+    container.register(.unique, factory: CountedClient.init)
+        .implements(Client.self)
+
+    container.register(.unique, factory: CountedServer.init)
+        .resolvingProperties { (container, service) in
+          service.client = try! container.resolve()
+        }
+        .implements(Server.self)
+
+    do {
+      // when
+      _ = try container.resolve() as Client
+      XCTFail()
+    } catch {
+      // then
+      // TODO: catch an invalid circular dependency error here
+    }
+  }
+
   func testThatItThrowsErrorIfCanNotFindDefinitionForType() {
     //given
     container.register { ServiceImp1() as ServiceImp1 }
