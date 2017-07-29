@@ -769,18 +769,18 @@ extension DipTests {
     XCTAssertTrue(service3 === serviceRoot)
     XCTAssertTrue(service4 === serviceRoot)
   }
-  
-  func testThatContainersShareTheirSingletonsOnlyWithCollaborators() {
-    class RootService {}
-    class ServiceClient {
-      let name: String
-      let service: RootService
-      init(name: String, service: RootService) {
-        self.name = name
-        self.service = service
-      }
+
+  class RootService {}
+  class ServiceClient {
+    let name: String
+    let service: RootService
+    init(name: String, service: RootService) {
+      self.name = name
+      self.service = service
     }
-    
+  }
+
+  func testThatContainersShareTheirSingletonsOnlyWithCollaborators() {
     let container = DependencyContainer()
     container.register(.singleton) { RootService() }
     
@@ -796,6 +796,31 @@ extension DipTests {
     
     collaborator1.collaborate(with: container)
     collaborator2.collaborate(with: container)
+    
+    let client2 = try! collaborator2.resolve() as ServiceClient
+    let client1 = try! collaborator1.resolve() as ServiceClient
+    
+    XCTAssertEqual(client1.name, "1")
+    XCTAssertEqual(client2.name, "2")
+    XCTAssertTrue(client1.service === client2.service)
+  }
+
+  func testThatContainerAutowireBeforeCollaboration() {
+    let container = DependencyContainer()
+    container.register(.singleton) { RootService() }
+    
+    let collaborator1 = DependencyContainer()
+    collaborator1.register(.singleton) {
+      ServiceClient(name: "1", service: $0)
+    }
+    
+    let collaborator2 = DependencyContainer()
+    collaborator2.register(.singleton) {
+      ServiceClient(name: "2", service: $0)
+    }
+    
+    collaborator1.collaborate(with: container, collaborator2)
+    collaborator2.collaborate(with: container, collaborator1)
     
     let client2 = try! collaborator2.resolve() as ServiceClient
     let client1 = try! collaborator1.resolve() as ServiceClient
