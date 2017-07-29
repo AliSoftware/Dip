@@ -71,6 +71,8 @@ extension DependencyContainer {
       definitions[key] = definition
       resolvedInstances.singletons[key] = nil
       resolvedInstances.weakSingletons[key] = nil
+      resolvedInstances.sharedSingletons[key] = nil
+      resolvedInstances.sharedWeakSingletons[key] = nil
       
       if .eagerSingleton == definition.scope {
         bootstrapQueue.append({ _ = try self.resolve(tag: tag) as T })
