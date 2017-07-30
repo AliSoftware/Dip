@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Develop
+
+* Fixed unneeded reuse of singletons in collaborating containers. 
+  Containers now first attempt to autowire components and fallback to collaboration when it fails.  
+  [#169](https://github.com/AliSoftware/Dip/issues/169), [@ilyapuchka](https://github.com/ilyapuchka)
+
 ## 5.1
 
 * Dropped Swift 2.3 support.  
