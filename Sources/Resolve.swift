@@ -100,7 +100,7 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce the number of dependencies.
    */
-  public func resolve<T, U>(tag: DependencyTagConvertible? = nil, builder: ((U) throws -> T) throws -> T) throws -> T {
+  public func resolve<T, U>(tag: DependencyTagConvertible? = nil, builder: @escaping ((U) throws -> T) throws -> T) throws -> T {
     return try _resolve(tag: tag, builder: builder)
   }
   
@@ -109,7 +109,7 @@ extension DependencyContainer {
    
    - seealso: `resolve(tag:builder:)`
   */
-  public func resolve<U>(_ type: Any.Type, tag: DependencyTagConvertible? = nil, builder: ((U) throws -> Any) throws -> Any) throws -> Any {
+  public func resolve<U>(_ type: Any.Type, tag: DependencyTagConvertible? = nil, builder: @escaping ((U) throws -> Any) throws -> Any) throws -> Any {
     return try _resolve(type: type, tag: tag, builder: builder)
   }
 
@@ -117,13 +117,13 @@ extension DependencyContainer {
 
 extension DependencyContainer {
   
-  func _resolve<T, U>(tag aTag: DependencyTagConvertible? = nil, builder: ((U) throws -> T) throws -> T) throws -> T {
+  func _resolve<T, U>(tag aTag: DependencyTagConvertible? = nil, builder: @escaping ((U) throws -> T) throws -> T) throws -> T {
     return try resolve(T.self, tag: aTag, builder: { factory in
       try builder({ try factory($0) as! T })
     }) as! T
   }
   
-  func _resolve<U>(type aType: Any.Type, tag: DependencyTagConvertible? = nil, builder: ((U) throws -> Any) throws -> Any) throws -> Any {
+  func _resolve<U>(type aType: Any.Type, tag: DependencyTagConvertible? = nil, builder: @escaping ((U) throws -> Any) throws -> Any) throws -> Any {
     let key = DefinitionKey(type: aType, typeOfArguments: U.self, tag: tag?.dependencyTag)
     
     return try inContext(key:key, injectedInType: context?.resolvingType) {

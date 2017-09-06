@@ -198,7 +198,7 @@ public final class Definition<T, U>: DefinitionType {
 
 //MARK: - _Definition
 
-protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefinition {
+protocol _Definition: AutoWiringDefinition, TypeForwardingDefinition {
   var type: Any.Type { get }
   var scope: ComponentScope { get }
   var weakFactory: ((Any) throws -> Any)! { get }
@@ -208,7 +208,7 @@ protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefini
 
 //MARK: - Type Forwarding
 
-protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definition {
+protocol _TypeForwardingDefinition: _Definition {
   weak var forwardsTo: _TypeForwardingDefinition? { get }
   var forwardsFrom: [_TypeForwardingDefinition] { get set }
   func _implements(type aType: Any.Type)
