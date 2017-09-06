@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "5.1"
+  s.version          = "5.2"
   s.summary          = "Dependency Injection for Swift made easy."
 
   s.description      = <<-DESC
