@@ -304,7 +304,7 @@ extension DependencyContainer {
           
           //get back singletons and shared instances registered in collaborator
           //and resolved during collaboration, so that they can be reused again later
-          if let matched = collaborator.definition(matching: aKey) as? _Definition {
+          if let matched = collaborator.definition(matching: aKey)?.definition {
             switch matched.scope {
             case .singleton, .eagerSingleton:
               collaborator.resolvedInstances.singletons[aKey] = self.resolvedInstances.singletons[aKey]
