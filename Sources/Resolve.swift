@@ -46,7 +46,7 @@ extension DependencyContainer {
    - seealso: `register(_:type:tag:factory:)`
    */
   public func resolve<T>(tag: DependencyTagConvertible? = nil) throws -> T {
-    return try resolve(tag: tag) { factory in try factory() }
+    return try resolve(tag: tag) { factory in try factory(()) }
   }
 
   /**
@@ -73,7 +73,7 @@ extension DependencyContainer {
    - seealso: `resolve(tag:)`, `register(_:type:tag:factory:)`
    */
   public func resolve(_ type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory() }
+    return try resolve(type, tag: tag) { factory in try factory(()) }
   }
   
   /**
