@@ -17,7 +17,7 @@ matrix:
       before_install:
         - gem install cocoapods --version 1.1.0.rc.2 --no-document
     - script:
-        - swift build --clean && swift build && swift test
+        - swift package clean && swift build && swift test
       os: linux
       dist: trusty
       sudo: required
@@ -31,7 +31,7 @@ matrix:
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - cd Dip
     - script:
-        - swift build --clean && swift build && swift test
+        - swift package clean && swift build && swift test
       os: linux
       dist: trusty
       sudo: required
@@ -39,8 +39,8 @@ matrix:
       before_install:
         - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
         - cd ..
-        - export SWIFT_VERSION=swift-3.2-RELEASE
-        - wget https://swift.org/builds/swift-3.2-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - export SWIFT_VERSION=swift-3.1-RELEASE
+        - wget https://swift.org/builds/swift-3.1-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - cd Dip
