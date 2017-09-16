@@ -573,12 +573,12 @@ class DipTests: XCTestCase {
       }.implements(Service.self)
     
     container.register(tag: "tag") { ServiceImp2() as Service }
-      .resolvingProperties { _ in
+      .resolvingProperties { _,_  in
         createdService2 = true
     }
     
     container.register { (arg: String) in ServiceImp1() }
-      .resolvingProperties { _ in
+      .resolvingProperties { _,_  in
         createdService3 = true
     }
     

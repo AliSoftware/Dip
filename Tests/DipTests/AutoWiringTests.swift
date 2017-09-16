@@ -112,7 +112,7 @@ class AutoWiringTests: XCTestCase {
     //2 args
     var factoryWithMostNumberOfArgumentsCalled = false
     container.register { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }
-      .resolvingProperties { _ in
+      .resolvingProperties { _,_  in
         factoryWithMostNumberOfArgumentsCalled = true
     }
     
@@ -164,7 +164,7 @@ class AutoWiringTests: XCTestCase {
     container.register(tag: "tag") { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }
     
     //2 arg tagged
-    container.register(tag: "tag") { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }.resolvingProperties { _ in
+    container.register(tag: "tag") { AutoWiredClientImp(service1: $0, service2: $1) as AutoWiredClient }.resolvingProperties { _,_  in
       taggedFactoryWithMostNumberOfArgumentsCalled = true
     }
 
@@ -189,7 +189,7 @@ class AutoWiringTests: XCTestCase {
     
     //1 arg tagged
     var taggedFactoryCalled = false
-    container.register(tag: "tag") { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }.resolvingProperties { _ in
+    container.register(tag: "tag") { AutoWiredClientImp(service1: try self.container.resolve(), service2: $0) as AutoWiredClient }.resolvingProperties { _,_  in
       taggedFactoryCalled = true
     }
     
@@ -208,7 +208,7 @@ class AutoWiringTests: XCTestCase {
     
     //1 arg
     var notTaggedFactoryWithMostNumberOfArgumentsCalled = false
-    container.register { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }.resolvingProperties { _ in
+    container.register { AutoWiredClientImp(service1: $0, service2: try self.container.resolve()) as AutoWiredClient }.resolvingProperties { _,_  in
       notTaggedFactoryWithMostNumberOfArgumentsCalled = true
     }
     
