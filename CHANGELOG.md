@@ -2,6 +2,7 @@
 
 ## 6.0
 
+* Swift 4 support
 * Fixed unneeded reuse of singletons in collaborating containers. 
   Containers now first attempt to autowire components and fallback to collaboration when it fails.  
   [#169](https://github.com/AliSoftware/Dip/issues/169), [@ilyapuchka](https://github.com/ilyapuchka)
