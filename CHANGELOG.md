@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Develop
+## 6.0
 
 * Fixed unneeded reuse of singletons in collaborating containers. 
   Containers now first attempt to autowire components and fallback to collaboration when it fails.  
