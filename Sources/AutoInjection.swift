@@ -275,7 +275,7 @@ class _InjectedPropertyBox<T> {
     do {
       container.context.key = container.context.key.tagged(with: tag)
       let key = DefinitionKey(type: T.self, typeOfArguments: Void.self, tag: tag?.dependencyTag)
-      return try resolve(with: container, key: key, builder: { factory in try factory() }) as? T
+      return try resolve(with: container, key: key, builder: { (factory: (Any) throws -> Any) in try factory(()) }) as? T
     }
     catch {
         let error = DipError.autoInjectionFailed(label: container.context.injectedInProperty, type: container.context.resolvingType, underlyingError: error)

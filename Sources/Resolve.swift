@@ -46,7 +46,7 @@ extension DependencyContainer {
    - seealso: `register(_:type:tag:factory:)`
    */
   public func resolve<T>(tag: DependencyTagConvertible? = nil) throws -> T {
-    return try resolve(tag: tag) { factory in try factory() }
+    return try _resolve(tag: tag) { (factory: () throws -> T) in try factory() }
   }
 
   /**
@@ -73,7 +73,7 @@ extension DependencyContainer {
    - seealso: `resolve(tag:)`, `register(_:type:tag:factory:)`
    */
   public func resolve(_ type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory() }
+    return try resolve(type, tag: tag) { (factory: () throws -> Any) in try factory() }
   }
   
   /**
@@ -103,7 +103,11 @@ extension DependencyContainer {
   public func resolve<T, U>(tag: DependencyTagConvertible? = nil, builder: ((U) throws -> T) throws -> T) throws -> T {
     return try _resolve(tag: tag, builder: builder)
   }
-  
+
+  public func resolve<T>(tag: DependencyTagConvertible? = nil, builder: (() throws -> T) throws -> T) throws -> T {
+    return try _resolve(tag: tag, builder: builder)
+  }
+
   /**
    Resolve an instance of provided type using builder closure. Weakly-typed alternative of `resolve(tag:builder:)`
    
@@ -113,13 +117,37 @@ extension DependencyContainer {
     return try _resolve(type: type, tag: tag, builder: builder)
   }
 
+  public func resolve(_ type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (() throws -> Any) throws -> Any) throws -> Any {
+    return try _resolve(type: type, tag: tag, builder: builder)
+  }
+
 }
 
 extension DependencyContainer {
   
+  func _resolve<T>(tag aTag: DependencyTagConvertible? = nil, builder: (() throws -> T) throws -> T) throws -> T {
+    return try resolve(T.self, tag: aTag, builder: { factory in
+      try withoutActuallyEscaping(factory, do: { (factory) throws -> T in
+        try builder({ try factory() as! T })
+      })
+    }) as! T
+  }
+  
+  func _resolve(type aType: Any.Type, tag: DependencyTagConvertible? = nil, builder: (() throws -> Any) throws -> Any) throws -> Any {
+    let key = DefinitionKey(type: aType, typeOfArguments: Void.self, tag: tag?.dependencyTag)
+    
+    return try inContext(key:key, injectedInType: context?.resolvingType) {
+      try self._resolve(key: key, builder: { definition in
+        try builder { try definition.weakFactory(()) }
+      })
+    }
+  }
+  
   func _resolve<T, U>(tag aTag: DependencyTagConvertible? = nil, builder: ((U) throws -> T) throws -> T) throws -> T {
     return try resolve(T.self, tag: aTag, builder: { factory in
-      try builder({ try factory($0) as! T })
+      try withoutActuallyEscaping(factory, do: { (factory) throws -> T in
+        try builder({ try factory($0) as! T })
+      })
     }) as! T
   }
   

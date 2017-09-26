@@ -63,7 +63,7 @@ class ContextTests: XCTestCase {
       XCTAssertTrue(self.container.context.resolvingType == Service.self)
       let _ = try self.container.resolve() as ServiceImp1
       return ServiceImp1() as Service
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertTrue(self.container.context.resolvingType == Service.self)
         let _ = try self.container.resolve() as ServiceImp1
     }
@@ -71,7 +71,7 @@ class ContextTests: XCTestCase {
     container.register { () -> ServiceImp1 in
       XCTAssertTrue(self.container.context.resolvingType == ServiceImp1.self)
       return ServiceImp1()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertTrue(self.container.context.resolvingType == ServiceImp1.self)
     }
     
@@ -83,7 +83,7 @@ class ContextTests: XCTestCase {
       XCTAssertNil(self.container.context.injectedInType)
       let _ = try self.container.resolve() as ServiceImp1
       return ServiceImp1() as Service
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNil(self.container.context.injectedInType)
         let _ = try self.container.resolve() as ServiceImp1
     }
@@ -91,7 +91,7 @@ class ContextTests: XCTestCase {
     container.register { () -> ServiceImp1 in
       XCTAssertTrue(self.container.context.injectedInType == Service.self)
       return ServiceImp1()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertTrue(self.container.context.injectedInType == Service.self)
     }
     
@@ -104,7 +104,7 @@ class ContextTests: XCTestCase {
       XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
       let _ = try self.container.resolve(tag: "otherTag") as ServiceImp1
       return ServiceImp1() as Service
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNotNil(self.container.context.tag)
         XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
         let _ = try self.container.resolve(tag: "otherTag") as ServiceImp1
@@ -114,7 +114,7 @@ class ContextTests: XCTestCase {
       XCTAssertNotNil(self.container.context.tag)
       XCTAssertTrue(DependencyContainer.Tag.String("otherTag") ~= self.container.context.tag!)
       return ServiceImp1()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNotNil(self.container.context.tag)
         XCTAssertTrue(DependencyContainer.Tag.String("otherTag") ~= self.container.context.tag!)
     }
@@ -135,7 +135,7 @@ class ContextTests: XCTestCase {
         XCTAssertTrue(DependencyContainer.Tag.String("injectedTag") ~= self.container.context.tag!)
       }
       return ServiceImp2()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         if self.container.context.injectedInProperty == "injectedNilTag" {
           XCTAssertNil(self.container.context.tag)
         }
@@ -149,7 +149,7 @@ class ContextTests: XCTestCase {
       XCTAssertNotNil(self.container.context.tag)
       XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
       return ServiceImp2()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNotNil(self.container.context.tag)
         XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
     }
@@ -160,14 +160,14 @@ class ContextTests: XCTestCase {
   func testThatContextStoresTheTagPassedToResolveWhenAutoWiring() {
     container.register { (_: ServiceImp1) -> Service in
       return ServiceImp1() as Service
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
     }
     
     container.register { () -> ServiceImp1 in
       XCTAssertNotNil(self.container.context.tag)
       XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
       return ServiceImp1()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNotNil(self.container.context.tag)
         XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
     }
@@ -181,7 +181,7 @@ class ContextTests: XCTestCase {
       XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
       let _ = try self.container.resolve() as ServiceImp1
       return ServiceImp1() as Service
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNotNil(self.container.context.tag)
         XCTAssertTrue(DependencyContainer.Tag.String("tag") ~= self.container.context.tag!)
         let _ = try self.container.resolve() as ServiceImp1
@@ -190,7 +190,7 @@ class ContextTests: XCTestCase {
     container.register { () -> ServiceImp1 in
       XCTAssertNil(self.container.context.tag)
       return ServiceImp1()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNil(self.container.context.tag)
     }
     
@@ -207,7 +207,7 @@ class ContextTests: XCTestCase {
       XCTAssertNotNil(self.container.context.injectedInProperty)
       XCTAssertTrue(names.contains(self.container.context.injectedInProperty!))
       return ServiceImp2()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertNotNil(self.container.context.injectedInProperty)
         XCTAssertTrue(names.contains(self.container.context.injectedInProperty!))
     }
@@ -239,7 +239,7 @@ class ContextTests: XCTestCase {
       XCTAssertTrue(self.container.context.resolvingType == Service.self)
       let _ = try self.container.resolve() as ServiceImp1
       return ServiceImp1() as Service
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertTrue(self.container.context.resolvingType == Service.self)
         let _ = try self.container.resolve() as ServiceImp1
     }
@@ -247,7 +247,7 @@ class ContextTests: XCTestCase {
     collaborator.register { () -> ServiceImp1 in
       XCTAssertTrue(collaborator.context.resolvingType == ServiceImp1.self)
       return ServiceImp1()
-      }.resolvingProperties { _ in
+      }.resolvingProperties { _,_  in
         XCTAssertTrue(collaborator.context.resolvingType == ServiceImp1.self)
     }
     
