@@ -23,7 +23,7 @@
 //
 
 ///A key used to store definitons in a container.
-public struct DefinitionKey : Hashable, CustomStringConvertible {
+public struct DefinitionKey: Hashable, CustomStringConvertible {
   public let type: Any.Type
   public let typeOfArguments: Any.Type
   public private(set) var tag: DependencyContainer.Tag?
@@ -47,15 +47,15 @@ public struct DefinitionKey : Hashable, CustomStringConvertible {
     tagged.tag = tag
     return tagged
   }
-  
-}
 
-/// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
-public func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
-  return
-    lhs.type == rhs.type &&
+  /// Check two definition keys on equality by comparing their `type`, `factoryType` and `tag` properties.
+  public static func ==(lhs: DefinitionKey, rhs: DefinitionKey) -> Bool {
+    return
+      lhs.type == rhs.type &&
       lhs.typeOfArguments == rhs.typeOfArguments &&
       lhs.tag == rhs.tag
+  }
+  
 }
 
 ///Dummy protocol to store definitions for different types in collection
@@ -198,7 +198,7 @@ public final class Definition<T, U>: DefinitionType {
 
 //MARK: - _Definition
 
-protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefinition {
+protocol _Definition: AutoWiringDefinition, TypeForwardingDefinition {
   var type: Any.Type { get }
   var scope: ComponentScope { get }
   var weakFactory: ((Any) throws -> Any)! { get }
@@ -208,7 +208,7 @@ protocol _Definition: DefinitionType, AutoWiringDefinition, TypeForwardingDefini
 
 //MARK: - Type Forwarding
 
-protocol _TypeForwardingDefinition: TypeForwardingDefinition, _Definition {
+protocol _TypeForwardingDefinition: _Definition {
   weak var forwardsTo: _TypeForwardingDefinition? { get }
   var forwardsFrom: [_TypeForwardingDefinition] { get set }
   func _implements(type aType: Any.Type)

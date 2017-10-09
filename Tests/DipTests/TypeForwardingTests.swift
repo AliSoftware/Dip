@@ -154,9 +154,9 @@ class TypeForwardingTests: XCTestCase {
     var originalResolvingPropertiesCalled = false
     var resolvingPropertiesCalled = false
     container.register { ServiceImp1() }
-      .resolvingProperties { _ in
+      .resolvingProperties { _,_  in
         originalResolvingPropertiesCalled = true
-      }.implements(Service.self) { _ in
+      }.implements(Service.self) { _,_ in
         resolvingPropertiesCalled = true
       }
     
@@ -184,11 +184,11 @@ class TypeForwardingTests: XCTestCase {
     var resolvingPropertiesCalled = false
     container.reset()
     let definition = container.register { ServiceImp1() }
-      .implements(Service.self) { container, object in
+      .implements(Service.self) { _,_ in
         resolvingPropertiesCalled = true
     }
     
-    definition.resolvingProperties { _ in
+    definition.resolvingProperties { _,_  in
       originalResolvingPropertiesCalled = true
     }
     

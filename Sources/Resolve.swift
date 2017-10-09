@@ -46,7 +46,7 @@ extension DependencyContainer {
    - seealso: `register(_:type:tag:factory:)`
    */
   public func resolve<T>(tag: DependencyTagConvertible? = nil) throws -> T {
-    return try resolve(tag: tag) { factory in try factory() }
+    return try _resolve(tag: tag) { (factory: () throws -> T) in try factory() }
   }
 
   /**
@@ -73,7 +73,7 @@ extension DependencyContainer {
    - seealso: `resolve(tag:)`, `register(_:type:tag:factory:)`
    */
   public func resolve(_ type: Any.Type, tag: DependencyTagConvertible? = nil) throws -> Any {
-    return try resolve(type, tag: tag) { factory in try factory() }
+    return try resolve(type, tag: tag) { (factory: () throws -> Any) in try factory() }
   }
   
   /**
@@ -103,7 +103,11 @@ extension DependencyContainer {
   public func resolve<T, U>(tag: DependencyTagConvertible? = nil, builder: ((U) throws -> T) throws -> T) throws -> T {
     return try _resolve(tag: tag, builder: builder)
   }
-  
+
+  public func resolve<T>(tag: DependencyTagConvertible? = nil, builder: (() throws -> T) throws -> T) throws -> T {
+    return try _resolve(tag: tag, builder: builder)
+  }
+
   /**
    Resolve an instance of provided type using builder closure. Weakly-typed alternative of `resolve(tag:builder:)`
    
@@ -113,13 +117,37 @@ extension DependencyContainer {
     return try _resolve(type: type, tag: tag, builder: builder)
   }
 
+  public func resolve(_ type: Any.Type, tag: DependencyTagConvertible? = nil, builder: (() throws -> Any) throws -> Any) throws -> Any {
+    return try _resolve(type: type, tag: tag, builder: builder)
+  }
+
 }
 
 extension DependencyContainer {
   
+  func _resolve<T>(tag aTag: DependencyTagConvertible? = nil, builder: (() throws -> T) throws -> T) throws -> T {
+    return try resolve(T.self, tag: aTag, builder: { factory in
+      try withoutActuallyEscaping(factory, do: { (factory) throws -> T in
+        try builder({ try factory() as! T })
+      })
+    }) as! T
+  }
+  
+  func _resolve(type aType: Any.Type, tag: DependencyTagConvertible? = nil, builder: (() throws -> Any) throws -> Any) throws -> Any {
+    let key = DefinitionKey(type: aType, typeOfArguments: Void.self, tag: tag?.dependencyTag)
+    
+    return try inContext(key:key, injectedInType: context?.resolvingType) {
+      try self._resolve(key: key, builder: { definition in
+        try builder { try definition.weakFactory(()) }
+      })
+    }
+  }
+  
   func _resolve<T, U>(tag aTag: DependencyTagConvertible? = nil, builder: ((U) throws -> T) throws -> T) throws -> T {
     return try resolve(T.self, tag: aTag, builder: { factory in
-      try builder({ try factory($0) as! T })
+      try withoutActuallyEscaping(factory, do: { (factory) throws -> T in
+        try builder({ try factory($0) as! T })
+      })
     }) as! T
   }
   
@@ -136,7 +164,15 @@ extension DependencyContainer {
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
   func _resolve<T>(key aKey: DefinitionKey, builder: (_Definition) throws -> T) throws -> T {
     guard let matching = self.definition(matching: aKey) else {
-      return try collaboratingResolve(key: aKey, builder: builder) ?? autowire(key: aKey)
+      do {
+        return try autowire(key: aKey)
+      } catch {
+        if let resolved = collaboratingResolve(key: aKey, builder: builder) {
+          return resolved
+        } else {
+          throw error
+        }
+      }
     }
     
     let (key, definition) = matching
@@ -175,7 +211,7 @@ extension DependencyContainer {
       return previouslyResolved
     }
     
-    resolvedInstances[key: key, inScope: definition.scope] = resolvedInstance
+    resolvedInstances[key: key, inScope: definition.scope, context: context] = resolvedInstance
     
     if let resolvable = resolvedInstance as? Resolvable {
       resolvedInstances.resolvableInstances.append(resolvable)
@@ -191,7 +227,7 @@ extension DependencyContainer {
   
   private func previouslyResolved<T>(for definition: _Definition, key: DefinitionKey) -> T? {
     //first check if exact key was already resolved
-    if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope] as? T {
+    if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T {
       return previouslyResolved
     }
     //then check if any related type was already resolved
@@ -199,7 +235,7 @@ extension DependencyContainer {
       DefinitionKey(type: $0, typeOfArguments: key.typeOfArguments, tag: key.tag)
     })
     for key in keys {
-      if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope] as? T {
+      if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T {
         return previouslyResolved
       }
     }
@@ -207,7 +243,7 @@ extension DependencyContainer {
   }
   
   /// Searches for definition that matches provided key
-  private func definition(matching key: DefinitionKey) -> KeyDefinitionPair? {
+  func definition(matching key: DefinitionKey) -> KeyDefinitionPair? {
     if let definition = (self.definitions[key] ?? self.definitions[key.tagged(with: nil)]) {
       return (key, definition)
     }
@@ -230,41 +266,47 @@ class ResolvedInstances {
   var resolvableInstances = [Resolvable]()
   
   //singletons are stored using reference type wrapper to be able to share them between containers
-  var singletonsBox = Box<[DefinitionKey: Any]>([:])
-  var singletons: [DefinitionKey: Any] {
-    get { return singletonsBox.unboxed }
-    set { singletonsBox.unboxed = newValue }
+  var sharedSingletonsBox = Box<[DefinitionKey: Any]>([:])
+  var sharedSingletons: [DefinitionKey: Any] {
+    get { return sharedSingletonsBox.unboxed }
+    set { sharedSingletonsBox.unboxed = newValue }
   }
+  var singletons = [DefinitionKey: Any]()
   
-  var weakSingletonsBox = Box<[DefinitionKey: Any]>([:])
-  var weakSingletons: [DefinitionKey: Any] {
-    get { return weakSingletonsBox.unboxed }
-    set { weakSingletonsBox.unboxed = newValue }
+  var sharedWeakSingletonsBox = Box<[DefinitionKey: Any]>([:])
+  var sharedWeakSingletons: [DefinitionKey: Any] {
+    get { return sharedWeakSingletonsBox.unboxed }
+    set { sharedWeakSingletonsBox.unboxed = newValue }
   }
+  var weakSingletons = [DefinitionKey: Any]()
   
-  subscript(key key: DefinitionKey, inScope scope: ComponentScope) -> Any? {
+  subscript(key key: DefinitionKey, inScope scope: ComponentScope, context context: DependencyContainer.Context) -> Any? {
     get {
-      if scope == .singleton || scope == .eagerSingleton {
-        return singletons[key]
-      }
-      if scope == .weakSingleton {
-        if let boxed = weakSingletons[key] as? WeakBoxType { return boxed.unboxed }
-        else { return weakSingletons[key] }
-      }
-      if scope == .shared {
+      switch scope {
+      case .singleton, .eagerSingleton:
+        return context.inCollaboration ? sharedSingletons[key] : singletons[key]
+      case .weakSingleton:
+        let singletons = context.inCollaboration ? sharedWeakSingletons : weakSingletons
+        if let boxed = singletons[key] as? WeakBoxType { return boxed.unboxed }
+        else { return singletons[key] }
+      case .shared:
         return resolvedInstances[key]
+      case .unique:
+        return nil
       }
-      return nil
     }
     set {
-      if scope == .singleton || scope == .eagerSingleton {
+      switch scope {
+      case .singleton, .eagerSingleton:
+        sharedSingletons[key] = newValue
         singletons[key] = newValue
-      }
-      if scope == .weakSingleton {
+      case .weakSingleton:
+        sharedWeakSingletons[key] = newValue
         weakSingletons[key] = newValue
-      }
-      if scope == .shared {
+      case .shared:
         resolvedInstances[key] = newValue
+      case .unique:
+        break
       }
     }
   }

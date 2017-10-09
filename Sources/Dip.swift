@@ -34,7 +34,7 @@ public final class DependencyContainer {
    
    - seealso: `DependencyTagConvertible`
    */
-  public enum Tag: Equatable {
+  public enum Tag {
     case String(StringLiteralType)
     case Int(IntegerLiteralType)
   }
@@ -167,12 +167,15 @@ extension DependencyContainer {
     /// The label of the property where resolved instance will be auto-injected.
     private(set) public var injectedInProperty: String?
     
+    let inCollaboration: Bool
+    
     var logErrors: Bool = true
     
-    init(key: DefinitionKey, injectedInType: Any.Type?, injectedInProperty: String?) {
+    init(key: DefinitionKey, injectedInType: Any.Type?, injectedInProperty: String?, inCollaboration: Bool) {
       self.key = key
       self.injectedInType = injectedInType
       self.injectedInProperty = injectedInProperty
+      self.inCollaboration = inCollaboration
     }
     
     public var debugDescription: String {
@@ -196,7 +199,7 @@ extension DependencyContainer {
 
   /// Pushes new context created with provided values and calls block. When block returns previous context is restored.
   /// When popped to initial (root) context will release all references to resolved instances and call `Resolvable` callbacks.
-  func inContext<T>(key aKey: DefinitionKey, injectedInType: Any.Type?, injectedInProperty: String? = nil, logErrors: Bool! = nil, block: () throws -> T) rethrows -> T {
+  func inContext<T>(key aKey: DefinitionKey, injectedInType: Any.Type?, injectedInProperty: String? = nil, inCollaboration: Bool = false, container: DependencyContainer? = nil, logErrors: Bool! = nil, block: () throws -> T) rethrows -> T {
     let key = aKey
     return try threadSafe {
       let currentContext = self.context
@@ -207,6 +210,10 @@ extension DependencyContainer {
         //clean instances pool if it is owned not by other container
         if context == nil {
           resolvedInstances.resolvedInstances.removeAll()
+          for (key, instance) in resolvedInstances.sharedWeakSingletons {
+            if resolvedInstances.sharedWeakSingletons[key] is WeakBoxType { continue }
+            resolvedInstances.sharedWeakSingletons[key] = WeakBox(instance)
+          }
           for (key, instance) in resolvedInstances.weakSingletons {
             if resolvedInstances.weakSingletons[key] is WeakBoxType { continue }
             resolvedInstances.weakSingletons[key] = WeakBox(instance)
@@ -222,7 +229,8 @@ extension DependencyContainer {
       context = Context(
         key: key,
         injectedInType: injectedInType,
-        injectedInProperty: injectedInProperty
+        injectedInProperty: injectedInProperty,
+        inCollaboration: inCollaboration
       )
       context.logErrors = logErrors ?? currentContext?.logErrors ?? true
       
@@ -258,17 +266,17 @@ extension DependencyContainer {
     _collaborators += containers
     for container in containers {
       container._collaborators += [self]
-      container.resolvedInstances.singletonsBox = self.resolvedInstances.singletonsBox
-      container.resolvedInstances.weakSingletonsBox = self.resolvedInstances.weakSingletonsBox
+      container.resolvedInstances.sharedSingletonsBox = self.resolvedInstances.sharedSingletonsBox
+      container.resolvedInstances.sharedWeakSingletonsBox = self.resolvedInstances.sharedWeakSingletonsBox
       updateCollaborationReferences(between: container, and: self)
     }
   }
   
   private func updateCollaborationReferences(between container: DependencyContainer, and collaborator: DependencyContainer) {
     for container in container._collaborators {
-      guard container.resolvedInstances.singletonsBox !== collaborator.resolvedInstances.singletonsBox else { continue }
-      container.resolvedInstances.singletonsBox = collaborator.resolvedInstances.singletonsBox
-      container.resolvedInstances.weakSingletonsBox = collaborator.resolvedInstances.weakSingletonsBox
+      guard container.resolvedInstances.sharedSingletonsBox !== collaborator.resolvedInstances.sharedSingletonsBox else { continue }
+      container.resolvedInstances.sharedSingletonsBox = collaborator.resolvedInstances.sharedSingletonsBox
+      container.resolvedInstances.sharedWeakSingletonsBox = collaborator.resolvedInstances.sharedWeakSingletonsBox
       updateCollaborationReferences(between: container, and: collaborator)
     }
   }
@@ -291,11 +299,23 @@ extension DependencyContainer {
         let context = collaborator.context
         collaborator.context = self.context
         defer {
-          collaborator.resolvedInstances = resolvedInstances
           collaborator.context = context
+          collaborator.resolvedInstances = resolvedInstances
+          
+          for (key, resolvedSingleton) in self.resolvedInstances.singletons {
+            collaborator.resolvedInstances.singletons[aKey] = resolvedSingleton
+          }
+          for (_, resolvedSingleton) in self.resolvedInstances.weakSingletons {
+            guard collaborator.definition(matching: aKey) != nil else { continue }
+            collaborator.resolvedInstances.weakSingletons[aKey] = WeakBox(resolvedSingleton)
+          }
+          for (_, resolved) in self.resolvedInstances.resolvedInstances {
+            guard collaborator.definition(matching: aKey) != nil else { continue }
+            collaborator.resolvedInstances.resolvedInstances[aKey] = resolved
+          }
         }
         
-        let resolved = try collaborator.inContext(key:key, injectedInType: self.context.injectedInType, injectedInProperty: self.context.injectedInProperty, logErrors: false) {
+        let resolved = try collaborator.inContext(key:key, injectedInType: self.context.injectedInType, injectedInProperty: self.context.injectedInProperty, inCollaboration: true, logErrors: false) {
           try collaborator._resolve(key: key, builder: builder)
         }
 
@@ -336,6 +356,8 @@ extension DependencyContainer {
       definitions[key] = nil
       resolvedInstances.singletons[key] = nil
       resolvedInstances.weakSingletons[key] = nil
+      resolvedInstances.sharedSingletons[key] = nil
+      resolvedInstances.sharedWeakSingletons[key] = nil
     }
   }
 
@@ -348,6 +370,8 @@ extension DependencyContainer {
       definitions.removeAll()
       resolvedInstances.singletons.removeAll()
       resolvedInstances.weakSingletons.removeAll()
+      resolvedInstances.sharedSingletons.removeAll()
+      resolvedInstances.sharedWeakSingletons.removeAll()
       bootstrapped = false
     }
   }
@@ -477,13 +501,17 @@ extension DependencyContainer.Tag: ExpressibleByIntegerLiteral {
   
 }
 
-public func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
-  switch (lhs, rhs) {
-  case let (.String(lhsString), .String(rhsString)):
-    return lhsString == rhsString
-  case let (.Int(lhsInt), .Int(rhsInt)):
-    return lhsInt == rhsInt
-  default:
-    return false
+extension DependencyContainer.Tag: Equatable {
+
+  public static func ==(lhs: DependencyContainer.Tag, rhs: DependencyContainer.Tag) -> Bool {
+    switch (lhs, rhs) {
+    case let (.String(lhsString), .String(rhsString)):
+      return lhsString == rhsString
+    case let (.Int(lhsInt), .Int(rhsInt)):
+      return lhsInt == rhsInt
+    default:
+      return false
+    }
   }
+
 }

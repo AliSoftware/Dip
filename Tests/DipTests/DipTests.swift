@@ -573,12 +573,12 @@ class DipTests: XCTestCase {
       }.implements(Service.self)
     
     container.register(tag: "tag") { ServiceImp2() as Service }
-      .resolvingProperties { _ in
+      .resolvingProperties { _,_  in
         createdService2 = true
     }
     
     container.register { (arg: String) in ServiceImp1() }
-      .resolvingProperties { _ in
+      .resolvingProperties { _,_  in
         createdService3 = true
     }
     
@@ -743,16 +743,16 @@ extension DipTests {
     let collaborator4 = DependencyContainer()
     
     collaborator1.collaborate(with: container)
-    XCTAssertTrue(collaborator1.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+    XCTAssertTrue(collaborator1.resolvedInstances.sharedSingletonsBox === container.resolvedInstances.sharedSingletonsBox)
 
     collaborator2.collaborate(with: container)
-    XCTAssertTrue(collaborator2.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+    XCTAssertTrue(collaborator2.resolvedInstances.sharedSingletonsBox === container.resolvedInstances.sharedSingletonsBox)
 
     collaborator3.collaborate(with: collaborator1)
-    XCTAssertTrue(collaborator3.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+    XCTAssertTrue(collaborator3.resolvedInstances.sharedSingletonsBox === container.resolvedInstances.sharedSingletonsBox)
 
     collaborator4.collaborate(with: collaborator2)
-    XCTAssertTrue(collaborator4.resolvedInstances.singletonsBox === container.resolvedInstances.singletonsBox)
+    XCTAssertTrue(collaborator4.resolvedInstances.sharedSingletonsBox === container.resolvedInstances.sharedSingletonsBox)
     
     let service1 = try! collaborator1.resolve() as Service
     let service2 = try! collaborator2.resolve() as Service
@@ -760,10 +760,74 @@ extension DipTests {
     let service4 = try! collaborator4.resolve() as Service
     let serviceRoot = try! container.resolve() as Service
     
+    XCTAssertTrue(service1 === service2)
+    XCTAssertTrue(service1 === service3)
+    XCTAssertTrue(service1 === service4)
+    
     XCTAssertTrue(service1 === serviceRoot)
     XCTAssertTrue(service2 === serviceRoot)
     XCTAssertTrue(service3 === serviceRoot)
     XCTAssertTrue(service4 === serviceRoot)
   }
-  
+
+  class RootService {}
+  class ServiceClient {
+    let name: String
+    let service: RootService
+    init(name: String, service: RootService) {
+      self.name = name
+      self.service = service
+    }
+  }
+
+  func testThatContainersShareTheirSingletonsOnlyWithCollaborators() {
+    let container = DependencyContainer()
+    container.register(.singleton) { RootService() }
+    
+    let collaborator1 = DependencyContainer()
+    collaborator1.register(.singleton) {
+      ServiceClient(name: "1", service: $0)
+    }
+    
+    let collaborator2 = DependencyContainer()
+    collaborator2.register(.singleton) {
+      ServiceClient(name: "2", service: $0)
+    }
+    
+    collaborator1.collaborate(with: container)
+    collaborator2.collaborate(with: container)
+    
+    let client2 = try! collaborator2.resolve() as ServiceClient
+    let client1 = try! collaborator1.resolve() as ServiceClient
+    
+    XCTAssertEqual(client1.name, "1")
+    XCTAssertEqual(client2.name, "2")
+    XCTAssertTrue(client1.service === client2.service)
+  }
+
+  func testThatContainerAutowireBeforeCollaboration() {
+    let container = DependencyContainer()
+    container.register(.singleton) { RootService() }
+    
+    let collaborator1 = DependencyContainer()
+    collaborator1.register(.singleton) {
+      ServiceClient(name: "1", service: $0)
+    }
+    
+    let collaborator2 = DependencyContainer()
+    collaborator2.register(.singleton) {
+      ServiceClient(name: "2", service: $0)
+    }
+    
+    collaborator1.collaborate(with: container, collaborator2)
+    collaborator2.collaborate(with: container, collaborator1)
+    
+    let client2 = try! collaborator2.resolve() as ServiceClient
+    let client1 = try! collaborator1.resolve() as ServiceClient
+    
+    XCTAssertEqual(client1.name, "1")
+    XCTAssertEqual(client2.name, "2")
+    XCTAssertTrue(client1.service === client2.service)
+  }
+
 }
