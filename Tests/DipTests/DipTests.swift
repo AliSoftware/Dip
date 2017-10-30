@@ -45,29 +45,19 @@ class ResolvableService: Service, Resolvable {
   }
 }
 
-protocol Manager: class { }
-protocol AnotherManager: class { }
+class Manager {}
+class AnotherManager {}
 
-class ManagerImpl: Manager {}
-class AnotherManagerImpl: AnotherManager {}
-
-class GenericOwner<T> {
-  let value: T
+class Object {
+  let manager: Manager?
   
-  init(_ value: T) {
-    self.value = value
+  init(with container: DependencyContainer) {
+      self.manager = try? container.resolve()
   }
 }
 
-class ConcreteOwner: GenericOwner<Int> {
+class Owner {
   var manager: Manager?
-  let string: String
-  
-  init(_ value: Int, _ string: String) {
-    self.string = string
-    
-    super.init(value)
-  }
 }
 
 class DipTests: XCTestCase {
@@ -95,7 +85,7 @@ class DipTests: XCTestCase {
       ("testThatCollaboratingWithSelfIsIgnored", testThatCollaboratingWithSelfIsIgnored),
       ("testThatCollaboratingContainersAreWeakReferences", testThatCollaboratingContainersAreWeakReferences),
       ("testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer", testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer),
-      ("testThatItCanHandleInnerSingletonTypesAndGenericConstrainedTypes", testThatItCanHandleInnerSingletonTypesAndGenericConstrainedTypes)
+      ("testThatItCanHandleInnerSingletonTypesAndGenericConstrainedTypes", testThatItCanHandleSeparateContainers)
     ]
   }()
 
@@ -103,44 +93,37 @@ class DipTests: XCTestCase {
     container.reset()
   }
   
-//  protocol Manager: class { }
-//  protocol AnotherManager: class { }
-//
-//  class ManagerImpl: Manager {}
-//  class AnotherManagerImpl: AnotherManager {}
-//
-//  class GenericOwner<T> {
-//    var value: T? = nil
-//  }
-//
-//  class ConcreteOwner: GenericOwner<Int> {
-//    var manager: Manager?
-//  }
-  
-  func testThatItCanHandleInnerSingletonTypesAndGenericConstrainedTypes() {
-    container.register(.singleton) { AnotherManagerImpl() as AnotherManager }
-    container.register(.singleton) { ManagerImpl() as Manager }
-    container
-      .register { ConcreteOwner($0, $1) }
-      .resolvingProperties {
-        $1.manager = try $0.resolve()
-      }
-      .implements(GenericOwner<Int>.self)
-
-    let manager = try? container.resolve() as Manager
-    let another = try? container.resolve() as AnotherManager
-    let owner = try? container.resolve(arguments: 1, "") as GenericOwner<Int>
+  func testThatItCanHandleSeparateContainers() {
+    let container = self.container
     
-    let nonNilValues: [Any?] = [another, manager, owner]
+    let anotherContainer = DependencyContainer()
+    anotherContainer.register { Object(with: anotherContainer) }
+    
+    container.collaborate(with: anotherContainer)
+    
+    container
+      .register { Owner() }
+      .resolvingProperties { $1.manager = try $0.resolve() }
+    
+    container.register(.singleton) { AnotherManager() }
+    container.register(.singleton) { Manager() }
+
+    let manager: Manager? = try? container.resolve()
+    let another: AnotherManager? = try? container.resolve()
+    var owner: Owner? = try? container.resolve(arguments: 1, "")
+    
+    let object: Object? = try? container.resolve()
+    owner = try? container.resolve()
+    
+    let nonNilValues: [Any?] = [another, manager, owner, object, object?.manager]
     nonNilValues.forEach { XCTAssertNotNil($0) }
     
-    let concrete = owner as? ConcreteOwner
-    XCTAssertNotNil(concrete)
     XCTAssertTrue(
-      concrete?.manager.flatMap { value in
-        manager.flatMap { $0 === value }
-      }
-      ?? false
+      owner?.manager
+        .flatMap { value in
+          manager.flatMap { $0 === value }
+        }
+        ?? false
     )
   }
   
