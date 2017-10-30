@@ -303,7 +303,7 @@ extension DependencyContainer {
           collaborator.resolvedInstances = resolvedInstances
           
           for (key, resolvedSingleton) in self.resolvedInstances.singletons {
-            collaborator.resolvedInstances.singletons[aKey] = resolvedSingleton
+            collaborator.resolvedInstances.singletons[key] = resolvedSingleton
           }
           for (_, resolvedSingleton) in self.resolvedInstances.weakSingletons {
             guard collaborator.definition(matching: aKey) != nil else { continue }
