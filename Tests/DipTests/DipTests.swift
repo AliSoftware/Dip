@@ -45,6 +45,31 @@ class ResolvableService: Service, Resolvable {
   }
 }
 
+protocol Manager: class { }
+protocol AnotherManager: class { }
+
+class ManagerImpl: Manager {}
+class AnotherManagerImpl: AnotherManager {}
+
+class GenericOwner<T> {
+  let value: T
+  
+  init(_ value: T) {
+    self.value = value
+  }
+}
+
+class ConcreteOwner: GenericOwner<Int> {
+  var manager: Manager?
+  let string: String
+  
+  init(_ value: Int, _ string: String) {
+    self.string = string
+    
+    super.init(value)
+  }
+}
+
 class DipTests: XCTestCase {
 
   let container = DependencyContainer()
@@ -70,11 +95,53 @@ class DipTests: XCTestCase {
       ("testThatCollaboratingWithSelfIsIgnored", testThatCollaboratingWithSelfIsIgnored),
       ("testThatCollaboratingContainersAreWeakReferences", testThatCollaboratingContainersAreWeakReferences),
       ("testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer", testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer),
+      ("testThatItCanHandleInnerSingletonTypesAndGenericConstrainedTypes", testThatItCanHandleInnerSingletonTypesAndGenericConstrainedTypes)
     ]
   }()
 
   override func setUp() {
     container.reset()
+  }
+  
+//  protocol Manager: class { }
+//  protocol AnotherManager: class { }
+//
+//  class ManagerImpl: Manager {}
+//  class AnotherManagerImpl: AnotherManager {}
+//
+//  class GenericOwner<T> {
+//    var value: T? = nil
+//  }
+//
+//  class ConcreteOwner: GenericOwner<Int> {
+//    var manager: Manager?
+//  }
+  
+  func testThatItCanHandleInnerSingletonTypesAndGenericConstrainedTypes() {
+    container.register(.singleton) { AnotherManagerImpl() as AnotherManager }
+    container.register(.singleton) { ManagerImpl() as Manager }
+    container
+      .register { ConcreteOwner($0, $1) }
+      .resolvingProperties {
+        $1.manager = try $0.resolve()
+      }
+      .implements(GenericOwner<Int>.self)
+
+    let manager = try? container.resolve() as Manager
+    let another = try? container.resolve() as AnotherManager
+    let owner = try? container.resolve(arguments: 1, "") as GenericOwner<Int>
+    
+    let nonNilValues: [Any?] = [another, manager, owner]
+    nonNilValues.forEach { XCTAssertNotNil($0) }
+    
+    let concrete = owner as? ConcreteOwner
+    XCTAssertNotNil(concrete)
+    XCTAssertTrue(
+      concrete?.manager.flatMap { value in
+        manager.flatMap { $0 === value }
+      }
+      ?? false
+    )
   }
   
   func testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle() {
