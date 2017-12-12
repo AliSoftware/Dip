@@ -31,6 +31,7 @@
 		09FC480F1DAA9CAF00566AA8 /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC480C1DAA9CAF00566AA8 /* Register.swift */; };
 		09FC48181DAAA53100566AA8 /* DipError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC48161DAAA53100566AA8 /* DipError.swift */; };
 		09FC481E1DAAA8F900566AA8 /* ComponentScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC481C1DAAA8F900566AA8 /* ComponentScope.swift */; };
+		8652F4EB1F2C3D6000A92D4B /* ParentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8652F4EA1F2C3D6000A92D4B /* ParentTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 		09FC480C1DAA9CAF00566AA8 /* Register.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Register.swift; path = ../../Sources/Register.swift; sourceTree = "<group>"; };
 		09FC48161DAAA53100566AA8 /* DipError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DipError.swift; path = ../../Sources/DipError.swift; sourceTree = "<group>"; };
 		09FC481C1DAAA8F900566AA8 /* ComponentScope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComponentScope.swift; path = ../../Sources/ComponentScope.swift; sourceTree = "<group>"; };
+		8652F4EA1F2C3D6000A92D4B /* ParentTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParentTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +129,7 @@
 				09BD350C1D84E30D00B33E53 /* TypeForwardingTests.swift */,
 				09BD350D1D84E30D00B33E53 /* Utils.swift */,
 				0919F4D11C16417000DC3B10 /* Info.plist */,
+				8652F4EA1F2C3D6000A92D4B /* ParentTests.swift */,
 			);
 			path = DipTests;
 			sourceTree = "<group>";
@@ -288,6 +291,7 @@
 				09BD35171D84E30D00B33E53 /* Utils.swift in Sources */,
 				09BD35131D84E30D00B33E53 /* DipTests.swift in Sources */,
 				09BD35101D84E30D00B33E53 /* ComponentScopeTests.swift in Sources */,
+				8652F4EB1F2C3D6000A92D4B /* ParentTests.swift in Sources */,
 				09BD350E1D84E30D00B33E53 /* AutoInjectionTests.swift in Sources */,
 				09BD35161D84E30D00B33E53 /* TypeForwardingTests.swift in Sources */,
 			);
