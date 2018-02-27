@@ -50,7 +50,7 @@ extension DependencyContainer {
     let wrappedType = type(of: injectedPropertyBox).wrappedType
     let contextKey = DefinitionKey(type: wrappedType, typeOfArguments: Void.self, tag: context.tag)
     try inContext(key:contextKey, injectedInType: context?.resolvingType, injectedInProperty: child.label, container: self.context.container, logErrors: false) {
-      try injectedPropertyBox.resolve(context.container)
+      try injectedPropertyBox.resolve(self)
     }
   }
   
