@@ -41,7 +41,7 @@ extension DependencyContainer {
     do {
       let key = autoWiringKey.tagged(with: key.tag ?? context.tag)
       return try _resolve(key: key) { definition in
-        try definition.autoWiringFactory!(self.context.container, key.tag) as! T
+        try definition.autoWiringFactory!(self, key.tag) as! T
       }
     }
     catch {
