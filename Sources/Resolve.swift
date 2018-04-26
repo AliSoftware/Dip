@@ -154,7 +154,7 @@ extension DependencyContainer {
   func _resolve<U>(type aType: Any.Type, tag: DependencyTagConvertible? = nil, builder: ((U) throws -> Any) throws -> Any) throws -> Any {
     let key = DefinitionKey(type: aType, typeOfArguments: U.self, tag: tag?.dependencyTag)
     
-    return try inContext(key:key, injectedInType: context?.resolvingType, container: self) {
+    return try inContext(key:key, injectedInType: context?.resolvingType) {
       try self._resolve(key: key, builder: { definition in
         try builder(definition.weakFactory)
       })
@@ -167,17 +167,11 @@ extension DependencyContainer {
       do {
         return try autowire(key: aKey)
       } catch {
-        //Try to resolve using Collaboratino first.
         if let resolved = collaboratingResolve(key: aKey, builder: builder) {
           return resolved
+        } else {
+          throw error
         }
-
-        //Now try to reoslve using parent child relationships.
-        if let resolved = parentResolve(key: aKey, builder: builder) {
-            return resolved
-        }
-
-        throw error
       }
     }
     
