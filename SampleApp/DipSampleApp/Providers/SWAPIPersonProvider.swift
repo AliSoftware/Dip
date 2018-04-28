@@ -27,8 +27,8 @@ struct SWAPIPersonProvider : PersonProviderAPI {
                 guard let results = dict["results"] as? [NSDictionary] else { throw SWAPIError.InvalidJSON }
                 
                 // Extract URLs (flatten to ignore invalid ones)
-                let urlStrings = results.flatMap({ $0["url"] as? String })
-                let ids = urlStrings.flatMap(idFromURLString)
+                let urlStrings = results.compactMap({ $0["url"] as? String })
+                let ids = urlStrings.compactMap(idFromURLString)
                 
                 completion(ids)
             }
@@ -61,7 +61,7 @@ struct SWAPIPersonProvider : PersonProviderAPI {
                     hairColor: hairColor,
                     eyeColor: eyeColor,
                     gender: Gender(rawValue: gender),
-                    starshipIDs: starshipURLStrings.flatMap(idFromURLString)
+                    starshipIDs: starshipURLStrings.compactMap(idFromURLString)
                 )
                 completion(person)
             }

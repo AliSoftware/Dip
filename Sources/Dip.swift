@@ -50,7 +50,7 @@ public final class DependencyContainer {
   private var _weakCollaborators: [WeakBox<DependencyContainer>] = []
   var _collaborators: [DependencyContainer] {
     get {
-      return _weakCollaborators.flatMap({ $0.value })
+      return _weakCollaborators.compactMap({ $0.value })
     }
     set {
       _weakCollaborators = newValue.filter({ $0 !== self }).map(WeakBox.init)
@@ -303,15 +303,15 @@ extension DependencyContainer {
           collaborator.resolvedInstances = resolvedInstances
           
           for (key, resolvedSingleton) in self.resolvedInstances.singletons {
-            collaborator.resolvedInstances.singletons[aKey] = resolvedSingleton
+            collaborator.resolvedInstances.singletons[key] = resolvedSingleton
           }
-          for (_, resolvedSingleton) in self.resolvedInstances.weakSingletons {
-            guard collaborator.definition(matching: aKey) != nil else { continue }
-            collaborator.resolvedInstances.weakSingletons[aKey] = WeakBox(resolvedSingleton)
+          for (key, resolvedSingleton) in self.resolvedInstances.weakSingletons {
+            guard collaborator.definition(matching: key) == nil else { continue }
+            collaborator.resolvedInstances.weakSingletons[key] = resolvedSingleton is WeakBoxType ? resolvedSingleton :  WeakBox(resolvedSingleton)
           }
-          for (_, resolved) in self.resolvedInstances.resolvedInstances {
-            guard collaborator.definition(matching: aKey) != nil else { continue }
-            collaborator.resolvedInstances.resolvedInstances[aKey] = resolved
+          for (key, resolved) in self.resolvedInstances.resolvedInstances {
+            guard collaborator.definition(matching: key) == nil else { continue }
+            collaborator.resolvedInstances.resolvedInstances[key] = resolved
           }
         }
         

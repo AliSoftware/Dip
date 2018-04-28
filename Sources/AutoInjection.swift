@@ -256,7 +256,7 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
 
 }
 
-class _InjectedPropertyBox<T> {
+public class _InjectedPropertyBox<T> {
 
   let required: Bool
   let didInject: (T) -> ()

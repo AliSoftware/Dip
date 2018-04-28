@@ -27,8 +27,8 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
                 guard let results = dict["results"] as? [NSDictionary] else { throw SWAPIError.InvalidJSON }
                 
                 // Extract URLs (flatten to ignore invalid ones)
-                let urlStrings = results.flatMap({ $0["url"] as? String })
-                let ids = urlStrings.flatMap(idFromURLString)
+                let urlStrings = results.compactMap({ $0["url"] as? String })
+                let ids = urlStrings.compactMap(idFromURLString)
                 
                 completion(ids)
             }
@@ -59,7 +59,7 @@ struct SWAPIStarshipProvider : StarshipProviderAPI {
                     manufacturer: manufacturer,
                     crew: crew,
                     passengers: passengers,
-                    pilotIDs: pilotIDStrings.flatMap(idFromURLString)
+                    pilotIDs: pilotIDStrings.compactMap(idFromURLString)
                 )
                 completion(ship)
             }

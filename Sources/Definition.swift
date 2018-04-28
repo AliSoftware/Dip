@@ -209,7 +209,7 @@ protocol _Definition: AutoWiringDefinition, TypeForwardingDefinition {
 //MARK: - Type Forwarding
 
 protocol _TypeForwardingDefinition: _Definition {
-  weak var forwardsTo: _TypeForwardingDefinition? { get }
+  var forwardsTo: _TypeForwardingDefinition? { get }
   var forwardsFrom: [_TypeForwardingDefinition] { get set }
   func _implements(type aType: Any.Type)
   func _implements(types aTypes: [Any.Type])
