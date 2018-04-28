@@ -13,7 +13,7 @@ struct DummyStarshipProvider : StarshipProviderAPI {
     var pilotName: String
     
     func fetchIDs(completion: @escaping ([Int]) -> Void) {
-        let nbShips = pilotName.characters.count
+        let nbShips = pilotName.count
         completion(Array(0..<nbShips))
     }
     

@@ -50,7 +50,7 @@ public final class DependencyContainer {
   private var _weakCollaborators: [WeakBox<DependencyContainer>] = []
   var _collaborators: [DependencyContainer] {
     get {
-      return _weakCollaborators.flatMap({ $0.value })
+      return _weakCollaborators.compactMap({ $0.value })
     }
     set {
       _weakCollaborators = newValue.filter({ $0 !== self }).map(WeakBox.init)
