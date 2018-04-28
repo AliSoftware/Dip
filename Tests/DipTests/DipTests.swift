@@ -881,46 +881,4 @@ extension DipTests {
         ?? false
     )
   }
-
-}
-
-extension DipTests {
-  
-  fileprivate class Dependancy {
-    let service: Service
-    init(service: Service){
-      self.service = service
-    }
-  }
-
-
-/**
-   Test when dependancies are registered in two collaborating containers
-   the container performing the resolve has priority.
- */
-  func testOverridenRegistry() {
-    let collaborator1 = DependencyContainer()
-    collaborator1.register { ServiceImp1() as Service}
-    collaborator1.register { Dependancy(service: $0) }
-
-    let collaborator2 = DependencyContainer()
-    collaborator2.register { ServiceImp2() as Service}
-
-
-    collaborator1.collaborate(with: collaborator2)
-    collaborator2.collaborate(with: collaborator1)
-
-    let client1 = try! collaborator1.resolve() as Dependancy
-    let client2 = try! collaborator2.resolve() as Dependancy
-
-    XCTAssertNotNil(client1.service as? ServiceImp1)
-    XCTAssertNotNil(client2.service as? ServiceImp2)
-
-    let service1 = try! collaborator1.resolve() as Service
-    let service2 = try! collaborator2.resolve() as Service
-
-    XCTAssertNotNil(service1 as? ServiceImp1)
-    XCTAssertNotNil(service2 as? ServiceImp2)
-  }
-  
 }
