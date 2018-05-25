@@ -48,12 +48,6 @@ extension Optional: BoxType {
   }
 }
 
-extension ImplicitlyUnwrappedOptional: BoxType {
-  var unboxed: Any? {
-    return self ?? nil
-  }
-}
-
 class Box<T> {
   var unboxed: T
   init(_ value: T) {
