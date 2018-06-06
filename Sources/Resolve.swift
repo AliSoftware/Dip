@@ -227,7 +227,7 @@ extension DependencyContainer {
   
   private func previouslyResolved<T>(for definition: _Definition, key: DefinitionKey) -> T? {
     //first check if exact key was already resolved
-    if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T {
+    if let previouslyResolved: T = resolvedInstances[key: key, inScope: definition.scope, context: context] {
       return previouslyResolved
     }
     //then check if any related type was already resolved
@@ -235,7 +235,7 @@ extension DependencyContainer {
       DefinitionKey(type: $0, typeOfArguments: key.typeOfArguments, tag: key.tag)
     })
     for key in keys {
-      if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T {
+      if let previouslyResolved: T = resolvedInstances[key: key, inScope: definition.scope, context: context] {
         return previouslyResolved
       }
     }
@@ -280,20 +280,22 @@ class ResolvedInstances {
   }
   var weakSingletons = [DefinitionKey: Any]()
   
-  subscript(key key: DefinitionKey, inScope scope: ComponentScope, context context: DependencyContainer.Context) -> Any? {
+  subscript<T>(key key: DefinitionKey, inScope scope: ComponentScope, context context: DependencyContainer.Context) -> T? {
     get {
+      let instance: Any?
       switch scope {
       case .singleton, .eagerSingleton:
-        return context.inCollaboration ? sharedSingletons[key] : singletons[key]
+        instance = context.inCollaboration ? sharedSingletons[key] : singletons[key]
       case .weakSingleton:
         let singletons = context.inCollaboration ? sharedWeakSingletons : weakSingletons
-        if let boxed = singletons[key] as? WeakBoxType { return boxed.unboxed }
-        else { return singletons[key] }
+        if let boxed = singletons[key] as? WeakBoxType { instance = boxed.unboxed }
+        else { instance = singletons[key] }
       case .shared:
-        return resolvedInstances[key]
+        instance = resolvedInstances[key]
       case .unique:
         return nil
       }
+      return instance.flatMap { $0 as? T }
     }
     set {
       switch scope {
