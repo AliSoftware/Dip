@@ -48,6 +48,15 @@ extension Optional: BoxType {
   }
 }
 
+#if swift(>=4.1)
+#else
+extension ImplicitlyUnwrappedOptional: BoxType {
+  var unboxed: Any? {
+    return self ?? nil
+  }
+}
+#endif
+
 class Box<T> {
   var unboxed: T
   init(_ value: T) {
