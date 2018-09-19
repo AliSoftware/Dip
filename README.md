@@ -19,7 +19,7 @@ It's aimed to be as simple as possible yet provide rich functionality usual for 
 
 * You start by creating `let container = DependencyContainer()` and **registering your dependencies, by associating a _protocol_ or _type_ to a `factory`** using `container.register { MyService() as Service }`.
 * Then you can call `container.resolve() as Service` to **resolve an instance of _protocol_ or _type_** using that `DependencyContainer`.
-* You can easily use Dip along with **Storyboards and Nibs** - checkout **[Dip-UI](https://github.com/AliSoftware/Dip-UI)** extensions. There is also a **[code generator](https://github.com/ilyapuchka/dipgen)** that can help to simplify registering new components.
+* You can easily use Dip along with **Storyboards and Nibs** . There is also a **[code generator](https://github.com/ilyapuchka/dipgen)** that can help to simplify registering new components.
 
 <details>
 <summary>Basic usage</summary>
@@ -148,26 +148,12 @@ File an issue if you have any question. Pull requests are warmly welcome too.
 
 ## Installation
 
-Since version 5.0.0 Dip is built with Swift 3.0. You can install Dip using your favorite dependency manager:
+You can install Dip using your favorite dependency manager:
 
 <details>
 <summary>CocoaPods</summary>
 
 `pod "Dip"`
-
-To build for Swift 2.3 add this code to the bottom of your Podfile
-
-```ruby
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings['SWIFT_VERSION'] = '2.3'
-    end
-  end
-end
-```
-
-> You need at least 1.1.0.rc.2 version of CocoaPods.
 
 </details>
 
