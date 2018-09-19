@@ -36,6 +36,20 @@ private protocol Client: class {
   var server: Server! { get }
 }
 
+private protocol Dependency {
+}
+
+private struct DependencyImpl: Dependency {
+}
+
+private struct DependencyClient {
+  init(dependency: Dependency) { }
+}
+
+private struct OptionalDependencyClient {
+  init(dependency: Dependency?) { }
+}
+
 class ResolvableService: Service, Resolvable {
   var didResolveDependenciesCalled = false
   
@@ -126,12 +140,21 @@ class DipTests: XCTestCase {
     XCTAssertTrue(optService is ServiceImp1)
     
     //and when
-    let impService = try! container.resolve((Service!).self)
+    let impService = try! container.resolve((Service?).self)
     
     //then
     XCTAssertTrue(impService is ServiceImp1)
   }
   
+  func testOptionalSingleton() {
+    container.register(.singleton) { DependencyImpl() as Dependency }
+    container.register() { DependencyClient(dependency: try! self.container.resolve()) }
+    container.register() { OptionalDependencyClient(dependency: try! self.container.resolve()) }
+
+    _ = try! container.resolve() as OptionalDependencyClient
+    _ = try! container.resolve() as DependencyClient
+  }
+    
   func testThatItResolvesInstanceRegisteredWithTag() {
     //given
     container.register(tag: "service") { ServiceImp1() as Service }
@@ -155,7 +178,7 @@ class DipTests: XCTestCase {
     XCTAssertTrue(optService is ServiceImp1)
     
     //and when
-    let impService = try! container.resolve((Service!).self, tag: "service")
+    let impService = try! container.resolve((Service?).self, tag: "service")
     
     //then
     XCTAssertTrue(impService is ServiceImp1)
@@ -191,8 +214,8 @@ class DipTests: XCTestCase {
     XCTAssertTrue(optService2 is ServiceImp2)
   
     //and when
-    let impService1 = try! container.resolve((Service!).self, tag: "service1")
-    let impService2 = try! container.resolve((Service!).self, tag: "service2")
+    let impService1 = try! container.resolve((Service??).self, tag: "service1")
+    let impService2 = try! container.resolve((Service?).self, tag: "service2")
     
     //then
     XCTAssertTrue(impService1 is ServiceImp1)
@@ -244,7 +267,7 @@ class DipTests: XCTestCase {
     resolveDependenciesCalled = false
     
     //and when
-    let _ = try! container.resolve((Service!).self)
+    let _ = try! container.resolve((Service??).self)
     
     //then
     XCTAssertTrue(resolveDependenciesCalled)
