@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 
-#if canImport(UIKit) || canImport(AppKit)
+#if (canImport(UIKit) || canImport(AppKit)) && !SWIFT_PACKAGE
 
 import XCTest
 @testable import Dip
@@ -59,7 +59,7 @@ import XCTest
 #elseif os(tvOS)
   let storyboardName: StoryboardName = "TVStoryboard"
 #else
-  let storyboardName: StoryboardName = StoryboardName(rawValue: "NSStoryboard")
+  let storyboardName: StoryboardName = StoryboardName("NSStoryboard")
 #endif
 
 class DipViewController: ViewController, StoryboardInstantiatable {}
