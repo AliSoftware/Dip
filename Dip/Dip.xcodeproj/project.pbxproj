@@ -31,6 +31,8 @@
 		09FC480F1DAA9CAF00566AA8 /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC480C1DAA9CAF00566AA8 /* Register.swift */; };
 		09FC48181DAAA53100566AA8 /* DipError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC48161DAAA53100566AA8 /* DipError.swift */; };
 		09FC481E1DAAA8F900566AA8 /* ComponentScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC481C1DAAA8F900566AA8 /* ComponentScope.swift */; };
+		63937A6A21524C0B00AEE75A /* StoryboardInstantiatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63937A6921524C0B00AEE75A /* StoryboardInstantiatable.swift */; };
+		63937A6F21524DA300AEE75A /* DipUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63937A6B21524DA200AEE75A /* DipUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +73,11 @@
 		09FC480C1DAA9CAF00566AA8 /* Register.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Register.swift; path = ../../Sources/Register.swift; sourceTree = "<group>"; };
 		09FC48161DAAA53100566AA8 /* DipError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DipError.swift; path = ../../Sources/DipError.swift; sourceTree = "<group>"; };
 		09FC481C1DAAA8F900566AA8 /* ComponentScope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComponentScope.swift; path = ../../Sources/ComponentScope.swift; sourceTree = "<group>"; };
+		63937A6921524C0B00AEE75A /* StoryboardInstantiatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StoryboardInstantiatable.swift; path = ../../Sources/StoryboardInstantiatable.swift; sourceTree = "<group>"; };
+		63937A6B21524DA200AEE75A /* DipUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DipUITests.swift; path = ../../Tests/DipTests/DipUITests.swift; sourceTree = "<group>"; };
+		63937A6C21524DA200AEE75A /* NSStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NSStoryboard.storyboard; sourceTree = "<group>"; };
+		63937A6D21524DA300AEE75A /* TVStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = TVStoryboard.storyboard; sourceTree = "<group>"; };
+		63937A6E21524DA300AEE75A /* UIStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = UIStoryboard.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +115,7 @@
 				095F829B1D043B41008CD706 /* TypeForwarding.swift */,
 				0982AF0B1C5183A000B62463 /* Utils.swift */,
 				09871B401DAA6BF300B40B91 /* Compatibility.swift */,
+				63937A6921524C0B00AEE75A /* StoryboardInstantiatable.swift */,
 				0919F4CB1C16417000DC3B10 /* Info.plist */,
 			);
 			path = Dip;
@@ -125,6 +133,10 @@
 				09BD350A1D84E30D00B33E53 /* RuntimeArgumentsTests.swift */,
 				09BD350B1D84E30D00B33E53 /* ThreadSafetyTests.swift */,
 				09BD350C1D84E30D00B33E53 /* TypeForwardingTests.swift */,
+				63937A6B21524DA200AEE75A /* DipUITests.swift */,
+				63937A6C21524DA200AEE75A /* NSStoryboard.storyboard */,
+				63937A6D21524DA300AEE75A /* TVStoryboard.storyboard */,
+				63937A6E21524DA300AEE75A /* UIStoryboard.storyboard */,
 				09BD350D1D84E30D00B33E53 /* Utils.swift */,
 				0919F4D11C16417000DC3B10 /* Info.plist */,
 			);
@@ -189,6 +201,7 @@
 			buildPhases = (
 				0903B35D1C161543002241C1 /* Sources */,
 				0903B35E1C161543002241C1 /* Frameworks */,
+				63937A7721524E3B00AEE75A /* ShellScript */,
 				0903B35F1C161543002241C1 /* Resources */,
 			);
 			buildRules = (
@@ -256,6 +269,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		63937A7721524E3B00AEE75A /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo \"${SRCROOT}/DipTests/${STORYBOARD_NAME_PREFIX}Storyboard.storyboard\"\nibtool --compilation-directory \"${TARGET_TEMP_DIR}\" \"${SRCROOT}/DipTests/${STORYBOARD_NAME_PREFIX}Storyboard.storyboard\"\nibtool --link \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\" \"${TARGET_TEMP_DIR}/${STORYBOARD_NAME_PREFIX}Storyboard.storyboardc\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		0903B3531C161543002241C1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -265,6 +298,7 @@
 				0982AF0C1C5183A000B62463 /* Utils.swift in Sources */,
 				0919F4D51C16417B00DC3B10 /* Definition.swift in Sources */,
 				09FC481E1DAAA8F900566AA8 /* ComponentScope.swift in Sources */,
+				63937A6A21524C0B00AEE75A /* StoryboardInstantiatable.swift in Sources */,
 				09B036001C5D2B83001EA5B7 /* AutoWiring.swift in Sources */,
 				0919F4D41C16417B00DC3B10 /* Dip.swift in Sources */,
 				09FC480F1DAA9CAF00566AA8 /* Register.swift in Sources */,
@@ -282,6 +316,7 @@
 			files = (
 				09BD35141D84E30D00B33E53 /* RuntimeArgumentsTests.swift in Sources */,
 				09BD35151D84E30D00B33E53 /* ThreadSafetyTests.swift in Sources */,
+				63937A6F21524DA300AEE75A /* DipUITests.swift in Sources */,
 				09BD35121D84E30D00B33E53 /* DefinitionTests.swift in Sources */,
 				09BD350F1D84E30D00B33E53 /* AutoWiringTests.swift in Sources */,
 				09BD35111D84E30D00B33E53 /* ContextTests.swift in Sources */,
@@ -359,6 +394,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.DipTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STORYBOARD_NAME_PREFIX = NS;
+				"STORYBOARD_NAME_PREFIX[sdk=appletvos*]" = TV;
+				"STORYBOARD_NAME_PREFIX[sdk=appletvsimulator*]" = TV;
+				"STORYBOARD_NAME_PREFIX[sdk=iphoneos*]" = UI;
+				"STORYBOARD_NAME_PREFIX[sdk=iphonesimulator*]" = UI;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -375,6 +415,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.DipTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				STORYBOARD_NAME_PREFIX = "";
 			};
 			name = Release;
 		};
