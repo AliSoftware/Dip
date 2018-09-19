@@ -22,10 +22,12 @@
 // THE SOFTWARE.
 //
 
+#if canImport(UIKit) || canImport(AppKit)
+
 import XCTest
 @testable import Dip
 
-#if os(iOS) || os(tvOS)
+#if canImport(UIKit)
   import UIKit
   typealias Storyboard = UIStoryboard
   typealias ViewController = UIViewController
@@ -246,3 +248,5 @@ extension DipUITests {
   }
   
 }
+
+#endif
