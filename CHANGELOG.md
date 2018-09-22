@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## 7.0
+## 7.0.0
 
 * Swift 4.2 support.
 * Fixed some issues when reusing instances previously resolved as optionals.
