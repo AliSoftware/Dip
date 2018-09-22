@@ -26,7 +26,7 @@ import XCTest
 @testable import Dip
 
 private protocol Server: class {
-  weak var client: Client! {get}
+  var client: Client! {get}
   var anotherClient: Client! {get set}
 }
 
@@ -47,7 +47,7 @@ private class ServerImp: Server {
   
   weak var anotherClient: Client!
   
-  weak var _optionalProperty = InjectedWeak<AnyObject>(required: false)
+  var _optionalProperty = InjectedWeak<AnyObject>(required: false)
 }
 
 private class ClientImp: Client {
