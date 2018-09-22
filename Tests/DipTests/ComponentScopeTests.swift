@@ -301,23 +301,17 @@ class ComponentScopeTests: XCTestCase {
   
   func testThatItReusesResolvedInstanceWhenResolvingOptional() {
     var otherService: Service!
-    var impOtherService: Service!
     var anyOtherService: Any!
-    var anyImpOtherService: Any!
-    
+
     container.register { ServiceImp1() as Service }
       .resolvingProperties { container, service in
         otherService = try! container.resolve() as Service?
-        impOtherService = try! container.resolve() as Service!
         anyOtherService = try! container.resolve((Service?).self)
-        anyImpOtherService = try! container.resolve((Service!).self)
     }
     
     let service = try! container.resolve() as Service
     XCTAssertTrue(otherService as! ServiceImp1 === service as! ServiceImp1)
-    XCTAssertTrue(impOtherService as! ServiceImp1 === service as! ServiceImp1)
     XCTAssertTrue(anyOtherService as! ServiceImp1 === service as! ServiceImp1)
-    XCTAssertTrue(anyImpOtherService as! ServiceImp1 === service as! ServiceImp1)
   }
   
   func testThatItHoldsWeakReferenceToWeakSingletonInstance() {

@@ -468,15 +468,7 @@ class AutoWiringTests: XCTestCase {
     XCTAssertNotNil(resolved)
     
     //when
-    AssertNoThrow(expression: resolved = try container.resolve() as AutoWiredClient!)
-    XCTAssertNotNil(resolved)
-
-    //when
     AssertNoThrow(expression: resolved = try container.resolve(tag: "tag") as AutoWiredClient?)
-    XCTAssertNotNil(resolved)
-    
-    //when
-    AssertNoThrow(expression: resolved = try container.resolve(tag: "tag") as AutoWiredClient!)
     XCTAssertNotNil(resolved)
   }
   

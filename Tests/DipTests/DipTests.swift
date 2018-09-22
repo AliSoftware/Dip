@@ -30,7 +30,7 @@ private class ServiceImp1: Service { }
 private class ServiceImp2: Service { }
 
 private protocol Server: class {
-  weak var client: Client! { get }
+  var client: Client! { get }
 }
 private protocol Client: class {
   var server: Server! { get }
@@ -124,12 +124,6 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(optService is ServiceImp1)
-    
-    //and when
-    let impService = try! container.resolve((Service!).self)
-    
-    //then
-    XCTAssertTrue(impService is ServiceImp1)
   }
   
   func testThatItResolvesInstanceRegisteredWithTag() {
@@ -153,12 +147,6 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(optService is ServiceImp1)
-    
-    //and when
-    let impService = try! container.resolve((Service!).self, tag: "service")
-    
-    //then
-    XCTAssertTrue(impService is ServiceImp1)
   }
   
   func testThatItResolvesDifferentInstancesRegisteredForDifferentTags() {
@@ -189,14 +177,6 @@ class DipTests: XCTestCase {
     //then
     XCTAssertTrue(optService1 is ServiceImp1)
     XCTAssertTrue(optService2 is ServiceImp2)
-  
-    //and when
-    let impService1 = try! container.resolve((Service!).self, tag: "service1")
-    let impService2 = try! container.resolve((Service!).self, tag: "service2")
-    
-    //then
-    XCTAssertTrue(impService1 is ServiceImp1)
-    XCTAssertTrue(impService2 is ServiceImp2)
   }
   
   func testThatNewRegistrationOverridesPreviousRegistration() {
@@ -242,12 +222,6 @@ class DipTests: XCTestCase {
     XCTAssertTrue(resolveDependenciesCalled)
 
     resolveDependenciesCalled = false
-    
-    //and when
-    let _ = try! container.resolve((Service!).self)
-    
-    //then
-    XCTAssertTrue(resolveDependenciesCalled)
   }
   
   func testThatItThrowsErrorIfCanNotFindDefinitionForType() {

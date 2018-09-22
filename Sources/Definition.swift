@@ -144,7 +144,7 @@ public final class Definition<T, U>: DefinitionType {
   //MARK: - TypeForwardingDefinition
   
   /// Types that can be resolved using this definition.
-  private(set) var implementingTypes: [Any.Type] = [(T?).self, (T!).self]
+  private(set) var implementingTypes: [Any.Type] = [(T?).self]
   
   /// Return `true` if type can be resolved using this definition
   func doesImplements(type aType: Any.Type) -> Bool {
