@@ -360,6 +360,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
 				PRODUCT_NAME = Dip;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -379,6 +380,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
 				PRODUCT_NAME = Dip;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -400,6 +402,7 @@
 				"STORYBOARD_NAME_PREFIX[sdk=iphoneos*]" = UI;
 				"STORYBOARD_NAME_PREFIX[sdk=iphonesimulator*]" = UI;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -416,6 +419,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.DipTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STORYBOARD_NAME_PREFIX = "";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
