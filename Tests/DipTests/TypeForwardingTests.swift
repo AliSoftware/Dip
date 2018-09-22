@@ -30,6 +30,25 @@ private protocol ForwardedType: class { }
 private class ServiceImp1: NSObject, Service, ForwardedType { }
 private class ServiceImp2: NSObject, Service, ForwardedType { }
 
+private protocol Dependency {}
+private struct DependencyImpl: Dependency {}
+private class DependencyRefImpl: Dependency {}
+
+private struct DependencyClient {
+  let dep: Dependency
+  init(dependency: Dependency) {
+    self.dep = dependency
+  }
+}
+
+private struct OptionalDependencyClient {
+  let dep: Dependency?
+  init(dependency: Dependency?) {
+    self.dep = dependency
+  }
+}
+
+
 class TypeForwardingTests: XCTestCase {
   
   let container = DependencyContainer()
@@ -44,6 +63,7 @@ class TypeForwardingTests: XCTestCase {
       ("testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding",testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding),
       ("testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding", testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding),
       ("testThatItCanResolveOptional", testThatItCanResolveOptional),
+      ("testThatItReusesInstancesResolvedForOptionalType", testThatItReusesInstancesResolvedForOptionalType),
       ("testThatItFirstUsesTaggedDefinitionWhenResolvingOptional", testThatItFirstUsesTaggedDefinitionWhenResolvingOptional),
       ("testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding", testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding),
       ("testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType),
@@ -252,6 +272,35 @@ class TypeForwardingTests: XCTestCase {
     XCTAssertTrue(object is ServiceImp1)
     XCTAssertTrue(anyObject is ServiceImp1)
   }
+
+  func testThatItReusesInstancesResolvedForOptionalType() {
+    var alreadyResolved = false
+    container.register(.singleton) { () -> Dependency in
+      XCTAssertFalse(alreadyResolved)
+      return DependencyImpl() as Dependency
+    }
+    container.register() { DependencyClient(dependency: try! self.container.resolve()) }
+    container.register() { OptionalDependencyClient(dependency: try! self.container.resolve()) }
+
+    let _ = try! container.resolve() as OptionalDependencyClient
+    let _ = try! container.resolve() as DependencyClient
+
+    alreadyResolved = false
+
+    let _ = try! container.resolve() as DependencyClient
+    let _ = try! container.resolve() as OptionalDependencyClient
+
+    container.register(.singleton) { () -> Dependency in
+      XCTAssertFalse(alreadyResolved)
+      return DependencyRefImpl() as Dependency
+    }
+
+    let client1 = try! container.resolve() as DependencyClient
+    let client2 = try! container.resolve() as OptionalDependencyClient
+
+    XCTAssertTrue(client1.dep as! DependencyRefImpl === client2.dep as! DependencyRefImpl)
+  }
+
   
   func testThatItFirstUsesTaggedDefinitionWhenResolvingOptional() {
     let expectedTag: DependencyContainer.Tag = .String("tag")
