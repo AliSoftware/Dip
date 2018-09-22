@@ -23,7 +23,7 @@ matrix:
         - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
         - cd ..
         - export SWIFT_VERSION=swift-4.2-RELEASE
-        - wget https://swift.org/builds/swift-4.1-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - wget https://swift.org/builds/swift-4.2-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - cd Dip
