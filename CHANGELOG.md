@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 7.0.1
+
+* Added workaround for Swift 4.2 regression related to weak properties ([#214](https://github.com/AliSoftware/Dip/issues/214)).
+  Now autoinjection can be disabled or enabled for th whole container or individula registrations.
+
 ## 7.0.0
 
 * Swift 4.2 support.
