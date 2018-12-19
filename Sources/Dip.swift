@@ -38,7 +38,8 @@ public final class DependencyContainer {
     case String(StringLiteralType)
     case Int(IntegerLiteralType)
   }
-  
+
+  var autoInjectProperties: Bool
   internal(set) public var context: Context!
   var definitions = [DefinitionKey: _Definition]()
   var resolvedInstances = ResolvedInstances()
@@ -59,8 +60,10 @@ public final class DependencyContainer {
 
   /**
    Designated initializer for a DependencyContainer
-   
-   - parameter configBlock: A configuration block in which you typically put all you `register` calls.
+
+   - Parameters:
+     - autoInjectProperties: Whether container should perform properties auto-injection. Default is `true`.
+     - configBlock: A configuration block in which you typically put all you `register` calls.
    
    - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
            It is only present for convenience to have a cleaner syntax when declaring and initializing
@@ -79,7 +82,8 @@ public final class DependencyContainer {
    
    - returns: A new DependencyContainer.
    */
-  public init(configBlock: (DependencyContainer)->() = { _ in }) {
+  public init(autoInjectProperties: Bool = true, configBlock: (DependencyContainer)->() = { _ in }) {
+    self.autoInjectProperties = autoInjectProperties
     configBlock(self)
   }
   
