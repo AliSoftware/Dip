@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Develop
+
+* You can now use a shorthand syntax for resoling single property using a key path, i.e. `resolvingProperty(\.value)`. This allows to inject properties without making them publicly writable (they still should be writable, but `private(set)` is good enough) and without manually casting resolved instance to its concrete type to set the property (this will be still done under the hood).
+
 ## 7.0.1
 
 * Added a workaround for Swift 4.2 regression related to retaining weak properties ([#214](https://github.com/AliSoftware/Dip/issues/214)).

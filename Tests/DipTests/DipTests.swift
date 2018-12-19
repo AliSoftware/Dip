@@ -481,7 +481,7 @@ class DipTests: XCTestCase {
     }
     
     class ResolvableClient: Client, Resolvable {
-      var server: Server!
+      private(set) var server: Server!
       var secondServer: Server!
       
       var didResolveDependenciesCalled = false
@@ -500,17 +500,11 @@ class DipTests: XCTestCase {
 
     //given
     container.register { try ResolvableServer(client: self.container.resolve()) as Server }
-      .resolvingProperties { (container: DependencyContainer, server: Server) in
-        let server = server as! ResolvableServer
-        server.secondClient = try container.resolve() as Client
-    }
+      .resolvingProperty(\ResolvableServer.secondClient, as: Client.self)
     
     container.register { ResolvableClient() as Client }
-      .resolvingProperties { (container: DependencyContainer, client: Client) in
-        let client = client as! ResolvableClient
-        client.server = try container.resolve() as Server
-        client.secondServer = try container.resolve() as Server
-    }
+      .resolvingProperty(\ResolvableClient.server, factory: { try $0.resolve() })
+      .resolvingProperty(\ResolvableClient.secondServer)
 
     //when
     let client = (try! container.resolve() as Client) as! ResolvableClient

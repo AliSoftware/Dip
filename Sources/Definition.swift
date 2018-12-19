@@ -126,6 +126,22 @@ public final class Definition<T, U>: DefinitionType {
     return self
   }
 
+  @discardableResult public func resolvingProperty<Root, V>(_ keyPath: ReferenceWritableKeyPath<Root, V>, as type: Any.Type = V.self, tag: DependencyTagConvertible? = nil) -> Definition {
+    return resolvingProperties { (container, instance) in
+      precondition(instance is Root, "Type of resolved instance \(Swift.type(of: instance)) does not match expected type \(Root.self)")
+      let resolved = try container.resolve(type, tag: tag)
+      precondition(resolved is V, "Type of resolved property \(Swift.type(of: resolved)) does not match expected type \(type)")
+      (instance as! Root)[keyPath: keyPath] = resolved as! V
+    }
+  }
+
+  @discardableResult public func resolvingProperty<Root, V>(_ keyPath: ReferenceWritableKeyPath<Root, V>, factory: @escaping (DependencyContainer) throws -> V = { try $0.resolve() }) -> Definition {
+    return resolvingProperties { (container, instance) in
+      precondition(instance is Root, "Type of resolved instance \(Swift.type(of: instance)) does not match expected type \(Root.self)")
+      (instance as! Root)[keyPath: keyPath] = try factory(container)
+    }
+  }
+
   /**
    Whether container should perform properties auto-injection when resolving using this definition.
    If called will override container configuration. Can be called together with `resolvingProperties`
