@@ -77,18 +77,21 @@ public enum DipError: Error, CustomStringConvertible {
   public var description: String {
     switch self {
     case let .definitionNotFound(key):
-      return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(key.type)."
+      return "No definition registered for \(key).\nCheck the tag, type you try to resolve, number, order and types of runtime arguments passed to `resolve()` and match them with registered factories for type \(reflect(key.type))."
     case let .autoInjectionFailed(label, type, error):
-      return "Failed to auto-inject property \"\(label.desc)\" of type \(type). \(error)"
+      return "Failed to auto-inject property \"\(label.desc)\" of type \(reflect(type)). \(error)"
     case let .autoWiringFailed(type, error):
-      return "Failed to auto-wire type \"\(type)\". \(error)"
+      return "Failed to auto-wire type \"\(reflect(type))\". \(error)"
     case let .ambiguousDefinitions(type, definitions):
-      return "Ambiguous definitions for \(type):\n" +
+      return "Ambiguous definitions for \(reflect(type)):\n" +
         definitions.map({ "\($0)" }).joined(separator: ";\n")
     case let .invalidType(resolved, key):
-      return "Resolved instance \(resolved ?? "nil") does not implement expected type \(key.type)."
+      return "Resolved instance \(resolved ?? "nil") does not implement expected type \(reflect(key.type))."
     }
   }
-  
 }
 
+func reflect(_ type: Any.Type) -> String
+{
+  return String(reflecting: type)
+}

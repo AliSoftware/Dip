@@ -35,11 +35,11 @@ public struct DefinitionKey: Hashable, CustomStringConvertible {
   }
   
   public var hashValue: Int {
-    return "\(type)-\(typeOfArguments)-\(tag.desc)".hashValue
+    return "\(reflect(type))-\(typeOfArguments)-\(tag.desc)".hashValue
   }
   
   public var description: String {
-    return "type: \(type), arguments: \(typeOfArguments), tag: \(tag.desc)"
+    return "type: \(reflect(type)), arguments: \(typeOfArguments), tag: \(tag.desc)"
   }
   
   func tagged(with tag: DependencyContainer.Tag?) -> DefinitionKey {
