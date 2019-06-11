@@ -138,12 +138,10 @@ class AutoWiringTests: XCTestCase {
     container.register { ServiceImp2() }
     
     //when
-    AssertThrows(expression: try container.resolve() as AutoWiredClient) { error -> Bool in
-      switch error {
-      case let DipError.autoWiringFailed(_, error):
-        if case DipError.ambiguousDefinitions = error { return true }
-        else { return false }
-      default: return false
+    XCTAssertThrowsError(try self.container.resolve() as AutoWiredClient) { (error) in
+      guard case DipError.autoWiringFailed(_, DipError.ambiguousDefinitions) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
       }
     }
   }
@@ -233,8 +231,12 @@ class AutoWiringTests: XCTestCase {
     
     //when
     let service = try! container.resolve() as Service
-    AssertThrows(expression: try container.resolve(arguments: service) as AutoWiredClient,
-      "Container should not use auto-wiring when resolving with runtime arguments")
+    
+    // then
+    XCTAssertThrowsError(
+      try self.container.resolve(arguments: service) as AutoWiredClient,
+      "Container should not use auto-wiring when resolving with runtime arguments"
+    )
   }
   
   func testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency() {
@@ -259,12 +261,13 @@ class AutoWiringTests: XCTestCase {
     container.register { ServiceImp2() }
     
     //then
-    AssertThrows(expression: try container.resolve() as AutoWiredClient,
-      "Container should not use auto-wiring when definition for resolved type is registered.")
+    XCTAssertThrowsError(
+      try self.container.resolve() as AutoWiredClient,
+      "Container should not use auto-wiring when definition for resolved type is registered."
+    )
   }
   
   func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain() {
-    
     //given
     container.register { ServiceImp1() as Service }
     container.register { ServiceImp2() }
@@ -282,8 +285,10 @@ class AutoWiringTests: XCTestCase {
     let resolved = try! container.resolve() as AutoWiredClient
     
     //then
-    //when doing another auto-wiring during resolve we should reuse instance
-    XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
+    XCTAssertTrue(
+      (resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp),
+      "when doing another auto-wiring during resolve we should reuse instance"
+    )
   }
   
   func testThatItReusesInstancesResolvedWithoutAutoWiringWhenUsingAutoWiringAgain() {
@@ -307,8 +312,10 @@ class AutoWiringTests: XCTestCase {
     let resolved = try! container.resolve(arguments: service1, service2) as AutoWiredClient
     
     //then
-    //when doing another auto-wiring during resolve we should reuse instance
-    XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
+    XCTAssertTrue(
+      (resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp),
+      "when doing another auto-wiring during resolve we should reuse instance"
+    )
   }
 
   func testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag() {
@@ -330,8 +337,10 @@ class AutoWiringTests: XCTestCase {
     let resolved = try! container.resolve(tag: "tag") as AutoWiredClient
     
     //then
-    //when doing another auto-wiring during resolve we should reuse instance
-    XCTAssertTrue((resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp))
+    XCTAssertTrue(
+      (resolved as! AutoWiredClientImp) === (anotherInstance as! AutoWiredClientImp),
+      "when doing another auto-wiring during resolve we should reuse instance"
+    )
   }
   
   func testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithAnotherTag() {
@@ -353,8 +362,10 @@ class AutoWiringTests: XCTestCase {
     let resolved = try! container.resolve(tag: "tag") as AutoWiredClient
     
     //then
-    //when doing another auto-wiring during resolve we should reuse instance
-    XCTAssertTrue((resolved as! AutoWiredClientImp) !== (anotherInstance as! AutoWiredClientImp))
+    XCTAssertTrue(
+      (resolved as! AutoWiredClientImp) !== (anotherInstance as! AutoWiredClientImp),
+      "when doing another auto-wiring during resolve we should reuse instance"
+    )
   }
   
   func testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument() {
@@ -464,19 +475,11 @@ class AutoWiringTests: XCTestCase {
     
     var resolved: AutoWiredClient?
     //when
-    AssertNoThrow(expression: resolved = try container.resolve() as AutoWiredClient?)
+    XCTAssertNoThrow(resolved = try self.container.resolve() as AutoWiredClient?)
     XCTAssertNotNil(resolved)
     
     //when
-    AssertNoThrow(expression: resolved = try container.resolve() as AutoWiredClient!)
-    XCTAssertNotNil(resolved)
-
-    //when
-    AssertNoThrow(expression: resolved = try container.resolve(tag: "tag") as AutoWiredClient?)
-    XCTAssertNotNil(resolved)
-    
-    //when
-    AssertNoThrow(expression: resolved = try container.resolve(tag: "tag") as AutoWiredClient!)
+    XCTAssertNoThrow(resolved = try self.container.resolve(tag: "tag") as AutoWiredClient?)
     XCTAssertNotNil(resolved)
   }
   

@@ -28,41 +28,6 @@ import XCTest
   typealias NSObject = AnyObject
 #endif
 
-func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T) {
-  AssertThrows(file, line: line, expression: expression, "")
-}
-
-func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, _ message: String) {
-  AssertThrows(expression: expression, checkError: { _ in true }, message)
-}
-
-func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, checkError: (Error) -> Bool) {
-  AssertThrows(file, line: line, expression: expression, checkError: checkError, "")
-}
-
-func AssertThrows<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, checkError: (Error) -> Bool, _ message: String) {
-  do {
-    let _ = try expression()
-    XCTFail(message, file: file, line: line)
-  }
-  catch {
-    XCTAssertTrue(checkError(error), "Thrown unexpected error: \(error)", file: file, line: line)
-  }
-}
-
-func AssertNoThrow<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T) {
-  AssertNoThrow(file, line: line, expression: expression, "")
-}
-
-func AssertNoThrow<T>(_ file: StaticString = #file, line: UInt = #line, expression: @autoclosure () throws -> T, _ message: String) {
-  do {
-    let _ = try expression()
-  }
-  catch {
-    XCTFail(message, file: file, line: line)
-  }
-}
-
 #if os(Linux)
 import Glibc
 typealias TMain = @convention(c) (UnsafeMutableRawPointer?) -> UnsafeMutableRawPointer?

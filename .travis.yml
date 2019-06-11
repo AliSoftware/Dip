@@ -9,7 +9,7 @@ matrix:
         - carthage build --no-skip-current
         - swift package clean && swift build && swift test
       os: osx
-      osx_image: xcode9.4
+      osx_image: xcode10.2
       language: objective-c
       before_install:
         - gem install cocoapods --version 1.1.0.rc.2 --no-document
@@ -22,8 +22,8 @@ matrix:
       before_install:
         - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
         - cd ..
-        - export SWIFT_VERSION=swift-4.1-RELEASE
-        - wget https://swift.org/builds/swift-4.1-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - export SWIFT_VERSION=swift-5.0-RELEASE
+        - wget https://swift.org/builds/swift-5.0-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - cd Dip

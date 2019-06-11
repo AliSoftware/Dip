@@ -48,8 +48,8 @@ private class ServerImp: Server, Hashable {
   weak var client: Client!
   init() {}
   
-  var hashValue: Int {
-    return Unmanaged.passUnretained(self).toOpaque().hashValue
+  func hash(into hasher: inout Hasher) {
+    hasher.combine(ObjectIdentifier(self))
   }
 }
 

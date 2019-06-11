@@ -183,7 +183,7 @@ extension DependencyContainer {
       return previouslyResolved
     }
     
-    log(level: .Verbose, context)
+    if let context = context { log(level: .Verbose, context) }
     var resolvedInstance = try builder(definition)
     
     /*
@@ -227,7 +227,7 @@ extension DependencyContainer {
   
   private func previouslyResolved<T>(for definition: _Definition, key: DefinitionKey) -> T? {
     //first check if exact key was already resolved
-    if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T {
+    if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T, String(describing: previouslyResolved) != "nil" {
       return previouslyResolved
     }
     //then check if any related type was already resolved
@@ -235,7 +235,7 @@ extension DependencyContainer {
       DefinitionKey(type: $0, typeOfArguments: key.typeOfArguments, tag: key.tag)
     })
     for key in keys {
-      if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T {
+      if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T, String(describing: previouslyResolved) != "nil" {
         return previouslyResolved
       }
     }

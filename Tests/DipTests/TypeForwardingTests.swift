@@ -109,15 +109,15 @@ class TypeForwardingTests: XCTestCase {
     def.implements(ForwardedType.self, tag: "otherTag")
     
     //then
-    AssertThrows(expression: try container.resolve(tag: "tag") as ForwardedType)
-    AssertThrows(expression: try container.resolve(ForwardedType.self, tag: "tag"))
+    XCTAssertThrowsError(try self.container.resolve(tag: "tag") as ForwardedType)
+    XCTAssertThrowsError(try self.container.resolve(ForwardedType.self, tag: "tag"))
     
     //and given
     def.implements(ForwardedType.self, tag: "tag")
     
     //then
-    AssertNoThrow(expression: try container.resolve(tag: "tag") as ForwardedType)
-    AssertNoThrow(expression: try container.resolve(ForwardedType.self, tag: "tag"))
+    XCTAssertNoThrow(try self.container.resolve(tag: "tag") as ForwardedType)
+    XCTAssertNoThrow(try self.container.resolve(ForwardedType.self, tag: "tag"))
   }
   
   func testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag() {
@@ -276,19 +276,23 @@ class TypeForwardingTests: XCTestCase {
       .implements(ServiceImp2.self)
     
     //then
-    AssertThrows(expression: try container.resolve() as ServiceImp2) { error in
-      guard case let DipError.invalidType(_, key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve() as ServiceImp2) { error in
+      guard case let DipError.invalidType(_, key) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       let expectedKey = DefinitionKey(type: ServiceImp2.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
-      return true
     }
-    AssertThrows(expression: try container.resolve(ServiceImp2.self)) { error in
-      guard case let DipError.invalidType(_, key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve(ServiceImp2.self)) { error in
+      guard case let DipError.invalidType(_, key) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       let expectedKey = DefinitionKey(type: ServiceImp2.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
-      return true
     }
   }
   

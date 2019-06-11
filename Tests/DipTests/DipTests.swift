@@ -30,7 +30,7 @@ private class ServiceImp1: Service { }
 private class ServiceImp2: Service { }
 
 private protocol Server: class {
-  weak var client: Client! { get }
+  var client: Client! { get }
 }
 private protocol Client: class {
   var server: Server! { get }
@@ -124,13 +124,7 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(optService is ServiceImp1)
-    
-    //and when
-    let impService = try! container.resolve((Service!).self)
-    
-    //then
-    XCTAssertTrue(impService is ServiceImp1)
-  }
+}
   
   func testThatItResolvesInstanceRegisteredWithTag() {
     //given
@@ -153,12 +147,6 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(optService is ServiceImp1)
-    
-    //and when
-    let impService = try! container.resolve((Service!).self, tag: "service")
-    
-    //then
-    XCTAssertTrue(impService is ServiceImp1)
   }
   
   func testThatItResolvesDifferentInstancesRegisteredForDifferentTags() {
@@ -189,14 +177,6 @@ class DipTests: XCTestCase {
     //then
     XCTAssertTrue(optService1 is ServiceImp1)
     XCTAssertTrue(optService2 is ServiceImp2)
-  
-    //and when
-    let impService1 = try! container.resolve((Service!).self, tag: "service1")
-    let impService2 = try! container.resolve((Service!).self, tag: "service2")
-    
-    //then
-    XCTAssertTrue(impService1 is ServiceImp1)
-    XCTAssertTrue(impService2 is ServiceImp2)
   }
   
   func testThatNewRegistrationOverridesPreviousRegistration() {
@@ -242,12 +222,6 @@ class DipTests: XCTestCase {
     XCTAssertTrue(resolveDependenciesCalled)
 
     resolveDependenciesCalled = false
-    
-    //and when
-    let _ = try! container.resolve((Service!).self)
-    
-    //then
-    XCTAssertTrue(resolveDependenciesCalled)
   }
   
   func testThatItThrowsErrorIfCanNotFindDefinitionForType() {
@@ -255,25 +229,27 @@ class DipTests: XCTestCase {
     container.register { ServiceImp1() as ServiceImp1 }
     
     //when
-    AssertThrows(expression: try container.resolve() as Service) { error in
-      guard case let DipError.definitionNotFound(key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve() as Service) { error in
+      guard case let DipError.definitionNotFound(key) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
-
-      return true
     }
 
     //and when
-    AssertThrows(expression: try container.resolve(Service.self)) { error in
-      guard case let DipError.definitionNotFound(key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve(Service.self)) { error in
+      guard case let DipError.definitionNotFound(key) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
-      
-      return true
     }
   }
   
@@ -282,25 +258,27 @@ class DipTests: XCTestCase {
     container.register(tag: "some tag") { ServiceImp1() as Service }
     
     //when
-    AssertThrows(expression: try container.resolve(tag: "other tag") as Service) { error in
-      guard case let DipError.definitionNotFound(key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve(tag: "other tag") as Service) { error in
+      guard case let DipError.definitionNotFound(key) = error  else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: "other tag")
       XCTAssertEqual(key, expectedKey)
-      
-      return true
     }
 
     //and when
-    AssertThrows(expression: try container.resolve(Service.self, tag: "other tag")) { error in
-      guard case let DipError.definitionNotFound(key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve(Service.self, tag: "other tag")) { error in
+      guard case let DipError.definitionNotFound(key) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: "other tag")
       XCTAssertEqual(key, expectedKey)
-      
-      return true
     }
   }
   
@@ -309,25 +287,27 @@ class DipTests: XCTestCase {
     container.register { ServiceImp1() as Service }
     
     //when
-    AssertThrows(expression: try container.resolve(arguments: "some string") as Service) { error in
-      guard case let DipError.definitionNotFound(key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve(arguments: "some string") as Service) { error in
+      guard case let DipError.definitionNotFound(key) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: String.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
-
-      return true
     }
 
     //and when
-    AssertThrows(expression: try container.resolve(Service.self, arguments: "some string")) { error in
-      guard case let DipError.definitionNotFound(key) = error else { return false }
+    XCTAssertThrowsError(try self.container.resolve(Service.self, arguments: "some string")) { error in
+      guard case let DipError.definitionNotFound(key) = error else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
       
       //then
       let expectedKey = DefinitionKey(type: Service.self, typeOfArguments: String.self, tag: nil)
       XCTAssertEqual(key, expectedKey)
-      
-      return true
     }
   }
   
@@ -338,18 +318,18 @@ class DipTests: XCTestCase {
     container.register { () throws -> Service in throw expectedError }
     
     //when
-    AssertThrows(expression: try container.resolve() as Service) { error in
-      switch error {
-      case let DipError.definitionNotFound(key) where key == failedKey: return true
-      default: return false
+    XCTAssertThrowsError(try self.container.resolve() as Service) { error in
+      guard case let DipError.definitionNotFound(key) = error, key == failedKey else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
       }
     }
     
     //and when
-    AssertThrows(expression: try container.resolve(Service.self)) { error in
-      switch error {
-      case let DipError.definitionNotFound(key) where key == failedKey: return true
-      default: return false
+    XCTAssertThrowsError(try self.container.resolve(Service.self)) { error in
+      guard case let DipError.definitionNotFound(key) = error, key == failedKey else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
       }
     }
   }
@@ -365,18 +345,18 @@ class DipTests: XCTestCase {
     }
     
     //when
-    AssertThrows(expression: try container.resolve() as Service) { error in
-      switch error {
-      case let DipError.definitionNotFound(key) where key == failedKey: return true
-      default: return false
+    XCTAssertThrowsError(try self.container.resolve() as Service) { error in
+      guard case let DipError.definitionNotFound(key) = error, key == failedKey else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
       }
     }
     
     //and when
-    AssertThrows(expression: try container.resolve(Service.self)) { error in
-      switch error {
-      case let DipError.definitionNotFound(key) where key == failedKey: return true
-      default: return false
+    XCTAssertThrowsError(try self.container.resolve(Service.self)) { error in
+      guard case let DipError.definitionNotFound(key) = error, key == failedKey else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
       }
     }
   }
@@ -584,7 +564,7 @@ class DipTests: XCTestCase {
     }
     
     //then
-    AssertNoThrow(expression: try container.validate("arg"))
+    XCTAssertNoThrow(try self.container.validate("arg"))
     XCTAssertTrue(createdService1)
     XCTAssertTrue(createdService2)
     XCTAssertTrue(createdService3)
@@ -607,8 +587,8 @@ class DipTests: XCTestCase {
     }
     
     //then
-    AssertNoThrow(expression:
-      try container.validate(
+    XCTAssertNoThrow(
+      try self.container.validate(
         "1",
         expectedIntArgument,
         "x",
@@ -623,8 +603,18 @@ class DipTests: XCTestCase {
     container.register { (a: Int) -> Service in ServiceImp1() as Service }
     
     //then
-    AssertThrows(expression: try container.validate()) { error in error is DipError }
-    AssertThrows(expression: try container.validate("1")) { error in error is DipError }
+    XCTAssertThrowsError(try self.container.validate()) { error in
+      guard error is DipError else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
+    }
+    XCTAssertThrowsError(try self.container.validate("1")) { error in
+      guard error is DipError else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
+    }
   }
   
   func testThatItFailsValidationOnlyForDipErrors() {
@@ -636,7 +626,7 @@ class DipTests: XCTestCase {
     }
     
     //then
-    AssertNoThrow(expression: try container.validate())
+    XCTAssertNoThrow(try self.container.validate())
     
     //given
     let key = DefinitionKey(type: Service.self, typeOfArguments: Void.self, tag: nil)
@@ -645,9 +635,11 @@ class DipTests: XCTestCase {
     }
     
     //then
-    AssertThrows(expression: try container.validate()) { error in
-      if case let DipError.definitionNotFound(_key) = error, _key == key { return true }
-      else { return false }
+    XCTAssertThrowsError(try self.container.validate()) { error in
+      guard case let DipError.definitionNotFound(_key) = error, _key == key else {
+        XCTFail("Thrown unexpected error: \(error)")
+        return
+      }
     }
   }
   
@@ -665,10 +657,10 @@ extension DipTests {
     container.collaborate(with: collaborator)
     
     //then
-    AssertNoThrow(expression: try container.resolve() as Service)
-    AssertNoThrow(expression: try container.resolve(Service.self))
-    AssertNoThrow(expression: try collaborator.resolve() as String)
-    AssertNoThrow(expression: try collaborator.resolve(String.self))
+    XCTAssertNoThrow(try self.container.resolve() as Service)
+    XCTAssertNoThrow(try self.container.resolve(Service.self))
+    XCTAssertNoThrow(try collaborator.resolve() as String)
+    XCTAssertNoThrow(try collaborator.resolve(String.self))
   }
   
   func testThatCollaboratingWithSelfIsIgnored() {
