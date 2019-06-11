@@ -92,25 +92,6 @@ class AutoInjectionTests: XCTestCase {
   static var clientDidInjectCalled: Bool = false
 
   let container = DependencyContainer()
-  
-  static var allTests = {
-    return [
-      ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
-      ("testThatItResolvesInheritedDependencies", testThatItResolvesInheritedDependencies),
-      ("testThatItThrowsErrorIfFailsToAutoInjectDependency", testThatItThrowsErrorIfFailsToAutoInjectDependency),
-      ("testThatItResolvesAutoInjectedSingletons", testThatItResolvesAutoInjectedSingletons),
-      ("testThatItCallsResolveDependencyBlockWhenAutoInjecting", testThatItCallsResolveDependencyBlockWhenAutoInjecting),
-      ("testThatItReusesResolvedAutoInjectedInstances", testThatItReusesResolvedAutoInjectedInstances),
-      ("testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection", testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection),
-      ("testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies", testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies),
-      ("testThatItCallsDidInjectOnAutoInjectedProperty", testThatItCallsDidInjectOnAutoInjectedProperty),
-      ("testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected", testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected),
-      ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties),
-      ("testThatItPassesTagToAutoInjectedProperty", testThatItPassesTagToAutoInjectedProperty),
-      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag),
-      ("testThatItAutoInjectsPropertyWithCollaboratingContainer", testThatItAutoInjectsPropertyWithCollaboratingContainer)
-    ]
-  }()
 
   override func setUp() {
     container.reset()

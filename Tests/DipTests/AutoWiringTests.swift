@@ -50,30 +50,6 @@ class AutoWiringTests: XCTestCase {
   
   let container = DependencyContainer()
 
-  static var allTests = {
-    return [
-      ("testThatItCanResolveWithAutoWiring", testThatItCanResolveWithAutoWiring),
-      ("testThatItUsesAutoWireFactoryWithMostNumberOfArguments", testThatItUsesAutoWireFactoryWithMostNumberOfArguments),
-      ("testThatItThrowsAmbiguityErrorWhenUsingAutoWire", testThatItThrowsAmbiguityErrorWhenUsingAutoWire),
-      ("testThatItUsesAutoWireFactoryWithMostNumberOfArguments", testThatItUsesAutoWireFactoryWithMostNumberOfArguments),
-      ("testThatItPrefersTaggedFactoryWithDifferentNumberOfArgumentsWhenUsingAutoWire", testThatItPrefersTaggedFactoryWithDifferentNumberOfArgumentsWhenUsingAutoWire),
-      ("testThatItPrefersTaggedFactoryWithDifferentTypesOfArgumentsWhenUsingAutoWire", testThatItPrefersTaggedFactoryWithDifferentTypesOfArgumentsWhenUsingAutoWire),
-      ("testThatItFallbackToNotTaggedFactoryWhenUsingAutoWire", testThatItFallbackToNotTaggedFactoryWhenUsingAutoWire),
-      ("testThatItDoesNotTryToUseAutoWiringWhenCallingResolveWithArguments", testThatItDoesNotTryToUseAutoWiringWhenCallingResolveWithArguments),
-      ("testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency", testThatItDoesNotUseAutoWiringWhenFailedToResolveLowLevelDependency),
-      ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgain),
-      ("testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag", testThatItReusesInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithTheSameTag),
-      ("testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithAnotherTag", testThatItDoesNotReuseInstancesResolvedWithAutoWiringWhenUsingAutoWiringAgainWithAnotherTag),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument", testThatItUsesTagToResolveDependenciesWithAutoWiringWith1Argument),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith2Arguments),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith3Arguments),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith4Arguments),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith5Arguments),
-      ("testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Arguments", testThatItUsesTagToResolveDependenciesWithAutoWiringWith6Arguments),
-      ("testThatItCanAutoWireOptional", testThatItCanAutoWireOptional)
-    ]
-  }()
-
   override func setUp() {
     container.reset()
   }

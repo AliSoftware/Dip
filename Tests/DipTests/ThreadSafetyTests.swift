@@ -124,14 +124,6 @@ class ThreadSafetyTests: XCTestCase {
   }
   #endif
   
-  static var allTests = {
-    return [
-      ("testSingletonThreadSafety", testSingletonThreadSafety),
-      ("testFactoryThreadSafety", testFactoryThreadSafety),
-      ("testCircularReferenceThreadSafety", testCircularReferenceThreadSafety)
-    ]
-  }()
-  
   override func setUp() {
     Dip.logLevel = .Verbose
     container = DependencyContainer()

@@ -33,23 +33,6 @@ private class ServiceImp2: NSObject, Service, ForwardedType { }
 class TypeForwardingTests: XCTestCase {
   
   let container = DependencyContainer()
-
-  static var allTests = {
-    return [
-      ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
-      ("testThatItReusesInstanceResolvedByTypeForwarding", testThatItReusesInstanceResolvedByTypeForwarding),
-      ("testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag", testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag),
-      ("testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag",  testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag),
-      ("testThatItCallsResolvedDependenciesBlockWhenResolvingByTypeForwarding", testThatItCallsResolvedDependenciesBlockWhenResolvingByTypeForwarding),
-      ("testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding",testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding),
-      ("testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding", testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding),
-      ("testThatItCanResolveOptional", testThatItCanResolveOptional),
-      ("testThatItFirstUsesTaggedDefinitionWhenResolvingOptional", testThatItFirstUsesTaggedDefinitionWhenResolvingOptional),
-      ("testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding", testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding),
-      ("testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType),
-      ("testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag", testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag)
-    ]
-  }()
   
   override func setUp() {
     container.reset()

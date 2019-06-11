@@ -39,20 +39,6 @@ class ContextTests: XCTestCase {
 
   let container = DependencyContainer()
   
-  static var allTests = {
-    return [
-      ("testThatContextStoresCurrentlyResolvedType", testThatContextStoresCurrentlyResolvedType),
-      ("testThatContextStoresInjectedInType", testThatContextStoresInjectedInType),
-      ("testThatContextStoresTheTagPassedToResolve", testThatContextStoresTheTagPassedToResolve),
-      ("testThatContextStoresTheTagPassedToResolveWhenAutoInjecting", testThatContextStoresTheTagPassedToResolveWhenAutoInjecting),
-      ("testThatContextStoresTheTagPassedToResolveWhenAutoWiring", testThatContextStoresTheTagPassedToResolveWhenAutoWiring),
-      ("testThatContextDoesNotOverrideNilTagPassedToResolve", testThatContextDoesNotOverrideNilTagPassedToResolve),
-      ("testThatContextStoresNameOfAutoInjectedProperty", testThatContextStoresNameOfAutoInjectedProperty),
-      ("testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration", testThatItDoesNotSetInjectedInTypeWhenResolvingWithCollaboration),
-      ("testThatContextIsPreservedWhenResolvingWithCollaboration", testThatContextIsPreservedWhenResolvingWithCollaboration)
-    ]
-  }()
-  
   override func setUp() {
     container.reset()
     container.register { ServiceImp2() }

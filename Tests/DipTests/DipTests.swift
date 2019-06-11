@@ -49,31 +49,6 @@ class DipTests: XCTestCase {
 
   let container = DependencyContainer()
 
-  static var allTests = {
-    return [
-      ("testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle", testThatCreatingContainerWithConfigBlockDoesNotCreateRetainCycle),
-      ("testThatItResolvesInstanceRegisteredWithoutTag", testThatItResolvesInstanceRegisteredWithoutTag),
-      ("testThatItResolvesInstanceRegisteredWithTag", testThatItResolvesInstanceRegisteredWithTag),
-      ("testThatItResolvesDifferentInstancesRegisteredForDifferentTags", testThatItResolvesDifferentInstancesRegisteredForDifferentTags),
-      ("testThatNewRegistrationOverridesPreviousRegistration", testThatNewRegistrationOverridesPreviousRegistration),
-      ("testThatItCallsResolveDependenciesOnDefinition", testThatItCallsResolveDependenciesOnDefinition),
-      ("testThatItThrowsErrorIfCanNotFindDefinitionForType", testThatItThrowsErrorIfCanNotFindDefinitionForType),
-      ("testThatItThrowsErrorIfCanNotFindDefinitionForTag", testThatItThrowsErrorIfCanNotFindDefinitionForTag),
-      ("testThatItThrowsErrorIfCanNotFindDefinitionForFactoryWithArguments", testThatItThrowsErrorIfCanNotFindDefinitionForFactoryWithArguments),
-      ("testThatItThrowsErrorIfConstructorThrows", testThatItThrowsErrorIfConstructorThrows),
-      ("testThatItThrowsErrorIfFailsToResolveDependency", testThatItThrowsErrorIfFailsToResolveDependency),
-      ("testThatItCallsDidResolveDependenciesOnResolvableIntance", testThatItCallsDidResolveDependenciesOnResolvableIntance),
-      ("testThatItCallsDidResolveDependenciesInReverseOrder", testThatItCallsDidResolveDependenciesInReverseOrder),
-      ("testItCallsResolveDependenciesOnResolableInstance", testItCallsResolveDependenciesOnResolableInstance),
-      ("testThatItResolvesCircularDependencies", testThatItResolvesCircularDependencies),
-      ("testThatItCanResolveUsingContainersCollaboration", testThatItCanResolveUsingContainersCollaboration),
-      ("testThatCollaboratingWithSelfIsIgnored", testThatCollaboratingWithSelfIsIgnored),
-      ("testThatCollaboratingContainersAreWeakReferences", testThatCollaboratingContainersAreWeakReferences),
-      ("testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer", testThatCollaboratingContainersReuseInstancesResolvedByAnotherContainer),
-      ("testThatItCanHandleSeparateContainersAndTheirCollaboration", testThatItCanHandleSeparateContainersAndTheirCollaboration)
-    ]
-  }()
-
   override func setUp() {
     container.reset()
   }
