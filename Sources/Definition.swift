@@ -82,6 +82,7 @@ public final class Definition<T, U>: DefinitionType {
   let scope: ComponentScope
   var weakFactory: ((Any) throws -> Any)!
   var resolveProperties: ((DependencyContainer, Any) throws -> ())?
+  var autoInjectProperties: Bool?
   
   init(scope: ComponentScope, factory: @escaping F) {
     self.factory = factory
@@ -124,6 +125,34 @@ public final class Definition<T, U>: DefinitionType {
     else {
       self.resolveProperties = { try block($0, $1 as! T) }
     }
+    return self
+  }
+
+  @discardableResult public func resolvingProperty<Root, V>(_ keyPath: ReferenceWritableKeyPath<Root, V>, as type: Any.Type = V.self, tag: DependencyTagConvertible? = nil) -> Definition {
+    return resolvingProperties { (container, instance) in
+      precondition(instance is Root, "Type of resolved instance \(Swift.type(of: instance)) does not match expected type \(Root.self)")
+      let resolved = try container.resolve(type, tag: tag)
+      precondition(resolved is V, "Type of resolved property \(Swift.type(of: resolved)) does not match expected type \(type)")
+      (instance as! Root)[keyPath: keyPath] = resolved as! V
+    }
+  }
+
+  @discardableResult public func resolvingProperty<Root, V>(_ keyPath: ReferenceWritableKeyPath<Root, V>, factory: @escaping (DependencyContainer) throws -> V = { try $0.resolve() }) -> Definition {
+    return resolvingProperties { (container, instance) in
+      precondition(instance is Root, "Type of resolved instance \(Swift.type(of: instance)) does not match expected type \(Root.self)")
+      (instance as! Root)[keyPath: keyPath] = try factory(container)
+    }
+  }
+
+  /**
+   Whether container should perform properties auto-injection when resolving using this definition.
+   If called will override container configuration. Can be called together with `resolvingProperties`
+   to resolve properties that are not automatically injected.
+
+   - parameter shouldAutoInject: Whether container should perform properties auto-injection when resolving using this definition. Default is `true`.
+  */
+  @discardableResult public func autoInjectingProperties(_ shouldAutoInject: Bool = true) -> Definition {
+    autoInjectProperties = shouldAutoInject
     return self
   }
 
@@ -206,6 +235,7 @@ protocol _Definition: AutoWiringDefinition, TypeForwardingDefinition {
   var weakFactory: ((Any) throws -> Any)! { get }
   func resolveProperties(of instance: Any, container: DependencyContainer) throws
   var container: DependencyContainer? { get set }
+  var autoInjectProperties: Bool? { get }
 }
 
 //MARK: - Type Forwarding

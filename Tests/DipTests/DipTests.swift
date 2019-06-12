@@ -99,7 +99,7 @@ class DipTests: XCTestCase {
     
     //then
     XCTAssertTrue(optService is ServiceImp1)
-}
+  }
   
   func testThatItResolvesInstanceRegisteredWithTag() {
     //given
@@ -198,7 +198,7 @@ class DipTests: XCTestCase {
 
     resolveDependenciesCalled = false
   }
-  
+
   func testThatItThrowsErrorIfCanNotFindDefinitionForType() {
     //given
     container.register { ServiceImp1() as ServiceImp1 }
@@ -462,7 +462,7 @@ class DipTests: XCTestCase {
     }
     
     class ResolvableClient: Client, Resolvable {
-      var server: Server!
+      private(set) var server: Server!
       var secondServer: Server!
       
       var didResolveDependenciesCalled = false
@@ -481,17 +481,11 @@ class DipTests: XCTestCase {
 
     //given
     container.register { try ResolvableServer(client: self.container.resolve()) as Server }
-      .resolvingProperties { (container: DependencyContainer, server: Server) in
-        let server = server as! ResolvableServer
-        server.secondClient = try container.resolve() as Client
-    }
+      .resolvingProperty(\ResolvableServer.secondClient, as: Client.self)
     
     container.register { ResolvableClient() as Client }
-      .resolvingProperties { (container: DependencyContainer, client: Client) in
-        let client = client as! ResolvableClient
-        client.server = try container.resolve() as Server
-        client.secondServer = try container.resolve() as Server
-    }
+      .resolvingProperty(\ResolvableClient.server, factory: { try $0.resolve() })
+      .resolvingProperty(\ResolvableClient.secondServer)
 
     //when
     let client = (try! container.resolve() as Client) as! ResolvableClient
@@ -847,5 +841,41 @@ extension DipTests {
         }
         ?? false
     )
+  }
+}
+
+extension DipTests {
+  // https://bugs.swift.org/browse/SR-8878
+  func test_weak_mirror_regression() {
+    class A {
+      static var released = false
+      deinit {
+        A.released = true
+      }
+    }
+    class B {
+      static var released = false
+      weak var a: A?
+      init(a: A) {
+        self.a = a
+      }
+      deinit {
+        B.released = true
+      }
+    }
+    let container = DependencyContainer()
+    let tag = "my_tag"
+    container.register(.unique, tag: tag, factory: B.init(a:))
+    do {
+      let a0 = A()
+      let _: B = try container.resolve(tag: tag, arguments: a0)
+
+
+      XCTAssertTrue(B.released)
+      // Due to regression in swift 4.2 Mirror retains weak children
+      // https://bugs.swift.org/browse/SR-8878
+      XCTAssertFalse(A.released)
+    } catch {
+    }
   }
 }

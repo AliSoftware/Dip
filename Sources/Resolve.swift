@@ -199,7 +199,7 @@ extension DependencyContainer {
      That happens because when Optional is casted to Any Swift can not implicitly unwrap it with as operator.
      As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
      */
-    if let box = resolvedInstance as? BoxType, let unboxed = box.unboxed as? T {
+    if let box = resolvedInstance as? BoxType, let unboxedAny = box.unboxed, let unboxed = unboxedAny as? T {
       resolvedInstance = unboxed
     }
     
@@ -217,8 +217,11 @@ extension DependencyContainer {
       resolvedInstances.resolvableInstances.append(resolvable)
       resolvable.resolveDependencies(self)
     }
-    
-    try autoInjectProperties(in: resolvedInstance)
+
+    let shouldAutoInject = definition.autoInjectProperties ?? self.autoInjectProperties
+    if shouldAutoInject {
+      try autoInjectProperties(in: resolvedInstance)
+    }
     try definition.resolveProperties(of: resolvedInstance, container: self)
     
     log(level: .Verbose, "Resolved type \(key.type) with \(resolvedInstance)")
@@ -227,7 +230,7 @@ extension DependencyContainer {
   
   private func previouslyResolved<T>(for definition: _Definition, key: DefinitionKey) -> T? {
     //first check if exact key was already resolved
-    if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T, String(describing: previouslyResolved) != "nil" {
+    if let previouslyResolved: T = resolvedInstances[key: key, inScope: definition.scope, context: context] {
       return previouslyResolved
     }
     //then check if any related type was already resolved
@@ -235,7 +238,7 @@ extension DependencyContainer {
       DefinitionKey(type: $0, typeOfArguments: key.typeOfArguments, tag: key.tag)
     })
     for key in keys {
-      if let previouslyResolved = resolvedInstances[key: key, inScope: definition.scope, context: context] as? T, String(describing: previouslyResolved) != "nil" {
+      if let previouslyResolved: T = resolvedInstances[key: key, inScope: definition.scope, context: context] {
         return previouslyResolved
       }
     }
@@ -280,20 +283,22 @@ class ResolvedInstances {
   }
   var weakSingletons = [DefinitionKey: Any]()
   
-  subscript(key key: DefinitionKey, inScope scope: ComponentScope, context context: DependencyContainer.Context) -> Any? {
+  subscript<T>(key key: DefinitionKey, inScope scope: ComponentScope, context context: DependencyContainer.Context) -> T? {
     get {
+      let instance: Any?
       switch scope {
       case .singleton, .eagerSingleton:
-        return context.inCollaboration ? sharedSingletons[key] : singletons[key]
+        instance = context.inCollaboration ? sharedSingletons[key] : singletons[key]
       case .weakSingleton:
         let singletons = context.inCollaboration ? sharedWeakSingletons : weakSingletons
-        if let boxed = singletons[key] as? WeakBoxType { return boxed.unboxed }
-        else { return singletons[key] }
+        if let boxed = singletons[key] as? WeakBoxType { instance = boxed.unboxed }
+        else { instance = singletons[key] }
       case .shared:
-        return resolvedInstances[key]
+        instance = resolvedInstances[key]
       case .unique:
         return nil
       }
+      return instance.flatMap { $0 as? T }
     }
     set {
       switch scope {

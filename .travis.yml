@@ -12,7 +12,7 @@ matrix:
       osx_image: xcode10.2
       language: objective-c
       before_install:
-        - gem install cocoapods --version 1.1.0.rc.2 --no-document
+        - gem install cocoapods --version 1.4.0 --no-document
     - script:
         - swift package clean && swift build && swift test
       os: linux

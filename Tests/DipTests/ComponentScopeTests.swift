@@ -281,7 +281,7 @@ class ComponentScopeTests: XCTestCase {
   func testThatItReusesResolvedInstanceWhenResolvingOptional() {
     var otherService: Service!
     var anyOtherService: Any!
-    
+
     container.register { ServiceImp1() as Service }
       .resolvingProperties { container, service in
         otherService = try! container.resolve() as Service?

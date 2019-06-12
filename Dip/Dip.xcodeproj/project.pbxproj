@@ -361,6 +361,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
 				PRODUCT_NAME = Dip;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -380,6 +381,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
 				PRODUCT_NAME = Dip;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -401,6 +403,7 @@
 				"STORYBOARD_NAME_PREFIX[sdk=iphoneos*]" = UI;
 				"STORYBOARD_NAME_PREFIX[sdk=iphonesimulator*]" = UI;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Debug;
 		};
@@ -417,6 +420,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.DipTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STORYBOARD_NAME_PREFIX = "";
+				SWIFT_VERSION = 4.2;
 			};
 			name = Release;
 		};
@@ -450,7 +454,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.1;
+				CURRENT_PROJECT_VERSION = 7.0.1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -514,7 +518,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 6.1;
+				CURRENT_PROJECT_VERSION = 7.0.1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;

@@ -1,9 +1,24 @@
 # CHANGELOG
 
+## Develop
+
+* You can now use a shorthand syntax for resolving a single property using a key path, i.e. `resolvingProperty(\.value)`. This allows to inject properties without making them publicly writable (they still should be writable, but `private(set)` is good enough) and without manually casting resolved instance to its concrete type to set the property (this will be still done under the hood).
+
+## 7.0.1
+
+* Added a workaround for Swift 4.2 regression related to retaining weak properties ([#214](https://github.com/AliSoftware/Dip/issues/214)).
+  For that auto-injection can be disabled or enabled for the whole container or individula registrations.
+
+## 7.0.0
+
+* Swift 4.2 support.
+* Fixed some issues when reusing instances previously resolved as optionals.
+* Dip-UI is now part of Dip.
+
 ## 6.1
 
-* Swift 4.1 support
-* Fixed crashes resolving singletons using collaborating containers
+* Swift 4.1 support.
+* Fixed crashes resolving singletons using collaborating containers.
   [#179](https://github.com/AliSoftware/Dip/pull/179), [@trimmurrti](https://github.com/trimmurrti)
   [#182](https://github.com/AliSoftware/Dip/pull/182), [@tapsandswipes](https://github.com/tapsandswipes)
 

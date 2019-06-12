@@ -35,10 +35,10 @@ public enum ComponentScope {
    ```
    container.register { ServiceImp() as Service }
    container.register {
-   ServiceConsumerImp(
-   service1: try container.resolve() as Service
-   service2: try container.resolve() as Service
-   ) as ServiceConsumer
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
    }
    let consumer = container.resolve() as ServiceConsumer
    consumer.service1 !== consumer.service2 //true
@@ -59,10 +59,10 @@ public enum ComponentScope {
    ```
    container.register { ServiceImp() as Service }
    container.register {
-   ServiceConsumerImp(
-   service1: try container.resolve() as Service
-   service2: try container.resolve() as Service
-   ) as ServiceConsumer
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
    }
    let consumer1 = container.resolve() as ServiceConsumer
    let consumer2 = container.resolve() as ServiceConsumer
@@ -89,10 +89,10 @@ public enum ComponentScope {
    ```
    container.register(.singleton) { ServiceImp() as Service }
    container.register {
-   ServiceConsumerImp(
-   service1: try container.resolve() as Service
-   service2: try container.resolve() as Service
-   ) as ServiceConsumer
+     ServiceConsumerImp(
+       service1: try container.resolve() as Service
+       service2: try container.resolve() as Service
+     ) as ServiceConsumer
    }
    let consumer1 = container.resolve() as ServiceConsumer
    let consumer2 = container.resolve() as ServiceConsumer
