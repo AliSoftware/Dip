@@ -226,11 +226,11 @@
 				TargetAttributes = {
 					0903B3571C161543002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1020;
 					};
 					0903B3601C161543002241C1 = {
 						CreatedOnToolsVersion = 7.1.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1020;
 					};
 				};
 			};
@@ -361,7 +361,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
 				PRODUCT_NAME = Dip;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -381,7 +381,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.Dip;
 				PRODUCT_NAME = Dip;
 				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
@@ -403,7 +403,7 @@
 				"STORYBOARD_NAME_PREFIX[sdk=iphoneos*]" = UI;
 				"STORYBOARD_NAME_PREFIX[sdk=iphonesimulator*]" = UI;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -420,7 +420,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.alisoftware.DipTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STORYBOARD_NAME_PREFIX = "";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
