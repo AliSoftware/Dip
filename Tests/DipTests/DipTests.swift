@@ -462,7 +462,7 @@ class DipTests: XCTestCase {
     }
     
     class ResolvableClient: Client, Resolvable {
-      private(set) var server: Server!
+      var server: Server!
       var secondServer: Server!
       
       var didResolveDependenciesCalled = false
@@ -476,7 +476,6 @@ class DipTests: XCTestCase {
         XCTAssertNotNil(self.server?.client)
         XCTAssertNotNil(self.secondServer?.client)
       }
-      
     }
 
     //given
