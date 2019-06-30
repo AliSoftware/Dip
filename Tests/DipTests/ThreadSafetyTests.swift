@@ -22,6 +22,7 @@
 // THE SOFTWARE.
 //
 
+#if canImport(ObjectiveC)
 import XCTest
 @testable import Dip
 
@@ -62,22 +63,6 @@ private var resolvedClients = Array<ClientImp>()
 
 private var container: DependencyContainer!
 
-#if os(Linux)
-import Glibc
-  
-private var runningThreads: Int = 0
-private var lock: pthread_spinlock_t = 0
-
-private let resolveClientSync: () -> Client? = {
-  let pointer = dispatch_sync { _ in
-    let resolved = try! container.resolve() as Client
-    return UnsafeMutableRawPointer(Unmanaged.passRetained(resolved as! ClientImp).toOpaque())
-  }
-  guard let clientPointer = pointer else { return nil }
-  return Unmanaged<ClientImp>.fromOpaque(clientPointer).takeRetainedValue()
-}
-  
-#else
 let queue = OperationQueue()
 let lock = RecursiveLock()
   
@@ -88,18 +73,11 @@ private let resolveClientSync: () -> Client? = {
   }
   return client
 }
-  
-#endif
 
 let resolveServerAsync = {
   let server = try! container.resolve() as Server
   lock.lock()
   resolvedServers.insert(server as! ServerImp)
-
-  #if os(Linux)
-    runningThreads -= 1
-  #endif
-
   lock.unlock()
 }
 
@@ -107,22 +85,10 @@ let resolveClientAsync = {
   let client = try! container.resolve() as Client
   lock.lock()
   resolvedClients.append(client as! ClientImp)
-
-  #if os(Linux)
-    runningThreads -= 1
-  #endif
-
   lock.unlock()
 }
 
 class ThreadSafetyTests: XCTestCase {
-  
-  #if os(Linux)
-  required init(name: String, testClosure: @escaping (XCTestCase) throws -> Void) {
-    pthread_spin_init(&lock, 0)
-    super.init(name: name, testClosure: testClosure)
-  }
-  #endif
   
   override func setUp() {
     Dip.logLevel = .Verbose
@@ -138,25 +104,10 @@ class ThreadSafetyTests: XCTestCase {
     container.register(.singleton) { ServerImp() as Server }
     
     for _ in 0..<100 {
-      #if os(Linux)
-      lock.lock()
-      runningThreads += 1
-      lock.unlock()
-        
-      dispatch_async { _ in
-        resolveServerAsync()
-        return nil
-      }
-      #else
       queue.addOperation(resolveServerAsync)
-      #endif
     }
     
-    #if os(Linux)
-    while runningThreads > 0 { sleep(1) }
-    #else
     queue.waitUntilAllOperationsAreFinished()
-    #endif
     
     XCTAssertEqual(resolvedServers.count, 1, "Should create only one instance")
   }
@@ -166,25 +117,10 @@ class ThreadSafetyTests: XCTestCase {
     container.register { ServerImp() as Server }
     
     for _ in 0..<100 {
-      #if os(Linux)
-      lock.lock()
-      runningThreads += 1
-      lock.unlock()
-
-      dispatch_async { _ in
-        resolveServerAsync()
-        return nil
-      }
-      #else
       queue.addOperation(resolveServerAsync)
-      #endif
     }
     
-    #if os(Linux)
-    while runningThreads > 0 { sleep(1) }
-    #else
     queue.waitUntilAllOperationsAreFinished()
-    #endif
 
     XCTAssertEqual(resolvedServers.count, 100, "All instances should be different")
   }
@@ -201,25 +137,10 @@ class ThreadSafetyTests: XCTestCase {
     }
     
     for _ in 0..<100 {
-      #if os(Linux)
-      lock.lock()
-      runningThreads += 1
-      lock.unlock()
-
-      dispatch_async { _ in
-        resolveClientAsync()
-        return nil
-      }
-      #else
       queue.addOperation(resolveClientAsync)
-      #endif
     }
     
-    #if os(Linux)
-    while runningThreads > 0 { sleep(1) }
-    #else
     queue.waitUntilAllOperationsAreFinished()
-    #endif
     
     XCTAssertEqual(resolvedClients.count, 100, "Instances should be not reused in different object graphs")
     for client in resolvedClients {
@@ -230,5 +151,4 @@ class ThreadSafetyTests: XCTestCase {
   }
   
 }
-
-
+#endif
