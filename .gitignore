@@ -36,3 +36,4 @@ Carthage
 # SPM
 .build/
 Packages
+.swiftpm
