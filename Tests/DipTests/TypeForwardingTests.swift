@@ -27,8 +27,13 @@ import XCTest
 
 private protocol Service: class { }
 private protocol ForwardedType: class { }
+#if os(Linux)
+private class ServiceImp1: Service, ForwardedType { }
+private class ServiceImp2: Service, ForwardedType { }
+#else
 private class ServiceImp1: NSObject, Service, ForwardedType { }
 private class ServiceImp2: NSObject, Service, ForwardedType { }
+#endif
 
 private protocol Dependency {}
 private struct DependencyImpl: Dependency {}
@@ -52,24 +57,6 @@ private struct OptionalDependencyClient {
 class TypeForwardingTests: XCTestCase {
   
   let container = DependencyContainer()
-
-  static var allTests = {
-    return [
-      ("testThatItResolvesInstanceByTypeForwarding", testThatItResolvesInstanceByTypeForwarding),
-      ("testThatItReusesInstanceResolvedByTypeForwarding", testThatItReusesInstanceResolvedByTypeForwarding),
-      ("testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag", testThatItDoesNotResolveByTypeForwardingIfRegisteredForAnotherTag),
-      ("testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag",  testThatItDoesNotReuseInstanceResolvedByTypeForwardingRegisteredForAnotherTag),
-      ("testThatItCallsResolvedDependenciesBlockWhenResolvingByTypeForwarding", testThatItCallsResolvedDependenciesBlockWhenResolvingByTypeForwarding),
-      ("testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding",testThatItCallsResolvedDependenciesBlockProvidedAfterRegistrationWhenResolvingByTypeForwarding),
-      ("testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding", testThatItFallbackToDefinitionWithNoTagWhenResolvingInstanceByTypeForwarding),
-      ("testThatItCanResolveOptional", testThatItCanResolveOptional),
-      ("testThatItReusesInstancesResolvedForOptionalType", testThatItReusesInstancesResolvedForOptionalType),
-      ("testThatItFirstUsesTaggedDefinitionWhenResolvingOptional", testThatItFirstUsesTaggedDefinitionWhenResolvingOptional),
-      ("testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding", testThatItThrowsErrorWhenResolvingNotImplementedTypeWithTypeForwarding),
-      ("testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType", testThatItOverridesIfSeveralDefinitionsWithTheSameTagForwardTheSameType),
-      ("testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag", testThatItDoesNotOverrideIfDefinitionForwardsTheSameTypeWithDifferentTag)
-    ]
-  }()
   
   override func setUp() {
     container.reset()

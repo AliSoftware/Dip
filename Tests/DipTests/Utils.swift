@@ -43,7 +43,7 @@ func dispatch_async(block: @escaping TMain) -> pthread_t {
 }
 
 func dispatch_sync(block: @escaping TMain) -> UnsafeMutableRawPointer? {
-  var result: UnsafeMutableRawPointer? = UnsafeMutableRawPointer.allocate(bytes: 1, alignedTo: 0)
+  var result: UnsafeMutableRawPointer? = UnsafeMutableRawPointer.allocate(byteCount: 1, alignment: 0)
   let pid = startThread(block)
   pthread_join(pid, &result)
   return result

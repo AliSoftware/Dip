@@ -202,7 +202,7 @@ public func __allTests() -> [XCTestCaseEntry] {
         testCase(DefinitionTests.__allTests__DefinitionTests),
         testCase(DipTests.__allTests__DipTests),
         testCase(RuntimeArgumentsTests.__allTests__RuntimeArgumentsTests),
-        testCase(ThreadSafetyTests.__allTests__ThreadSafetyTests),
+        //testCase(ThreadSafetyTests.__allTests__ThreadSafetyTests),
         testCase(TypeForwardingTests.__allTests__TypeForwardingTests),
     ]
 }
