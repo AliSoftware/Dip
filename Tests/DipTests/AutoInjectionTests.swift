@@ -92,29 +92,6 @@ class AutoInjectionTests: XCTestCase {
   static var clientDidInjectCalled: Bool = false
 
   let container = DependencyContainer()
-  
-  static var allTests = {
-    return [
-      ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
-      ("testThatItResolvesInheritedDependencies", testThatItResolvesInheritedDependencies),
-      ("testThatItCanSetInjectedProperty", testThatItCanSetInjectedProperty),
-      ("testThatItThrowsErrorIfFailsToAutoInjectDependency", testThatItThrowsErrorIfFailsToAutoInjectDependency),
-      ("testThatItResolvesAutoInjectedSingletons", testThatItResolvesAutoInjectedSingletons),
-      ("testThatItCallsResolveDependencyBlockWhenAutoInjecting", testThatItCallsResolveDependencyBlockWhenAutoInjecting),
-      ("testThatItReusesResolvedAutoInjectedInstances", testThatItReusesResolvedAutoInjectedInstances),
-      ("testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection", testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection),
-      ("testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies", testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies),
-      ("testThatItCallsDidInjectOnAutoInjectedProperty", testThatItCallsDidInjectOnAutoInjectedProperty),
-      ("testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected", testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected),
-      ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties),
-      ("testThatItPassesTagToAutoInjectedProperty", testThatItPassesTagToAutoInjectedProperty),
-      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag),
-      ("testThatItAutoInjectsPropertyWithCollaboratingContainer", testThatItAutoInjectsPropertyWithCollaboratingContainer),
-      ("testThatItDoesNotAutoInjectIfDisabled", testThatItDoesNotAutoInjectIfDisabledInDefinition),
-      ("testThatItDoesNotAutoInjectIfDisabledInContainer", testThatItDoesNotAutoInjectIfDisabledInContainer),
-      ("testThatItAutoInjectsWhenOverridenInDefinition", testThatItAutoInjectsWhenOverridenInDefinition),
-    ]
-  }()
 
   override func setUp() {
     container.reset()
@@ -147,26 +124,10 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(client === server?.client2)
   }
   
-  func testThatItCanSetInjectedProperty() {
-    container.register { ServerImp() as Server }
-    container.register { ClientImp() as Client }
-    
-    let client = (try! container.resolve() as Client) as! ClientImp
-    let server = client.server as! ServerImp
-    
-    let newServer = ServerImp()
-    let newClient = ClientImp()
-    client._server = client._server.setValue(newServer)
-    server._client = server._client.setValue(newClient)
-    
-    XCTAssertTrue(client.server === newServer)
-    XCTAssertTrue(server.client === newClient)
-  }
-  
   func testThatItThrowsErrorIfFailsToAutoInjectDependency() {
     container.register { ClientImp() as Client }
     
-    AssertThrows(expression: try container.resolve() as Client)
+    XCTAssertThrowsError(try self.container.resolve() as Client)
   }
 
   func testThatItResolvesAutoInjectedSingletons() {
@@ -297,7 +258,10 @@ class AutoInjectionTests: XCTestCase {
     container.register { ServerImp() as Server }
     container.register { ClientImp() as Client }
 
-    AssertNoThrow(expression: try container.resolve() as Client, "Container should not throw error if failed to resolve optional auto-injected properties.")
+    XCTAssertNoThrow(
+      try container.resolve() as Client,
+      "Container should not throw error if failed to resolve optional auto-injected properties."
+    )
   }
   
   func testThatItResolvesTaggedAutoInjectedProperties() {
@@ -367,10 +331,10 @@ class AutoInjectionTests: XCTestCase {
     let collaborator = DependencyContainer()
     collaborator.register { ServerImp() as Server }
     container.register { ClientImp() as Client }
-    
+
     container.collaborate(with: collaborator)
     collaborator.collaborate(with: container)
-    
+
     let client = try! container.resolve() as Client
     let server = client.server
     XCTAssertTrue(client === server?.client)

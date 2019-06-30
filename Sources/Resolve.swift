@@ -183,7 +183,7 @@ extension DependencyContainer {
       return previouslyResolved
     }
     
-    log(level: .Verbose, context)
+    if let context = context { log(level: .Verbose, context) }
     var resolvedInstance = try builder(definition)
     
     /*

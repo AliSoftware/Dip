@@ -47,27 +47,6 @@ class ComponentScopeTests: XCTestCase {
   
   let container = DependencyContainer()
   
-  static var allTests = {
-    return [
-      ("testThatSharedIsDefaultScope", testThatSharedIsDefaultScope),
-      ("testThatScopeCanBeChanged", testThatScopeCanBeChanged),
-      ("testThatItResolvesTypeAsNewInstanceForUniqueScope", testThatItResolvesTypeAsNewInstanceForUniqueScope),
-      ("testThatItReusesInstanceForSingletonScope", testThatItReusesInstanceForSingletonScope),
-      ("testThatSingletonIsNotReusedAcrossContainers", testThatSingletonIsNotReusedAcrossContainers),
-      ("testThatSingletonIsReleasedWhenDefinitionIsRemoved", testThatSingletonIsReleasedWhenDefinitionIsRemoved),
-      ("testThatSingletonIsReleasedWhenDefinitionIsOverridden", testThatSingletonIsReleasedWhenDefinitionIsOverridden),
-      ("testThatSingletonIsReleasedWhenContainerIsReset", testThatSingletonIsReleasedWhenContainerIsReset),
-      ("testThatItReusesInstanceInSharedScopeDuringResolve", testThatItReusesInstanceInSharedScopeDuringResolve),
-      ("testThatItDoesNotReuseInstanceInSharedScopeInNextResolve", testThatItDoesNotReuseInstanceInSharedScopeInNextResolve),
-      ("testThatItDoesNotReuseInstanceInSharedScopeResolvedForNilTag", testThatItDoesNotReuseInstanceInSharedScopeResolvedForNilTagWhenResolvingForAnotherTag),
-      ("testThatItReusesInstanceInSharedScopeResolvedForNilTag", testThatItReusesInstanceInSharedScopeResolvedForNilTag),
-      ("testThatItReusesResolvedInstanceWhenResolvingOptional", testThatItReusesResolvedInstanceWhenResolvingOptional),
-      ("testThatItHoldsWeakReferenceToWeakSingletonInstance", testThatItHoldsWeakReferenceToWeakSingletonInstance),
-      ("testThatItResolvesWeakSingletonAgainAfterItWasReleased", testThatItResolvesWeakSingletonAgainAfterItWasReleased),
-      ("testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer", testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer)
-    ]
-  }()
-  
   override func setUp() {
     container.reset()
   }
@@ -341,7 +320,10 @@ class ComponentScopeTests: XCTestCase {
     _ = try? container.resolve() as ServiceImp1
     
     //then
-    AssertNoThrow(expression: try container.resolve() as Service, "Weak singleton should be resolved again.")
+    XCTAssertNoThrow(
+      try container.resolve() as Service,
+      "Weak singleton should be resolved again."
+    )
   }
   
   func testThatCollaboratingContainersReuseSingletonsResolvedByAnotherContainer() {
