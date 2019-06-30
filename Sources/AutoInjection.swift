@@ -93,30 +93,24 @@ public protocol AutoInjectedPropertyBox: class {
   func resolve(_ container: DependencyContainer) throws
 }
 
+#if swift(>=5.1)
 /**
  Use this wrapper to identify _strong_ properties of the instance that should be
  auto-injected by `DependencyContainer`. Type T can be any type.
-
- - warning: Do not define this property as optional or container will not be able to inject it.
-            Instead define it with initial value of `Injected<T>()`.
-
+ 
  **Example**:
-
+ 
  ```swift
  class ClientImp: Client {
-   var service = Injected<Service>()
+   @Injected() var service: Service
  }
  ```
+ 
  - seealso: `InjectedWeak`
-
-*/
+ 
+ */
+@propertyDelegate
 public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
-  
-  ///The type of wrapped property.
-  public static var wrappedType: Any.Type {
-    return T.self
-  }
-
   ///Wrapped value.
   public fileprivate(set) var value: T? {
     didSet {
@@ -128,7 +122,47 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
     self.value = value
     super.init(required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
   }
+}
+#else
+/**
+ Use this wrapper to identify _strong_ properties of the instance that should be
+ auto-injected by `DependencyContainer`. Type T can be any type.
+ 
+ - warning: Do not define this property as optional or container will not be able to inject it.
+ Instead define it with initial value of `Injected<T>()`.
+ 
+ **Example**:
+ 
+ ```swift
+ class ClientImp: Client {
+   var service = Injected<Service>()
+ }
+ ```
+ 
+ - seealso: `InjectedWeak`
+ 
+ */
+public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
+  ///Wrapped value.
+  public fileprivate(set) var value: T? {
+    didSet {
+      if let value = value { didInject(value) }
+    }
+  }
+  
+  init(value: T?, required: Bool = true, tag: DependencyTagConvertible?, overrideTag: Bool, didInject: @escaping (T) -> ()) {
+    self.value = value
+    super.init(required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
+  }
+}
+#endif
 
+public extension Injected {
+  ///The type of wrapped property.
+  static var wrappedType: Any.Type {
+    return T.self
+  }
+  
   /**
    Creates a new wrapper for auto-injected property.
    
@@ -140,21 +174,21 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
       - didInject: Block that will be called when concrete instance is injected in this property.
                    Similar to `didSet` property observer. Default value does nothing.
    */
-  public convenience init(required: Bool = true, didInject: @escaping (T) -> () = { _ in }) {
+  convenience init(required: Bool = true, didInject: @escaping (T) -> () = { _ in }) {
     self.init(value: nil, required: required, tag: nil, overrideTag: false, didInject: didInject)
   }
   
-  public convenience init(required: Bool = true, tag: DependencyTagConvertible?, didInject: @escaping (T) -> () = { _ in }) {
+  convenience init(required: Bool = true, tag: DependencyTagConvertible?, didInject: @escaping (T) -> () = { _ in }) {
     self.init(value: nil, required: required, tag: tag, overrideTag: true, didInject: didInject)
   }
 
-  public func resolve(_ container: DependencyContainer) throws {
+  func resolve(_ container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(with: container)
     value = resolved
   }
 
   /// Returns a new wrapper with provided value.
-  public func setValue(_ value: T?) -> Injected {
+  func setValue(_ value: T?) -> Injected {
     guard (required && value != nil) || !required else {
       fatalError("Can not set required property to nil.")
     }
@@ -164,6 +198,7 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
 
 }
 
+#if swift(>=5.1)
 /**
  Use this wrapper to identify _weak_ properties of the instance that should be
  auto-injected by `DependencyContainer`. Type T should be a **class** type.
@@ -185,26 +220,72 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
  
  ```swift
  class ServiceImp: Service {
-   var client = InjectedWeak<Client>()
+   @InjectedWeak() var client: Client
  }
-
  ```
  
  - seealso: `Injected`
  
  */
+@propertyDelegate
 public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
 
   //Only classes (means AnyObject) can be used as `weak` properties
   //but we can not make <T: AnyObject> because that will prevent using protocol as generic type
   //so we just rely on user reading documentation and passing AnyObject in runtime
   //also we will throw fatal error if type can not be casted to AnyObject during resolution.
-
-  ///The type of wrapped property.
-  public static var wrappedType: Any.Type {
-    return T.self
+  
+  var valueBox: WeakBox<T>? = nil {
+    didSet {
+      if let value = value { didInject(value) }
+    }
   }
-
+  
+  ///Wrapped value.
+  public var value: T? {
+    return valueBox?.value
+  }
+  
+  init(value: T?, required: Bool = true, tag: DependencyTagConvertible?, overrideTag: Bool, didInject: @escaping (T) -> ()) {
+    self.valueBox = value.map(WeakBox.init)
+    super.init(required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
+  }
+}
+#else
+/**
+ Use this wrapper to identify _weak_ properties of the instance that should be
+ auto-injected by `DependencyContainer`. Type T should be a **class** type.
+ Otherwise it will cause runtime exception when container will try to resolve the property.
+ Use this wrapper to define one of two circular dependencies to avoid retain cycle.
+ 
+ - note: The only difference between `InjectedWeak` and `Injected` is that `InjectedWeak` uses
+ _weak_ reference to store underlying value, when `Injected` uses _strong_ reference.
+ For that reason if you resolve instance that has a _weak_ auto-injected property this property
+ will be released when `resolve` will complete.
+ 
+ Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
+ This will prevent a retain cycle between resolved instances.
+ 
+ - warning: Do not define this property as optional or container will not be able to inject it.
+ Instead define it with initial value of `InjectedWeak<T>()`.
+ 
+ **Example**:
+ 
+ ```swift
+ class ServiceImp: Service {
+   var client = InjectedWeak<Client>()
+ }
+ ```
+ 
+ - seealso: `Injected`
+ 
+ */public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox {
+  
+  //Only classes (means AnyObject) can be used as `weak` properties
+  //but we can not make <T: AnyObject> because that will prevent using protocol as generic type
+  //so we just rely on user reading documentation and passing AnyObject in runtime
+  //also we will throw fatal error if type can not be casted to AnyObject during resolution.
+  
   var valueBox: WeakBox<T>? = nil {
     didSet {
       if let value = value { didInject(value) }
@@ -220,6 +301,14 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
     self.valueBox = value.map(WeakBox.init)
     super.init(required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
   }
+}
+#endif
+
+public extension InjectedWeak {
+  ///The type of wrapped property.
+  static var wrappedType: Any.Type {
+    return T.self
+  }
   
   /**
    Creates a new wrapper for weak auto-injected property.
@@ -232,21 +321,21 @@ public final class InjectedWeak<T>: _InjectedPropertyBox<T>, AutoInjectedPropert
       - didInject: Block that will be called when concrete instance is injected in this property.
                    Similar to `didSet` property observer. Default value does nothing.
    */
-  public convenience init(required: Bool = true, didInject: @escaping (T) -> () = { _ in }) {
+  convenience init(required: Bool = true, didInject: @escaping (T) -> () = { _ in }) {
     self.init(value: nil, required: required, tag: nil, overrideTag: false, didInject: didInject)
   }
   
-  public convenience init(required: Bool = true, tag: DependencyTagConvertible?, didInject: @escaping (T) -> () = { _ in }) {
+  convenience init(required: Bool = true, tag: DependencyTagConvertible?, didInject: @escaping (T) -> () = { _ in }) {
     self.init(value: nil, required: required, tag: tag, overrideTag: true, didInject: didInject)
   }
   
-  public func resolve(_ container: DependencyContainer) throws {
+  func resolve(_ container: DependencyContainer) throws {
     let resolved: T? = try super.resolve(with: container)
     valueBox = resolved.map(WeakBox.init)
   }
 
   /// Returns a new wrapper with provided value.
-  public func setValue(_ value: T?) -> InjectedWeak {
+  func setValue(_ value: T?) -> InjectedWeak {
     guard (required && value != nil) || !required else {
       fatalError("Can not set required property to nil.")
     }
