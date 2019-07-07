@@ -119,7 +119,7 @@ public struct Injected<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
       return valueBox.unboxed
     }
     set {
-      guard (required && value != nil) || !required else {
+      guard (required && newValue != nil) || !required else {
         fatalError("Can not set required property to nil.")
       }
       valueBox.unboxed = newValue
@@ -270,7 +270,7 @@ public struct InjectedWeak<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
       return valueBox.value
     }
     set {
-      guard (required && value != nil) || !required else {
+      guard (required && newValue != nil) || !required else {
         fatalError("Can not set required property to nil.")
       }
       
