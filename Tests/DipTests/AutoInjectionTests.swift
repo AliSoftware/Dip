@@ -148,10 +148,18 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItResolvesInheritedDependencies() {
     class ServerImp2: ServerImp {
+      #if swift(>=5.1)
+      @InjectedWeak(didInject: { _ in
+        XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled, "Inherited properties should be resolved first")
+      }) var client2: Client?
+      #else
       var _client2 = InjectedWeak<Client>() { _ in
         XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled, "Inherited properties should be resolved first")
       }
-      var client2: Client? { return _client2.value }
+      var client2: Client? {
+        return _client2.value
+      }
+      #endif
     }
 
     container.register { ServerImp2() as Server }

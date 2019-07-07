@@ -102,19 +102,19 @@ public protocol AutoInjectedPropertyBox {
  
  ```swift
  class ClientImp: Client {
-   @Injected() var service: Service
+   @Injected var service: Service? = nil
  }
  ```
  
  - seealso: `InjectedWeak`
  
  */
-@propertyDelegate
+@propertyWrapper
 public struct Injected<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
   let valueBox: NullableBox<T> = NullableBox(nil)
   
   ///Wrapped value.
-  public var value: T? {
+  public var wrappedValue: T? {
     get {
       return valueBox.unboxed
     }
@@ -247,14 +247,14 @@ public extension Injected {
  
  ```swift
  class ServiceImp: Service {
-   @InjectedWeak() var client: Client
+   @InjectedWeak var client: Client? = nil
  }
  ```
  
  - seealso: `Injected`
  
  */
-@propertyDelegate
+@propertyWrapper
 public struct InjectedWeak<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
 
   //Only classes (means AnyObject) can be used as `weak` properties
@@ -265,7 +265,7 @@ public struct InjectedWeak<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
   let valueBox: WeakBox<T> = WeakBox(nil)
   
   ///Wrapped value.
-  public var value: T? {
+  public var wrappedValue: T? {
     get {
       return valueBox.value
     }
