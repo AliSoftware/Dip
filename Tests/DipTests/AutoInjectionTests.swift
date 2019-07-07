@@ -99,12 +99,12 @@ private class ClientImp: Client {
 
 #if swift(>=5.1)
 private class Obj1 {
-  @InjectedWeak() var obj2: Obj2
-  @Injected() var obj3: Obj3
+  @InjectedWeak var obj2: Obj2 = nil
+  @Injected var obj3: Obj3 = nil
 }
 
 private class Obj2 {
-  @Injected() var obj1: Obj1
+  @Injected var obj1: Obj1 = nil
 }
 #else
 private class Obj1 {
@@ -164,6 +164,28 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertTrue(client === server?.client2)
   }
   
+  func testThatItCanSetInjectedProperty() {
+    container.register { ServerImp() as Server }
+    container.register { ClientImp() as Client }
+    
+    let client = (try! container.resolve() as Client) as! ClientImp
+    let server = client.server as! ServerImp
+    
+    let newServer = ServerImp()
+    let newClient = ClientImp()
+    #if swift(>=5.1)
+    client.server = newServer
+    server.client = newClient
+    #else
+    client._server = client._server.setValue(newServer)
+    server._client = server._client.setValue(newClient)
+    #endif
+    
+    XCTAssertTrue(client.server === newServer)
+    XCTAssertTrue(server.client === newClient)
+  }
+    
+
   func testThatItThrowsErrorIfFailsToAutoInjectDependency() {
     container.register { ClientImp() as Client }
     
