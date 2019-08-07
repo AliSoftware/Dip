@@ -163,6 +163,11 @@ extension DependencyContainer {
   
   /// Lookup definition by the key and use it to resolve instance. Fallback to the key with `nil` tag.
   func _resolve<T>(key aKey: DefinitionKey, builder: (_Definition) throws -> T) throws -> T {
+
+    if aKey.type == DependencyContainer.self {
+      return (context.inCollaboration ? self : context.container) as! T
+    }
+
     guard let matching = self.definition(matching: aKey) else {
       do {
         return try autowire(key: aKey)
@@ -205,6 +210,8 @@ extension DependencyContainer {
      That happens because when Optional is casted to Any Swift can not implicitly unwrap it with as operator.
      As a workaround we detect boxing here and unwrap it so that we return not a box, but wrapped instance.
      */
+
+    let resolvedDescription = String(reflecting: resolvedInstance)
     if let box = resolvedInstance as? BoxType, let unboxedAny = box.unboxed, let unboxed = unboxedAny as? T {
       resolvedInstance = unboxed
     }
@@ -212,7 +219,7 @@ extension DependencyContainer {
     //when builder calls factory it will in turn resolve sub-dependencies (if there are any)
     //when it returns instance that we try to resolve here can be already resolved
     //so we return it, throwing away instance created by previous call to builder
-    if let previouslyResolved: T = previouslyResolved(for: definition, key: key) {
+    if let previouslyResolved: T = context.container.previouslyResolved(for: definition, key: key) {
       log(level: .Verbose, "Reusing previously resolved instance \(previouslyResolved)")
       return previouslyResolved
     }
@@ -221,20 +228,22 @@ extension DependencyContainer {
     
     if let resolvable = resolvedInstance as? Resolvable {
       resolvedInstances.resolvableInstances.append(resolvable)
-      resolvable.resolveDependencies(self)
+      resolvable.resolveDependencies(context.inCollaboration ? self : context.container)
     }
 
     let shouldAutoInject = definition.autoInjectProperties ?? self.autoInjectProperties
     if shouldAutoInject {
+  if !resolvedDescription.contains("OCMock") {
       try autoInjectProperties(in: resolvedInstance)
     }
-    try definition.resolveProperties(of: resolvedInstance, container: self)
+    }
+    try definition.resolveProperties(of: resolvedInstance, container: context.inCollaboration ? self : context.container)
     
     log(level: .Verbose, "Resolved type \(key.type) with \(resolvedInstance)")
     return resolvedInstance
   }
-  
-  private func previouslyResolved<T>(for definition: _Definition, key: DefinitionKey) -> T? {
+
+  internal func previouslyResolved<T>(for definition: _Definition, key: DefinitionKey) -> T? {
     //first check if exact key was already resolved
     if let previouslyResolved: T = resolvedInstances[key: key, inScope: definition.scope, context: context] {
       return previouslyResolved
@@ -248,6 +257,19 @@ extension DependencyContainer {
         return previouslyResolved
       }
     }
+
+    //Search the parent for resolved instances.
+    if let parent = parent {
+      if let previouslyResolvedInParent : T = parent.inContext(key: key,
+                       injectedInType: self.context.injectedInType,
+                       container: context.container,
+                       block: { () -> T? in
+                        return parent.previouslyResolved(for: definition, key: key)
+        }) {
+          return previouslyResolvedInParent
+      }
+    }
+
     return nil
   }
   

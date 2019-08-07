@@ -1,0 +1,2 @@
+erb -v -T 1 RuntimeArguments+Generated.erb > ../Sources/RuntimeArguments+Generated.swift
+swiftformat ../Sources/RuntimeArguments+Generated.swift

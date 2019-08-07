@@ -24,7 +24,7 @@
 
 protocol AutoWiringDefinition: DefinitionType {
   var numberOfArguments: Int { get }
-  var autoWiringFactory: ((DependencyContainer, DependencyContainer.Tag?) throws -> Any)? { get }
+  var autoWiringFactory: ((DependencyContainer, DefinitionKey) throws -> Any)? { get }
 }
 
 extension DependencyContainer {
@@ -41,7 +41,7 @@ extension DependencyContainer {
     do {
       let key = autoWiringKey.tagged(with: key.tag ?? context.tag)
       return try _resolve(key: key) { definition in
-        try definition.autoWiringFactory!(self.context.container, key.tag) as! T
+        try definition.autoWiringFactory!(self.context.container, key) as! T
       }
     }
     catch {
@@ -63,10 +63,10 @@ extension DependencyContainer {
   
   private func autoWiringDefinition(byKey key: DefinitionKey, strictByTag: Bool) throws -> KeyDefinitionPair {
     var definitions = self.definitions.map({ (key: $0.0, definition: $0.1) })
-    
+
     definitions = filter(definitions: definitions, byKey: key, strictByTag: strictByTag)
     definitions = definitions.sorted(by: { $0.definition.numberOfArguments > $1.definition.numberOfArguments })
-    
+
     guard definitions.count > 0 && definitions[0].definition.numberOfArguments > 0 else {
       throw DipError.definitionNotFound(key: key)
     }
@@ -79,7 +79,8 @@ extension DependencyContainer {
       let error = DipError.ambiguousDefinitions(type: key.type, definitions: definitions.map({ $0.definition }))
       throw DipError.autoWiringFailed(type: key.type, underlyingError: error)
     } else {
-      return definitions[0]
+      let ret = definitions.first { $0.key.type == key.type } ?? definitions[0]
+      return ret
     }
   }
   
