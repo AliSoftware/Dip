@@ -83,7 +83,7 @@ public final class DependencyContainer {
    
    - returns: A new DependencyContainer.
    */
-  public init(parent: DependencyContainer? = nil,autoInjectProperties: Bool = true, configBlock: (DependencyContainer)->() = { _ in }) {
+  public init(parent: DependencyContainer? = nil, autoInjectProperties: Bool = false, configBlock: (DependencyContainer)->() = { _ in }) {
     self.autoInjectProperties = autoInjectProperties
     self.parent = parent
     configBlock(self)
