@@ -233,9 +233,9 @@ extension DependencyContainer {
 
     let shouldAutoInject = definition.autoInjectProperties ?? self.autoInjectProperties
     if shouldAutoInject {
-  if !resolvedDescription.contains("OCMock") {
-      try autoInjectProperties(in: resolvedInstance)
-    }
+      if !resolvedDescription.contains("OCMock") {
+          try autoInjectProperties(in: resolvedInstance)
+      }
     }
     try definition.resolveProperties(of: resolvedInstance, container: context.inCollaboration ? self : context.container)
     
