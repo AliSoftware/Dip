@@ -31,6 +31,7 @@
 		09FC480F1DAA9CAF00566AA8 /* Register.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC480C1DAA9CAF00566AA8 /* Register.swift */; };
 		09FC48181DAAA53100566AA8 /* DipError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC48161DAAA53100566AA8 /* DipError.swift */; };
 		09FC481E1DAAA8F900566AA8 /* ComponentScope.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09FC481C1DAAA8F900566AA8 /* ComponentScope.swift */; };
+		8652F4EB1F2C3D6000A92D4B /* ParentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8652F4EA1F2C3D6000A92D4B /* ParentTests.swift */; };
 		63937A6A21524C0B00AEE75A /* StoryboardInstantiatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63937A6921524C0B00AEE75A /* StoryboardInstantiatable.swift */; };
 		63937A6F21524DA300AEE75A /* DipUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63937A6B21524DA200AEE75A /* DipUITests.swift */; };
 /* End PBXBuildFile section */
@@ -73,6 +74,7 @@
 		09FC480C1DAA9CAF00566AA8 /* Register.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Register.swift; path = ../../Sources/Register.swift; sourceTree = "<group>"; };
 		09FC48161DAAA53100566AA8 /* DipError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DipError.swift; path = ../../Sources/DipError.swift; sourceTree = "<group>"; };
 		09FC481C1DAAA8F900566AA8 /* ComponentScope.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ComponentScope.swift; path = ../../Sources/ComponentScope.swift; sourceTree = "<group>"; };
+		8652F4EA1F2C3D6000A92D4B /* ParentTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParentTests.swift; sourceTree = "<group>"; };
 		63937A6921524C0B00AEE75A /* StoryboardInstantiatable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = StoryboardInstantiatable.swift; path = ../../Sources/StoryboardInstantiatable.swift; sourceTree = "<group>"; };
 		63937A6B21524DA200AEE75A /* DipUITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DipUITests.swift; path = ../../Tests/DipTests/DipUITests.swift; sourceTree = "<group>"; };
 		63937A6C21524DA200AEE75A /* NSStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = NSStoryboard.storyboard; sourceTree = "<group>"; };
@@ -139,6 +141,7 @@
 				63937A6E21524DA300AEE75A /* UIStoryboard.storyboard */,
 				09BD350D1D84E30D00B33E53 /* Utils.swift */,
 				0919F4D11C16417000DC3B10 /* Info.plist */,
+				8652F4EA1F2C3D6000A92D4B /* ParentTests.swift */,
 			);
 			path = DipTests;
 			sourceTree = "<group>";
@@ -323,6 +326,7 @@
 				09BD35171D84E30D00B33E53 /* Utils.swift in Sources */,
 				09BD35131D84E30D00B33E53 /* DipTests.swift in Sources */,
 				09BD35101D84E30D00B33E53 /* ComponentScopeTests.swift in Sources */,
+				8652F4EB1F2C3D6000A92D4B /* ParentTests.swift in Sources */,
 				09BD350E1D84E30D00B33E53 /* AutoInjectionTests.swift in Sources */,
 				09BD35161D84E30D00B33E53 /* TypeForwardingTests.swift in Sources */,
 			);
