@@ -58,6 +58,8 @@ public final class DependencyContainer {
       _weakCollaborators = newValue.filter({ $0 !== self }).map(WeakBox.init)
     }
   }
+  
+  public var enableAutoInjection: Bool? = nil;
 
   /**
    Designated initializer for a DependencyContainer
@@ -83,8 +85,8 @@ public final class DependencyContainer {
    
    - returns: A new DependencyContainer.
    */
-  public init(parent: DependencyContainer? = nil, autoInjectProperties: Bool = false, configBlock: (DependencyContainer)->() = { _ in }) {
-    self.autoInjectProperties = autoInjectProperties
+  public init(parent: DependencyContainer? = nil, autoInjectProperties: Bool = true, configBlock: (DependencyContainer)->() = { _ in }) {
+    self.autoInjectProperties = enableAutoInjection ?? autoInjectProperties
     self.parent = parent
     configBlock(self)
   }
