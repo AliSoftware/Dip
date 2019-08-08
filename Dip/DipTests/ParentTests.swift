@@ -604,8 +604,11 @@ class ParentTests: XCTestCase {
     XCTAssertNotNil(levelTwo)
     XCTAssertEqual(count, 1)
     XCTAssertEqual(levelTwo?.resolveCount, 1)
+    
   }
 
+  
+  
   /**
   *  Esnure that once instance of the class is constructed when the class is
   *  registered in the Parent container.
