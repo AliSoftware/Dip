@@ -44,7 +44,7 @@ public final class DependencyContainer {
   var definitions = [DefinitionKey: _Definition]()
   var resolvedInstances = ResolvedInstances()
   private let lock = RecursiveLock()
-
+  
   let parent: DependencyContainer?
   var bootstrapped = false
   var bootstrapQueue: [() throws -> ()] = []
@@ -327,7 +327,6 @@ extension DependencyContainer {
             collaborator.resolvedInstances.resolvedInstances[key] = resolved
           }
         }
-
 
         let resolved = try collaborator.inContext(key:key, injectedInType: self.context.injectedInType, injectedInProperty: self.context.injectedInProperty, inCollaboration: true, container: self.context.container, logErrors: false) {
           try collaborator._resolve(key: key, builder: builder)

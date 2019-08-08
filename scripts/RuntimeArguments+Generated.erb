@@ -48,13 +48,16 @@ extension DependencyContainer {
                               type: type,
                               tag: tag,
                               factory: factory,
-                              numberOfArguments: <%=i%>)  { container, key in
+                              numberOfArguments: <%=i%>)  { container, tag in
 
         <% (1..i).each do |j| %>
-            let <%= "#{(j+96).chr}" %>: <%= "#{(j+64).chr}" %> = try container.resolve(tag: key.tag)
+            let <%= "#{(j+96).chr}" %>: <%= "#{(j+64).chr}" %> = try container.resolve(tag: tag)
         <% end %>
+            let key = DefinitionKey(type: type, typeOfArguments: (<%= arg_tuples %>).self, tag: tag?.dependencyTag)
         
-            if let definition = definitionWeak, let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
+            if 
+                let definition = definitionWeak, 
+                let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
                 return previouslyResolved
             }
 

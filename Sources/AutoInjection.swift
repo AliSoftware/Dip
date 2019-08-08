@@ -38,13 +38,12 @@ extension DependencyContainer {
       try superClassMirror?.children.forEach(resolveChild)
       superClassMirror = superClassMirror?.superclassMirror
     }
-
+    
     try mirror.children.forEach(resolveChild)
   }
   
   private func resolveChild(child: Mirror.Child) throws {
     //HOTFIX for https://bugs.swift.org/browse/SR-2282
-//    guard !String(describing: type(of: child.value)).has(prefix: "Optional") else { return }
     guard !String(describing: type(of: child.value)).has(prefix: "ImplicitlyUnwrappedOptional") else { return }
     guard let injectedPropertyBox = child.value as? AutoInjectedPropertyBox else { return }
     

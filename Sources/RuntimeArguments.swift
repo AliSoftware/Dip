@@ -100,7 +100,7 @@ extension DependencyContainer {
    
    Though before you do so you should probably review your design and try to reduce number of depnedencies.
    */
-  public func register<T, U>(scope: ComponentScope, type: T.Type, tag: DependencyTagConvertible?, factory: @escaping (U) throws -> T, numberOfArguments: Int, autoWiringFactory: @escaping (DependencyContainer, DefinitionKey) throws -> T) -> Definition<T, U> {
+  public func register<T, U>(scope: ComponentScope, type: T.Type, tag: DependencyTagConvertible?, factory: @escaping (U) throws -> T, numberOfArguments: Int, autoWiringFactory: @escaping (DependencyContainer, Tag?) throws -> T) -> Definition<T, U> {
     let definition = DefinitionBuilder<T, U> {
       $0.scope = scope
       $0.factory = factory

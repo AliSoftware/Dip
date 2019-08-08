@@ -30,11 +30,14 @@ extension DependencyContainer {
                                   type: type,
                                   tag: tag,
                                   factory: factory,
-                                  numberOfArguments: 1) { container, key in
+                                  numberOfArguments: 1) { container, tag in
 
-            let a: A = try container.resolve(tag: key.tag)
+            let a: A = try container.resolve(tag: tag)
+            let key = DefinitionKey(type: type, typeOfArguments: A.self, tag: tag?.dependencyTag)
 
-            if let definition = definitionWeak, let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
+            if
+                let definition = definitionWeak,
+                let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
                 return previouslyResolved
             }
 
@@ -96,12 +99,15 @@ extension DependencyContainer {
                                   type: type,
                                   tag: tag,
                                   factory: factory,
-                                  numberOfArguments: 2) { container, key in
+                                  numberOfArguments: 2) { container, tag in
 
-            let a: A = try container.resolve(tag: key.tag)
-            let b: B = try container.resolve(tag: key.tag)
+            let a: A = try container.resolve(tag: tag)
+            let b: B = try container.resolve(tag: tag)
+            let key = DefinitionKey(type: type, typeOfArguments: (A, B).self, tag: tag?.dependencyTag)
 
-            if let definition = definitionWeak, let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
+            if
+                let definition = definitionWeak,
+                let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
                 return previouslyResolved
             }
 
@@ -140,13 +146,16 @@ extension DependencyContainer {
                                   type: type,
                                   tag: tag,
                                   factory: factory,
-                                  numberOfArguments: 3) { container, key in
+                                  numberOfArguments: 3) { container, tag in
 
-            let a: A = try container.resolve(tag: key.tag)
-            let b: B = try container.resolve(tag: key.tag)
-            let c: C = try container.resolve(tag: key.tag)
+            let a: A = try container.resolve(tag: tag)
+            let b: B = try container.resolve(tag: tag)
+            let c: C = try container.resolve(tag: tag)
+            let key = DefinitionKey(type: type, typeOfArguments: (A, B, C).self, tag: tag?.dependencyTag)
 
-            if let definition = definitionWeak, let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
+            if
+                let definition = definitionWeak,
+                let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
                 return previouslyResolved
             }
 
@@ -185,14 +194,17 @@ extension DependencyContainer {
                                   type: type,
                                   tag: tag,
                                   factory: factory,
-                                  numberOfArguments: 4) { container, key in
+                                  numberOfArguments: 4) { container, tag in
 
-            let a: A = try container.resolve(tag: key.tag)
-            let b: B = try container.resolve(tag: key.tag)
-            let c: C = try container.resolve(tag: key.tag)
-            let d: D = try container.resolve(tag: key.tag)
+            let a: A = try container.resolve(tag: tag)
+            let b: B = try container.resolve(tag: tag)
+            let c: C = try container.resolve(tag: tag)
+            let d: D = try container.resolve(tag: tag)
+            let key = DefinitionKey(type: type, typeOfArguments: (A, B, C, D).self, tag: tag?.dependencyTag)
 
-            if let definition = definitionWeak, let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
+            if
+                let definition = definitionWeak,
+                let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
                 return previouslyResolved
             }
 
@@ -231,15 +243,18 @@ extension DependencyContainer {
                                   type: type,
                                   tag: tag,
                                   factory: factory,
-                                  numberOfArguments: 5) { container, key in
+                                  numberOfArguments: 5) { container, tag in
 
-            let a: A = try container.resolve(tag: key.tag)
-            let b: B = try container.resolve(tag: key.tag)
-            let c: C = try container.resolve(tag: key.tag)
-            let d: D = try container.resolve(tag: key.tag)
-            let e: E = try container.resolve(tag: key.tag)
+            let a: A = try container.resolve(tag: tag)
+            let b: B = try container.resolve(tag: tag)
+            let c: C = try container.resolve(tag: tag)
+            let d: D = try container.resolve(tag: tag)
+            let e: E = try container.resolve(tag: tag)
+            let key = DefinitionKey(type: type, typeOfArguments: (A, B, C, D, E).self, tag: tag?.dependencyTag)
 
-            if let definition = definitionWeak, let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
+            if
+                let definition = definitionWeak,
+                let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
                 return previouslyResolved
             }
 
@@ -278,16 +293,19 @@ extension DependencyContainer {
                                   type: type,
                                   tag: tag,
                                   factory: factory,
-                                  numberOfArguments: 6) { container, key in
+                                  numberOfArguments: 6) { container, tag in
 
-            let a: A = try container.resolve(tag: key.tag)
-            let b: B = try container.resolve(tag: key.tag)
-            let c: C = try container.resolve(tag: key.tag)
-            let d: D = try container.resolve(tag: key.tag)
-            let e: E = try container.resolve(tag: key.tag)
-            let f: F = try container.resolve(tag: key.tag)
+            let a: A = try container.resolve(tag: tag)
+            let b: B = try container.resolve(tag: tag)
+            let c: C = try container.resolve(tag: tag)
+            let d: D = try container.resolve(tag: tag)
+            let e: E = try container.resolve(tag: tag)
+            let f: F = try container.resolve(tag: tag)
+            let key = DefinitionKey(type: type, typeOfArguments: (A, B, C, D, E, F).self, tag: tag?.dependencyTag)
 
-            if let definition = definitionWeak, let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
+            if
+                let definition = definitionWeak,
+                let previouslyResolved: T = container.previouslyResolved(for: definition, key: key) {
                 return previouslyResolved
             }
 

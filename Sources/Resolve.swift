@@ -175,14 +175,14 @@ extension DependencyContainer {
         //Try to resolve using Collaboratino first.
         if let resolved = collaboratingResolve(key: aKey, builder: builder) {
           return resolved
-        }
+        } else {
+          //Now try to reoslve using parent child relationships.
+          if let resolved = parentResolve(key: aKey, builder: builder) {
+              return resolved
+          }
 
-        //Now try to reoslve using parent child relationships.
-        if let resolved = parentResolve(key: aKey, builder: builder) {
-            return resolved
+          throw error
         }
-
-        throw error
       }
     }
     
@@ -232,14 +232,14 @@ extension DependencyContainer {
 
     let shouldAutoInject = definition.autoInjectProperties ?? self.autoInjectProperties
     if shouldAutoInject {
-          try autoInjectProperties(in: resolvedInstance)
+      try autoInjectProperties(in: resolvedInstance)
     }
     try definition.resolveProperties(of: resolvedInstance, container: context.inCollaboration ? self : context.container)
     
     log(level: .Verbose, "Resolved type \(key.type) with \(resolvedInstance)")
     return resolvedInstance
   }
-
+  
   internal func previouslyResolved<T>(for definition: _Definition, key: DefinitionKey) -> T? {
     //first check if exact key was already resolved
     if let previouslyResolved: T = resolvedInstances[key: key, inScope: definition.scope, context: context] {
@@ -254,19 +254,6 @@ extension DependencyContainer {
         return previouslyResolved
       }
     }
-
-    //Search the parent for resolved instances.
-    if let parent = parent {
-      if let previouslyResolvedInParent : T = parent.inContext(key: key,
-                       injectedInType: self.context.injectedInType,
-                       container: context.container,
-                       block: { () -> T? in
-                        return parent.previouslyResolved(for: definition, key: key)
-        }) {
-          return previouslyResolvedInParent
-      }
-    }
-
     return nil
   }
   
