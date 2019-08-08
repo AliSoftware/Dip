@@ -59,7 +59,7 @@ public final class DependencyContainer {
     }
   }
   
-  public var enableAutoInjection: Bool? = nil;
+  public static var enableAutoInjection: Bool? = nil;
 
   /**
    Designated initializer for a DependencyContainer
@@ -86,7 +86,7 @@ public final class DependencyContainer {
    - returns: A new DependencyContainer.
    */
   public init(parent: DependencyContainer? = nil, autoInjectProperties: Bool = true, configBlock: (DependencyContainer)->() = { _ in }) {
-    self.autoInjectProperties = enableAutoInjection ?? autoInjectProperties
+    self.autoInjectProperties = DependencyContainer.enableAutoInjection ?? autoInjectProperties
     self.parent = parent
     configBlock(self)
   }
