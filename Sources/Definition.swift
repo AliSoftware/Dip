@@ -34,8 +34,10 @@ public struct DefinitionKey: Hashable, CustomStringConvertible {
     self.tag = tag
   }
   
-  public var hashValue: Int {
-    return "\(reflect(type))-\(typeOfArguments)-\(tag.desc)".hashValue
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(ObjectIdentifier(type))
+    hasher.combine(ObjectIdentifier(typeOfArguments))
+    hasher.combine(tag.desc)
   }
   
   public var description: String {
@@ -53,7 +55,7 @@ public struct DefinitionKey: Hashable, CustomStringConvertible {
     return
       lhs.type == rhs.type &&
       lhs.typeOfArguments == rhs.typeOfArguments &&
-      lhs.tag == rhs.tag
+      lhs.tag.desc == rhs.tag.desc
   }
   
 }

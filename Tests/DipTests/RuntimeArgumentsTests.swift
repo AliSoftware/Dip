@@ -51,22 +51,6 @@ class RuntimeArgumentsTests: XCTestCase {
   
   let container = DependencyContainer()
  
-  static var allTests = {
-    return [
-      ("testThatItResolvesInstanceWithOneArgument", testThatItResolvesInstanceWithOneArgument),
-      ("testThatItResolvesInstanceWithTwoArguments", testThatItResolvesInstanceWithTwoArguments),
-      ("testThatItResolvesInstanceWithThreeArguments", testThatItResolvesInstanceWithThreeArguments),
-      ("testThatItResolvesInstanceWithFourArguments", testThatItResolvesInstanceWithFourArguments),
-      ("testThatItResolvesInstanceWithFiveArguments", testThatItResolvesInstanceWithFiveArguments),
-      ("testThatItResolvesInstanceWithSixArguments", testThatItResolvesInstanceWithSixArguments),
-      ("testThatItRegistersDifferentFactoriesForDifferentNumberOfArguments", testThatItRegistersDifferentFactoriesForDifferentNumberOfArguments),
-      ("testThatItRegistersDifferentFactoriesForDifferentTypesOfArguments", testThatItRegistersDifferentFactoriesForDifferentTypesOfArguments),
-      ("testThatItRegistersDifferentFactoriesForDifferentOrderOfArguments", testThatItRegistersDifferentFactoriesForDifferentOrderOfArguments),
-      ("testThatNewRegistrationWithSameArgumentsOverridesPreviousRegistration", testThatNewRegistrationWithSameArgumentsOverridesPreviousRegistration),
-      ("testThatDifferentFactoriesRegisteredIfArgumentIsOptional", testThatDifferentFactoriesRegisteredIfArgumentIsOptional)
-    ]
-  }()
-
   override func setUp() {
     container.reset()
   }

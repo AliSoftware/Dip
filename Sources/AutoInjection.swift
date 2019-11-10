@@ -118,12 +118,12 @@ public final class Injected<T>: _InjectedPropertyBox<T>, AutoInjectedPropertyBox
   }
 
   ///Wrapped value.
-  public internal(set) var value: T? {
+  public fileprivate(set) var value: T? {
     didSet {
       if let value = value { didInject(value) }
     }
   }
-
+  
   init(value: T?, required: Bool = true, tag: DependencyTagConvertible?, overrideTag: Bool, didInject: @escaping (T) -> ()) {
     self.value = value
     super.init(required: required, tag: tag, overrideTag: overrideTag, didInject: didInject)
@@ -296,5 +296,3 @@ public class _InjectedPropertyBox<T> {
   }
   
 }
-
-

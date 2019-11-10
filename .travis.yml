@@ -5,11 +5,11 @@ matrix:
     - script:
         - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest' ONLY_ACTIVE_ARCH=NO | xcpretty -c
         - set -o pipefail && xcodebuild test -workspace Dip.xcworkspace -scheme Dip -sdk macosx -destination 'platform=macOS,arch=x86_64' ONLY_ACTIVE_ARCH=NO | xcpretty -c
-        - pod spec lint --allow-warnings
+        # - pod spec lint --allow-warnings
         - carthage build --no-skip-current
         - swift package clean && swift build && swift test
       os: osx
-      osx_image: xcode10
+      osx_image: xcode10.2
       language: objective-c
       before_install:
         - gem install cocoapods --version 1.4.0 --no-document
@@ -22,8 +22,8 @@ matrix:
       before_install:
         - wget -q -O - https://swift.org/keys/all-keys.asc | gpg --import -
         - cd ..
-        - export SWIFT_VERSION=swift-4.2-RELEASE
-        - wget https://swift.org/builds/swift-4.2-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
+        - export SWIFT_VERSION=swift-5.0-RELEASE
+        - wget https://swift.org/builds/swift-5.0-release/ubuntu1404/$SWIFT_VERSION/$SWIFT_VERSION-ubuntu14.04.tar.gz
         - tar xzf $SWIFT_VERSION-ubuntu14.04.tar.gz
         - export PATH="${PWD}/${SWIFT_VERSION}-ubuntu14.04/usr/bin:${PATH}"
         - cd Dip
