@@ -417,7 +417,42 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertNotNil(taggedServer)
     XCTAssertNotNil(nilTaggedServer)
   }
-  
+
+
+  struct Foo
+  {
+    struct Bar
+    {
+
+    }
+  }
+
+  struct Baz
+  {
+    struct Bar
+    {
+
+    }
+  }
+
+
+  func testScopedTypes() {
+    let key1 = DefinitionKey(type: Baz.Bar.self, typeOfArguments: Void.self)
+    let key2 = DefinitionKey(type: Foo.Bar.self, typeOfArguments: Void.self)
+
+    XCTAssertNotEqual(key1, key2)
+    XCTAssertNotEqual(key1.hashValue, key2.hashValue)
+
+    container.register { Baz.Bar() }
+
+    XCTAssertNotNil(try? container.resolve() as Baz.Bar)
+    XCTAssertThrowsError(try container.resolve() as Foo.Bar)
+
+    container.register { Foo.Bar() }
+
+    XCTAssertNotNil(try? container.resolve() as Foo.Bar)
+  }
+
   func testThatItAutoInjectsPropertyWithCollaboratingContainer() {
     let collaborator = DependencyContainer()
     collaborator.register { ServerImp() as Server }

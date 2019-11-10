@@ -41,7 +41,7 @@ public struct DefinitionKey: Hashable, CustomStringConvertible {
   }
   
   public var description: String {
-    return "type: \(type), arguments: \(typeOfArguments), tag: \(tag.desc)"
+    return "type: \(String(reflecting: type)), arguments: \(typeOfArguments), tag: \(tag.desc)"
   }
   
   func tagged(with tag: DependencyContainer.Tag?) -> DefinitionKey {
