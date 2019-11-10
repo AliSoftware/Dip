@@ -2,7 +2,10 @@
 
 ## Develop
 
-* You can now use a shorthand syntax for resolving a single property using a key path, i.e. `resolvingProperty(\.value)`. This allows to inject properties without making them publicly writable (they still should be writable, but `private(set)` is good enough) and without manually casting resolved instance to its concrete type to set the property (this will be still done under the hood).
+* You can now use a shorthand syntax for resolving a single property using a key path, i.e. `resolvingProperty(\.value)`.
+* Swift 5.0 support ([#224](https://github.com/AliSoftware/Dip/pull/224)).
+* Fixed resolving nested types with the same local names ([#221](https://github.com/AliSoftware/Dip/pull/221))
+* `@Injected` and `@IntectedWeak` property wrappers ([#225](https://github.com/AliSoftware/Dip/pull/225))
 
 ## 7.0.1
 
