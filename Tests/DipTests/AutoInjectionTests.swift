@@ -99,12 +99,12 @@ private class ClientImp: Client {
 
 #if swift(>=5.1)
 private class Obj1 {
-  @InjectedWeak var obj2: Obj2 = nil
-  @Injected var obj3: Obj3 = nil
+  @InjectedWeak var obj2: Obj2?
+  @Injected var obj3: Obj3?
 }
 
 private class Obj2 {
-  @Injected var obj1: Obj1 = nil
+  @Injected var obj1: Obj1?
 }
 #else
 private class Obj1 {

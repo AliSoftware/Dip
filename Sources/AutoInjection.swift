@@ -102,7 +102,7 @@ public protocol AutoInjectedPropertyBox {
  
  ```swift
  class ClientImp: Client {
-   @Injected var service: Service? = nil
+   @Injected var service: Service?
  }
  ```
  
@@ -247,7 +247,7 @@ public extension Injected {
  
  ```swift
  class ServiceImp: Service {
-   @InjectedWeak var client: Client? = nil
+   @InjectedWeak var client: Client?
  }
  ```
  
