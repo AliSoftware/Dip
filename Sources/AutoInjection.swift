@@ -132,7 +132,7 @@ public struct Injected<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
   let tag: DependencyContainer.Tag?
   let overrideTag: Bool
 
-  public init(initialValue: T?) {
+  public init(wrappedValue initialValue: T?) {
     self.init()
   }
 }
@@ -283,7 +283,7 @@ public struct InjectedWeak<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
   let tag: DependencyContainer.Tag?
   let overrideTag: Bool
   
-  public init(initialValue: T?) {
+  public init(wrappedValue initialValue: T?) {
     self.init()
   }
 }
