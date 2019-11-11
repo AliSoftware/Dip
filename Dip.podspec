@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "7.0.1"
+  s.version          = "7.1.0"
   s.summary          = "Dependency Injection for Swift made easy."
 
   s.description      = <<-DESC
@@ -23,4 +23,6 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.source_files = 'Sources/**/*.swift'
+
+  s.swift_version = "5.0", "5.1"
 end

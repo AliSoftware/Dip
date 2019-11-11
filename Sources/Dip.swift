@@ -40,6 +40,7 @@ public final class DependencyContainer {
   }
 
   var autoInjectProperties: Bool
+  var threadSafe: Bool
   internal(set) public var context: Context!
   var definitions = [DefinitionKey: _Definition]()
   var resolvedInstances = ResolvedInstances()
@@ -63,6 +64,7 @@ public final class DependencyContainer {
 
    - Parameters:
      - autoInjectProperties: Whether container should perform properties auto-injection. Default is `true`.
+     - threadSafe: Whether container should be thread-safe. Default is `true`. You may want to disable it for better performance.
      - configBlock: A configuration block in which you typically put all you `register` calls.
    
    - note: The `configBlock` is simply called at the end of the `init` to let you configure everything. 
@@ -82,8 +84,9 @@ public final class DependencyContainer {
    
    - returns: A new DependencyContainer.
    */
-  public init(autoInjectProperties: Bool = true, configBlock: (DependencyContainer)->() = { _ in }) {
+  public init(autoInjectProperties: Bool = true, threadSafe: Bool = true, configBlock: (DependencyContainer)->() = { _ in }) {
     self.autoInjectProperties = autoInjectProperties
+    self.threadSafe = threadSafe
     configBlock(self)
   }
   
@@ -104,6 +107,10 @@ public final class DependencyContainer {
   }
 
   func threadSafe<T>(_ closure: () throws -> T) rethrows -> T {
+    guard threadSafe else {
+      return try closure()
+    }
+
     lock.lock()
     defer { lock.unlock() }
     return try closure()

@@ -35,6 +35,34 @@ private protocol Client: class {
   var anotherServer: Server! {get set}
 }
 
+#if swift(>=5.1)
+private class ServerImp: Server {
+  
+  @InjectedWeak(didInject: { _ in
+    AutoInjectionTests.clientDidInjectCalled = true
+  }) var client: Client!
+  
+  @InjectedWeak(required: false) var _optionalProperty: AnyObject?
+  
+  weak var anotherClient: Client!
+}
+
+private class ClientImp: Client {
+  
+  @Injected(didInject: { _ in
+    AutoInjectionTests.serverDidInjectCalled = true
+  }) var server: Server
+  
+  @Injected(required: false) var _optionalProperty: AnyObject?
+  
+  @Injected(tag: "tagged") var taggedServer: Server
+  @Injected(tag: nil) var nilTaggedServer: Server
+  
+  var anotherServer: Server!
+}
+
+#else
+
 private class ServerImp: Server {
   
   var _client = InjectedWeak<Client>() { _ in
@@ -67,7 +95,18 @@ private class ClientImp: Client {
   var taggedServer = Injected<Server>(tag: "tagged")
   var nilTaggedServer = Injected<Server>(tag: nil)
 }
+#endif
 
+#if swift(>=5.1)
+private class Obj1 {
+  @InjectedWeak var obj2: Obj2?
+  @Injected var obj3: Obj3?
+}
+
+private class Obj2 {
+  @Injected var obj1: Obj1?
+}
+#else
 private class Obj1 {
   let obj2 = InjectedWeak<Obj2>()
   let obj3 = Injected<Obj3>()
@@ -76,6 +115,7 @@ private class Obj1 {
 private class Obj2 {
   let obj1 = Injected<Obj1>()
 }
+#endif
 
 private class Obj3 {
   
@@ -92,29 +132,6 @@ class AutoInjectionTests: XCTestCase {
   static var clientDidInjectCalled: Bool = false
 
   let container = DependencyContainer()
-  
-  static var allTests = {
-    return [
-      ("testThatItResolvesAutoInjectedDependencies", testThatItResolvesAutoInjectedDependencies),
-      ("testThatItResolvesInheritedDependencies", testThatItResolvesInheritedDependencies),
-      ("testThatItCanSetInjectedProperty", testThatItCanSetInjectedProperty),
-      ("testThatItThrowsErrorIfFailsToAutoInjectDependency", testThatItThrowsErrorIfFailsToAutoInjectDependency),
-      ("testThatItResolvesAutoInjectedSingletons", testThatItResolvesAutoInjectedSingletons),
-      ("testThatItCallsResolveDependencyBlockWhenAutoInjecting", testThatItCallsResolveDependencyBlockWhenAutoInjecting),
-      ("testThatItReusesResolvedAutoInjectedInstances", testThatItReusesResolvedAutoInjectedInstances),
-      ("testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection", testThatItReusesAutoInjectedInstancesOnNextResolveOrAutoInjection),
-      ("testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies", testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies),
-      ("testThatItCallsDidInjectOnAutoInjectedProperty", testThatItCallsDidInjectOnAutoInjectedProperty),
-      ("testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected", testThatNoErrorThrownWhenOptionalPropertiesAreNotAutoInjected),
-      ("testThatItResolvesTaggedAutoInjectedProperties", testThatItResolvesTaggedAutoInjectedProperties),
-      ("testThatItPassesTagToAutoInjectedProperty", testThatItPassesTagToAutoInjectedProperty),
-      ("testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag", testThatItDoesNotPassTagToAutoInjectedPropertyWithExplicitTag),
-      ("testThatItAutoInjectsPropertyWithCollaboratingContainer", testThatItAutoInjectsPropertyWithCollaboratingContainer),
-      ("testThatItDoesNotAutoInjectIfDisabled", testThatItDoesNotAutoInjectIfDisabledInDefinition),
-      ("testThatItDoesNotAutoInjectIfDisabledInContainer", testThatItDoesNotAutoInjectIfDisabledInContainer),
-      ("testThatItAutoInjectsWhenOverridenInDefinition", testThatItAutoInjectsWhenOverridenInDefinition),
-    ]
-  }()
 
   override func setUp() {
     container.reset()
@@ -131,10 +148,18 @@ class AutoInjectionTests: XCTestCase {
   
   func testThatItResolvesInheritedDependencies() {
     class ServerImp2: ServerImp {
+      #if swift(>=5.1)
+      @InjectedWeak(didInject: { _ in
+        XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled, "Inherited properties should be resolved first")
+      }) var client2: Client?
+      #else
       var _client2 = InjectedWeak<Client>() { _ in
         XCTAssertTrue(AutoInjectionTests.serverDidInjectCalled, "Inherited properties should be resolved first")
       }
-      var client2: Client? { return _client2.value }
+      var client2: Client? {
+        return _client2.value
+      }
+      #endif
     }
 
     container.register { ServerImp2() as Server }
@@ -156,17 +181,23 @@ class AutoInjectionTests: XCTestCase {
     
     let newServer = ServerImp()
     let newClient = ClientImp()
+    #if swift(>=5.1)
+    client.server = newServer
+    server.client = newClient
+    #else
     client._server = client._server.setValue(newServer)
     server._client = server._client.setValue(newClient)
+    #endif
     
     XCTAssertTrue(client.server === newServer)
     XCTAssertTrue(server.client === newClient)
   }
-  
+    
+
   func testThatItThrowsErrorIfFailsToAutoInjectDependency() {
     container.register { ClientImp() as Client }
     
-    AssertThrows(expression: try container.resolve() as Client)
+    XCTAssertThrowsError(try self.container.resolve() as Client)
   }
 
   func testThatItResolvesAutoInjectedSingletons() {
@@ -248,11 +279,19 @@ class AutoInjectionTests: XCTestCase {
     let obj2 = try! container.resolve() as Obj2
     
     //then
-    XCTAssertTrue(obj2 === obj2.obj1.value!.obj2.value!,
+    #if swift(>=5.1)
+    XCTAssertTrue(obj2 === obj2.obj1!.obj2!,
       "Auto-injected instance should be reused on next auto-injection")
     
-    XCTAssertTrue(obj2.obj1.value! === obj2.obj1.value!.obj3.value!.obj1,
+    XCTAssertTrue(obj2.obj1! === obj2.obj1!.obj3!.obj1,
       "Auto-injected instance should be reused on next resolve")
+    #else
+    XCTAssertTrue(obj2 === obj2.obj1.value!.obj2.value!,
+                  "Auto-injected instance should be reused on next auto-injection")
+    
+    XCTAssertTrue(obj2.obj1.value! === obj2.obj1.value!.obj3.value!.obj1,
+                  "Auto-injected instance should be reused on next resolve")
+    #endif
   }
   
   func testThatThereIsNoRetainCycleBetweenAutoInjectedCircularDependencies() {
@@ -297,7 +336,10 @@ class AutoInjectionTests: XCTestCase {
     container.register { ServerImp() as Server }
     container.register { ClientImp() as Client }
 
-    AssertNoThrow(expression: try container.resolve() as Client, "Container should not throw error if failed to resolve optional auto-injected properties.")
+    XCTAssertNoThrow(
+      try container.resolve() as Client,
+      "Container should not throw error if failed to resolve optional auto-injected properties."
+    )
   }
   
   func testThatItResolvesTaggedAutoInjectedProperties() {
@@ -310,7 +352,11 @@ class AutoInjectionTests: XCTestCase {
     let client = try! container.resolve() as Client
     
     //then
+    #if swift(>=5.1)
+    let taggedServer = (client as! ClientImp).taggedServer!
+    #else
     let taggedServer = (client as! ClientImp).taggedServer.value!
+    #endif
     let server = client.server!
     
     //server and tagged server should be resolved as different instances
@@ -329,7 +375,11 @@ class AutoInjectionTests: XCTestCase {
     let client = try! container.resolve(tag: "tagged") as Client
     
     //then
+    #if swift(>=5.1)
+    let taggedServer = (client as! ClientImp).taggedServer!
+    #else
     let taggedServer = (client as! ClientImp).taggedServer.value!
+    #endif
     let server = client.server!
     
     //server and tagged server should be resolved as the same instance
@@ -350,8 +400,13 @@ class AutoInjectionTests: XCTestCase {
     let client = try! container.resolve(tag: "otherTag") as Client
     
     //then
+    #if swift(>=5.1)
+    let taggedServer = (client as! ClientImp).taggedServer!
+    let nilTaggedServer = (client as! ClientImp).nilTaggedServer!
+    #else
     let taggedServer = (client as! ClientImp).taggedServer.value!
     let nilTaggedServer = (client as! ClientImp).nilTaggedServer.value!
+    #endif
     let server = client.server!
     
     //server and tagged server should be resolved as different instances
@@ -362,15 +417,50 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertNotNil(taggedServer)
     XCTAssertNotNil(nilTaggedServer)
   }
-  
+
+
+  struct Foo
+  {
+    struct Bar
+    {
+
+    }
+  }
+
+  struct Baz
+  {
+    struct Bar
+    {
+
+    }
+  }
+
+
+  func testScopedTypes() {
+    let key1 = DefinitionKey(type: Baz.Bar.self, typeOfArguments: Void.self)
+    let key2 = DefinitionKey(type: Foo.Bar.self, typeOfArguments: Void.self)
+
+    XCTAssertNotEqual(key1, key2)
+    XCTAssertNotEqual(key1.hashValue, key2.hashValue)
+
+    container.register { Baz.Bar() }
+
+    XCTAssertNotNil(try? container.resolve() as Baz.Bar)
+    XCTAssertThrowsError(try container.resolve() as Foo.Bar)
+
+    container.register { Foo.Bar() }
+
+    XCTAssertNotNil(try? container.resolve() as Foo.Bar)
+  }
+
   func testThatItAutoInjectsPropertyWithCollaboratingContainer() {
     let collaborator = DependencyContainer()
     collaborator.register { ServerImp() as Server }
     container.register { ClientImp() as Client }
-    
+
     container.collaborate(with: collaborator)
     collaborator.collaborate(with: container)
-    
+
     let client = try! container.resolve() as Client
     let server = client.server
     XCTAssertTrue(client === server?.client)
