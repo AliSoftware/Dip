@@ -22,7 +22,7 @@
 // THE SOFTWARE.
 //
 
-#if (canImport(UIKit) || canImport(AppKit) || canImport(WatchKit)) && !SWIFT_PACKAGE
+#if (canImport(UIKit) || canImport(AppKit) || canImport(WatchKit))
 
 extension DependencyContainer {
   ///Containers that will be used to resolve dependencies of instances, created by stroyboards.
