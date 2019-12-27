@@ -2,6 +2,10 @@
 
 ## Develop
 
+## 7.1.1
+
+* Fixed using `StoryboardInstantiatable` with SPM  ([#233](https://github.com/AliSoftware/Dip/pull/233)).
+
 ## 7.1.0
 
 * You can now use a shorthand syntax for resolving a single property using a key path, i.e. `resolvingProperty(\.value)`.
