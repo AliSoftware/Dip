@@ -98,7 +98,7 @@ extension DependencyContainer {
    }
    ```
    
-   Though before you do so you should probably review your design and try to reduce number of depnedencies.
+   Though before you do so you should probably review your design and try to reduce number of dependencies.
    */
   public func register<T, U>(scope: ComponentScope, type: T.Type, tag: DependencyTagConvertible?, factory: @escaping (U) throws -> T, numberOfArguments: Int, autoWiringFactory: @escaping (DependencyContainer, Tag?) throws -> T) -> Definition<T, U> {
     let definition = DefinitionBuilder<T, U> {
@@ -141,7 +141,7 @@ extension DependencyContainer {
            which factories accept any number of runtime arguments and are tagged with the same tag,
            passed to `resolve` method, or with no tag. Container will try to use these definitions
            to resolve a component one by one until one of them succeeds, starting with tagged definitions
-           in order of decreasing their's factories number of arguments. If none of them succeds it will
+           in order of decreasing their's factories number of arguments. If none of them succeeds it will
            throw an error. If it finds two definitions with the same number of arguments - it will throw
            an error.
    

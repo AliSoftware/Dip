@@ -81,7 +81,7 @@ extension DependencyContainer {
    
    - parameters:
       - tag: The arbitrary tag to use to lookup definition.
-      - builder: Generic closure that accepts generic factory and returns inctance created by that factory.
+      - builder: Generic closure that accepts generic factory and returns instance created by that factory.
    
    - throws: `DipError.DefinitionNotFound`, `DipError.AutoInjectionFailed`, `DipError.AmbiguousDefinitions`, `DipError.InvalidType`
    

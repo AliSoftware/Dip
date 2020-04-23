@@ -488,7 +488,7 @@ class AutoInjectionTests: XCTestCase {
     XCTAssertNil(server)
   }
 
-  func testThatItAutoInjectsWhenOverridenInDefinition() {
+  func testThatItAutoInjectsWhenOverriddenInDefinition() {
     let container = DependencyContainer(autoInjectProperties: false)
     container.register { ServerImp() as Server }
     container.register { ClientImp() as Client }

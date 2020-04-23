@@ -8,7 +8,7 @@
 
 import Foundation
 
-///Provides Person entitis fetching them with web service
+///Provides Person entities fetching them with web service
 struct SWAPIPersonProvider : PersonProviderAPI {
     let ws: NetworkLayer
     

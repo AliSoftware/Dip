@@ -66,7 +66,7 @@ public enum DipError: Error, CustomStringConvertible {
   case ambiguousDefinitions(type: Any.Type, definitions: [DefinitionType])
   
   /**
-   Thrown by `resolve(tag:)` if resolved instance does not implemenet resolved type (i.e. when type-forwarding).
+   Thrown by `resolve(tag:)` if resolved instance does not implement resolved type (i.e. when type-forwarding).
    
    - parameters:
       - resolved: Resolved instance
