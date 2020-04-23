@@ -25,7 +25,7 @@
 import XCTest
 @testable import Dip
 
-private protocol Service: class {}
+private protocol Service: AnyObject {}
 private class ServiceImp1: Service {}
 private class ServiceImp2: Service {}
 

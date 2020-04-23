@@ -164,10 +164,10 @@ class DipUITests: XCTestCase {
   }
 }
 
-protocol SomeService: class {
+protocol SomeService: AnyObject {
   var delegate: SomeServiceDelegate? { get set }
 }
-protocol SomeServiceDelegate: class { }
+protocol SomeServiceDelegate: AnyObject { }
 class SomeServiceImp: SomeService {
   weak var delegate: SomeServiceDelegate?
   init(delegate: SomeServiceDelegate) {
@@ -176,10 +176,10 @@ class SomeServiceImp: SomeService {
   init(){}
 }
 
-protocol OtherService: class {
+protocol OtherService: AnyObject {
   var delegate: OtherServiceDelegate? { get set }
 }
-protocol OtherServiceDelegate: class {}
+protocol OtherServiceDelegate: AnyObject {}
 class OtherServiceImp: OtherService {
   weak var delegate: OtherServiceDelegate?
   init(delegate: OtherServiceDelegate){
@@ -189,7 +189,7 @@ class OtherServiceImp: OtherService {
 }
 
 
-protocol SomeScreen: class {
+protocol SomeScreen: AnyObject {
   var someService: SomeService? { get set }
   var otherService: OtherService? { get set }
 }

@@ -13,11 +13,11 @@ Very often we encounter situations when we have circular dependencies between co
 Let's say you have some network client and it's delegate defined like this:
 */
 
-protocol NetworkClientDelegate: class {
+protocol NetworkClientDelegate: AnyObject {
     var networkClient: NetworkClient { get }
 }
 
-protocol NetworkClient: class {
+protocol NetworkClient: AnyObject {
     weak var delegate: NetworkClientDelegate? { get set }
 }
 

@@ -25,8 +25,8 @@
 import XCTest
 @testable import Dip
 
-private protocol Service: class { }
-private protocol ForwardedType: class { }
+private protocol Service: AnyObject { }
+private protocol ForwardedType: AnyObject { }
 #if os(Linux)
 private class ServiceImp1: Service, ForwardedType { }
 private class ServiceImp2: Service, ForwardedType { }

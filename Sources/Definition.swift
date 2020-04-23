@@ -61,7 +61,7 @@ public struct DefinitionKey: Hashable, CustomStringConvertible {
 }
 
 ///Dummy protocol to store definitions for different types in collection
-public protocol DefinitionType: class { }
+public protocol DefinitionType: AnyObject { }
 
 /**
  `Definition<T, U>` describes how instances of type `T` should be created when this type is resolved by the `DependencyContainer`.

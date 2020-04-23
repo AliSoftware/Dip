@@ -25,12 +25,12 @@
 import XCTest
 @testable import Dip
 
-private protocol Server: class {
+private protocol Server: AnyObject {
   var client: Client! {get}
   var anotherClient: Client! {get set}
 }
 
-private protocol Client: class {
+private protocol Client: AnyObject {
   var server: Server? {get}
   var anotherServer: Server! {get set}
 }

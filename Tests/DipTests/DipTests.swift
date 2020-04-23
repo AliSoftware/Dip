@@ -25,14 +25,14 @@
 import XCTest
 @testable import Dip
 
-private protocol Service: class { }
+private protocol Service: AnyObject { }
 private class ServiceImp1: Service { }
 private class ServiceImp2: Service { }
 
-private protocol Server: class {
+private protocol Server: AnyObject {
   var client: Client! { get }
 }
-private protocol Client: class {
+private protocol Client: AnyObject {
   var server: Server! { get }
 }
 
