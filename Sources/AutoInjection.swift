@@ -237,7 +237,7 @@ public extension Injected {
          For that reason if you resolve instance that has a _weak_ auto-injected property this property
          will be released when `resolve` will complete.
  
- Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
+ Use `InjectedWeak<T>` to define one of two circular dependencies if another dependency is defined as `Injected<U>`.
  This will prevent a retain cycle between resolved instances.
 
  - warning: Do not define this property as optional or container will not be able to inject it.
@@ -299,7 +299,7 @@ public struct InjectedWeak<T>: _InjectedPropertyBox, AutoInjectedPropertyBox {
  For that reason if you resolve instance that has a _weak_ auto-injected property this property
  will be released when `resolve` will complete.
  
- Use `InjectedWeak<T>` to define one of two circular dependecies if another dependency is defined as `Injected<U>`.
+ Use `InjectedWeak<T>` to define one of two circular dependencies if another dependency is defined as `Injected<U>`.
  This will prevent a retain cycle between resolved instances.
  
  - warning: Do not define this property as optional or container will not be able to inject it.

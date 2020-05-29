@@ -94,7 +94,7 @@ public final class DependencyContainer {
    Call this method to complete container setup. After container is bootstrapped
    you can not add or remove definitions. Trying to do so will cause runtime exception.
    You can completely reset container, after reset you can bootstrap it again. 
-   During bootsrap container will instantiate components registered with `EagerSingleton` scope.
+   During bootstrap container will instantiate components registered with `EagerSingleton` scope.
    
    - throws: `DipError` if failed to instantiate any component
   */
@@ -298,7 +298,7 @@ extension DependencyContainer {
     for collaborator in _collaborators {
       //if container is already in a context resolving this type
       //it means that it has been already called to resolve this type,
-      //so there is probably a cercular reference between containers.
+      //so there is probably a circular reference between containers.
       //To break it skip this container
       if let context = collaborator.context, context.resolvingType == key.type && context.tag == key.tag { continue }
       
@@ -453,7 +453,7 @@ extension DependencyContainer: CustomStringConvertible {
 //MARK: - DependencyTagConvertible
 
 /// Implement this protocol on your type if you want to use its instances as `DependencyContainer`'s tags.
-/// `DependencyContainer.Tag`, `String`, `Int` and any `RawRepresentable` with `RawType` of `String` or `Int` by default confrom to this protocol.
+/// `DependencyContainer.Tag`, `String`, `Int` and any `RawRepresentable` with `RawType` of `String` or `Int` by default conform to this protocol.
 public protocol DependencyTagConvertible {
   var dependencyTag: DependencyContainer.Tag { get }
 }

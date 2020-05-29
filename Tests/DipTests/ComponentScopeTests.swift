@@ -316,7 +316,7 @@ class ComponentScopeTests: XCTestCase {
     container.register(service, type: Service.self)
     
     //when
-    //resolve and realease reight away
+    //resolve and release right away
     _ = try? container.resolve() as ServiceImp1
     
     //then

@@ -136,7 +136,7 @@ class TypeForwardingTests: XCTestCase {
         resolveDependenciesCalled = true
 
         //when
-        //resolving via type-forawrding for tag different then tag for original definition
+        //resolving via type-forwarding for tag different then tag for original definition
         let forwardType = try container.resolve(tag: "tag") as ForwardedType
         let anyForwardType = try container.resolve(ForwardedType.self, tag: "tag") as! ForwardedType
 

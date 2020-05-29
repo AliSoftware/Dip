@@ -268,7 +268,7 @@ class RuntimeArgumentsTests: XCTestCase {
     
     //Due to incomplete implementation of SE-0054 (bug: https://bugs.swift.org/browse/SR-2143)
     //registering definition with T? and T! arguments types will produce two different definitions
-    //but when argement of T! will be passed to `resolve` method it will be transformed to T?
+    //but when argument of T! will be passed to `resolve` method it will be transformed to T?
     //and wrong definition will be used
     //When fixed using T? and T! should not register two different definitions
 

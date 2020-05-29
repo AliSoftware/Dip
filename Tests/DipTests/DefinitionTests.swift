@@ -100,7 +100,7 @@ class DefinitionTests: XCTestCase {
     XCTAssertFalse(blockCalled)
   }
   
-  func testThatItRegisteresOptionalTypesAsForwardedTypes() {
+  func testThatItRegistersOptionalTypesAsForwardedTypes() {
     let def = Definition<Service, ()>(scope: .unique) { ServiceImp() as Service }
     
     XCTAssertTrue(def.implementingTypes.contains(where: { $0 == Service?.self }))
