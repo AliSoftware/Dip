@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol Service: class {}
+public protocol Service: AnyObject {}
 
 public class ServiceImp1: Service {
   public init() {}
@@ -22,7 +22,7 @@ public class ServiceImp4: Service {
   
 }
 
-public protocol Client: class {
+public protocol Client: AnyObject {
   var service: Service {get}
   init(service: Service)
 }
@@ -74,9 +74,9 @@ public class DataProviderImp: DataProvider {
     public init() {}
 }
 
-public protocol ListInteractorOutput: class {}
-public protocol ListModuleInterface: class {}
-public protocol ListInteractorInput: class {}
+public protocol ListInteractorOutput: AnyObject {}
+public protocol ListModuleInterface: AnyObject {}
+public protocol ListInteractorInput: AnyObject {}
 public class ListPresenter: NSObject {
     public var listInteractor : ListInteractorInput?
     public var listWireframe : ListWireframe?
@@ -96,8 +96,8 @@ public class ListWireframe : NSObject {
     }
 }
 
-public protocol AddModuleDelegate: class {}
-public protocol AddModuleInterface: class {}
+public protocol AddModuleDelegate: AnyObject {}
+public protocol AddModuleInterface: AnyObject {}
 public class AddWireframe: NSObject {
     let addPresenter : AddPresenter
     public init(addPresenter: AddPresenter) {

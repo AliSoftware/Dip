@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol FetchableTrait: class {
+protocol FetchableTrait: AnyObject {
     associatedtype ObjectType
     var objects: [ObjectType]? { get set }
     var batchRequestID: Int { get set }

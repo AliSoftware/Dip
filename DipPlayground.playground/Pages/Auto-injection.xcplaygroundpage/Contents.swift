@@ -13,7 +13,7 @@ On the previous page you saw how auto-wiring helps us to get rid of boilerplate 
 Let's say you have following related components:
 */
 
-protocol Service: class {
+protocol Service: AnyObject {
     var logger: Logger? { get }
     var tracker: Tracker? { get }
 }
@@ -101,11 +101,11 @@ serverWithNoClient.optionalClient.value
 Another example of using auto-injection is circular dependencies. Let's say you have a `Server` and a `ServerClient` both referencing each other.
 */
 
-protocol Server: class {
+protocol Server: AnyObject {
     weak var client: ServerClient? { get }
 }
 
-protocol ServerClient: class {
+protocol ServerClient: AnyObject {
     var server: Server? { get }
 }
 
