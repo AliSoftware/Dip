@@ -32,9 +32,9 @@ public var logLevel: LogLevel = .Errors
 
 public var logger: (LogLevel, Any) -> Void = { print($1) }
 
-func log(level logLevel: LogLevel, _ message: Any) {
+func log(level logLevel: LogLevel, _ message: @autoclosure () -> Any) {
   guard logLevel.rawValue <= Dip.logLevel.rawValue else { return }
-  logger(logLevel, message)
+  logger(logLevel, message())
 }
 
 ///Internal protocol used to unwrap optional values.

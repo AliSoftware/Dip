@@ -537,7 +537,7 @@ class DipTests: XCTestCase {
     var createdService3 = false
     var createdService = false
     
-    container.register { ServiceImp1() }
+    let definition = container.register { ServiceImp1() }
       .resolvingProperties { container, _ in
         if container.context.resolvingType == ServiceImp1.self {
           createdService1 = true
@@ -547,7 +547,7 @@ class DipTests: XCTestCase {
         }
       }.implements(Service.self)
     
-    container.register(tag: "tag") { ServiceImp2() as Service }
+    let definition2 = container.register(tag: "tag") { ServiceImp2() as Service }
       .resolvingProperties { _,_  in
         createdService2 = true
     }
@@ -563,6 +563,17 @@ class DipTests: XCTestCase {
     XCTAssertTrue(createdService2)
     XCTAssertTrue(createdService3)
     XCTAssertTrue(createdService)
+
+    // 3 Registrations + one implements, times 2 for optional T?
+    XCTAssertEqual(container.definitions.all.count,8)
+    
+    container.remove(definition)
+    // Minus ServiceImp1 and ServiceImp1? but not Service
+    XCTAssertEqual(container.definitions.all.count,6)
+
+    container.remove(definition2)
+    // Minus Service and Service?
+    XCTAssertEqual(container.definitions.all.count,4)
   }
   
   func testThatItPicksRuntimeArgumentsWhenValidatingConfiguration() {
