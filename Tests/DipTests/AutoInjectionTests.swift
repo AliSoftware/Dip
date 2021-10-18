@@ -51,12 +51,12 @@ private class ClientImp: Client {
   
   @Injected(didInject: { _ in
     AutoInjectionTests.serverDidInjectCalled = true
-  }) var server: Server
+  }) var server: Server?
   
   @Injected(required: false) var _optionalProperty: AnyObject?
-  
-  @Injected(tag: "tagged") var taggedServer: Server
-  @Injected(tag: nil) var nilTaggedServer: Server
+    
+  @Injected(tag: "tagged") var taggedServer: Server?
+  @Injected(tag: nil) var nilTaggedServer: Server?
   
   var anotherServer: Server!
 }
