@@ -8,7 +8,7 @@
 [![Swift Version](https://img.shields.io/badge/Swift-4.0--4.2-F16D39.svg?style=flat)](https://developer.apple.com/swift)
 [![Swift Version](https://img.shields.io/badge/Linux-4.0--4.2-4BC51D.svg?style=flat)](https://developer.apple.com/swift)
 
-![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)  
+![Animated Dipping GIF](cinnamon-pretzels-caramel-dipping.gif)
 _Photo courtesy of [www.kevinandamanda.com](http://www.kevinandamanda.com/recipes/appetizer/homemade-soft-cinnamon-sugar-pretzel-bites-with-salted-caramel-dipping-sauce.html)_
 
 ## Introduction
@@ -29,19 +29,19 @@ import Dip
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
+
     // Create the container
     private let container = DependencyContainer { container in
-    
+
         // Register some factory. ServiceImp here implements protocol Service
         container.register { ServiceImp() as Service }
     }
 
-    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool { 
-        
+    func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
+
         // Resolve a concrete instance. Container will instantiate new instance of ServiceImp
         let service = try! container.resolve() as Service
-    
+
         ...
     }
 }
@@ -68,15 +68,15 @@ import DipUI
 extension DependencyContainer {
 
 	static func configure() -> DependencyContainer {
-		return DependencyContainer { container in 
+		return DependencyContainer { container in
 			unowned let container = container
 			DependencyContainer.uiContainers = [container]
-		
+
 			container.register(tag: "ViewController") { ViewController() }
 			  .resolvingProperties { container, controller in
-				  controller.animationsFactory = try container.resolve() as AnimatonsFactory
+				  controller.animationsFactory = try container.resolve() as AnimationsFactory
 			}
-    
+
 			container.register { AuthFormBehaviourImp(apiClient: $0) as AuthFormBehaviour }
 			container.register { container as AnimationsFactory }
 			container.register { view in ShakeAnimationImp(view: view) as ShakeAnimation }
@@ -86,7 +86,7 @@ extension DependencyContainer {
 
 }
 
-extension DependencyContainer: AnimationsFactory { 
+extension DependencyContainer: AnimationsFactory {
     func shakeAnimation(view: UIView) -> ShakeAnimation {
         return try! self.resolve(withArguments: view)
     }
@@ -100,7 +100,7 @@ class ViewController {
     var animationsFactory: AnimationsFactory?
 
     private let _formBehaviour = Injected<AuthFormBehaviour>()
-    
+
     var formBehaviour: AuthFormBehaviour? {
         return _formBehaviour.value
     }
@@ -117,7 +117,7 @@ Dip is completely [documented](http://cocoadocs.org/docsets/Dip/5.0.0/) and come
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip` scheme and build for iPhone Simulator.
 
-You can find bunch of usage examples and usfull tips in a [wiki](../../wiki). 
+You can find bunch of usage examples and usfull tips in a [wiki](../../wiki).
 
 If your are using [VIPER](https://www.objc.io/issues/13-architecture/viper/) architecture - [here](https://github.com/ilyapuchka/VIPER-SWIFT) is VIPER demo app that uses Dip instead of manual dependency injection.
 
