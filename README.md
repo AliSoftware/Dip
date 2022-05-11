@@ -74,7 +74,7 @@ extension DependencyContainer {
 		
 			container.register(tag: "ViewController") { ViewController() }
 			  .resolvingProperties { container, controller in
-				  controller.animationsFactory = try container.resolve() as AnimatonsFactory
+				  controller.animationsFactory = try container.resolve() as AnimationsFactory
 			}
     
 			container.register { AuthFormBehaviourImp(apiClient: $0) as AuthFormBehaviour }
