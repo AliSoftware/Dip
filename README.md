@@ -117,7 +117,7 @@ Dip is completely [documented](http://cocoadocs.org/docsets/Dip/5.0.0/) and come
 
 > Note: it may happen that you will need to build Dip framework before playground will be able to use it. For that select `Dip` scheme and build for iPhone Simulator.
 
-You can find bunch of usage examples and usfull tips in a [wiki](../../wiki). 
+You can find bunch of usage examples and useful tips in a [wiki](../../wiki). 
 
 If your are using [VIPER](https://www.objc.io/issues/13-architecture/viper/) architecture - [here](https://github.com/ilyapuchka/VIPER-SWIFT) is VIPER demo app that uses Dip instead of manual dependency injection.
 
@@ -135,7 +135,7 @@ File an issue if you have any question. Pull requests are warmly welcome too.
 - **[Scopes](../../wiki/scopes)**. Dip supports 5 different scopes (or life cycle strategies): _Unique_, _Shared_, _Singleton_, _EagerSingleton_, _WeakSingleton_;
 - **[Auto-wiring](../../wiki/auto-wiring)** & **[Auto-injection](../../wiki/auto-injection)**. Dip can infer your components' dependencies injected in constructor and automatically resolve them as well as dependencies injected with properties.
 - **[Resolving optionals](../../wiki/resolving-optionals)**. Dip is able to resolve constructor or property dependencies defined as optionals.
-- **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types implemeted by a single class.
+- **[Type forwarding](../../wiki/type-forwarding)**. You can register the same factory to resolve different types implemented by a single class.
 - **[Circular dependencies](../../wiki/circular-dependencies)**. Dip will be able to resolve circular dependencies if you will follow some simple rules;
 - **[Storyboards integration](../../wiki/storyboards-integration)**. You can easily use Dip along with storyboards and Xibs without ever referencing container in your view controller's code;
 - **[Named definitions](../../wiki/named-definitions)**. You can register different factories for the same protocol or type by registering them with [tags]();
