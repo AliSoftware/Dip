@@ -24,6 +24,14 @@
 
 #if (canImport(UIKit) || canImport(AppKit) || canImport(WatchKit))
 
+#if os(iOS) || os(tvOS) || os(visionOS)
+  import UIKit
+#elseif os(OSX)
+  import AppKit
+#elseif os(watchOS)
+    import WatchKit
+#endif
+
 extension DependencyContainer {
   ///Containers that will be used to resolve dependencies of instances, created by stroyboards.
   static public var uiContainers: [DependencyContainer] = {
@@ -110,7 +118,7 @@ extension DependencyContainer {
 
 }
 
-#if os(watchOS)
+#if os(watchOS) || os(visionOS)
   public protocol StoryboardInstantiatableType {}
 #else
   public typealias StoryboardInstantiatableType = NSObjectProtocol
@@ -164,14 +172,7 @@ extension StoryboardInstantiatable {
   }
 }
 
-#if os(iOS) || os(tvOS) || os(OSX)
-  
-#if os(iOS) || os(tvOS)
-  import UIKit
-#elseif os(OSX)
-  import AppKit
-#endif
-  
+#if os(iOS) || os(tvOS) || os(OSX) || os(visionOS)
 let DipTagAssociatedObjectKey = UnsafeMutablePointer<Int8>.allocate(capacity: 1)
 
 extension NSObject {
@@ -207,7 +208,7 @@ func log(_ message: Any) {
   }
 }
 
-#else
+#elseif os(watchOS)
 import WatchKit
   
 let swizzleAwakeWithContext: Void = {
