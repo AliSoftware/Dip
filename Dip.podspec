@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "Dip"
-  s.version          = "7.1.1"
+  s.version          = "7.1.2"
   s.summary          = "Dependency Injection for Swift made easy."
 
   s.description      = <<-DESC
@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target = '10.9'
   s.tvos.deployment_target = '9.0'
   s.watchos.deployment_target = '2.0'
+  s.visionos.deployment_target = '1.1'
 
   s.requires_arc = true
 
